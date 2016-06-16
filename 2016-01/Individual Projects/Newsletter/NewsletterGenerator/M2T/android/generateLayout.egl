@@ -1,0 +1,14 @@
+[%	
+import "./operations.eol";
+import "./subTemplates.egl";
+%]
+[** This EGL generates the layout for the main activity for the android project**]
+<?xml version="1.0" encoding="utf-8"?>
+[%
+var rootViewGroup: RelativeLayout = layout.content; 
+%]
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    [%=rootViewGroup.printViewProperties()%][%=rootViewGroup.printContext(app, ma)%]>
+	[%=rootViewGroup.printInnerViews()%]
+</RelativeLayout>

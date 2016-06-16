@@ -1,0 +1,37 @@
+[%
+import "./operations.eol";
+operation generateCustomViewSelectors()
+{
+	//Formatter XML
+	var fxml = new Native("org.eclipse.epsilon.egl.formatter.language.XmlFormatter");
+	
+	// Complex drawable/styles templates
+	var buttonTemplate : Template;
+	var videoTemplate : Template;
+	
+	var keys:Set = getColorsKeys();
+	//keys.println();
+	
+	//Creates a static selector (interactive drawable) by color to make friendly 
+	// user interactions with the view elements that trigger any action.
+	for (k in keys) {
+		
+		var darkColor:String = mapDarkColors().get(k);
+		var lightColor:String = mapLightColors().get(k);
+		
+		//Drawable for button click interactions
+		buttonTemplate = TemplateFactory.load("generateButtonStyle.egl");
+		buttonTemplate.setFormatter(fxml);
+		buttonTemplate.populate("darkColor", darkColor);
+		buttonTemplate.populate("lightColor", lightColor);
+		buttonTemplate.generate(dirPackageDrawables() + "selector_on_click_view_" + k.toLowerCase() + ".xml");
+	
+		//Drawable for video click interactions
+		videoTemplate = TemplateFactory.load("generateVideoStyle.egl");
+		videoTemplate.setFormatter(fxml);
+		videoTemplate.populate("darkColor", darkColor);
+		videoTemplate.populate("lightColor", lightColor);
+		videoTemplate.generate(dirPackageDrawables() + "selector_on_click_video_" + k.toLowerCase() + ".xml");
+	}
+}
+%]

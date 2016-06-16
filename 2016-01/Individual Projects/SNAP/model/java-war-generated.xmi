@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:java="http://www.example.org/java">
+  <java:Project name="terceros-pensiones-war">
+    <packages name="com.uniandes.terceros.pensiones.web.app">
+      <classes name="TercerospensionesRestApp" extend="/2">
+        <methods name="getClasses" content="return resources;">
+          <returns xsi:type="java:HashSet">
+            <typeOf xsi:type="java:Class" name="Class&lt;?>"/>
+          </returns>
+          <annotations value="@Override"/>
+        </methods>
+        <methods name="TercerospensionesRestApp" content="resources.add(ConsultarTerceroRestService.class);&#xA;"/>
+        <attributes name="resources" visibility="private" initialization="true">
+          <typeOf xsi:type="java:HashSet">
+            <typeOf xsi:type="java:Class" name="Class&lt;?>"/>
+          </typeOf>
+        </attributes>
+        <imports name="java.util.HashSet"/>
+        <imports name="java.util.Set"/>
+        <imports name="javax.ws.rs.ApplicationPath"/>
+        <imports name="javax.ws.rs.core.Application"/>
+        <imports name="com.uniandes.terceros.pensiones.web.rest.ConsultarTerceroRestService"/>
+        <annotations value="@ApplicationPath(&quot;rest&quot;)"/>
+      </classes>
+    </packages>
+    <packages name="com.uniandes.terceros.pensiones.web.rest">
+      <classes name="ConsultarTerceroRestService">
+        <methods name="createPersonas" content="consultarTerceroServiceLocal.createPersonas(personasDTO);">
+          <parameters name="personasDTO">
+            <typeOf xsi:type="java:Class" name="PersonasDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <annotations value="@PUT"/>
+          <annotations value="@Path(&quot;/createPersonas&quot;)"/>
+          <annotations value="@Consumes(MediaType.APPLICATION_JSON)"/>
+        </methods>
+        <methods name="createAbonos" content="consultarTerceroServiceLocal.createAbonos(abonosDTO);">
+          <parameters name="abonosDTO">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <annotations value="@PUT"/>
+          <annotations value="@Path(&quot;/createAbonos&quot;)"/>
+          <annotations value="@Consumes(MediaType.APPLICATION_JSON)"/>
+        </methods>
+        <methods name="updatePersonas" content="consultarTerceroServiceLocal.updatePersonas(personasDTO);">
+          <parameters name="personasDTO">
+            <typeOf xsi:type="java:Class" name="PersonasDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <annotations value="@PUT"/>
+          <annotations value="@Path(&quot;/updatePersonas&quot;)"/>
+          <annotations value="@Consumes(MediaType.APPLICATION_JSON)"/>
+        </methods>
+        <methods name="updateAbonos" content="consultarTerceroServiceLocal.updateAbonos(abonosDTO);">
+          <parameters name="abonosDTO">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <annotations value="@PUT"/>
+          <annotations value="@Path(&quot;/updateAbonos&quot;)"/>
+          <annotations value="@Consumes(MediaType.APPLICATION_JSON)"/>
+        </methods>
+        <methods name="deletePersonas" content="consultarTerceroServiceLocal.deletePersonas(personasDTO);">
+          <parameters name="personasDTO">
+            <typeOf xsi:type="java:Class" name="PersonasDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <annotations value="@PUT"/>
+          <annotations value="@Path(&quot;/deletePersonas&quot;)"/>
+          <annotations value="@Consumes(MediaType.APPLICATION_JSON)"/>
+        </methods>
+        <methods name="deleteAbonos" content="consultarTerceroServiceLocal.deleteAbonos(abonosDTO);">
+          <parameters name="abonosDTO">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <annotations value="@PUT"/>
+          <annotations value="@Path(&quot;/deleteAbonos&quot;)"/>
+          <annotations value="@Consumes(MediaType.APPLICATION_JSON)"/>
+        </methods>
+        <methods name="getAllPersonas" content="return consultarTerceroServiceLocal.getAllPersonas();">
+          <parameters name="personasDTO">
+            <typeOf xsi:type="java:Class" name="PersonasDTO"/>
+          </parameters>
+          <returns xsi:type="java:ArrayList">
+            <typeOf xsi:type="java:Class" name="PersonasDTO"/>
+          </returns>
+          <annotations value="@GET"/>
+          <annotations value="@Path(&quot;/allPersonas&quot;)"/>
+          <annotations value="@Produces(MediaType.APPLICATION_JSON)"/>
+        </methods>
+        <methods name="getAllAbonos" content="return consultarTerceroServiceLocal.getAllAbonos();">
+          <parameters name="abonosDTO">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </parameters>
+          <returns xsi:type="java:ArrayList">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </returns>
+          <annotations value="@GET"/>
+          <annotations value="@Path(&quot;/allAbonos&quot;)"/>
+          <annotations value="@Produces(MediaType.APPLICATION_JSON)"/>
+        </methods>
+        <attributes name="consultarTerceroServiceLocal" visibility="private">
+          <typeOf xsi:type="java:Class" name="ConsultarTerceroServiceLocal"/>
+          <annotations value="@EJB"/>
+        </attributes>
+        <imports name="java.util.List"/>
+        <imports name="javax.ejb.EJB"/>
+        <imports name="javax.ws.rs.Consumes"/>
+        <imports name="javax.ws.rs.GET"/>
+        <imports name="javax.ws.rs.POST"/>
+        <imports name="javax.ws.rs.PUT"/>
+        <imports name="javax.ws.rs.Path"/>
+        <imports name="javax.ws.rs.PathParam"/>
+        <imports name="javax.ws.rs.Produces"/>
+        <imports name="javax.ws.rs.core.MediaType"/>
+        <imports name="com.uniandes.terceros.pensiones.service.ConsultarTerceroServiceLocal"/>
+        <imports name="com.uniandes.terceros.pensiones.dto.PersonasDTO"/>
+        <imports name="com.uniandes.terceros.pensiones.dto.AbonosDTO"/>
+        <annotations value="@Path(&quot;/consultarTercero&quot;)"/>
+      </classes>
+    </packages>
+  </java:Project>
+  <java:Interface name="Serializable"/>
+  <java:Class name="Application"/>
+  <java:Import/>
+  <java:PrimitiveType/>
+  <java:PrimitiveType/>
+</xmi:XMI>

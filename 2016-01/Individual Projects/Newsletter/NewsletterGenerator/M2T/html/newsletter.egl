@@ -1,0 +1,287 @@
+[%
+var table = html!TABLE.all.at(0);
+%]
+[%=table.printTag()%]
+[%
+
+//Styles Template
+@template
+operation html!HTMLElement printStyles(){
+	if(self.styles.notEmpty()){
+		out.print("style=\"");
+		for(style in self.styles){
+			out.print(style.key.literal + ":" + style.value + ";");
+		}
+		out.print("\"");
+	}
+}
+
+//Inner tags Template
+@template
+operation html!HTMLElement printInnerTags(){
+	for(content in self.eContents()){
+		if(not content.isTypeOf(html!Style)){
+%]
+[%=content.printTag()%]
+[%
+		}
+	}
+}
+//TABLE Template
+@template
+operation html!TABLE printTag() { 
+%]
+<table [%=self.printBorder()%] [%=self.printWidth()%] [%=self.printCellspacing()%] [%=self.printCellpadding()%] [%=self.printAlign()%] [%=self.printBgcolor()%] [%=self.printStyles()%]>
+	[%=self.printInnerTags()%]
+</table>
+[%
+}
+
+//TR Template
+@template
+operation html!TR printTag() { 
+%]
+<tr [%=self.printValign()%] [%=self.printAlign()%] [%=self.printBgcolor()%] [%=self.printHeight()%] [%=self.printStyles()%]>
+	[%=self.printInnerTags()%]
+</tr>
+[%
+}
+
+//TD Template
+@template
+operation html!TD printTag() { 
+%]
+<td [%=self.printColspan()%] [%=self.printRowspan()%] [%=self.printValign()%] [%=self.printAlign()%] [%=self.printWidth()%] [%=self.printBgcolor()%] [%=self.printHeight()%] [%=self.printStyles()%]>
+	[%=self.printInnerTags()%]
+</td>
+[%
+}
+
+//DIV Template
+@template
+operation html!DIV printTag() { 
+%]
+<div [%=self.printAlign()%] [%=self.printStyles()%]>
+	[%=self.printInnerTags()%]
+</div>
+[%
+}
+
+//SPAN Template
+@template
+operation html!SPAN printTag() { 
+%]
+<span [%=self.printStyles()%]>
+	[%=self.printInnerTags()%]
+</span>
+[%
+}
+
+//P Template
+@template
+operation html!P printTag() { 
+%]
+<p [%=self.printAlign()%] [%=self.printStyles()%]>
+	[%=self.printInnerTags()%]
+</p>
+[%
+}
+
+//A Template
+@template
+operation html!A printTag() { 
+%]
+<a [%=self.printHref()%] [%=self.printStyles()%]>
+	[%=self.printInnerTags()%]
+</a>
+[%
+}
+
+//FONT Template
+@template
+operation html!FONT printTag() { 
+%]
+<font [%=self.printColor()%] [%=self.printFace()%] [%=self.printSize()%] [%=self.printValue()%] [%=self.printStyles()%]>
+	[%=self.value%]
+</font>
+[%
+}
+
+//B Template
+@template
+operation html!B printTag() { 
+%]
+<b>
+	[%=self.printInnerTags()%]
+</b>
+[%
+}
+
+//U Template
+@template
+operation html!U printTag() { 
+%]
+<u>
+	[%=self.printInnerTags()%]
+</u>
+[%
+}
+
+//I Template
+@template
+operation html!I printTag() { 
+%]
+<i>
+	[%=self.printInnerTags()%]
+</i>
+[%
+}
+
+//S Template
+@template
+operation html!S printTag() { 
+%]
+<s>
+	[%=self.printInnerTags()%]
+</s>
+[%
+}
+
+//IMG Template
+@template
+operation html!IMG printTag() { 
+%]
+<img [%=self.printSrc()%] [%=self.printWidth()%] [%=self.printHeight()%] [%=self.printBorder()%] [%=self.printStyles()%]>
+[%
+}
+
+//BR Template
+@template
+operation html!BR printTag() { 
+%]
+<br>
+[%
+}
+
+//HR Template
+@template
+operation html!HR printTag() { 
+%]
+<hr [%=self.printColor()%] [%=self.printStyles()%]>
+[%
+}
+
+//Attributes templates
+@template
+operation html!HTMLElement printBorder(){
+	if(self.hasProperty("border") and self.border <> null){
+		out.print("border=\""+self.border+"\"");
+	}	
+}
+
+@template
+operation html!HTMLElement printWidth(){
+	if(self.hasProperty("width") and self.width <> null){
+		out.print("width=\""+self.width+"\"");
+	}	
+}
+
+@template
+operation html!HTMLElement printCellspacing(){
+	if(self.hasProperty("cellspacing") and self.cellspacing <> null){
+		out.print("cellspacing=\""+self.cellspacing+"\"");
+	}	
+}
+
+@template
+operation html!HTMLElement printCellpadding(){
+	if(self.hasProperty("cellpadding") and self.cellpadding <> null){
+		out.print("cellpadding=\""+self.cellpadding+"\"");
+	}	
+}
+
+@template
+operation html!HTMLElement printAlign(){
+	if(self.hasProperty("align") and self.align <> null){
+		out.print("align=\""+self.align+"\"");
+	}	
+}
+
+@template
+operation html!HTMLElement printBgcolor(){
+	if(self.hasProperty("bgcolor") and self.bgcolor <> null){
+		out.print("bgcolor=\""+self.bgcolor+"\"");
+	}	
+}
+
+@template
+operation html!HTMLElement printValign(){
+	if(self.hasProperty("valign") and self.valign <> null){
+		out.print("valign=\""+self.valign+"\"");
+	}	
+}
+
+@template
+operation html!HTMLElement printHeight(){
+	if(self.hasProperty("height") and self.height <> null){
+		out.print("height=\""+self.height+"\"");
+	}	
+}
+
+@template
+operation html!HTMLElement printColspan(){
+	if(self.hasProperty("colspan") and self.colspan <> null){
+		out.print("colspan=\""+self.colspan+"\"");
+	}	
+}
+
+@template
+operation html!HTMLElement printRowspan(){
+	if(self.hasProperty("rowspan") and self.rowspan <> null){
+		out.print("rowspan=\""+self.rowspan+"\"");
+	}	
+}
+
+@template
+operation html!HTMLElement printHref(){
+	if(self.hasProperty("ref") and self.ref <> null){
+		out.print("href=\""+self.ref+"\"");
+	}	
+}
+
+@template
+operation html!HTMLElement printColor(){
+	if(self.hasProperty("color") and self.color <> null){
+		out.print("color=\""+self.color+"\"");
+	}	
+}
+
+@template
+operation html!HTMLElement printFace(){
+	if(self.hasProperty("face") and self.face <> null){
+		out.print("face=\""+self.face+"\"");
+	}	
+}
+
+@template
+operation html!HTMLElement printSize(){
+	if(self.hasProperty("size") and self.size <> null){
+		out.print("size=\""+self.size+"\"");
+	}	
+}
+
+@template
+operation html!HTMLElement printValue(){
+	if(self.hasProperty("value") and self.value <> null){
+		out.print("value=\""+self.value+"\"");
+	}	
+}
+
+@template
+operation html!HTMLElement printSrc(){
+	if(self.hasProperty("src") and self.src <> null){
+		out.print("src=\""+self.src+"\"");
+	}	
+}
+%]
+

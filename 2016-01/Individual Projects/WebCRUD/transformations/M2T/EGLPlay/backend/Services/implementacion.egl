@@ -1,0 +1,98 @@
+package controllers.implementacion;
+
+import controllers.contratos.I[%=resource.name.firstToUpperCase()%];
+import models.[%=resource.name.firstToUpperCase()%];
+import play.db.jpa.JPA;
+import play.db.jpa.Transactional;
+
+import javax.persistence.EntityManager;
+import java.sql.Date;
+import java.util.List;
+
+public class [%=resource.name.firstToUpperCase()%]s implements I[%=resource.name.firstToUpperCase()%] {
+
+    @Transactional
+    public List<[%=resource.name.firstToUpperCase()%]> get[%=resource.name.firstToUpperCase()%]s(){
+        return JPA.em().createNamedQuery("[%=resource.name.firstToUpperCase()%].findAll", [%=resource.name.firstToUpperCase()%].class ).getResultList();
+    }
+    
+[%
+	/*Imprime metodos por Id*/
+	for(atribute in resource.atributes.select(a|a.isTypeOf(PKAtribute))){%]
+    @Transactional
+    public [%=resource.name.firstToUpperCase()%] get[%=resource.name.firstToUpperCase()%]ById([%=atribute.type%] [%=atribute.name.firstToLowerCase()%]){
+        return JPA.em().createNamedQuery("[%=resource.name.firstToUpperCase()%].findById", [%=resource.name.firstToUpperCase()%].class ).setParameter("[%=atribute.name.firstToLowerCase()%]",[%=atribute.name.firstToLowerCase()%]).getSingleResult();
+    }
+	[%}
+	/*Imprime metodos por Referencia*/
+	for(atribute in resource.atributes.select(a|a.isTypeOf(RefAtribute))){%]
+    @Transactional
+    public List<[%=resource.name.firstToUpperCase()%]> get[%=resource.name.firstToUpperCase()%]sBy[%=atribute.name.firstToUpperCase()%]([%=atribute.type%] [%=atribute.name.firstToLowerCase()%]){
+        return JPA.em().createNamedQuery("[%=resource.name.firstToUpperCase()%].findBy[%=atribute.name.firstToUpperCase()%]", [%=resource.name.firstToUpperCase()%].class ).setParameter("[%=atribute.name.firstToLowerCase()%]",[%=atribute.name.firstToLowerCase()%]).getResultList();
+    }
+	[%}
+%]    
+
+    @Transactional
+    public [%=resource.name.firstToUpperCase()%] save([%=resource.name.firstToUpperCase()%] [%=resource.name.firstToLowerCase()%]){
+        EntityManager em = JPA.em();
+        [%=resource.name.firstToUpperCase()%] [%=resource.name.firstToLowerCase()%]Tmp;
+        [%=resource.name.firstToLowerCase()%]Tmp = new [%=resource.name.firstToUpperCase()%]();
+[%
+	/*Imprime metodos excepto el id*/
+	for(atribute in resource.atributes.select(a| not a.isTypeOf(PKAtribute))){%]
+        [%=resource.name.firstToLowerCase()%]Tmp.set[%=atribute.name.firstToUpperCase()%]([%=resource.name.firstToLowerCase()%].get[%=atribute.name.firstToUpperCase()%]());
+	[%}
+%]        em.persist([%=resource.name.firstToLowerCase()%]Tmp);
+        return [%=resource.name.firstToLowerCase()%]Tmp;
+    
+    }
+
+    @Transactional
+    public [%=resource.name.firstToUpperCase()%] update([%=resource.name.firstToUpperCase()%] [%=resource.name.firstToLowerCase()%]){
+        EntityManager em = JPA.em();
+        [%=resource.name.firstToUpperCase()%] [%=resource.name.firstToLowerCase()%]Tmp;
+        [%=resource.name.firstToLowerCase()%]Tmp = em.find([%=resource.name.firstToUpperCase()%].class, [%=resource.name.firstToLowerCase()%].get[%if(resource.getId() <> null){%][%=resource.getId().name.firstToUpperCase()%][%}%]());
+        if([%=resource.name.firstToLowerCase()%]Tmp == null){
+            //Bodega no existe
+            return null;
+        }
+[%
+	/*Imprime metodos excepto el id*/
+	for(atribute in resource.atributes.select(a| not a.isTypeOf(PKAtribute))){%]
+        [%=resource.name.firstToLowerCase()%]Tmp.set[%=atribute.name.firstToUpperCase()%]([%=resource.name.firstToLowerCase()%].get[%=atribute.name.firstToUpperCase()%]());
+	[%}
+%]        [%=resource.name.firstToLowerCase()%] = em.merge([%=resource.name.firstToLowerCase()%]Tmp);
+        return [%=resource.name.firstToLowerCase()%];
+    
+    }
+
+[%
+	/*Imprime metodo detele por Id*/
+	for(atribute in resource.atributes.select(a|a.isTypeOf(PKAtribute))){%]
+    @Transactional
+    public [%=resource.name.firstToUpperCase()%] delete([%=atribute.type%] [%=atribute.name.firstToLowerCase()%]){
+        EntityManager em = JPA.em();
+        [%=resource.name.firstToUpperCase()%] [%=resource.name.firstToLowerCase()%]Tmp =  em.find([%=resource.name.firstToUpperCase()%].class, [%=atribute.name.firstToLowerCase()%]);
+        if([%=resource.name.firstToLowerCase()%]Tmp!=null) {
+            em.remove([%=resource.name.firstToLowerCase()%]Tmp);
+        }
+        return [%=resource.name.firstToLowerCase()%]Tmp;
+    
+    }
+	[%}
+%]    
+
+
+}
+
+[%
+/*Operacion recupera el PKey del recurso*/ 
+ operation Resource getId () : Atribute {
+	 if(self.atributes.select(a|a.isTypeOf(PKAtribute)).size() > 0){
+		return 	 self.atributes.select(a|a.isTypeOf(PKAtribute)).at(0);
+	 }
+	 return null;
+ }
+
+%]

@@ -1,0 +1,50 @@
+[%
+ var swing = swing!Proyecto.all;
+
+	TemplateFactory.setOutputRoot('../../swing/'+swing.Nombre->first().firstToLowerCase().replace("_",""));
+	var implementation:Template:= TemplateFactory.load('GenerateMain.egl');
+	implementation.populate('swing',swing);
+	implementation.generate('App' + swing.Nombre->first().replace("_","") + '.java');
+	
+	var entidad = new String;
+	var controlador = new String;
+	var vista = new String;
+	var modelo = new String;
+	
+	var isFirst = new Boolean;
+	
+	for(ent in swing.entidad.first)
+	{
+	entidad = ent;
+		for (ctr in ent.controlador)
+		{
+			TemplateFactory.setOutputRoot('../../generated/swing/controlador/');
+			var implementationView:Template:= TemplateFactory.load('GenerateCtr.egl');
+			implementationView.populate('swing',swing);
+			implementationView.populate('ctr',ctr);
+			implementationView.generate(ctr.Nombre+'.java');
+
+			controlador=ctr;
+			
+			modelo = ctr.vista.first.clase;
+			
+			
+			TemplateFactory.setOutputRoot('../../generated/swing/modelo/');
+			var implementationView:Template:= TemplateFactory.load('GenerateModel.egl');
+			implementationView.populate('swing',swing);
+			implementationView.populate('ctr',ctr);
+			implementationView.generate(modelo.first.Nombre+'.java');
+			
+			
+			for(view in ctr.vista.last.ventana)
+			{
+				TemplateFactory.setOutputRoot('../../generated/swing/vista/');
+				var implementationView:Template:= TemplateFactory.load('GenerateView.egl');
+				implementationView.populate('swing',swing);
+				implementationView.populate('view',view);
+				implementationView.generate(view.Name+'.java');
+			}
+		}
+	}	
+	
+%]

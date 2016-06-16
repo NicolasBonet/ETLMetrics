@@ -1,0 +1,199 @@
+<html>
+<head>
+<tittle>personas</tittle>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-material-data-table/0.10.5/md-data-table.css">
+<link rel="stylesheet" href="https://gitcdn.link/repo/angular/bower-material/master/angular-material.css">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-animate.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-route.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-aria.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-messages.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.7/angular-material.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-material-data-table/0.10.5/md-data-table.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-resource.js"></script>
+<script src="../scripts/app.js"></script>
+<script src="../scripts/service/rest-api.js"></script>
+<script src="../scripts/service/create-personas.js"></script>
+<script src="../scripts/service/update-personas.js"></script>
+<script src="../scripts/service/delete-personas.js"></script>
+<script src="../scripts/service/list-personas.js"></script>
+<script src="../scripts/controller/personas.js"></script>
+</head>
+<body ng-app="tercerospensionesApp">
+<div ng-controller="personasController" >
+<form name="myForm"  class="form-horizontal" >
+<div class="container-fluid" >
+<div class="row" >
+<md-table-container>
+<table md-table md-row-select multiple ng-model="selected" md-progress="promise">
+<caption>Lista de Personas</caption>
+<thead md-head>
+<tr md-row>
+<th md-column>Tipoidentificacion</th>
+<th md-column>Numeroidentificacion</th>
+<th md-column>Primerapellido</th>
+<th md-column>Segundoapellido</th>
+<th md-column>Primernombre</th>
+<th md-column>Segundonombre</th>
+</tr>
+</thead>
+<tbody md-body>
+<tr md-row ng-repeat="personasCursor in listPersonas" >
+<td md-cell>{{ personasCursor.tipoidentificacion }}</td>
+<td md-cell>{{ personasCursor.numeroidentificacion }}</td>
+<td md-cell>{{ personasCursor.primerapellido }}</td>
+<td md-cell>{{ personasCursor.segundoapellido }}</td>
+<td md-cell>{{ personasCursor.primernombre }}</td>
+<td md-cell>{{ personasCursor.segundonombre }}</td>
+<td md-cell><a ng-href="#" ng-click="loadPersonas(personasCursor)"><span>Editar</span></a>&nbsp;</td>
+<td md-cell><a ng-href="#" ng-click="deletePersonas(personasCursor)"><span>Eliminar</span></a>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</md-table-container>
+</div>
+<div class="row row-button" >
+<div class="col-md-6" >
+<input type="submit"  class="button"  value="Nuevo"  id="btnNewPersonas"  name="newPersonas"  ng-click="newPersonas()"  />
+<input type="submit"  class="button"  value="Guardar"  id="btnSavePersonas"  name="savePersonas"  ng-click="savePersonas()"  />
+</div>
+</div>
+<div class="panel panel-default"  id="tabs-panel" >
+<uib-tabset class="panel-body" >
+<uib-tab heading="Detalle" >
+<div class="row row-field" >
+<div class="col-md-6" >
+<div class="control-group form-group" >
+<label for="inputTipoidentificacion"  class="control-label" >Tipoidentificacion</label>
+</div>
+</div>
+<div class="col-md-6" >
+<div class="control-group form-group" >
+<input type="text"  id="inputTipoidentificacion"  name="txtTipoidentificacion"  ng-model="personas.tipoidentificacion"  >
+</div>
+</div>
+</div>
+<div class="row row-field" >
+<div class="col-md-6" >
+<div class="control-group form-group" >
+<label for="inputNumeroidentificacion"  class="control-label" >Numeroidentificacion</label>
+</div>
+</div>
+<div class="col-md-6" >
+<div class="control-group form-group" >
+<input type="text"  id="inputNumeroidentificacion"  name="txtNumeroidentificacion"  ng-model="personas.numeroidentificacion"  >
+</div>
+</div>
+</div>
+<div class="row row-field" >
+<div class="col-md-6" >
+<div class="control-group form-group" >
+<label for="inputPrimerapellido"  class="control-label" >Primerapellido</label>
+</div>
+</div>
+<div class="col-md-6" >
+<div class="control-group form-group" >
+<input type="text"  id="inputPrimerapellido"  name="txtPrimerapellido"  ng-model="personas.primerapellido"  >
+</div>
+</div>
+</div>
+<div class="row row-field" >
+<div class="col-md-6" >
+<div class="control-group form-group" >
+<label for="inputSegundoapellido"  class="control-label" >Segundoapellido</label>
+</div>
+</div>
+<div class="col-md-6" >
+<div class="control-group form-group" >
+<input type="text"  id="inputSegundoapellido"  name="txtSegundoapellido"  ng-model="personas.segundoapellido"  >
+</div>
+</div>
+</div>
+<div class="row row-field" >
+<div class="col-md-6" >
+<div class="control-group form-group" >
+<label for="inputPrimernombre"  class="control-label" >Primernombre</label>
+</div>
+</div>
+<div class="col-md-6" >
+<div class="control-group form-group" >
+<input type="text"  id="inputPrimernombre"  name="txtPrimernombre"  ng-model="personas.primernombre"  >
+</div>
+</div>
+</div>
+<div class="row row-field" >
+<div class="col-md-6" >
+<div class="control-group form-group" >
+<label for="inputSegundonombre"  class="control-label" >Segundonombre</label>
+</div>
+</div>
+<div class="col-md-6" >
+<div class="control-group form-group" >
+<input type="text"  id="inputSegundonombre"  name="txtSegundonombre"  ng-model="personas.segundonombre"  >
+</div>
+</div>
+</div>
+</uib-tab>
+<uib-tab heading="Abonos" >
+<div class="row row-field" >
+<div class="col-md-6" >
+<div class="control-group form-group" >
+<label for="inputNAbono"  class="control-label" >NAbono</label>
+</div>
+</div>
+<div class="col-md-6" >
+<div class="control-group form-group" >
+<input type="text"  id="inputNAbono"  name="txtNAbono"  ng-model="abonosNew.nAbono"  >
+</div>
+</div>
+</div>
+<div class="row row-field" >
+<div class="col-md-6" >
+<div class="control-group form-group" >
+<label for="inputFoo"  class="control-label" >Foo</label>
+</div>
+</div>
+<div class="col-md-6" >
+<div class="control-group form-group" >
+<input type="text"  id="inputFoo"  name="txtFoo"  ng-model="abonosNew.foo"  >
+</div>
+</div>
+</div>
+<div class="row row-field" >
+<div class="col-md-6" >
+<input type="button"  class="button"  value="A&ntilde;adir"  id="btnSaveAbonos"  name="saveAbonos"  ng-click="saveAbonos()"  />
+</div>
+</div>
+<md-table-container>
+<table md-table md-row-select multiple ng-model="selected" md-progress="promise">
+<caption>Lista de Abonos</caption>
+<thead md-head>
+<tr md-row>
+<th md-column>NAbono</th>
+<th md-column>Foo</th>
+</tr>
+</thead>
+<tbody md-body>
+<tr md-row ng-repeat="abonosCursor in personas.abonos" >
+<td md-cell>{{ abonosCursor.nAbono }}</td>
+<td md-cell>{{ abonosCursor.foo }}</td>
+<td md-cell><a ng-href="#" ng-click="deleteAbonos(abonosCursor)"><span>Eliminar</span></a>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</md-table-container>
+</uib-tab>
+</uib-tabset>
+</div>
+</div>
+</form>
+</div>
+</body>
+</html>
+

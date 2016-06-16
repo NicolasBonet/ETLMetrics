@@ -1,0 +1,29 @@
+[%
+//var dataBase = mp!Table.all;
+var projectName = java!Project.all.first().name;
+//var allClasses = java!Project.all.packages.first().classes.first();
+for(p in java!Project.all.packages.first())
+{
+  var packageName=p.name.replace("\\.","/");
+  TemplateFactory.setOutputRoot('../../generated/'+projectName.replace("-war","")+'/'+projectName+'/src/'+packageName);
+  for(c in p.classes){
+    var implementation:Template:= TemplateFactory.load('TransformacionEntity.egl');
+    implementation.populate('class', c);
+    implementation.populate('packageName', p.name);
+  	implementation.generate(c.name.replace("<T>","")+'.java');
+  }
+  for(i in p.interfaces){
+    var implementation:Template:= TemplateFactory.load('TransformacionInterfaces.egl');
+    implementation.populate('int', i);
+    implementation.populate('packageName', p.name);
+  	implementation.generate(i.name.replace("<T>","")+'.java');
+  }
+  //implementation.populate('class', c);
+}
+
+TemplateFactory.setOutputRoot('../../generated/'+projectName.replace("-war","")+'/'+projectName);
+var implementationPom:Template:= TemplateFactory.load('JavaWarPOM.egl');
+implementationPom.populate('project',projectName);
+implementationPom.generate('pom.xml');
+
+%]

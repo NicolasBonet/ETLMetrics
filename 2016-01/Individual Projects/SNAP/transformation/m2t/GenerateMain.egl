@@ -1,0 +1,27 @@
+[% var nombreApp=swing.Nombre->first().replace("_","");%] 
+package [%=nombreApp.ToLowerCase() %];
+import modelo.*;
+import vista.*;
+import controlador.*;
+public class App[%=nombreApp.firstToUpperCase() %] {
+[%
+var entidad = new String;
+var controlador = new String;
+var vista = new String;
+	for(ent in swing.entidad.first)
+	{
+	entidad = ent;
+		for (ctr in ent.controlador)
+		{
+			controlador=ctr;
+		}
+	}
+%] 	
+
+
+	public static void main(String[] args) {
+		Ver[%=entidad.Nombre%]Grid ver[%=entidad.Nombre%] = new Ver[%=entidad.Nombre%]Grid();
+		[%=controlador.Nombre%] ctl[%=entidad.Nombre%] = new [%=controlador.Nombre%](ver[%=entidad.Nombre%]);
+	}
+
+}

@@ -1,0 +1,35 @@
+package controllers.contratos;
+
+import models.[%=resource.name.firstToUpperCase()%];
+
+import java.util.List;
+
+public interface I[%=resource.name.firstToUpperCase()%] {
+
+
+    public List<[%=resource.name.firstToUpperCase()%]> get[%=resource.name.firstToUpperCase()%]s();
+[%
+	/*Imprime metodos por Id*/
+	for(atribute in resource.atributes.select(a|a.isTypeOf(PKAtribute))){%]
+    public [%=resource.name.firstToUpperCase()%] get[%=resource.name.firstToUpperCase()%]ById([%=atribute.type%] [%=atribute.name.firstToLowerCase()%]);
+	[%}
+	/*Imprime metodos por Referencia*/
+	for(atribute in resource.atributes.select(a|a.isTypeOf(RefAtribute))){%]
+    public List<[%=resource.name.firstToUpperCase()%]> get[%=resource.name.firstToUpperCase()%]sBy[%=atribute.name.firstToUpperCase()%]([%=atribute.type%] [%=atribute.name.firstToLowerCase()%]);
+	[%}
+
+
+%]    
+
+    [%=resource.name.firstToUpperCase()%] save([%=resource.name.firstToUpperCase()%] [%=resource.name.firstToLowerCase()%]);
+    [%=resource.name.firstToUpperCase()%] update([%=resource.name.firstToUpperCase()%] [%=resource.name.firstToLowerCase()%]);
+[%
+	/*Imprime metodo detele por Id*/
+	for(atribute in resource.atributes.select(a|a.isTypeOf(PKAtribute))){%]
+    [%=resource.name.firstToUpperCase()%] delete([%=atribute.type%] [%=atribute.name.firstToLowerCase()%]);
+	[%}
+%]    
+
+
+}
+

@@ -1,0 +1,365 @@
+[%	
+import "./operations.eol";
+%]
+
+[%
+//------------------------------------------------
+//Root Layout Templates
+//------------------------------------------------
+@Template
+operation RelativeLayout printSchema(){
+%]xmlns:android="http://schemas.android.com/apk/res/android"
+[%
+}
+
+@Template
+operation RelativeLayout printTools(){
+%]xmlns:android="http://schemas.android.com/apk/res/android"
+[%
+}
+
+@Template
+operation RelativeLayout printContext(app : Application, mainActivity: Activity){
+%]tools:context="[%=app.getPackageName()%].[%=mainActivity.name%]"[%
+}
+//------------------------------------------------
+//Print inner view tags for a ViewGroup
+//------------------------------------------------
+@Template
+operation View printInnerViews(){
+	for (view in self.views)
+	{
+		view.printViewTag();
+	}
+}
+//------------------------------------------------
+//ViewGroup Templates Tags
+//------------------------------------------------
+@Template
+operation RelativeLayout printViewTag(){
+%]
+<RelativeLayout
+	[%=self.printViewProperties()%]>
+	[%=self.printInnerViews()%]
+</RelativeLayout>
+[%
+}
+
+@Template
+operation ScrollView printViewTag(){
+%]
+<ScrollView
+	[%=self.printViewProperties()%]>
+	[%=self.printInnerViews()%]
+</ScrollView>
+[%
+}
+
+@Template
+operation GridLayout printViewTag(){
+%]
+<GridLayout
+	[%=self.printViewProperties()%]>
+	[%=self.printInnerViews()%]
+</GridLayout>
+[%
+}
+
+@Template
+operation LinearLayout printViewTag(){
+%]
+<LinearLayout
+	[%=self.printViewProperties()%]>
+	[%=self.printInnerViews()%]
+</LinearLayout>
+[%
+}
+
+//------------------------------------------------
+//View Templates Tags
+//------------------------------------------------
+@Template
+operation ImageView printViewTag(){
+%]
+<ImageView
+	[%=self.printViewProperties()%]>
+</ImageView>
+[%
+}
+
+@Template
+operation Button printViewTag(){
+%]
+<Button
+	[%=self.printViewProperties()%]>
+</Button>
+[%
+}
+
+@Template
+operation TextView printViewTag(){
+%]
+<TextView
+	[%=self.printViewProperties()%]>
+</TextView>
+[%
+}
+
+//------------------------------------------------
+//Templates for properties in View Element
+//------------------------------------------------
+@Template
+operation View printViewProperties()
+{
+	self.printId();
+	self.printText();
+	self.printTextColor();
+	self.printTextAlignment();
+	self.printTextStyle();
+	self.printTextAppearance();
+	self.printLayoutWith();
+	self.printLayoutHeight();
+	self.printLayoutWeight();
+	self.printLayoutGravity();
+	self.printLayoutRow();
+	self.printLayoutColumn();
+	self.printBackground();
+	self.printPaddingBottom();
+	self.printPaddingLeft();
+	self.printPaddingRight();
+	self.printPaddingTop();
+	if(self.isTypeOf(GridLayout)){
+	self.printRowCount();
+	self.printColumnCount();
+	}
+	if(self.isTypeOf(LinearLayout)){
+	self.printOrientation();
+	self.printLayoutColumnWeight();
+	self.printGravity();
+	}
+	if(self.isTypeOf(ImageView)){
+	self.printSrc();
+	}
+	self.addOnClickPropertiesIfApply();
+}
+//------------------------------------------------
+//Operations to print each specific property acording to a one or more validations.
+//------------------------------------------------
+@Templte
+operation View addOnClickPropertiesIfApply(){
+	if(self.triggerAction()){
+	%]android:onClick="onClick"
+      android:clickable="true"
+	[%
+	}
+}
+
+@Template
+operation View printId(){
+	if(self.id.isDefined()){
+	%]android:id="@+id/[%=self.id%]"
+	[%
+	}
+}
+
+@Template
+operation View printText(){
+//var nativeString:new Native("java.lang.String") = self.text;
+//nativeString.println();
+	if(self.text.isDefined()){
+	%]android:text="[%=self.text%]"
+	[%
+	}
+}
+
+@Template
+operation View printTextColor(){
+
+	if(self.textColor.isDefined() and getColorByKey(self.textColor)<>'NONE'){
+	%]android:textColor="[%=getColorByKey(self.textColor)%]"
+	[%
+	}
+}
+
+@Template
+operation View printTextAlignment(){
+	if(self.textAlignment.isDefined()){
+	%]android:textAlignment="[%=self.textAlignment%]"
+	[%
+	}
+}
+
+@Template
+operation View printTextStyle(){
+	if(self.textStyle.isDefined()){
+	%]android:textStyle="[%=self.textStyle%]"
+	[%
+	}
+}
+
+@Template
+operation View printTextAppearance(){
+	if(self.textAppearance.isDefined()){
+	%]android:textAppearance="[%=self.textAppearance%]"
+	[%
+	}
+}
+
+@Template
+operation View printLayoutWith(){
+	if(self.layout_width.isDefined()){
+	%]android:layout_width="[%=self.layout_width%]"
+	[%
+	}
+}
+
+@Template
+operation View printLayoutHeight(){
+	if(self.layout_height.isDefined()){
+	%]android:layout_height="[%=self.layout_height%]"
+	[%
+	}
+}
+
+@Template
+operation View printLayoutWeight(){
+	if(self.layout_weight.isDefined() and self.layout_weight <> 0.0 ){
+	%]android:layout_weight="[%=self.layout_weight%]"
+	[%
+	}
+}
+
+@Template
+operation View printLayoutGravity(){
+	if(self.layout_gravity.isDefined()){
+	%]android:layout_gravity="[%=self.layout_gravity%]"
+	[%
+	}
+}
+
+@Template
+operation View printLayoutRow(){
+var container = self.eContainer();
+	if(self.layout_row.isDefined() and container.isTypeOf(GridLayout)){
+	%]android:layout_row="[%=self.layout_row%]"
+	[%
+		if(self.layout_row >= container.rowCount )
+		{
+			self.layout_row.println("Fila del View NO puede ser mayor o igual a Numero de columnas del GridLayout - ");
+		}
+	}
+}
+
+@Template
+operation View printLayoutColumn(){
+var container = self.eContainer();
+	if(self.layout_column.isDefined() and container.isTypeOf(GridLayout)){
+	%]android:layout_column="[%=self.layout_column%]"
+	[%
+		if(self.layout_column >= container.columnCount )
+		{
+			self.layout_column.println("Columna del View NO puede ser mayor o igual a Numero de columnas del GridLayout");
+		}
+	}
+	
+}
+
+@Template
+operation View printBackground(){
+	if(self.background.isDefined() and getColorByKey(self.background)<>'NONE'){
+	%]android:background="[%=self.getBackgroundByKey((self.background))%]"
+	[%
+	}
+}
+
+@Template
+operation View printPaddingBottom(){
+	if(self.paddingBottom.isDefined()){
+	%]android:paddingBottom="[%=self.paddingBottom%]"
+	[%
+	}
+}
+
+@Template
+operation View printPaddingLeft(){
+	if(self.paddingLeft.isDefined()){
+	%]android:paddingLeft="[%=self.paddingLeft%]"
+	[%
+	}
+}
+
+@Template
+operation View printPaddingRight(){
+	if(self.paddingRight.isDefined()){
+	%]android:paddingRight="[%=self.paddingRight%]"
+	[%
+	}
+}
+
+@Template
+operation View printPaddingTop(){
+	if(self.paddingTop.isDefined()){
+	%]android:paddingTop="[%=self.paddingTop%]"
+	[%
+	}
+}
+
+//------------------------------------------------
+//Templates for specific properties in GridLayout Element
+//------------------------------------------------
+@Template
+operation GridLayout printRowCount(){
+	if(self.rowCount.isDefined()){
+	%]android:rowCount="[%=self.rowCount%]"
+	[%
+	}
+}
+
+@Template
+operation GridLayout printColumnCount(){
+	if(self.columnCount.isDefined()){
+	%]android:columnCount="[%=self.columnCount%]"
+	[%
+	}
+}
+
+//------------------------------------------------
+//Templates for specific properties in LinearLayout Element
+//------------------------------------------------
+@Template
+operation LinearLayout printOrientation(){
+	if(self.orientation.isDefined()){
+	%]android:orientation="[%=self.orientation%]"
+	[%
+	}
+}
+
+@Template
+operation LinearLayout printLayoutColumnWeight(){
+	if(self.layout_columnWeight.isDefined() and self.layout_columnWeight <> 0.0 ){
+	%]android:layout_columnWeight="[%=self.layout_columnWeight%]"
+	[%
+	}
+}
+
+@Template
+operation LinearLayout printGravity(){
+	if(self.gravity.isDefined()){
+	%]android:gravity="[%=self.gravity%]"
+	[%
+	}
+}
+
+//------------------------------------------------
+// Templates for specific properties in ImageView
+//------------------------------------------------
+@Template
+operation ImageView printSrc(){
+	if(self.src.isDefined()){
+	%]android:src="@drawable/[%=self.src%]"
+	[%
+	}
+}
+
+
+%]

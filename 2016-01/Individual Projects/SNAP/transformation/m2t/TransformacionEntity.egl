@@ -1,0 +1,200 @@
+package [%=packageName%];
+
+[%
+for(imp in class.imports){
+%]
+import [%=imp.name%];
+[%
+}
+%]
+
+[%
+for(annotation in class.annotations){
+%]
+[%=annotation.value%]
+[%
+}
+%]
+public class [%=class.name%][%
+var first = true;
+if (class.extend <> null){%] extends [%=class.extend.name%][%}
+if (class.implements->size()>0){%] implements [%}
+for (imp in class.implements){
+	if (first){first=false;%][%=imp.name%][%}
+	else {%], [%=imp.name%][%}
+}%] {
+
+	[%
+	for(attr in class.attributes){
+	  for(annotation in attr.annotations){
+	%]
+	[%=annotation.value%]
+	[%
+	  }
+	%]
+	[%=attr.visibility%] [%=attr.returnType()%] [%=attr.name%][%
+	if (attr.initialization = true){%] = new [%=attr.returnTypeInitialization()%][%}
+	%];
+	[%
+	}
+	%]
+	
+	[%
+	for(method in class.methods){
+	var first = true;
+		for(annotation in method.annotations){
+		%]
+	[%=annotation.value%]
+		[%
+		}
+	%]
+	[%=method.visibility%] [%
+		if (method.modifiers->size() > 0){
+		%] [%=method.modifiers.first().modifier%] [%
+		}
+	%] [%=method.returnType()%] [%=method.name%]([%
+		for(param in method.parameters){
+		if (first == false){
+		 %],[%
+		}
+		%][%=param.returnType()%] [%=param.name%][%
+		first = false;
+		}
+		%]){
+		[%=method.content%]
+	}
+	
+	[%
+		
+	}
+	%]
+	
+	
+}
+[%
+  @template
+  operation Attribute returnType() { 
+  	var nameType = "";
+		if (self.typeOf.isTypeOf(PrimitiveType)){
+			nameType=self.typeOf.type.name;
+		} else if (self.typeOf.isTypeOf(Class)){
+			nameType=self.typeOf.name;
+		} else if (self.typeOf.isTypeOf(Interface)){
+			nameType=self.typeOf.name;
+		} else if (self.typeOf.isTypeOf(ArrayList)){
+		    nameType=nameType+"List<";
+			if (self.typeOf.typeOf.isTypeOf(PrimitiveType)){
+			 nameType=nameType+self.typeOf.typeOf.type;
+			} else if (self.typeOf.typeOf.isTypeOf(Class)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			} else if (self.typeOf.typeOf.isTypeOf(Interface)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			}
+			nameType=nameType+">";
+		} else if (self.typeOf.isTypeOf(HashSet)){
+		    nameType=nameType+"Set<";
+			if (self.typeOf.typeOf.isTypeOf(PrimitiveType)){
+			 nameType=nameType+self.typeOf.typeOf.type;
+			} else if (self.typeOf.typeOf.isTypeOf(Class)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			} else if (self.typeOf.typeOf.isTypeOf(Interface)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			}
+			nameType=nameType+">";
+		}
+  	%][%=nameType%]
+  [% }
+  
+  @template
+  operation Attribute returnTypeInitialization() { 
+  	var nameType = "";
+		if (self.typeOf.isTypeOf(HashSet)){
+		    nameType=nameType+"HashSet<";
+			if (self.typeOf.typeOf.isTypeOf(PrimitiveType)){
+			 nameType=nameType+self.typeOf.typeOf.type;
+			} else if (self.typeOf.typeOf.isTypeOf(Class)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			} else if (self.typeOf.typeOf.isTypeOf(Interface)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			}
+			nameType=nameType+">()";
+		} else if (self.typeOf.isTypeOf(ArrayList)){
+		    nameType=nameType+"ArrayList<";
+			if (self.typeOf.typeOf.isTypeOf(PrimitiveType)){
+			 nameType=nameType+self.typeOf.typeOf.type;
+			} else if (self.typeOf.typeOf.isTypeOf(Class)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			} else if (self.typeOf.typeOf.isTypeOf(Interface)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			}
+			nameType=nameType+">()";
+		}
+  	%][%=nameType%]
+  [% }
+  
+  @template
+  operation Parameter returnType() { 
+  	var nameType = "";
+		if (self.typeOf.isTypeOf(PrimitiveType)){
+			nameType=self.typeOf.type.name;
+		} else if (self.typeOf.isTypeOf(Class)){
+			nameType=self.typeOf.name;
+		} else if (self.typeOf.isTypeOf(Interface)){
+			nameType=self.typeOf.name;
+		} else if (self.typeOf.isTypeOf(ArrayList)){
+		    nameType=nameType+"List<";
+			if (self.typeOf.typeOf.isTypeOf(PrimitiveType)){
+			 nameType=nameType+self.typeOf.typeOf.type;
+			} else if (self.typeOf.typeOf.isTypeOf(Class)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			} else if (self.typeOf.typeOf.isTypeOf(Interface)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			}
+			nameType=nameType+">";
+		} else if (self.typeOf.isTypeOf(HashSet)){
+		    nameType=nameType+"Set<";
+			if (self.typeOf.typeOf.isTypeOf(PrimitiveType)){
+			 nameType=nameType+self.typeOf.typeOf.type;
+			} else if (self.typeOf.typeOf.isTypeOf(Class)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			} else if (self.typeOf.typeOf.isTypeOf(Interface)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			}
+			nameType=nameType+">";
+		}
+  	%][%=nameType%]
+  [% }
+  
+  @template
+  operation Method returnType() { 
+  	var nameType = "";
+		if (self.returns.isTypeOf(PrimitiveType)){
+			nameType=self.returns.type.name;
+		} else if (self.returns.isTypeOf(Class)){
+			nameType=self.returns.name;
+		} else if (self.returns.isTypeOf(Interface)){
+			nameType=self.returns.name;
+		} else if (self.returns.isTypeOf(ArrayList)){
+		    nameType=nameType+"List<";
+			if (self.returns.typeOf.isTypeOf(PrimitiveType)){
+			 nameType=nameType+self.returns.typeOf.type;
+			} else if (self.returns.typeOf.isTypeOf(Class)){
+				 nameType=nameType+self.returns.typeOf.name;
+			} else if (self.returns.typeOf.isTypeOf(Interface)){
+				 nameType=nameType+self.returns.typeOf.name;
+			}
+			nameType=nameType+">";
+		} else if (self.returns.isTypeOf(HashSet)){
+		    nameType=nameType+"Set<";
+			if (self.returns.typeOf.isTypeOf(PrimitiveType)){
+			 nameType=nameType+self.returns.typeOf.type;
+			} else if (self.returns.typeOf.isTypeOf(Class)){
+				 nameType=nameType+self.returns.typeOf.name;
+			} else if (self.returns.typeOf.isTypeOf(Interface)){
+				 nameType=nameType+self.returns.typeOf.name;
+			}
+			nameType=nameType+">";
+		}
+  	%][%=nameType%]
+  [% }
+%]

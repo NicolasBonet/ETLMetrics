@@ -1,0 +1,1 @@
+var app = angular.module('tercerospensionesApp', ['ngMaterial','ngResource','md.data.table', 'ui.bootstrap']);

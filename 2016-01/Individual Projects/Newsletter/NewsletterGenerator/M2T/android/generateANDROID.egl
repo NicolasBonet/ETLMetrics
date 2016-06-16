@@ -1,0 +1,70 @@
+[%	
+import "./operations.eol";
+import "./stylesGenerator.egl";
+
+var app : android!Application= android!Application.all.at(0);
+out.println("Application" + app);
+%]
+
+[%
+("Start EGL Android2Text - generateANDROID -----------").println();
+
+//----------------------------------------------------
+//PROCEDIMIENTOS PREVIOS A LA GENERACION DE CODIGO
+//----------------------------------------------------
+//Elementos principales para dividir el trabajo en templates
+var mainActivity : android!Activity = app.mainActivity;
+var layout : android!Layout  = mainActivity.layout;
+generateCustomViewSelectors();
+
+//Formateadores para imprimir el codigo de forma organizada en el archivo destino.
+//Formateador JAVA
+var fjava = new Native("org.eclipse.epsilon.egl.formatter.language.JavaFormatter");
+//Formateador XML
+var fxml = new Native("org.eclipse.epsilon.egl.formatter.language.XmlFormatter");
+
+//----------------------------------------------------
+//EJECUCION DE TEMPLATES
+//----------------------------------------------------
+
+//Template Generador de MainActivity
+
+var tMainActivity : Template ;
+
+("Creando MainActivity" ).println();
+
+tMainActivity  = TemplateFactory.load("generateMainActivity.egl");
+tMainActivity.setFormatter(fjava);
+tMainActivity.populate("ma", mainActivity);
+tMainActivity.populate("layout", layout);
+tMainActivity.populate("app", app);
+tMainActivity.generate(dirPackageMainJava() + mainActivity.name + ".java");
+
+//Template Generador de layout para MainActivity
+
+var tLayout : Template ;
+
+("Creando Layout" ).println();
+
+tLayout  = TemplateFactory.load("generateLayout.egl");
+tLayout.setFormatter(fxml);
+tLayout.populate("ma", mainActivity);
+tLayout.populate("layout", layout);
+tLayout.populate("app", app);
+tLayout.generate(dirPackageLayouts() + layout.name + ".xml");
+
+//Template Generador de Manifest
+
+var tManifest : Template ;
+
+("Creando AndroidMainifest" ).println();
+
+tManifest  = TemplateFactory.load("generateAndroidManifest.egl");
+tManifest.setFormatter(fxml);
+tManifest.populate("ma", mainActivity);
+tManifest.populate("app", app);
+tManifest.generate(dirPackageManifest() + "AndroidManifest.xml");
+
+
+("Finish EGL Android2Text - generateANDROID -----------").println();
+%]

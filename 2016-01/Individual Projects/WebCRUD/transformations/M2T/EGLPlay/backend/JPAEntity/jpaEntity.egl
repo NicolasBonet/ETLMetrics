@@ -1,0 +1,64 @@
+package models;
+
+import javax.persistence.*;
+
+@Entity
+@NamedQueries({
+        @NamedQuery(name = "[%=resource.name%].findAll", query = "SELECT t FROM [%=resource.name%] t  ")[%if(resource.getId() <> null){%],
+        @NamedQuery(name = "[%=resource.name%].findById", query = "SELECT t FROM [%=resource.name%] t where [%=resource.getId().name%] = :id ")
+        [%}%]
+        [%
+/*Imprime las sentencias para acceder a los datos desde lar referencias.*/        
+for(atribute in resource.atributes.select(a|a.isTypeOf(RefAtribute))){%]
+        ,@NamedQuery(name = "[%=resource.name%].findBy[%=atribute.name.firstToUpperCase()%]", query = "SELECT t FROM [%=resource.name%] t where [%=atribute.name.firstToLowerCase()%] = :[%=atribute.name.firstToLowerCase()%] ")
+[%}        
+        %]
+        
+})
+public class [%=resource.name.firstToUpperCase()%] {
+
+[%
+/*Crea Propiedades de la Clase a partir de los atributos.*/
+for(atribute in resource.atributes){
+	if(resource.getId() <> null and atribute.name = resource.getId().name){%]
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "[%=resource.name.firstToLowerCase()%]Gen")
+    @SequenceGenerator(name = "[%=resource.name.firstToLowerCase()%]Gen", sequenceName = "[%=resource.name.firstToLowerCase()%]_seq")
+	[%}%]
+    @Column
+    private [%=atribute.type%] [%=atribute.name.firstToLowerCase()%];
+	[%
+}
+
+/*Crea getters and setters a partir de los atributos.*/
+for(atribute in resource.atributes){%]
+	
+    [%=atribute.getMetodo()%]
+    [%=atribute.setMetodo()%]
+	[%
+}
+
+%]
+}
+
+[%
+/*Operacion recupera el PKey del recurso*/ 
+ operation Resource getId () : Atribute {
+	 if(self.atributes.select(a|a.isTypeOf(PKAtribute)).size() > 0){
+		return 	 self.atributes.select(a|a.isTypeOf(PKAtribute)).at(0);
+	 }
+	 return null;
+ }
+
+/*Operacion que imprime el metodo get del atributo*/ 
+operation Atribute getMetodo() {
+	%]public [%=self.type%] get[%=self.name.firstToUpperCase()%]() { return [%=self.name.firstToLowerCase()%]; }[%
+}
+
+/*Operacion que imprime el metodo set del atributo*/ 
+ operation Atribute setMetodo () {
+%]public void set[%=self.name.firstToUpperCase()%]([%=self.type%] [%=self.name.firstToLowerCase()%]){this.[%=self.name.firstToLowerCase()%]= [%=self.name.firstToLowerCase()%];}[%
+}
+
+
+%]

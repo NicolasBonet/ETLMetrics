@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="playApp" nsURI="http://www.example.org/playApp" nsPrefix="playApp">
+  <eClassifiers xsi:type="ecore:EClass" name="App">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="backend" eType="#//Backend"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="HTMLApp" eType="#//HTMLApp"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="JQueryApp" eType="#//JQueryApp"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Backend">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="resources" upperBound="-1"
+        eType="#//Resource" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Resource">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="url" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="atributes" upperBound="-1"
+        eType="#//Atribute" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="HTMLApp">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pages" upperBound="-1"
+        eType="#//HTMLPage" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="HTMLPage">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="route" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="resource" eType="#//Resource"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="controller" eType="#//HTMLController"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="template" eType="#//HTMLTemplate"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sourceDir" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="HTMLController">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fileName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="HTMLTemplate">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fileName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Type">
+    <eLiterals name="String" literal="String"/>
+    <eLiterals name="int" value="1" literal="int"/>
+    <eLiterals name="double" value="2" literal="double"/>
+    <eLiterals name="Long" value="3" literal="Long"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="JQueryApp"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Atribute" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SimpleAtribute" eSuperTypes="#//Atribute">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="#//Type"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PKAtribute" eSuperTypes="#//SimpleAtribute"/>
+  <eClassifiers xsi:type="ecore:EClass" name="RefAtribute" eSuperTypes="#//SimpleAtribute">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ref" eType="#//Resource"/>
+  </eClassifiers>
+</ecore:EPackage>

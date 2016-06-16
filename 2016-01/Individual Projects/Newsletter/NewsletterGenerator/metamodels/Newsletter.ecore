@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="metamodeloNewsletter" nsURI="http://www.example.org/metamodeloNewsletter"
+    nsPrefix="metamodeloNewsletter">
+  <eClassifiers xsi:type="ecore:EClass" name="Newsletter">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="table" lowerBound="1" eType="#//Table"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Table">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="rows" lowerBound="1" upperBound="-1"
+        eType="#//Row" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="width" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="backgroundColor" eType="#//enums/Color"
+        defaultValueLiteral="white"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Row">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cells" lowerBound="1" upperBound="-1"
+        eType="#//Cell" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="height" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="backgroundColor" eType="#//enums/Color"
+        defaultValueLiteral="white"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Cell">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="elements" upperBound="-1"
+        eType="#//Element" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="width" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="backgroundColor" eType="#//enums/Color"
+        defaultValueLiteral="white"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="verticalAlignment" eType="#//enums/VerticalAlign"
+        defaultValueLiteral="top"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Element" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="link" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="align" eType="#//enums/Align"
+        defaultValueLiteral="left"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="width" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="height" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Text" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="content" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="Text"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fontFamily" eType="#//enums/FontFamily"
+        defaultValueLiteral="Arial"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fontSize" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="3"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fontColor" eType="#//enums/Color"
+        defaultValueLiteral="black"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="bold" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="italic" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="underline" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="strikethrough" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="textAlign" eType="#//enums/Align"
+        defaultValueLiteral="left"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Button" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="text" lowerBound="1" eType="#//Text"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="color" eType="#//enums/Color"
+        defaultValueLiteral="white"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Image" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="src" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Video" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="preview" lowerBound="1"
+        eType="#//Image" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="title" lowerBound="1" eType="#//Text"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="button" lowerBound="1"
+        eType="#//Button" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Divider" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="color" eType="#//enums/Color"
+        defaultValueLiteral="black"/>
+  </eClassifiers>
+  <eSubpackages name="enums" nsURI="enums" nsPrefix="enums">
+    <eClassifiers xsi:type="ecore:EEnum" name="Color">
+      <eLiterals name="aqua" literal="aqua"/>
+      <eLiterals name="black" literal="black"/>
+      <eLiterals name="blue" literal="blue"/>
+      <eLiterals name="fuchsia" literal="fuchsia"/>
+      <eLiterals name="gray" literal="gray"/>
+      <eLiterals name="green" literal="green"/>
+      <eLiterals name="lime" literal="lime"/>
+      <eLiterals name="maroon" literal="maroon"/>
+      <eLiterals name="navy" literal="navy"/>
+      <eLiterals name="olive" literal="olive"/>
+      <eLiterals name="orange" literal="orange"/>
+      <eLiterals name="purple" literal="purple"/>
+      <eLiterals name="red" literal="red"/>
+      <eLiterals name="silver" literal="silver"/>
+      <eLiterals name="teal" literal="teal"/>
+      <eLiterals name="white" literal="white"/>
+      <eLiterals name="yellow" literal="yellow"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EEnum" name="Align">
+      <eLiterals name="left" literal="left"/>
+      <eLiterals name="center" literal="center"/>
+      <eLiterals name="right" literal="right"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EEnum" name="VerticalAlign">
+      <eLiterals name="top" literal="top"/>
+      <eLiterals name="middle" literal="middle"/>
+      <eLiterals name="bottom" literal="bottom"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EEnum" name="FontFamily">
+      <eLiterals name="arial" literal="Arial"/>
+      <eLiterals name="helvetica" literal="Helvetica"/>
+      <eLiterals name="timesNewRoman" literal="Times New Roman"/>
+      <eLiterals name="trebuchetMS" literal="Trebuchet MS"/>
+    </eClassifiers>
+  </eSubpackages>
+</ecore:EPackage>

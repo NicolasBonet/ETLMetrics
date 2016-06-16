@@ -1,0 +1,139 @@
+package [%=packageName%];
+
+[%
+for(imp in int.imports){
+%]
+import [%=imp.name%];
+[%
+}
+%]
+
+[%
+for(annotation in int.annotations){
+%]
+[%=annotation.value%]
+[%
+}
+%]
+public interface [%=int.name%] [%if (int.extend <> null){%] extends [%=int.extend.name%][%}%]
+{
+
+	[%
+	for(method in int.methods){
+	var first = true;
+	%]
+	[%=method.visibility%] [%=method.returnType()%] [%=method.name%]([%
+		for(param in method.parameters){
+		if (first == false){
+		 %],[%
+		}
+		%][%=param.returnType()%] [%=param.name%][%
+		first = false;
+		}
+		%]);
+	[%
+	}
+	%]
+	
+	
+}
+[%
+  @template
+  operation Attribute returnType() { 
+  	var nameType = "";
+		if (self.typeOf.isTypeOf(PrimitiveType)){
+			nameType=self.typeOf.type.name;
+		} else if (self.typeOf.isTypeOf(Class)){
+			nameType=self.typeOf.name;
+		} else if (self.typeOf.isTypeOf(Interface)){
+			nameType=self.typeOf.name;
+		} else if (self.typeOf.isTypeOf(ArrayList)){
+		    nameType=nameType+"List<";
+			if (self.typeOf.typeOf.isTypeOf(PrimitiveType)){
+			 nameType=nameType+self.typeOf.typeOf.type;
+			} else if (self.typeOf.typeOf.isTypeOf(Class)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			} else if (self.typeOf.typeOf.isTypeOf(Interface)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			}
+			nameType=nameType+">";
+		} else if (self.typeOf.isTypeOf(HashSet)){
+		    nameType=nameType+"Set<";
+			if (self.typeOf.typeOf.isTypeOf(PrimitiveType)){
+			 nameType=nameType+self.typeOf.typeOf.type;
+			} else if (self.typeOf.typeOf.isTypeOf(Class)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			} else if (self.typeOf.typeOf.isTypeOf(Interface)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			}
+			nameType=nameType+">";
+		}
+  	%][%=nameType%]
+  [% }
+
+  @template
+  operation Parameter returnType() { 
+  	var nameType = "";
+		if (self.typeOf.isTypeOf(PrimitiveType)){
+			nameType=self.typeOf.type.name;
+		} else if (self.typeOf.isTypeOf(Class)){
+			nameType=self.typeOf.name;
+		} else if (self.typeOf.isTypeOf(Interface)){
+			nameType=self.typeOf.name;
+		} else if (self.typeOf.isTypeOf(ArrayList)){
+		    nameType=nameType+"List<";
+			if (self.typeOf.typeOf.isTypeOf(PrimitiveType)){
+			 nameType=nameType+self.typeOf.typeOf.type;
+			} else if (self.typeOf.typeOf.isTypeOf(Class)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			} else if (self.typeOf.typeOf.isTypeOf(Interface)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			}
+			nameType=nameType+">";
+		} else if (self.typeOf.isTypeOf(HashSet)){
+		    nameType=nameType+"Set<";
+			if (self.typeOf.typeOf.isTypeOf(PrimitiveType)){
+			 nameType=nameType+self.typeOf.typeOf.type;
+			} else if (self.typeOf.typeOf.isTypeOf(Class)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			} else if (self.typeOf.typeOf.isTypeOf(Interface)){
+				 nameType=nameType+self.typeOf.typeOf.name;
+			}
+			nameType=nameType+">";
+		}
+  	%][%=nameType%]
+  [% }
+  
+  @template
+  operation Method returnType() { 
+  	var nameType = "";
+		if (self.returns.isTypeOf(PrimitiveType)){
+			nameType=self.returns.type.name;
+		} else if (self.returns.isTypeOf(Class)){
+			nameType=self.returns.name;
+		} else if (self.returns.isTypeOf(Interface)){
+			nameType=self.returns.name;
+		} else if (self.returns.isTypeOf(ArrayList)){
+		    nameType=nameType+"List<";
+			if (self.returns.typeOf.isTypeOf(PrimitiveType)){
+			 nameType=nameType+self.returns.typeOf.type;
+			} else if (self.returns.typeOf.isTypeOf(Class)){
+				 nameType=nameType+self.returns.typeOf.name;
+			} else if (self.returns.typeOf.isTypeOf(Interface)){
+				 nameType=nameType+self.returns.typeOf.name;
+			}
+			nameType=nameType+">";
+		} else if (self.returns.isTypeOf(HashSet)){
+		    nameType=nameType+"Set<";
+			if (self.returns.typeOf.isTypeOf(PrimitiveType)){
+			 nameType=nameType+self.returns.typeOf.type;
+			} else if (self.returns.typeOf.isTypeOf(Class)){
+				 nameType=nameType+self.returns.typeOf.name;
+			} else if (self.returns.typeOf.isTypeOf(Interface)){
+				 nameType=nameType+self.returns.typeOf.name;
+			}
+			nameType=nameType+">";
+		}
+  	%][%=nameType%]
+  [% }
+%]

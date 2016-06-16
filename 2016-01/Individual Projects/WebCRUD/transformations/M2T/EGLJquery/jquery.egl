@@ -1,0 +1,23 @@
+[%
+var root: play!App:= play!App.all.at(0); 
+TemplateFactory.setOutputRoot("../MHack_Project/ScripToForm");
+if(root.HTMLApp <> null){
+		var indexT:Template:= TemplateFactory.load('jqueryFront/index.egl');
+		indexT.populate('app', root.HTMLApp);
+		indexT.generate('./public/html_app/index.html');
+		
+		for(page in root.HTMLApp.pages){
+			
+			var pageController:Template:= TemplateFactory.load('jqueryFront/controllerJs.egl');
+			pageController.populate('page', page);
+			pageController.generate('./public/html_app/' + page.resource.name + '/' + page.resource.name+'.controller.js');
+			
+			var pageTemplate:Template:= TemplateFactory.load('jqueryFront/templateHtml.egl');
+			pageTemplate.populate('app', root.HTMLApp);
+			pageTemplate.populate('page', page);
+			pageTemplate.generate('./public/html_app/'+ page.resource.name+'.html');
+			
+		}
+}
+"ok".println(); 
+%]

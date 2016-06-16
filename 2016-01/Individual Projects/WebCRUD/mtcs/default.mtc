@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.mtcflow.model:MTC xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:com.mtcflow.model="http://com.mtcflow.mtc/1.1">
+  <files name="entrada.sql" URI="models/entrada.sql"/>
+  <files name="angular"/>
+  <files name="jquery"/>
+  <metamodels name="sql" alias="sql" metamodelURI="http://uniandes.edu.co/sqlCrud"/>
+  <metamodels name="playAppMM" alias="playAppMM" metamodelURI="http://www.example.org/playApp"/>
+  <models name="SqlM" URI="sql.xmi" metamodels="//@metamodels.0"/>
+  <models name="PlayApp" URI="playApp.xmi" metamodels="//@metamodels.1"/>
+  <inputModels model="//@models.0" modelAlias="sql" transformation="//@transformations.1"/>
+  <inputModels model="//@models.1" modelAlias="play" transformation="//@transformations.2"/>
+  <inputModels model="//@models.1" modelAlias="play" transformation="//@transformations.3"/>
+  <transformations xsi:type="com.mtcflow.model:T2MTransformation" name="Gen XMI" URI="generate.xtext"/>
+  <transformations xsi:type="com.mtcflow.model:M2MTransformation" name="SqlToPlay" URI="sql2Play.etl"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="angular" URI="EGLPlay/main.egl" implementationClass="" target="gen"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="jquery" URI="EGLJquery/jquery.egl" target="gen"/>
+  <outputModels modelAlias="entrada.sql" model="//@models.0" transformation="//@transformations.0"/>
+  <outputModels modelAlias="play" model="//@models.1" transformation="//@transformations.1"/>
+  <inputFiles file="//@files.0" transformation="//@transformations.0"/>
+  <outputFiles transformation="//@transformations.2" file="//@files.1"/>
+  <outputFiles transformation="//@transformations.3" file="//@files.2"/>
+</com.mtcflow.model:MTC>

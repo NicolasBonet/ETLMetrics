@@ -1,0 +1,48 @@
+[%
+var projectName= html!Root.all.first().projectName;
+for(p in html!Root.all.pages.first())
+{
+  //var packageName=p.name.replace("\\.","/");
+  TemplateFactory.setOutputRoot('../../generated/'+projectName+'/'+projectName+'-war/WebContent/views');
+  var implementation:Template:= TemplateFactory.load('TransformacionHTML.egl');
+  implementation.populate('page', p);
+  implementation.generate(p.name+'.html');
+  
+  for (s in p.head.scripts){
+  	//Solo se generan scripts locales
+  	if (s.path <> null){
+  		TemplateFactory.setOutputRoot('../../generated/'+projectName+'/'+projectName+'-war/WebContent'+s.path);
+		var implementation:Template:= TemplateFactory.load('TransformacionJavaScript.egl');
+		implementation.populate('content', s.content);
+		var nameScript= s.name.split("/").last();
+		implementation.generate(nameScript);
+  	}
+  }
+  for (s in p.head.styles){
+  	//Solo se generan estilos locales
+  	if (s.path <> null){
+  		TemplateFactory.setOutputRoot('../../generated/'+projectName+'/'+projectName+'-war/WebContent'+s.path);
+		var implementation:Template:= TemplateFactory.load('TransformacionCSS.egl');
+		implementation.populate('content', s.content);
+		var nameScript= s.name.split("/").last();
+		implementation.generate(nameScript);
+  	}
+  }
+}
+//libreria resource
+TemplateFactory.setOutputRoot('../../generated/'+projectName+'/'+projectName+'-war/WebContent/scripts/lib');
+var implementation:Template:= TemplateFactory.load('AngularResourceLib.egl');
+implementation.generate('angular-resource.js');
+
+//Archivos necesarios para el proyecto WEB sobre el servidor
+TemplateFactory.setOutputRoot('../../generated/'+projectName+'/'+projectName+'-war/WebContent/WEB-INF');
+var implementation:Template:= TemplateFactory.load('web/beans.egl');
+implementation.generate('beans.xml');
+var implementation:Template:= TemplateFactory.load('web/faces.egl');
+implementation.generate('faces-config.xml');
+var implementation:Template:= TemplateFactory.load('web/jboss.egl');
+implementation.populate('projectName', projectName);
+implementation.generate('jboss-web.xml');
+var implementation:Template:= TemplateFactory.load('web/web.egl');
+implementation.generate('web.xml');
+%]

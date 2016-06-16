@@ -1,0 +1,681 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:java="http://www.example.org/java">
+  <java:Project name="terceros-pensiones-ejb">
+    <packages name="com.uniandes.terceros.pensiones.domain">
+      <classes name="Abonos" implements="/1" service="ConsultarTercero">
+        <methods name="getId" content="return this.id;">
+          <returns xsi:type="java:PrimitiveType" type="int"/>
+        </methods>
+        <methods name="getNAbono" content="return this.nAbono;">
+          <returns xsi:type="java:PrimitiveType" type="String"/>
+        </methods>
+        <methods name="getPersonas" content="return this.personas;">
+          <returns xsi:type="java:Class" name="Personas"/>
+        </methods>
+        <methods name="Abonos"/>
+        <methods name="getFoo" content="return this.foo;">
+          <returns xsi:type="java:PrimitiveType" type="String"/>
+        </methods>
+        <methods name="setPersonas" content="this.personas = personas;">
+          <parameters xsi:type="java:Attribute" name="personas" visibility="private">
+            <typeOf xsi:type="java:Class" name="Personas"/>
+            <annotations value="@ManyToOne"/>
+            <annotations value="@JoinColumn(name=&quot;ID_PERSONAS&quot;)"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="setNAbono" content="this.nAbono = nAbono;">
+          <parameters xsi:type="java:Attribute" name="nAbono" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="String"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="setFoo" content="this.foo = foo;">
+          <parameters xsi:type="java:Attribute" name="foo" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="String"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="setId" content="this.id = id;">
+          <parameters xsi:type="java:Attribute" name="id" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="int"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <attributes name="nAbono" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="foo" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="personas" visibility="private">
+          <typeOf xsi:type="java:Class" name="Personas"/>
+          <annotations value="@ManyToOne"/>
+          <annotations value="@JoinColumn(name=&quot;ID_PERSONAS&quot;)"/>
+        </attributes>
+        <attributes name="id" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="int"/>
+          <annotations value="@Id"/>
+          <annotations value="@SequenceGenerator(name=&quot;ABONOS_ID_GENERATOR&quot;, sequenceName=&quot;ABONOS_SEQ&quot;, allocationSize=1)"/>
+          <annotations value="@GeneratedValue(strategy=GenerationType.SEQUENCE, generator=&quot;ABONOS_ID_GENERATOR&quot;)"/>
+        </attributes>
+        <imports name="java.io.Serializable"/>
+        <imports name="javax.persistence.*"/>
+        <imports name="java.util.ArrayList"/>
+        <imports name="java.util.List"/>
+        <annotations value="@Entity"/>
+        <annotations value="@NamedQuery(name=&quot;Abonos.findAll&quot;, query=&quot;SELECT p FROM Abonos p&quot;)"/>
+      </classes>
+      <classes name="Personas" implements="/1" service="ConsultarTercero">
+        <methods name="getTipoidentificacion" content="return this.tipoidentificacion;">
+          <returns xsi:type="java:PrimitiveType" type="String"/>
+        </methods>
+        <methods name="getPrimerapellido" content="return this.primerapellido;">
+          <returns xsi:type="java:PrimitiveType" type="String"/>
+        </methods>
+        <methods name="setSegundonombre" content="this.segundonombre = segundonombre;">
+          <parameters xsi:type="java:Attribute" name="segundonombre" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="String"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="setNumeroidentificacion" content="this.numeroidentificacion = numeroidentificacion;">
+          <parameters xsi:type="java:Attribute" name="numeroidentificacion" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="String"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="setSegundoapellido" content="this.segundoapellido = segundoapellido;">
+          <parameters xsi:type="java:Attribute" name="segundoapellido" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="String"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="setId" content="this.id = id;">
+          <parameters xsi:type="java:Attribute" name="id" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="int"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="getNumeroidentificacion" content="return this.numeroidentificacion;">
+          <returns xsi:type="java:PrimitiveType" type="String"/>
+        </methods>
+        <methods name="getSegundoapellido" content="return this.segundoapellido;">
+          <returns xsi:type="java:PrimitiveType" type="String"/>
+        </methods>
+        <methods name="setPrimerapellido" content="this.primerapellido = primerapellido;">
+          <parameters xsi:type="java:Attribute" name="primerapellido" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="String"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="getId" content="return this.id;">
+          <returns xsi:type="java:PrimitiveType" type="int"/>
+        </methods>
+        <methods name="getSegundonombre" content="return this.segundonombre;">
+          <returns xsi:type="java:PrimitiveType" type="String"/>
+        </methods>
+        <methods name="removeAbonos" content="getAbonos().remove(abonos);&#xA;abonos.setPersonas(null);&#xA;return abonos;">
+          <parameters name="abonos">
+            <typeOf xsi:type="java:Class" name="Abonos"/>
+          </parameters>
+          <returns xsi:type="java:Class" name="Abonos"/>
+        </methods>
+        <methods name="setTipoidentificacion" content="this.tipoidentificacion = tipoidentificacion;">
+          <parameters xsi:type="java:Attribute" name="tipoidentificacion" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="String"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="getPrimernombre" content="return this.primernombre;">
+          <returns xsi:type="java:PrimitiveType" type="String"/>
+        </methods>
+        <methods name="getAbonos" content="return this.abonos;">
+          <returns xsi:type="java:ArrayList">
+            <typeOf xsi:type="java:Class" name="Abonos"/>
+          </returns>
+        </methods>
+        <methods name="Personas"/>
+        <methods name="addAbonos" content="getAbonos().add(abonos);&#xA;abonos.setPersonas(this);&#xA;return abonos;">
+          <parameters name="abonos">
+            <typeOf xsi:type="java:Class" name="Abonos"/>
+          </parameters>
+          <returns xsi:type="java:Class" name="Abonos"/>
+        </methods>
+        <methods name="setAbonos" content="this.abonos=abonos;">
+          <parameters name="abonos">
+            <typeOf xsi:type="java:ArrayList">
+              <typeOf xsi:type="java:Class" name="Abonos"/>
+            </typeOf>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="setPrimernombre" content="this.primernombre = primernombre;">
+          <parameters xsi:type="java:Attribute" name="primernombre" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="String"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <attributes name="tipoidentificacion" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="numeroidentificacion" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="primerapellido" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="segundoapellido" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="primernombre" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="segundonombre" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="id" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="int"/>
+          <annotations value="@Id"/>
+          <annotations value="@SequenceGenerator(name=&quot;PERSONAS_ID_GENERATOR&quot;, sequenceName=&quot;PERSONAS_SEQ&quot;, allocationSize=1)"/>
+          <annotations value="@GeneratedValue(strategy=GenerationType.SEQUENCE, generator=&quot;PERSONAS_ID_GENERATOR&quot;)"/>
+        </attributes>
+        <attributes name="abonos" visibility="private" initialization="true">
+          <typeOf xsi:type="java:ArrayList">
+            <typeOf xsi:type="java:Class" name="Abonos"/>
+          </typeOf>
+          <annotations value="@OneToMany(mappedBy=&quot;personas&quot;, orphanRemoval=true, cascade={CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})"/>
+        </attributes>
+        <imports name="java.io.Serializable"/>
+        <imports name="javax.persistence.*"/>
+        <imports name="java.util.ArrayList"/>
+        <imports name="java.util.List"/>
+        <annotations value="@Entity"/>
+        <annotations value="@NamedQuery(name=&quot;Personas.findAll&quot;, query=&quot;SELECT p FROM Personas p&quot;)"/>
+      </classes>
+    </packages>
+    <packages name="com.uniandes.terceros.pensiones.service">
+      <classes name="ConsultarTerceroService" implements="/4">
+        <methods name="tercerospensionesOtro" content="/*&#xD;&#xA;    Prueba&#xD;&#xA;    */">
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="getAllAbonos" content="List&lt;AbonosDTO> abonosDTOs = new ArrayList&lt;AbonosDTO>();&#xA;&#x9;List&lt;Abonos> abonoss = abonosDAOLocal.getAbonos();&#xA;&#x9;for (Abonos p : abonoss){&#xA;&#x9;&#x9;AbonosDTO abonosDTO = new AbonosDTO();&#xA;&#x9;&#x9;Utils.convertToAbonosDTO(abonosDTO,p);&#xA;&#x9;&#x9;abonosDTOs.add(abonosDTO);&#xA;&#x9;}&#xA;&#x9;return abonosDTOs;">
+          <returns xsi:type="java:ArrayList">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </returns>
+          <annotations value="@Override"/>
+        </methods>
+        <methods name="createPersonas" content="Personas personas = new Personas();&#xA;&#x9;Utils.convertToPersonas(personas,personasDTO);&#xA;&#x9;personasDAOLocal.create(personas);">
+          <parameters name="personasDTO">
+            <typeOf xsi:type="java:Class" name="PersonasDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <annotations value="@Override"/>
+        </methods>
+        <methods name="createAbonos" content="Abonos abonos = new Abonos();&#xA;&#x9;Utils.convertToAbonos(abonos,abonosDTO);&#xA;&#x9;abonosDAOLocal.create(abonos);">
+          <parameters name="abonosDTO">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <annotations value="@Override"/>
+        </methods>
+        <methods name="deleteAbonos" content="Abonos abonos = new Abonos();&#xA;&#x9;Utils.convertToAbonos(abonos,abonosDTO);&#xA;&#x9;abonosDAOLocal.delete(abonos);">
+          <parameters name="abonosDTO">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <annotations value="@Override"/>
+        </methods>
+        <methods name="getAllPersonas" content="List&lt;PersonasDTO> personasDTOs = new ArrayList&lt;PersonasDTO>();&#xA;&#x9;List&lt;Personas> personass = personasDAOLocal.getPersonas();&#xA;&#x9;for (Personas p : personass){&#xA;&#x9;&#x9;PersonasDTO personasDTO = new PersonasDTO();&#xA;&#x9;&#x9;Utils.convertToPersonasDTO(personasDTO,p);&#xA;&#x9;&#x9;personasDTOs.add(personasDTO);&#xA;&#x9;}&#xA;&#x9;return personasDTOs;">
+          <returns xsi:type="java:ArrayList">
+            <typeOf xsi:type="java:Class" name="PersonasDTO"/>
+          </returns>
+          <annotations value="@Override"/>
+        </methods>
+        <methods name="tercerospensionesM000001" content="/*&#xD;&#xA;    RECUPERAR TERARC (ZTIPID ZNUMID) &#xD;&#xA;    SI ERE(TERARC) &#xD;&#xA;    PASAR ZFOPAG TERFOR&#xD;&#xA;    PASAR ZNUMCT TERNU1&#xD;&#xA;    PASAR ZTELEF TERTEL&#xD;&#xA;    PASAR ZTIPCU TERTI1&#xD;&#xA;    EDTDDS 'PAGFOR' ZFOPAG ZDESFO&#xD;&#xA;    EDTDDS 'AJUT02' ZTIPCU ZDESTC&#xD;&#xA;    **ZDESEN &#xD;&#xA;    FIN&#xD;&#xA;    */">
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="updateAbonos" content="Abonos abonos = new Abonos();&#xA;&#x9;Utils.convertToAbonos(abonos,abonosDTO);&#xA;&#x9;abonosDAOLocal.edit(abonos);">
+          <parameters name="abonosDTO">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <annotations value="@Override"/>
+        </methods>
+        <methods name="tercerospensionesMain" content="/*&#xD;&#xA;    PARAMETROS (ZTIPID ZNUMID) &#xD;&#xA;    EJECUTAR M00001&#xD;&#xA;    MIENTRAS *F12&lt;> '1'&#xD;&#xA;    CONVERSAR PANT02&#xD;&#xA;    FIN&#xD;&#xA;    */">
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="deletePersonas" content="Personas personas = new Personas();&#xA;&#x9;Utils.convertToPersonas(personas,personasDTO);&#xA;&#x9;personasDAOLocal.delete(personas);">
+          <parameters name="personasDTO">
+            <typeOf xsi:type="java:Class" name="PersonasDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <annotations value="@Override"/>
+        </methods>
+        <methods name="updatePersonas" content="Personas personas = new Personas();&#xA;&#x9;Utils.convertToPersonas(personas,personasDTO);&#xA;&#x9;personasDAOLocal.edit(personas);">
+          <parameters name="personasDTO">
+            <typeOf xsi:type="java:Class" name="PersonasDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <annotations value="@Override"/>
+        </methods>
+        <methods name="ConsultarTerceroService"/>
+        <attributes name="personasDAOLocal" visibility="private">
+          <typeOf xsi:type="java:Class" name="PersonasDAOLocal"/>
+          <annotations value="@EJB"/>
+        </attributes>
+        <attributes name="abonosDAOLocal" visibility="private">
+          <typeOf xsi:type="java:Class" name="AbonosDAOLocal"/>
+          <annotations value="@EJB"/>
+        </attributes>
+        <imports name="java.util.ArrayList"/>
+        <imports name="java.util.List"/>
+        <imports name="javax.ejb.EJB"/>
+        <imports name="javax.ejb.Stateless"/>
+        <imports name="com.uniandes.terceros.pensiones.domain.Personas"/>
+        <imports name="com.uniandes.terceros.pensiones.dto.PersonasDTO"/>
+        <imports name="com.uniandes.terceros.pensiones.dao.PersonasDAOLocal"/>
+        <imports name="com.uniandes.terceros.pensiones.domain.Abonos"/>
+        <imports name="com.uniandes.terceros.pensiones.dto.AbonosDTO"/>
+        <imports name="com.uniandes.terceros.pensiones.dao.AbonosDAOLocal"/>
+        <imports name="com.uniandes.terceros.pensiones.utils.Utils"/>
+        <annotations value="@Stateless"/>
+      </classes>
+      <interfaces name="ConsultarTerceroServiceLocal">
+        <methods name="createPersonas">
+          <parameters name="personasDTO">
+            <typeOf xsi:type="java:Class" name="PersonasDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="createAbonos">
+          <parameters name="abonosDTO">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="updatePersonas">
+          <parameters name="personasDTO">
+            <typeOf xsi:type="java:Class" name="PersonasDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="updateAbonos">
+          <parameters name="abonosDTO">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="deletePersonas">
+          <parameters name="personasDTO">
+            <typeOf xsi:type="java:Class" name="PersonasDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="deleteAbonos">
+          <parameters name="abonosDTO">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="getAllPersonas">
+          <returns xsi:type="java:ArrayList">
+            <typeOf xsi:type="java:Class" name="PersonasDTO"/>
+          </returns>
+        </methods>
+        <methods name="getAllAbonos">
+          <returns xsi:type="java:ArrayList">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </returns>
+        </methods>
+        <imports name="java.util.ArrayList"/>
+        <imports name="java.util.List"/>
+        <imports name="javax.ejb.Local"/>
+        <imports name="com.uniandes.terceros.pensiones.domain.Personas"/>
+        <imports name="com.uniandes.terceros.pensiones.dto.PersonasDTO"/>
+        <imports name="com.uniandes.terceros.pensiones.domain.Abonos"/>
+        <imports name="com.uniandes.terceros.pensiones.dto.AbonosDTO"/>
+        <annotations value="@Local"/>
+      </interfaces>
+    </packages>
+    <packages name="com.uniandes.terceros.pensiones.dao">
+      <classes name="PersonasDAO" extend="/11" implements="/12">
+        <methods name="PersonasDAO"/>
+        <methods name="getPersonas" content="Query q = em.createQuery(&quot;SELECT p FROM Personas p&quot;);&#xA;&#x9;List&lt;Personas> a = q.getResultList();&#xA;&#x9;return a;">
+          <returns xsi:type="java:ArrayList">
+            <typeOf xsi:type="java:Class" name="Personas"/>
+          </returns>
+          <annotations value="@Override"/>
+        </methods>
+        <imports name="java.util.List"/>
+        <imports name="javax.ejb.LocalBean"/>
+        <imports name="javax.ejb.Stateless"/>
+        <imports name="javax.persistence.Query"/>
+        <imports name="com.uniandes.terceros.pensiones.domain.Personas"/>
+        <annotations value="@Stateless"/>
+        <annotations value="@LocalBean"/>
+      </classes>
+      <classes name="AbonosDAO" extend="/9" implements="/10">
+        <methods name="AbonosDAO"/>
+        <methods name="getAbonos" content="Query q = em.createQuery(&quot;SELECT p FROM Abonos p&quot;);&#xA;&#x9;List&lt;Abonos> a = q.getResultList();&#xA;&#x9;return a;">
+          <returns xsi:type="java:ArrayList">
+            <typeOf xsi:type="java:Class" name="Abonos"/>
+          </returns>
+          <annotations value="@Override"/>
+        </methods>
+        <imports name="java.util.List"/>
+        <imports name="javax.ejb.LocalBean"/>
+        <imports name="javax.ejb.Stateless"/>
+        <imports name="javax.persistence.Query"/>
+        <imports name="com.uniandes.terceros.pensiones.domain.Abonos"/>
+        <annotations value="@Stateless"/>
+        <annotations value="@LocalBean"/>
+      </classes>
+      <classes name="GenericDAO&lt;T>" implements="/13">
+        <methods name="edit" content="em.merge(p);">
+          <parameters xsi:type="java:Attribute" name="p">
+            <typeOf xsi:type="java:PrimitiveType" type="T"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <annotations value="@Override"/>
+        </methods>
+        <methods name="searchById" content="Class&lt;T> classEntity = (Class&lt;T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];&#xA;&#x9;return em.find(classEntity, p);">
+          <parameters xsi:type="java:Attribute" name="p">
+            <typeOf xsi:type="java:PrimitiveType" type="Object"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="T"/>
+          <annotations value="@Override"/>
+        </methods>
+        <methods name="create" content="em.persist(p);">
+          <parameters xsi:type="java:Attribute" name="p">
+            <typeOf xsi:type="java:PrimitiveType" type="T"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <annotations value="@Override"/>
+        </methods>
+        <methods name="delete" content="em.remove(em.merge(p));">
+          <parameters xsi:type="java:Attribute" name="p">
+            <typeOf xsi:type="java:PrimitiveType" type="T"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <annotations value="@Override"/>
+        </methods>
+        <attributes name="em" visibility="protected">
+          <typeOf xsi:type="java:PrimitiveType" type="EntityManager"/>
+          <annotations value="@PersistenceContext(unitName = &quot;tercerosPensionesPU&quot;)"/>
+        </attributes>
+        <imports name="java.lang.reflect.ParameterizedType"/>
+        <imports name="javax.ejb.Stateless"/>
+        <imports name="javax.persistence.EntityManager"/>
+        <imports name="javax.persistence.PersistenceContext"/>
+        <annotations value="@Stateless"/>
+      </classes>
+      <interfaces name="PersonasDAOLocal" extend="/7">
+        <methods name="getPersonas">
+          <returns xsi:type="java:ArrayList">
+            <typeOf xsi:type="java:Class" name="Personas"/>
+          </returns>
+        </methods>
+        <imports name="java.util.List"/>
+        <imports name="javax.ejb.Local"/>
+        <imports name="com.uniandes.terceros.pensiones.domain.Personas"/>
+        <annotations value="@Local"/>
+      </interfaces>
+      <interfaces name="AbonosDAOLocal" extend="/5">
+        <methods name="getAbonos">
+          <returns xsi:type="java:ArrayList">
+            <typeOf xsi:type="java:Class" name="Abonos"/>
+          </returns>
+        </methods>
+        <imports name="java.util.List"/>
+        <imports name="javax.ejb.Local"/>
+        <imports name="com.uniandes.terceros.pensiones.domain.Abonos"/>
+        <annotations value="@Local"/>
+      </interfaces>
+      <interfaces name="GenericDAOLocal&lt;T>">
+        <methods name="create">
+          <parameters xsi:type="java:Attribute" name="p">
+            <typeOf xsi:type="java:PrimitiveType" type="T"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="delete">
+          <parameters xsi:type="java:Attribute" name="p">
+            <typeOf xsi:type="java:PrimitiveType" type="T"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="edit">
+          <parameters xsi:type="java:Attribute" name="p">
+            <typeOf xsi:type="java:PrimitiveType" type="T"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="searchById">
+          <parameters xsi:type="java:Attribute" name="p">
+            <typeOf xsi:type="java:PrimitiveType" type="Object"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="T"/>
+        </methods>
+        <imports name="javax.ejb.Local"/>
+        <annotations value="@Local"/>
+      </interfaces>
+    </packages>
+    <packages name="com.uniandes.terceros.pensiones.dto">
+      <classes name="AbonosDTO" implements="/1">
+        <methods name="AbonosDTO"/>
+        <methods name="getNabono" content="return this.nabono;">
+          <returns xsi:type="java:PrimitiveType" type="String"/>
+        </methods>
+        <methods name="setId" content="this.id = id;">
+          <parameters xsi:type="java:Attribute" name="id" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="int"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="getId" content="return this.id;">
+          <returns xsi:type="java:PrimitiveType" type="int"/>
+        </methods>
+        <methods name="getFoo" content="return this.foo;">
+          <returns xsi:type="java:PrimitiveType" type="String"/>
+        </methods>
+        <methods name="setFoo" content="this.foo = foo;">
+          <parameters xsi:type="java:Attribute" name="foo" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="String"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="setNabono" content="this.nabono = nabono;">
+          <parameters xsi:type="java:Attribute" name="nAbono" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="String"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <attributes name="nAbono" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="foo" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="tipoidentificacion" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="id" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="int"/>
+        </attributes>
+        <imports name="java.io.Serializable"/>
+        <imports name="java.util.ArrayList"/>
+        <imports name="java.util.List"/>
+      </classes>
+      <classes name="PersonasDTO" implements="/1">
+        <methods name="PersonasDTO"/>
+        <methods name="getPrimernombre" content="return this.primernombre;">
+          <returns xsi:type="java:PrimitiveType" type="String"/>
+        </methods>
+        <methods name="setSegundoapellido" content="this.segundoapellido = segundoapellido;">
+          <parameters xsi:type="java:Attribute" name="segundoapellido" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="String"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="setPrimerapellido" content="this.primerapellido = primerapellido;">
+          <parameters xsi:type="java:Attribute" name="primerapellido" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="String"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="getSegundoapellido" content="return this.segundoapellido;">
+          <returns xsi:type="java:PrimitiveType" type="String"/>
+        </methods>
+        <methods name="setNumeroidentificacion" content="this.numeroidentificacion = numeroidentificacion;">
+          <parameters xsi:type="java:Attribute" name="numeroidentificacion" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="String"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="setSegundonombre" content="this.segundonombre = segundonombre;">
+          <parameters xsi:type="java:Attribute" name="segundonombre" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="String"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="setId" content="this.id = id;">
+          <parameters xsi:type="java:Attribute" name="id" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="int"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="getNumeroidentificacion" content="return this.numeroidentificacion;">
+          <returns xsi:type="java:PrimitiveType" type="String"/>
+        </methods>
+        <methods name="getSegundonombre" content="return this.segundonombre;">
+          <returns xsi:type="java:PrimitiveType" type="String"/>
+        </methods>
+        <methods name="getTipoidentificacion" content="return this.tipoidentificacion;">
+          <returns xsi:type="java:PrimitiveType" type="String"/>
+        </methods>
+        <methods name="getPrimerapellido" content="return this.primerapellido;">
+          <returns xsi:type="java:PrimitiveType" type="String"/>
+        </methods>
+        <methods name="setPrimernombre" content="this.primernombre = primernombre;">
+          <parameters xsi:type="java:Attribute" name="primernombre" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="String"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="setTipoidentificacion" content="this.tipoidentificacion = tipoidentificacion;">
+          <parameters xsi:type="java:Attribute" name="tipoidentificacion" visibility="private">
+            <typeOf xsi:type="java:PrimitiveType" type="String"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <methods name="getId" content="return this.id;">
+          <returns xsi:type="java:PrimitiveType" type="int"/>
+        </methods>
+        <methods name="getAbonos" content="return this.abonos;">
+          <returns xsi:type="java:ArrayList">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </returns>
+        </methods>
+        <methods name="setAbonos" content="this.abonos=abonos;">
+          <parameters name="abonos">
+            <typeOf xsi:type="java:ArrayList">
+              <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+            </typeOf>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+        </methods>
+        <attributes name="tipoidentificacion" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="numeroidentificacion" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="primerapellido" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="segundoapellido" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="primernombre" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="segundonombre" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="String"/>
+        </attributes>
+        <attributes name="id" visibility="private">
+          <typeOf xsi:type="java:PrimitiveType" type="int"/>
+        </attributes>
+        <attributes name="abonos" visibility="private" initialization="true">
+          <typeOf xsi:type="java:ArrayList">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </typeOf>
+        </attributes>
+        <imports name="java.io.Serializable"/>
+        <imports name="java.util.ArrayList"/>
+        <imports name="java.util.List"/>
+      </classes>
+    </packages>
+    <packages name="com.uniandes.terceros.pensiones.utils">
+      <classes name="Utils">
+        <methods name="convertToPersonasDTO" content="personasDTO.setTipoidentificacion(personas.getTipoidentificacion());&#xA;personasDTO.setNumeroidentificacion(personas.getNumeroidentificacion());&#xA;personasDTO.setPrimerapellido(personas.getPrimerapellido());&#xA;personasDTO.setSegundoapellido(personas.getSegundoapellido());&#xA;personasDTO.setPrimernombre(personas.getPrimernombre());&#xA;personasDTO.setSegundonombre(personas.getSegundonombre());&#xA;personasDTO.setId(personas.getId());&#xA;&#xA;for (Abonos abonos :  personas.getAbonos()){&#xA;AbonosDTO abonosDTO = new AbonosDTO();&#xA;convertToAbonosDTO(abonosDTO, abonos);&#xA;personasDTO.getAbonos().add(abonosDTO);&#xA;}">
+          <parameters xsi:type="java:Attribute" name="personasDTO">
+            <typeOf xsi:type="java:Class" name="PersonasDTO"/>
+          </parameters>
+          <parameters xsi:type="java:Attribute" name="personas">
+            <typeOf xsi:type="java:Class" name="Personas"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <modifiers modifier="static"/>
+        </methods>
+        <methods name="convertToPersonas" content="personas.setTipoidentificacion(personasDTO.getTipoidentificacion());&#xA;personas.setNumeroidentificacion(personasDTO.getNumeroidentificacion());&#xA;personas.setPrimerapellido(personasDTO.getPrimerapellido());&#xA;personas.setSegundoapellido(personasDTO.getSegundoapellido());&#xA;personas.setPrimernombre(personasDTO.getPrimernombre());&#xA;personas.setSegundonombre(personasDTO.getSegundonombre());&#xA;personas.setId(personasDTO.getId());&#xA;&#xA;for (AbonosDTO abonosDTO :  personasDTO.getAbonos()){&#xA;Abonos abonos = new Abonos();&#xA;convertToAbonos(abonos, abonosDTO);&#xA;abonos.setPersonas(personas);&#xA;personas.getAbonos().add(abonos);&#xA;}">
+          <parameters xsi:type="java:Attribute" name="personas">
+            <typeOf xsi:type="java:Class" name="Personas"/>
+          </parameters>
+          <parameters xsi:type="java:Attribute" name="personasDTO">
+            <typeOf xsi:type="java:Class" name="PersonasDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <modifiers modifier="static"/>
+        </methods>
+        <methods name="convertToAbonosDTO" content="abonosDTO.setNAbono(abonos.getNAbono());&#xA;abonosDTO.setFoo(abonos.getFoo());&#xA;abonosDTO.setId(abonos.getId());&#xA;">
+          <parameters xsi:type="java:Attribute" name="abonosDTO">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </parameters>
+          <parameters xsi:type="java:Attribute" name="abonos">
+            <typeOf xsi:type="java:Class" name="Abonos"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <modifiers modifier="static"/>
+        </methods>
+        <methods name="convertToAbonos" content="abonos.setNAbono(abonosDTO.getNAbono());&#xA;abonos.setFoo(abonosDTO.getFoo());&#xA;abonos.setId(abonosDTO.getId());&#xA;">
+          <parameters xsi:type="java:Attribute" name="abonos">
+            <typeOf xsi:type="java:Class" name="Abonos"/>
+          </parameters>
+          <parameters xsi:type="java:Attribute" name="abonosDTO">
+            <typeOf xsi:type="java:Class" name="AbonosDTO"/>
+          </parameters>
+          <returns xsi:type="java:PrimitiveType" type="void"/>
+          <modifiers modifier="static"/>
+        </methods>
+        <imports name="com.uniandes.terceros.pensiones.domain.Personas"/>
+        <imports name="com.uniandes.terceros.pensiones.dto.PersonasDTO"/>
+        <imports name="com.uniandes.terceros.pensiones.domain.Abonos"/>
+        <imports name="com.uniandes.terceros.pensiones.dto.AbonosDTO"/>
+      </classes>
+    </packages>
+  </java:Project>
+  <java:Interface name="Serializable"/>
+  <java:Attribute visibility="private"/>
+  <java:Attribute visibility="private"/>
+  <java:Interface name="ConsultarTerceroServiceLocal"/>
+  <java:Class name="GenericDAOLocal&lt;Abonos>"/>
+  <java:Method/>
+  <java:Class name="GenericDAOLocal&lt;Personas>"/>
+  <java:Method/>
+  <java:Class name="GenericDAO&lt;Abonos>"/>
+  <java:Interface name="AbonosDAOLocal"/>
+  <java:Class name="GenericDAO&lt;Personas>"/>
+  <java:Interface name="PersonasDAOLocal"/>
+  <java:Interface name="GenericDAOLocal&lt;T>"/>
+</xmi:XMI>

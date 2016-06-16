@@ -1,0 +1,9 @@
+<resources>
+	[%
+	for (string in android!String.all()) {
+	%]
+    <string name="[%=string.name%]">[%=string.value%]</string>
+    [%
+    }
+    %]
+</resources>

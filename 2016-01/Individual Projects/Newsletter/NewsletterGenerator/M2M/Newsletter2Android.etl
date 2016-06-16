@@ -1,0 +1,394 @@
+import "androidOperations.eol";
+
+/**
+* Pre rules execution function.
+* Initializes some variables used in the rules exectuion
+*/
+pre {
+	"Start ETL Newsletter2Android".println();
+	
+	// This map will save a number with the last
+	// id count by each clickable element
+	var contIds:Map = Map{
+	'lastId_ImageView'=0,
+	'lastId_TextView'=0,
+	'lastId_Button'=0,
+	'lastId_LinearLayout'=0,
+	'lastId_GridLayout'=0
+	};
+	//This Set wil save the actions related to views with a link defined.
+	var allActions:Set = new Set;
+}
+
+/**
+* This is the primary rule.
+* This rule is the starting point of the transformation, this map Newsletter
+* to Application. 
+* - It will launch the definition of the 'mainActivity' relation 
+* throught the equivalent function 
+*/
+rule Newsletter2Application
+	transform 
+		s:newsletter!Newsletter
+	to 
+		t:android!Application{
+		t.name = "NewsletterAndroid";
+		t.identifier = "co.edu.uniandes.newslettermockup";			
+		t.mainActivity = s.equivalent('Newsletter2Activity');
+		}
+		
+/**
+* This rule executes the transformation for the map Newsletter
+* to Activity. 
+* - It will launch the definition of the 'layout' relation 
+* throught the equivalent function 
+* - It will launch the definition of the 'actions' relation 
+* throught the equivalent function 
+*/
+@lazy
+rule Newsletter2Activity
+	transform 
+		s:newsletter!Newsletter
+	to 
+		t:android!Activity{
+		t.name = "MainActivity";
+		t.title = "NewsLetterMockup";
+		if(s.table <> null){
+				t.layout = s.equivalent('Newsletter2Layout');
+				t.actions = allActions;
+			}
+		}
+/**
+* This rule executes the transformation for the map Newsletter
+* to Layout. 
+* - It will launch the definition of the 'content' relation 
+* throught the equivalent function.
+*/
+@lazy
+rule Newsletter2Layout
+	transform 
+		s:newsletter!Newsletter
+	to 
+		t:android!Layout{
+		t.name = "activity_main";
+		t.content = s.table.equivalent('RootTable2RelativeScrollableGridLayout');
+		}
+
+
+/**
+* This rule executes the transformation for the map Table
+* to RelativeScrollableGridLayout. 
+* - It will launch the definition of the 'views' relation 
+* throught the equivalent function.
+*/
+@lazy
+rule RootTable2RelativeScrollableGridLayout
+	transform 
+		s:newsletter!Table
+	to 
+		t:android!RelativeLayout{
+		t.id = "root_relativeLayout";
+		t.layout_width = "match_parent";
+		t.layout_height = "match_parent";
+		t.paddingBottom = "@dimen/activity_vertical_margin";
+		t.paddingLeft = "@dimen/activity_horizontal_margin";
+		t.paddingRight = "@dimen/activity_horizontal_margin";
+		t.paddingTop = "@dimen/activity_vertical_margin";
+		
+		var scrollView:android!ScrollView = new android!ScrollView;
+		scrollView.id = "root_scrollView";
+		scrollView.layout_width = "match_parent";
+		scrollView.layout_height = "wrap_content";
+		
+		var rootGridLayout:android!GridLayout = s.equivalent('Table2GridLayout');
+		rootGridLayout.id = "root_"+rootGridLayout.id;
+		rootGridLayout.layout_aligntParentTop = true;
+		rootGridLayout.layout_centerHorizontal =true;
+		
+		scrollView.views.add (rootGridLayout); 		
+		
+		t.views.add(scrollView);
+				
+		}
+/**
+* This rule executes the transformation for the map Table
+* to GridLayout. 
+* - It will launch the definition of the 'views' relation 
+* throught the equivalent function.
+*/
+@lazy
+rule  Table2GridLayout
+	transform 
+		s:newsletter!Table
+	to 
+		t:android!GridLayout{
+		t.id = "table_"+t.nextId();
+		t.layout_width = "match_parent";
+		t.layout_height = "wrap_content";
+		
+		if(s.backgroundColor <> null){
+				t.background = s.backgroundColor.literal;
+			}
+			
+		var rowCount = 1;
+		var columnCount =1;
+		
+		for(row in s.rows){
+			rowCount = loopCount;
+			
+			if(row.cells.size()==1)
+			{
+				//LinearLayout Row (only one cell)
+				for(cell in row.cells){	
+					var ll:android!LinearLayout = cell.equivalent();
+					ll.layout_column = 0;
+					ll.layout_row = rowCount-1;
+					t.views.add(ll);
+				}
+			}
+			else
+			{
+				//GridLayout Row (2 or mor cells, with LinearLayout by Cell)
+				var gridCell = new android!GridLayout;
+				gridCell.id = "cell_"+ gridCell.nextId();
+				gridCell.columnCount = row.cells.size();
+				gridCell.rowCount = 1;
+				
+				for(cell in row.cells){	
+					var ll:android!LinearLayout = cell.equivalent();
+					
+					ll.layout_columnWeight = (cell.width/row.getSumCells());
+					ll.layout_width="0dp";
+					ll.layout_height="wrap_content";
+					ll.layout_column = loopCount-1;
+					ll.layout_row = 0;
+					
+					gridCell.layout_column = 0;
+					gridCell.layout_row = rowCount-1;
+					gridCell.background = ll.background;
+					gridCell.views.add(ll);
+					
+					t.views.add(gridCell);
+				}
+			}
+			
+						
+			}
+		t.rowCount = rowCount;
+		t.columnCount = columnCount;
+		}
+/**
+* This rule executes the transformation for the map Cell
+* to LinearLayout. 
+* - It will launch the definition of the 'views' relation 
+* throught the equivalent function.
+*/
+@lazy 
+rule Cell2LinearLayout
+	transform 
+		s:newsletter!Cell
+	to 
+		t:android!LinearLayout{
+		t.id= "cell_"+t.nextId();
+		t.layout_width = "match_parent";
+		t.layout_height = "wrap_content";
+		t.orientation = "vertical";
+		
+		if(s.backgroundColor <> null){
+				t.background = s.backgroundColor.literal;
+			}
+			
+		t.gravity = s.toGravity( s.verticalAlignment);
+		
+		t.views = s.elements.equivalent();
+		//Posible rules called in above equivalen() operation:
+		//Text to Textview, Button to Button, 
+		//Image to Imageview, Video to special LinearLayoutVideo,
+		//and Divider to special LinearLayoutDivider,
+		}
+
+/**
+* This rule executes the transformation for the map Text
+* to TextView.  It will not launch more definitions.
+*/
+@lazy 
+rule Text2TextView
+	transform 
+		s:newsletter!Text
+	to
+		t:android!TextView{
+		t.id= t.nextId();
+		
+		t.layout_width = "wrap_content";
+		t.layout_height = "wrap_content";
+		
+		t.text = s.content.normalize();
+		t.textColor = s.fontColor.literal;
+		if(s.textAlign == newsletter!Align#center)
+		{
+			t.textAlignment = s.textAlign.literal;
+		}
+		else
+		{
+			t.textAlignment = "gravity";
+		}
+		t.layout_gravity= s.textAlign.literal;
+		t.textAppearance = "?android:attr/textAppearanceSmall";
+		t.textSize = (10+(s.fontSize.asInteger())).asString()+"dp";
+		t.textStyle = s.extractTextStyles();
+		
+		s.createActionIfApplies(t);
+		}
+/**
+* This rule executes the transformation for the map newsletter!Button
+* to android!Button.  It will not launch more definitions.
+*/
+@lazy 
+rule Button2Button
+	transform 
+		s:newsletter!Button
+	to
+		t:android!Button{
+		t.id= t.nextId();
+		
+		t.layout_width = "wrap_content";
+		t.layout_height = "wrap_content";
+		t.background = s.color.literal;
+		
+		//Atributos tomados del Text del Button
+		var text:newsletter!Text = s.text;
+		t.text = text.content.normalize();
+		t.textColor = text.fontColor.literal;
+		t.textAlignment = "gravity";
+		t.layout_gravity= text.textAlign.literal;
+		t.textSize = (10+(text.fontSize.asInteger())).asString()+"dp";
+		t.textStyle = text.extractTextStyles();
+		
+		s.createActionIfApplies(t);
+		
+		}
+/**
+* This rule executes the transformation for the map Image
+* to ImageView.  It will not launch more definitions.
+*/
+@lazy 
+rule Image2ImageView
+	transform 
+		s:newsletter!Image
+	to
+		t:android!ImageView{
+		t.id= t.nextId();
+		
+		t.layout_width = "wrap_content";
+		t.layout_height = "wrap_content";
+		
+		t.src = s.extractImageNameNormalized(t);
+		
+		s.createActionIfApplies(t);
+		
+		}
+		
+/**
+* This rule executes the transformation for the map Video
+* to a LinearLayout with a specific format that represents a video in android.  
+* - It will launch the definition of the 'preview' relation 
+* throught the equivalent function.
+* - It will launch the definition of the 'button' relation 
+* throught the equivalent function.
+* - It will launch the definition of the 'title' relation 
+* throught the equivalent function.
+*/
+@lazy 
+rule Video2LinearLayoutVideo
+	transform 
+		s:newsletter!Video
+	to
+		t:android!LinearLayout{
+		t.id= "video_"+t.nextId();
+		
+		t.layout_width = "wrap_content";
+		t.layout_height = "wrap_content";
+		t.background = s.button.color.literal;
+		
+		//If the Video doesnt have link, 
+		//then it tries to use the link in his Button
+		if(not s.link.isDefined()){
+			s.link=s.button.link;
+		}
+		
+		//If the Button doesnt have link, 
+		//then it tries to use the link in the Video
+		if(not s.button.link.isDefined()){
+			s.button.link=s.link;
+		}
+
+		var preview:android!ImageView = s.preview.equivalent();
+		var title:android!TextView = s.title.equivalent();
+		var button:android!Button = s.button.equivalent();
+		
+		t.views.add(preview);
+		t.views.add(title);
+		t.views.add(button);
+	
+		s.createActionIfApplies(t);
+		
+		}
+/**
+* This rule executes the transformation for the map Divider
+* to a LinearLayout with a specific format that represents a divider in android.  
+*/
+@lazy 
+rule Divider2LinearLayoutDivider
+	transform 
+		s:newsletter!Divider
+	to
+		t:android!LinearLayout{
+		t.id= "divider_"+t.nextId();
+		t.orientation="vertical";
+		t.gravity="center";
+		
+		t.layout_width="match_parent";
+		if (t.layout_height.isDefined() > 2 )
+		{
+			t.layout_height= s.height.asString() + "dp";
+		}
+		else
+		{
+			t.layout_height= "10dp";
+		}
+		
+		t.paddingLeft="10dp";
+		t.paddingRight="10dp";
+		
+		var separator:android!LinearLayout = new android!LinearLayout;
+		separator.id= "separator_"+separator.nextId();
+		separator.orientation="horizontal";
+		separator.background=s.color.literal;
+		separator.layout_width="match_parent";
+		separator.layout_height="2dp";
+		
+		t.views.add(separator);
+		
+		}			
+/**
+* Post rules execution function.
+* Prints some results in console as a summary of the excecution.
+*/
+post {
+	"Finish ETL Newsletter2Android".println();
+	// Print the results 
+	("Application: " + android!Application.all().size()).println(); 
+	("Activity: " + android!Activity.all().size()).println(); 
+	("View: " + android!View.all().size()).println(); 
+	("	ViewGroup: " + android!ViewGroup.all().size()).println();
+	("		RelativeLayout: " + android!RelativeLayout.all().size()).println();
+	("		ScrollView: " + android!ScrollView.all().size()).println();
+	("		GridLayout: " + android!GridLayout.all().size()).println();
+	("		LinearLayout: " + android!LinearLayout.all().size()).println();
+	("			VideoLinearLayout: " + android!LinearLayout.all()->select( e | e.id.startsWith("video_")).size()).println();
+	("			DividerLinearLayout: " + android!LinearLayout.all()->select( e | e.id.startsWith("divider_")).size()).println();
+	("	Button: " + android!Button.all().size()).println();
+	("	TextView: " + android!TextView.all().size()).println();
+	("	ImageView: " + android!ImageView.all().size()).println();
+	
+}	

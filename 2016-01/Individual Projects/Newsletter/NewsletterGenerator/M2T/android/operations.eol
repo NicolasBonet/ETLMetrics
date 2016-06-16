@@ -1,0 +1,215 @@
+/**--------------------------------------------------------------**/
+//Definition of reused operations for Egls
+/**--------------------------------------------------------------**/
+
+//--------------------------------------------------------------
+// Common operations about directories and paths for the Egls
+//--------------------------------------------------------------
+operation dirGenerado(): String{  
+   return "../../generated/";
+}
+
+operation dirStaticFiles():String{
+ return "../../staticFiles/";
+}
+
+operation getAppName():String{
+ 	var app : android!Application:= android!Application.all.at(0);
+ 	return app.name;
+}
+
+operation dirProyecto(): String{  
+   return dirGenerado() + getAppName() +"/";
+}
+
+operation dirAppFolder(): String{  
+   return dirProyecto() + "app/";
+}
+
+operation dirSourceFolder(): String {
+	return dirAppFolder()+"src/";
+}
+
+operation dirPackageMainJava(): String {
+	return dirSourceFolder()+ "main/java/co/edu/uniandes/newslettermockup/";
+}
+
+operation dirPackageResources(): String {
+	return dirSourceFolder()+ "main/res";
+}
+
+operation dirPackageLayouts(): String {
+	return dirSourceFolder()+ "main/res/layout/";
+}
+
+operation dirPackageDrawables(): String {
+	return dirSourceFolder()+ "main/res/drawable/";
+}
+
+operation dirPackageManifest(): String {
+	return dirSourceFolder()+ "main/";
+}
+
+operation dirPackageAndroidTest(): String {
+	return dirSourceFolder()+ "androidTest/java/co/edu/uniandes/newslettermockup/";
+}
+
+operation dirPackageTest(): String {
+	return dirSourceFolder()+ "test/java/co/edu/uniandes/newslettermockup/";
+}
+operation dirPackage(packageName: String): String {
+	return dirSourceFolder()+ packageName;
+}
+
+operation Application getPackageName(): String{
+	return self.identifier;
+}
+
+operation getPackageName():String{
+ 	var app : android!Application:= android!Application.all.at(0);
+ 	return app.identifier;
+}
+
+operation View isViewGroup(): Boolean {
+    return self.isKindOf(ViewGroup);
+}
+
+operation ViewGroup isGridLayout(): Boolean {
+    return self.isTypeOf(GridLayout);
+}
+operation ViewGroup isLinearLayout(): Boolean {
+    return self.isTypeOf(LinearLayout);
+}
+
+// ------------------------------------
+// Operations about colors and actions
+// ------------------------------------
+
+/**
+* Dark colors for create gradients and custom styles for colors supported
+*/
+operation mapDarkColors(): Map{
+
+	var mapDarkColors : Map = 
+	Map{
+	'aqua'='#009688',
+	'black'='#000000',
+	'blue'='#0099cc',
+	'fuchsia'='#A80F43',
+	'gray'='#363739',
+	'green'='#669900',
+	'lime'='#00FF00',
+	'maroon'='#D30101',
+	'navy'='#000080',
+	'olive'='#808000',
+	'orange'='#bb6008',
+	'purple'='#7D2AA6',
+	'red'='#cc0000',
+	'silver'='#726D6D',
+	'teal'='#008080',
+	'white'='#DAD2D2',
+	'yellow'='#FFCC00'
+	};
+	return mapDarkColors;
+}
+
+/**
+* Light and default value for colors supported
+*/
+operation mapLightColors(): Map{
+
+	var mapLightColors : Map = 
+	Map{
+	'aqua'='#00FFFF',
+	'black'='#000000',
+	'blue'='#33b5e5',
+	'fuchsia'='#FF4081',
+	'gray'='#464749',
+	'green'='#99cc00',
+	'lime'='#A2F5A2',
+	'maroon'='#800000',
+	'navy'='#4747AA',
+	'olive'='#E8E838',
+	'orange'='#f3ae1b',
+	'purple'='#aa66cc',
+	'red'='#CB4848',
+	'silver'='#C0C0C0',
+	'teal'='#008080',
+	'white'='#FFFFFF',
+	'yellow'='#FFFF00'
+	};
+	
+	return mapLightColors;
+}
+
+/**
+* Returns the map color keys supported by the transformation chain. 
+*/
+operation getColorsKeys(): Set{
+
+	var keysColors:Set = mapLightColors().keySet();
+	return keysColors;
+}
+
+/**
+* Returns a color from the Map with the supported colors by the transformation chain. 
+* The default colors are the light representations.
+*/
+operation getColorByKey(keyColor: String ): String{
+	
+	if (getColorsKeys().includes(keyColor))
+	{
+		return mapLightColors().get(keyColor);
+	}
+	else 
+	{
+		return 'NONE';
+	}
+}
+
+/**
+* Returns a Dark color from the Map with the supported colors by the transformation chain. 
+*/
+operation getColorDarkByKey(keyColor: String ): String{
+	
+	if (getColorsKeys().includes(keyColor))
+	{
+		return mapDarkColors().get(keyColor);
+	}
+	else 
+	{
+		return 'NONE';
+	}
+}
+
+/**
+* This operation evaluate the best background effect for the View received by context.
+* The backgroud depends of View type and actions that triggers or not. 
+*/
+operation View getBackgroundByKey(keyColor): String{
+	
+
+	// If context is a Button View. (It must have an action and needs a visual effect as background)
+	if (self.isTypeOf(Button))
+	{
+		return '@drawable/selector_on_click_view_'+keyColor;
+	}
+	// If context is a LinearLayout with a link (It's a video). (It must have an action and needs a visual effect as background)
+	if (self.isTypeOf(LinearLayout) and self.triggerAction()) 
+	{
+		return '@drawable/selector_on_click_video_'+keyColor;
+	}
+	return getColorByKey(keyColor);
+	
+}
+
+/**
+* This operation evaluate if a View received by context is a trigger view for any action.
+*/
+operation View triggerAction(){
+	var app : android!Application:= android!Application.all.at(0);
+	var mainActivity : android!Activity = app.mainActivity;
+	
+	return mainActivity.actions->collect(a | a.view).includes(self);
+}
+

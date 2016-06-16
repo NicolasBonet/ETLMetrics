@@ -1,0 +1,73 @@
+(function() {
+  angular.module('invApp')
+    .service('invData', invData);
+
+  invData.$inject = ['$http'];
+  function invData ($http) {
+
+[%
+	for(page in app.pages){
+		var resourceName = page.resource.name;
+		var url = page.resource.url;
+%]
+    /**
+     * [%= resourceName %]
+     */
+    var get[%= resourceName %]s = function(callback){
+      $http.get('[%= url %]').then(function(response){
+        callback(response.data);
+      },
+      function(response){//error
+        console.log(response);
+      });
+    };
+
+    var add[%= resourceName %] = function(data, callback){
+      $http.post('[%= url %]', data).then(function(response){
+        callback(response.data);
+      },
+      function(response){//error
+        console.log(response);
+      });
+    };
+
+    var update[%= resourceName %] = function(data, callback){
+      $http.put('[%= url %]'+data.id, data).then(function(response){
+        callback(response.data);
+      },
+      function(response){//error
+        console.log(response);
+      });
+    };
+
+    var delete[%= resourceName %] = function(id, callback){
+      $http.delete('[%= url %]' + id).then(function(response){
+        callback(response.data);
+      },
+      function(response){//error
+        console.log(response);
+      });
+    };
+
+[%
+	}
+%]
+
+    return {
+[%
+	for(page in app.pages){
+		var resourceName = page.resource.name;
+		var url = page.resource.url;
+%]
+      get[%= resourceName %]s: get[%= resourceName %]s,
+      add[%= resourceName %]: add[%= resourceName %],
+      update[%= resourceName %]: update[%= resourceName %],
+      delete[%= resourceName %]: delete[%= resourceName %],
+      
+[%
+	}
+%]
+    };
+  }
+
+})();

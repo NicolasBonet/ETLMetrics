@@ -1,0 +1,163 @@
+
+//---------------------------------------------------------
+// Ids generators for the diferent android Views Types.
+//---------------------------------------------------------
+/**
+* Generates a valid id for a GridLayout
+*/
+operation android!GridLayout nextId(): String{
+	var key = 'lastId_GridLayout';
+	contIds.put(key, contIds.get(key) + 1);
+	return  'gridLayout_'+contIds.get(key);
+}
+
+/**
+* Generates a valid id for a LinearLayout
+*/
+operation android!LinearLayout nextId(): String{
+	var key = 'lastId_LinearLayout';
+	contIds.put(key, contIds.get(key) + 1);
+	return  'linearLayout_'+contIds.get(key);
+}
+
+/**
+* Generates a valid id for a ImageView
+*/
+operation android!ImageView nextId(): String{
+	var key = 'lastId_ImageView';
+	contIds.put(key, contIds.get(key) + 1);
+	return  'imageView_'+contIds.get(key);
+}
+
+/**
+* Generates a valid id for a Button
+*/
+operation android!Button nextId(): String{
+	var key = 'lastId_Button';
+	contIds.put(key, contIds.get(key) + 1);
+	return  'button_'+contIds.get(key);
+}
+
+/**
+* Generates a valid id for a TextView
+*/
+operation android!TextView nextId(): String{
+	var key = 'lastId_TextView';
+	contIds.put(key, contIds.get(key) + 1);
+	return  'textView_'+contIds.get(key);
+}
+//---------------------------------------------------------
+// Other Utilities opertarions
+//---------------------------------------------------------
+/**
+* Converts a newsletter!VerticalAlign from a Cell 
+* to an android gravity value
+*/
+operation newsletter!Cell toGravity(vAlign):String{
+	
+	if (vAlign==newsletter!VerticalAlign#middle)
+	{
+		return "center_vertical";
+	}
+	if (vAlign==newsletter!VerticalAlign#bottom)
+	{
+		return "bottom";
+	}
+	if (vAlign==newsletter!VerticalAlign#top)
+	{
+		return "top";
+	}
+}
+/**
+* Get Styles from newsletter!Text that applies
+* in a android!TextView
+*/
+operation newsletter!Text extractTextStyles():String{
+
+	var styles = "";
+		if (self.bold)
+		{
+			styles = "bold";
+		}
+		if (self.italic)
+		{
+			styles = "italic";
+		}
+		if (self.bold and self.italic)
+		{
+			styles = "bold | italic";
+		}
+	return styles;
+}
+/**
+* Returns a the number 1 as a double data type
+*/
+operation newsletter!Row getSumCells():Real{
+	return 1.0d;
+}
+
+/**
+* Returns the image name normalized for android 
+* Given the newsletter!Image that contains the src
+* The normalization removes special characters and accentuations.
+*/
+operation newsletter!Image extractImageNameNormalized(target:android!ImageView):String{
+	
+	var urlImagen: new Native("java.lang.String") = self.src;
+	var lastSlash = urlImagen.lastIndexOf('/');
+	//lastSlash.println();
+	var lastDot = urlImagen.lastIndexOf('.');
+	//lastDot.println();
+	var nombre = urlImagen.substring(lastSlash+1, lastDot);
+	//Normalizes the image name for android, 
+	//It just can be in lower case letters without special characters.
+	nombre = nombre.replaceAll("[-+.^:,]","");
+	nombre = nombre.toLowerCase();
+	nombre = nombre.normalize();
+	
+	("Imagen " + target.id + " = "+nombre).println();
+	
+	return nombre.asString();
+}
+
+/**
+* Operation that create an action giving newsletter!Element and a possible trigger android!View.
+* if the newsletter!Element has a link, then it's created an android!Action with the source link 
+* and the trigger android!View associated.
+*/
+operation newsletter!Element createActionIfApplies(trigger:android!View){
+	if (self.link.isDefined())
+		{
+			var action:android!Action = new android!Action;
+			action.actionLink = self.link;
+			action.view = trigger;
+			allActions.add(action);
+		}
+}	
+
+/**
+* Operation that standardizes a String passed through the context by removing the accents. 
+* Returns the string without the common accents.
+*/
+operation String normalize():String{
+	
+	var myString: new Native("java.lang.String") = self;
+	
+	myString = myString.replace("á","a");
+	myString = myString.replace("é","e");
+	myString = myString.replace("í","i");
+	myString = myString.replace("ó","o");
+	myString = myString.replace("ú","u");
+	myString = myString.replace("ñ","n");
+	
+	myString = myString.replace("Á","A");
+	myString = myString.replace("É","E");
+	myString = myString.replace("Í","I");
+	myString = myString.replace("Ó","O");
+	myString = myString.replace("Ú","U");
+	myString = myString.replace("Ñ","N");
+	
+	return myString;
+}
+
+

@@ -1,0 +1,6 @@
+[%
+("Start EGL HTML2Text - generateHTML-----------").println();
+	var entityTemplate:Template:= TemplateFactory.load('newsletter.egl');
+	entityTemplate.generate('../../generated/newsletter.html');
+("Finish EGL HTML2Text - generateHTML -----------").println();
+%]

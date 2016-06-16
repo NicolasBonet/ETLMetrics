@@ -1,0 +1,111 @@
+<navigation></navigation>
+
+<div class="container">
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4>[%= page.resource.name%]</h4>
+        </div>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>[%
+	for(atribute in page.resource.atributes) {
+%]              
+                <th>[%= atribute.name %]</th>[%
+	}
+%]
+                
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="dato in vm.data.lista">[%
+	for(atribute in page.resource.atributes) {
+%]              
+                <td>{{ dato.[%= atribute.name %] }}</td>[%
+	}
+%]
+                
+                <td>
+                  <div class="btn-group">
+                    <button class="btn btn-primary" ng-click="vm.edit[%= page.resource.name%](dato)">
+                      <span class="glyphicon glyphicon-edit"></span>
+                    </button>
+                    <button class="btn btn-danger" ng-click="vm.delete[%= page.resource.name%](dato.id)">
+                      <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 starter-template">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+        	  <button class="btn btn-danger pull-right" ng-click="vm.add[%= page.resource.name%]()">
+            <span class="glyphicon glyphicon-remove"></span> Borrar cambios
+          </button>
+          <h4>Detalles [%= page.resource.name%]</h4>
+        </div>
+        <div class="panel-body">
+          <form class="form-horizontal">
+         
+            <div class="form-group">
+              <label for="inputEmail3" class="col-sm-2 control-label">Id</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="inputEmail3" placeholder="Id" ng-model="vm.data.detalle.id" disabled>
+              </div>
+            </div>
+            
+[%
+	for(atribute in page.resource.atributes.select(a | a.isTypeOf(play!SimpleAtribute))){
+%]             
+            <div class="form-group">
+              <label for="[%= atribute.name %]" class="col-sm-2 control-label">[%= atribute.name %]</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="[%= atribute.name %]" ng-model="vm.data.detalle.[%= atribute.name %]">
+              </div>
+            </div>
+[%
+	}
+%]   
+[%
+	for(atribute in page.resource.atributes.select(a | a.isTypeOf(play!RefAtribute))){
+%]            
+            <div class="form-group">
+              <label for="[%= atribute.name %]" class="col-sm-2 control-label">[%= atribute.name %]</label>
+              <div class="col-sm-10">
+                <select name="mySelect" id="mySelect" class="form-control"
+                      ng-options="option.id for option in vm.data.[%= atribute.name %]s track by option.id"
+                      ng-model="vm.data.selected[%= atribute.name.firstToUpperCase %]Option">
+                </select>
+              </div>
+            </div>
+[%
+	}
+%]
+
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button ng-show="!vm.data.create" type="button" class="btn btn-primary" ng-click="vm.update[%= page.resource.name%]()">Guardar</button>
+                <button ng-show="vm.data.create" type="button" class="btn btn-success" ng-click="vm.crear[%= page.resource.name%]()">Crear</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+
+</div><!-- /.container -->

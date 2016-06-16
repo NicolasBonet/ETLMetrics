@@ -1,0 +1,178 @@
+[%
+var isGrid = new Boolean;
+if(view.Name.endsWith('Grid') )
+isGrid=true;
+else
+isGrid=false;
+
+var entidad = new String;
+var controlador = new String;
+var modelo = new String;
+var isFirst = new Boolean;
+	for(ent in swing.entidad.first)
+	{
+		entidad = ent;
+		for (ctr in ent.controlador)
+		{
+			controlador=ctr;
+			modelo = ctr.vista.first.clase;
+		}
+	}
+	var atr = new Set;
+	if(isGrid==false)
+	{
+atr = modelo.first.atributo.Nombre;
+	}
+%]
+package vista;
+import java.awt.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.*;
+
+public class [%=view.Name%] extends JFrame
+{	
+	public JLabel lbTitulo;
+[% 
+if(isGrid==false)
+{
+	for(campo in atr)
+	{
+		%] public JLabel lb[%=campo%];
+		   public JTextField txt[%=campo%];
+		[%
+	}
+%]
+	public JButton cmdConfirmar;
+	public JButton cmdRegresar;
+[%
+}
+else
+{
+%]
+	public JButton cmdCrear;
+	public JButton cmdConsultar;
+	public JButton cmdActualizar;
+	public JButton cmdEliminar;
+	public JTable tabla;
+	public DefaultTableModel dtm;
+[%}%]	
+	public JPanel panelDetalle ;
+	public JPanel panelBotones;
+	
+	[% if(isGrid==true)
+	{%]
+	public [%=view.Name%] ()
+	[% }
+	else
+	{%]
+	public [%=view.Name%] (int modo)
+	[% }%] 
+	{
+	JFrame ventana = new JFrame("[%=swing.Nombre->first().firstToLowerCase()%]");
+	ventana.setExtendedState(JFrame.MAXIMIZED_BOTH);
+	ventana.setDefaultCloseOperation(EXIT_ON_CLOSE);
+	ventana.setLayout(new GridBagLayout());
+	JPanel panelDetalle = new JPanel();
+	JPanel panelBotones = new JPanel();
+	lbTitulo = new JLabel("[%=swing.Nombre->first().firstToLowerCase()%]");
+    Font fuente = new Font ("Times-Roman", Font.BOLD + Font.ITALIC, 36);
+    lbTitulo.setFont(fuente);
+   fuente = new Font ("Times-Roman", Font.BOLD + Font.ITALIC, 16);
+[%
+if(isGrid==false)
+{
+	for(campo in atr)
+	{
+		%] lb[%=campo%] = new JLabel ("[%=campo%]");
+		   txt[%=campo%]= new JTextField("", 20) ;
+		   lb[%=campo%].setFont(fuente);
+		   txt[%=campo%].setFont(fuente);
+		[%
+	}
+	%]
+		this.cmdConfirmar= new JButton("Confirmar");
+		this.cmdRegresar = new JButton("Regresar");
+	[%
+}
+else
+{
+%]
+	this.cmdCrear = new JButton("Crear");
+	this.cmdConsultar = new JButton("Consultar");
+	this.cmdActualizar = new JButton("Actualizar");
+	this.cmdEliminar = new JButton("Eliminar");
+    
+ 	cmdCrear.setFont(fuente);
+	cmdConsultar.setFont(fuente);
+	cmdActualizar.setFont(fuente);
+	cmdEliminar.setFont(fuente);
+[%}%]
+	
+	GridBagConstraints gbc = new GridBagConstraints();
+	gbc.insets = new Insets(5,10,10,10);
+	panelDetalle.setLayout(new GridBagLayout());
+	gbc.gridx=0;
+	gbc.gridy=0;
+	
+	panelDetalle.add(lbTitulo, gbc);
+[% 
+if(isGrid==true)
+{
+	isFirst=true;
+	%]	String[] columnas = {[%
+	for (campo in atr)
+	{
+		if(isFirst==true)
+		{
+			%]"[%=campo%]"[%
+			isFirst=false;
+		}
+		else
+		{
+			%],"[%=campo%]"[%
+		}
+	}
+%]
+};
+	DefaultTableModel dtm = new DefaultTableModel(columnas,20);
+	tabla = new JTable(dtm);
+
+	tabla.setPreferredScrollableViewportSize(tabla.getPreferredSize());
+	tabla.setAutoscrolls(true);
+	tabla.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+	JScrollPane scroll = new JScrollPane(tabla);
+	panelDetalle.setFont(fuente);
+    gbc.gridy=1;
+	panelDetalle.add(scroll, gbc);
+	
+
+	gbc.anchor=GridBagConstraints.WEST;
+	gbc.fill  = GridBagConstraints.HORIZONTAL;
+	gbc.insets = new Insets(3,10,3,10);
+	
+	gbc.gridx=0;
+	gbc.gridy=0;
+	gbc.gridwidth = 3;
+
+	gbc.fill = GridBagConstraints.BOTH;
+
+	panelBotones.add(this.cmdCrear,gbc);
+	panelBotones.add(this.cmdConsultar,gbc);
+	panelBotones.add(this.cmdActualizar,gbc);
+	panelBotones.add(this.cmdEliminar,gbc);
+	gbc.gridx=1;
+	gbc.gridx=0;
+	gbc.gridy=0;
+[%
+}
+
+%]
+
+
+	ventana.add(panelDetalle,gbc);
+	gbc.gridy=1;
+	ventana.add(panelBotones,gbc);
+	ventana.setVisible(true);
+	
+	}
+}
