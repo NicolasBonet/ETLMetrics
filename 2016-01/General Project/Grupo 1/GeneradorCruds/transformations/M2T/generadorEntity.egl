@@ -1,0 +1,52 @@
+[%	
+import "./operations.eol";
+import "./subTemplates.egl";
+%]
+package [%= claseEntity.eContainer().name %];
+
+[*For para imports*]
+[% for (importElement in claseEntity.imports) { %]
+import [%= importElement.name %];
+[%}%]
+
+/**
+* Clase para manejo de la tabla [%= claseEntity.name %]
+*
+*/
+[*Agrega anotaciones a la clase*]
+[%= claseEntity.annotationsText()%]
+[*Agrega decalaracion de la clase*]
+[%= claseEntity.declaration()%]
+{
+	
+	[*Agrega los atributos a la clase*]
+	[% for (attributeElement in claseEntity.attributes) { %]
+		[*Agrega anotaciones al atributo*]
+		[%= attributeElement.annotationsText()%]
+		[%= attributeElement.declaration()%];
+		
+	[%}%]
+	
+	public [%= claseEntity.name %]()
+	{
+	}
+	
+	[*Agrega los metodos de la clase*]
+	[% for (methodElement in claseEntity.methods) { %]
+		[*Agrega anotaciones al atributo*]
+		[%= methodElement.annotationsText()%]
+		[%= methodElement.declaration()%]
+		[%if (methodElement.name.startsWith('get')){%]
+		{
+			return [%= methodElement.name.substring(3).firstToLowerCase() %];
+		}
+		[%}%]
+		[%if (methodElement.name.startsWith('set')){%]
+		{
+			[%var nameAttribute = methodElement.name.substring(3).firstToLowerCase();%]
+			this.[%=nameAttribute%] = [%=nameAttribute%];
+		}
+		[%}%]
+	[%}%]	
+}
+

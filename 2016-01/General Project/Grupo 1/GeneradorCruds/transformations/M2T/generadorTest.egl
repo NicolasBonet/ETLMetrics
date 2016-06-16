@@ -1,0 +1,109 @@
+[%	
+import "./operations.eol";
+import "./subTemplates.egl";
+%]
+package [%= claseTest.eContainer().name %];
+
+[*For para imports*]
+[% for (importElement in claseTest.imports) { %]
+import [%= importElement.name %];
+[%}%]
+
+/**
+* Clase para manejo de test [%= claseTest.name %]
+*
+*/
+[*Agrega anotaciones a la clase*]
+[%= claseTest.annotationsText()%]
+[*Agrega decalaracion de la clase*]
+[%= claseTest.declaration()%]
+{
+	[*Agrega los atributos a la clase*]
+	[% for (attributeElement in claseTest.attributes) { %]
+		[%= attributeElement.declaration()%];
+	[%}%]
+	
+	[%
+	var mp : Attribute = claseTest.attributes->select(a | a.datatypeAttribute.name == entitiesManager.getTypeAsText() )->first();
+	var factory : Attribute = claseTest.attributes->select(a | a.datatypeAttribute.name == 'PodamFactory')->first();
+	%]
+	
+	[*Agrega los metodos de la clase*]
+	[% for (methodElement in claseTest.methods) { %]
+	
+		[*Agrega anotaciones al atributo*]
+		[%= methodElement.annotationsText()%]
+		[%= methodElement.declaration()%]
+		[%if (methodElement.name.startsWith('prepareTest')){%]
+		{
+			[% for (attributeElement in claseTest.attributes) { %]
+				[%if (attributeElement.datatypeAttribute.getTypeAsText()=='PodamFactory'){%]
+				[%= attributeElement.name%] = new PodamFactoryImpl();
+				[%}%]
+				[%else{%]
+				[%= attributeElement.name%] = new [%= attributeElement.datatypeAttribute.getTypeAsText()%]();
+				[%}%]
+			[%}%]
+		}
+		[%}%]
+		[%if (methodElement.name.startsWith('test1') and  methodElement.name.endsWith('Add')){%]
+		{
+			[%var entityName = methodElement.name.substring('test1'.length(), (methodElement.name.length()-'Add'.length())); %]
+			[%var entity = entities.selectByName(entityName); %]
+			//test1 Add [%= entityName%]
+			[%= entity.manufactureAndPopulatePojo(factory)%]
+			
+			[%= mp.name%].add[%= entityName%]([%= entityName.firstToLowerCase()%]);
+			
+			[% for (attribute in entity.attributes) {%]
+				[% var idText:String = entityName.firstToLowerCase()+'.getId()';%]
+				[% if (not attribute.datatypeAttribute.isTypeOf(java!ListType)){%]
+			    [%= entity.createAssertEquals(attribute, mp, idText)%]
+			    [%}%]
+			[%}%]
+		}
+		[%}%]
+		[%if (methodElement.name.startsWith('test2Get')){%]
+		{
+			[%var entityName = methodElement.name.substring('test2Get'.length()); %]
+			[%var entity = entities.selectByName(entityName); %]
+			//test2 Get Singular [%= entityName%]
+			assertNotNull([%= mp.name%].get[%= entityName%]([%= mp.name%].get[%= entityName%]s().get(0).getId()));
+		}
+		[%}%]
+		[%if (methodElement.name.startsWith('test3') and  methodElement.name.endsWith('Edit')){%]
+		{
+			[%var entityName = methodElement.name.substring('test3'.length(), (methodElement.name.length()-'Edit'.length())); %]
+			[%var entity = entities.selectByName(entityName); %]
+			//test3 Edit [%= entityName%]
+			[%= entity.manufactureAndPopulatePojo(factory)%]
+			
+			int primerId = mp.get[%= entityName%]s().get(0).getId();
+			
+			[%= mp.name%].edit[%= entityName%](primerId, [%= entity.gettersAsParamsText()%]);
+			
+			[% for (attribute in entity.attributes) {%]
+				[% var idText:String = 'primerId';%]
+				[% if (attribute.name <>'id' and not attribute.datatypeAttribute.isTypeOf(java!ListType)){%]
+			    [%= entity.createAssertEquals(attribute, mp, idText)%]
+			    [%}%]
+			[%}%]
+			
+		}
+		[%}%]
+		[%if (methodElement.name.startsWith('test4') and  methodElement.name.endsWith('Delete')){%]
+		{
+			[%var entityName = methodElement.name.substring('test4'.length(), (methodElement.name.length()-'Delete'.length())); %]
+			[%var entity = entities.selectByName(entityName); %]
+			//test4 Delete [%= entityName%]
+			int primerId = [%= mp.name%].get[%= entityName%]s().get(0).getId();
+		
+			assertNotNull([%= mp.name%].get[%= entityName%](primerId));
+		
+			[%= mp.name%].delete[%= entityName%](primerId);
+		
+			assertNull([%= mp.name%].get[%= entityName%](primerId));
+		}
+		[%}%]
+	[%}%]
+}

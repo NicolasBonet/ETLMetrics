@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.uniandes.xtext
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: org.uniandes.xtext; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext,
+ org.eclipse.xtext.xbase,
+ org.eclipse.equinox.common;bundle-version="3.5.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext.xbase.lib,
+ org.antlr.runtime,
+ org.eclipse.xtext.util,
+ org.eclipse.xtend.lib,
+ org.eclipse.emf.common
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: org.uniandes.xtext.services,
+ org.uniandes.xtext.parser.antlr,
+ org.uniandes.xtext.serializer,
+ org.uniandes.xtext.sQL,
+ org.uniandes.xtext.sQL.impl,
+ org.uniandes.xtext.validation,
+ org.uniandes.xtext,
+ org.uniandes.xtext.sQL.util,
+ org.uniandes.xtext.generator,
+ org.uniandes.xtext.parser.antlr.internal,
+ org.uniandes.xtext.scoping
+Import-Package: org.apache.log4j

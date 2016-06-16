@@ -1,0 +1,118 @@
+[%	
+import "./operations.eol";
+import "./subTemplates.egl";
+%]
+package [%= entitiesManager.eContainer().name %];
+
+[*For para imports*]
+[% for (importElement in entitiesManager.imports) { %]
+import [%= importElement.name %];
+[%}%]
+
+/**
+* Clase que administra la persistencia 
+* manipulando las entidades [%= entitiesManager.name %]
+*/
+[*Agrega anotaciones a la clase*]
+[%= entitiesManager.annotationsText()%]
+[*Agrega decalaracion de la clase*]
+[%= entitiesManager.declaration()%]
+{
+	[*Agrega los atributos a la clase*]
+	[% for (attributeElement in entitiesManager.attributes) { %]
+		[*Agrega anotaciones al atributo*]
+		[%= attributeElement.annotationsText()%]
+		[%if (attributeElement.value.isDefined() ){%]
+			[%= attributeElement.declaration()%] = [%= attributeElement.value%];
+		[%}%]
+		[%else{%]
+			[%= attributeElement.declaration()%];
+		[%}%]
+	[%}%]
+	
+    /*
+	 * [%= entitiesManager.name %], Manejador de [%= entities->size()%] entities
+	 */
+	public [%= entitiesManager.name %]()
+	{	
+		[%
+		var emf : Attribute = entitiesManager.attributes->select(a | a.datatypeAttribute.name == 'EntityManagerFactory')->first();
+		var em : Attribute = entitiesManager.attributes->select(a | a.datatypeAttribute.name == 'EntityManager')->first();
+		%]
+		[%= emf.name%] = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+        [%= em.name%] = [%= emf.name%].createEntityManager();
+	}
+	
+	[*Agrega los metodos de la clase*]
+	[% for (methodElement in entitiesManager.methods) { %]
+		[*Agrega anotaciones al atributo*]
+		[%= methodElement.annotationsText()%]
+		[%= methodElement.declaration()%]
+		[%if (methodElement.name.startsWith('get') and methodElement.name.endsWith('s') ){%]
+		{
+			[%var entityName = methodElement.name.substring(3, (methodElement.name.length()-1)); %]
+			// get plural [%= entityName%]
+			Query q = [%= em.name%].createQuery("SELECT c FROM [%= entityName%] c");
+        	return q.getResultList();
+			
+		}
+		[%}%]
+		[%if (methodElement.name.startsWith('get') and not methodElement.name.endsWith('s') ){%]
+		{
+			[%var entityName = methodElement.name.substring(3); %]
+			// get singular [%= entityName%]
+			[% if (entities.selectByName(entityName).attributes->one(a | a.name=='id') ){%]
+				return [%= em.name%].find([%= entityName%].class, id);
+			[%}%]
+			[%else {%]
+				// NO contiene campo id definido. Corrija para generar cuerpo del metodo
+				return null;
+			[%}%]
+		}
+		[%}%]
+		[%if (methodElement.name.startsWith('add') ){%]
+		{
+			[%var entityName = methodElement.name.substring(3); %]
+			// add body [%= entityName%]
+			[%= em.name%].getTransaction().begin();
+        	[%= em.name%].persist([%= entityName.firstToLowerCase()%]);
+        	[%= em.name%].getTransaction().commit();
+		}
+		[%}%]
+		[%if (methodElement.name.startsWith('edit') ){%]
+		{
+			[%var entityName = methodElement.name.substring(4); %]
+			// edit body [%= entityName%]
+			[% if (entities.selectByName(entityName).attributes->one(a | a.name=='id') ){%]
+				[%= entityName%] [%= entityName.firstToLowerCase()%] = [%= em.name%].find([%= entityName%].class, id);
+				[%= em.name%].getTransaction().begin();
+				[% for (attribute in entities.selectByName(entityName).attributes) {%]
+					[% if (attribute.name <>'id' and (not attribute.datatypeAttribute.isTypeOf(java!ListType))){%]
+					[%= entityName.firstToLowerCase()%].set[%= attribute.name.firstToUpperCase()%]([%= attribute.name%]);
+					[%}%]
+				[%}%]
+				[%= em.name%].getTransaction().commit();
+			[%}%]
+			[%else {%]
+				// NO contiene campo id definido. Corrija para generar cuerpo del metodo
+			[%}%]
+		}
+		[%}%]
+		[%if (methodElement.name.startsWith('delete') ){%]
+		{
+			[%var entityName = methodElement.name.substring(6); %]
+			// delete body [%= entityName%]
+			[% if (entities.selectByName(entityName).attributes->one(a | a.name=='id') ){%]
+				[%= entityName%] [%= entityName.firstToLowerCase()%] = [%= em.name%].find([%= entityName%].class, id);
+				[%= em.name%].getTransaction().begin();
+				[%= em.name%].remove([%= entityName.firstToLowerCase()%]);
+				[%= em.name%].getTransaction().commit();
+			[%}%]
+			[%else {%]
+				// NO contiene campo id definido. Corrija para generar cuerpo del metodo
+			[%}%]
+		}
+		[%}%]
+	[%}%]	
+	
+}

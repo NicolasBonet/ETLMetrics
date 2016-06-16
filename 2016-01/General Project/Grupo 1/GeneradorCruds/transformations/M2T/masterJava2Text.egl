@@ -1,0 +1,117 @@
+[%	
+import "./operations.eol";
+var app : java!Project:= java!Project.all.at(0);
+out.println(app);
+%]
+[%
+out.println("INICIO generador SQL2Java-------------------------------------------");
+
+//PROCEDIMIENTOS PREVIOS A LA GENERACION DE CODIGO
+
+//Division de trabajo en templates
+var packageEntities:String = "entities";
+var packageTest:String  = "test";
+var packageEntitiesManager:String  = "marketplace";
+
+//Elementos fundamentales
+var entities:Set;
+var tests:Set;
+var entitiesManager:Class;
+
+for (clase in Class.all)
+{
+	out.println("Procesando Clase = " + clase.name);
+	out.println("Contenida en packete = " + clase.eContainer());
+	var paquete: Package = clase.eContainer(); 
+	
+	switch (paquete.name){
+	
+	case packageEntities : 
+		out.println("Entitiy encontrada = " + clase);
+		entities.add(clase);
+		
+	case packageTest : 
+		out.println("Test encontrado = " + clase);
+		tests.add(clase);
+		
+	case packageEntitiesManager : 
+		out.println("Manejado persistencia = " + clase);
+		entitiesManager=clase;
+		
+	default: 
+			out.println("Paquete no esperado= "	+ clase.eContainer());
+	}
+}
+
+
+var fjava = new Native("org.eclipse.epsilon.egl.formatter.language.JavaFormatter");
+
+//CLASES DEL MUNDO TIPO ENTITY
+
+var clasePojo : Template ;
+
+for (entity in entities)
+{
+	out.println("Procesando ClaseEntity = " + entity.name);
+	
+	clasePojo  = TemplateFactory.load("generadorEntity.egl");
+	clasePojo.setFormatter(fjava);
+	clasePojo.populate("claseEntity", entity);
+	clasePojo.generate(dirPackage(entity.eContainer().name) + entity.name.firstToUpperCase() + ".java");
+
+}
+
+//CLASES DE TEST
+
+var claseTest : Template ;
+
+for (test in tests)
+{
+	out.println("Procesando ClaseTest = " + test.name);
+
+	claseTest  = TemplateFactory.load("generadorTest.egl");
+	claseTest.setFormatter(fjava);
+	claseTest.populate("claseTest", test);
+	claseTest.populate("entitiesManager", entitiesManager);
+	claseTest.populate("entities", entities);
+	claseTest.generate(dirPackage(test.eContainer().name) + test.name.firstToUpperCase() + ".java");
+
+}
+
+//ClASE MANEJADORA DE LA PERSISTENCIA
+
+var manejadorPersistencia : Template ;
+
+out.println("Creando Manejador de Persisntencia" );
+
+manejadorPersistencia  = TemplateFactory.load("generadorEntitiesManager.egl");
+manejadorPersistencia.setFormatter(fjava);
+manejadorPersistencia.populate("entitiesManager", entitiesManager);
+manejadorPersistencia.populate("entities", entities);
+manejadorPersistencia.generate(dirPackage(entitiesManager.eContainer().name) + entitiesManager.name +".java");
+
+
+//ARCHIVO ESTATICOS 
+
+var fxml = new Native("org.eclipse.epsilon.egl.formatter.language.XmlFormatter");
+
+var tpom = TemplateFactory.load(dirStaticFiles()+ "pom.xml");
+tpom.setFormatter(fxml);
+tpom.generate(dirPomXML()+"pom.xml");
+
+var tpersistence = TemplateFactory.load(dirStaticFiles()+"persistence.xml");
+tpersistence.setFormatter(fxml);
+tpersistence.generate(dirPersistenceXML()+"persistence.xml");
+
+
+var tproject = TemplateFactory.load(dirStaticFiles()+"project.project");
+tproject.setFormatter(fxml);
+tproject.generate(dirProject() + ".project");
+
+
+var tclasspath = TemplateFactory.load(dirStaticFiles() + "classpath.classpath");
+tclasspath.setFormatter(fxml);
+tclasspath.generate(dirClassPath()+".classpath");
+
+out.println("TERMINO generador SQL2Java-------------------------------------------");
+%]

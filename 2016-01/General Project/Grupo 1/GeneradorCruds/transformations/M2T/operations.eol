@@ -1,0 +1,119 @@
+/**--------------------------------------------------------------**/
+//Definicion de operaciones reutilizables entre egls
+/**--------------------------------------------------------------**/
+
+//--------------------------------------------------------------
+//Operaciones sobre directorios
+//--------------------------------------------------------------
+operation dirGenerado(): String{  
+   return "../../generado/";
+}
+
+operation dirStaticFiles():String{
+ return "../../staticFiles/";
+}
+
+operation getAppName():String{
+ 	var app : java!Project:= java!Project.all.at(0);
+ 	return app.name;
+}
+
+operation dirProyecto(): String{  
+   return dirGenerado() + getAppName() +"/";
+}
+
+operation dirSource(): String {
+	return dirProyecto()+"src/";
+}
+
+operation dirPackage(packageName: String): String {
+	return dirSource()+ packageName + "/";
+}
+
+operation dirPomXML(): String {
+	return dirProyecto();
+}
+
+operation dirPersistenceXML(): String{
+	return dirSource()+"META-INF/";
+}
+
+operation dirProject(): String {
+	return dirProyecto();
+}
+
+operation dirClassPath(): String {
+	return dirProyecto();
+}
+
+//--------------------------------------------------------------
+// Operaciones comunes para los egls que crean las clases
+//--------------------------------------------------------------
+
+/**Classifier agrupa DataType y  Class asi que el nombre funciona para cualquiera
+el tipo List es un caso especial*/
+operation Classifier getTypeAsText():String {
+	//Si es una clase o un datatype pesonalizado
+	var type = self.name;
+	//Si es una lista 
+	if (self.isTypeOf(java!ListType) )
+	{
+		type = "List<"+self.name+">";
+	}
+	if (self.isTypeOf(java!Primitive) )
+	{
+		type = self.typeName.literal;
+	}
+	return type;
+}
+
+/**
+Retorna los parametros de un metodo en formato de una linea y separados por coma
+*/
+operation Method getTextRepresentationForMethodParameters():String{
+	var textParameters:String = "";
+		for (parameter in self.methodParameters.asSequence()->sortBy(m | m.order)) {
+			textParameters = textParameters + parameter.datatypeParameter.getTypeAsText()+" " +parameter.name;
+			if (hasMore) {
+				textParameters = textParameters + ", "; 	
+			}
+		}
+	return textParameters;
+}
+
+/**
+Retorna los keyvalues de una anotacion en formato de una linea, 
+separados por coma y dentro de parentesis
+*/
+operation Annotation getTextRepresentationForAnnotationKeyValues():String{
+	var textParameters:String = "";
+		for (keyValue in self.annotationParameters) {	
+			if (loopCount == 1) {
+				 textParameters = textParameters + "("; 
+			}
+			if (keyValue.key.isDefined() and keyValue.value.isDefined() )
+			{
+				textParameters = textParameters + keyValue.key + " = " + keyValue.value;
+			}
+			if (keyValue.key.isUndefined() and keyValue.value.isDefined() )
+			{
+				textParameters = textParameters + keyValue.value;
+			}
+			
+			if (hasMore) {
+				textParameters = textParameters + ", "; 	
+			}else{
+				textParameters = textParameters + ")";
+			}
+		}
+	return textParameters;
+}
+/**
+* Selecciona una clase de una Collection (contexto) , dado el nombre de la clase
+* (Util para buscar entities class) 
+*/
+operation Collection selectByName(name:String):Class{
+	 var class : Class = self->select(e | e.name == name)->first();
+	 return class;
+}
+

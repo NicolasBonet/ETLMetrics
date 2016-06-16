@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="ASCII"?>
+<mmJavaMinimalista:Project xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mmJavaMinimalista="http://uniandes.edu.co/mmJavaMinimalista" name="co.edu.uniandes.sqlcrud">
+  <packages name="entities">
+    <classes name="Client">
+      <annotateClass name="@Entity"/>
+      <methods datatypeReturn="//@datatype.0" name="getId"/>
+      <methods datatypeReturn="//@datatype.4" name="getPassword"/>
+      <methods datatypeReturn="//@datatype.4" name="getName"/>
+      <methods datatypeReturn="//@datatype.10" name="getCarritos"/>
+      <methods name="setId">
+        <methodParameters datatypeParameter="//@datatype.0" name="id"/>
+      </methods>
+      <methods name="setPassword">
+        <methodParameters datatypeParameter="//@datatype.4" name="password"/>
+      </methods>
+      <methods name="setName">
+        <methodParameters datatypeParameter="//@datatype.4" name="name"/>
+      </methods>
+      <methods name="setCarritos">
+        <methodParameters datatypeParameter="//@datatype.10" name="carritos"/>
+      </methods>
+      <attributes name="id" visibility="private" datatypeAttribute="//@datatype.0">
+        <annotateAttribute name="@Id"/>
+      </attributes>
+      <attributes name="password" visibility="private" datatypeAttribute="//@datatype.4"/>
+      <attributes name="name" visibility="private" datatypeAttribute="//@datatype.4"/>
+      <attributes name="carritos" visibility="private" datatypeAttribute="//@datatype.10">
+        <annotateAttribute name="@OneToMany">
+          <annotationParameters key="mappedBy" value="&quot;client&quot;"/>
+          <annotationParameters key="cascade" value="CascadeType.ALL"/>
+        </annotateAttribute>
+        <annotateAttribute name="@PodamExclude"/>
+      </attributes>
+      <imports name="javax.persistence.Id"/>
+      <imports name="javax.persistence.OneToMany"/>
+      <imports name="javax.persistence.CascadeType"/>
+      <imports name="uk.co.jemos.podam.common.PodamExclude"/>
+      <imports name="java.util.List"/>
+      <imports name="javax.persistence.Entity"/>
+    </classes>
+    <classes name="Producto">
+      <annotateClass name="@Entity"/>
+      <methods datatypeReturn="//@datatype.4" name="getName"/>
+      <methods datatypeReturn="//@datatype.0" name="getId"/>
+      <methods datatypeReturn="//@datatype.14" name="getItems"/>
+      <methods name="setName">
+        <methodParameters datatypeParameter="//@datatype.4" name="name"/>
+      </methods>
+      <methods name="setId">
+        <methodParameters datatypeParameter="//@datatype.0" name="id"/>
+      </methods>
+      <methods name="setItems">
+        <methodParameters datatypeParameter="//@datatype.14" name="items"/>
+      </methods>
+      <attributes name="name" visibility="private" datatypeAttribute="//@datatype.4"/>
+      <attributes name="id" visibility="private" datatypeAttribute="//@datatype.0">
+        <annotateAttribute name="@Id"/>
+      </attributes>
+      <attributes name="items" visibility="private" datatypeAttribute="//@datatype.14">
+        <annotateAttribute name="@OneToMany">
+          <annotationParameters key="mappedBy" value="&quot;producto&quot;"/>
+          <annotationParameters key="cascade" value="CascadeType.ALL"/>
+        </annotateAttribute>
+        <annotateAttribute name="@PodamExclude"/>
+      </attributes>
+      <imports name="javax.persistence.Id"/>
+      <imports name="javax.persistence.OneToMany"/>
+      <imports name="javax.persistence.CascadeType"/>
+      <imports name="uk.co.jemos.podam.common.PodamExclude"/>
+      <imports name="java.util.List"/>
+      <imports name="javax.persistence.Entity"/>
+    </classes>
+    <classes name="Carrito">
+      <annotateClass name="@Entity"/>
+      <methods datatypeReturn="//@datatype.0" name="getId"/>
+      <methods datatypeReturn="//@datatype.4" name="getName"/>
+      <methods datatypeReturn="//@datatype.5" name="getClient"/>
+      <methods datatypeReturn="//@datatype.12" name="getCarritoItems"/>
+      <methods name="setId">
+        <methodParameters datatypeParameter="//@datatype.0" name="id"/>
+      </methods>
+      <methods name="setName">
+        <methodParameters datatypeParameter="//@datatype.4" name="name"/>
+      </methods>
+      <methods name="setClient">
+        <methodParameters datatypeParameter="//@datatype.5" name="client"/>
+      </methods>
+      <methods name="setCarritoItems">
+        <methodParameters datatypeParameter="//@datatype.12" name="carritoItems"/>
+      </methods>
+      <attributes name="id" visibility="private" datatypeAttribute="//@datatype.0">
+        <annotateAttribute name="@Id"/>
+      </attributes>
+      <attributes name="name" visibility="private" datatypeAttribute="//@datatype.4"/>
+      <attributes name="client" visibility="private" datatypeAttribute="//@datatype.5">
+        <annotateAttribute name="@ManyToOne">
+          <annotationParameters key="fetch" value="FetchType.LAZY"/>
+          <annotationParameters key="cascade" value="CascadeType.PERSIST"/>
+        </annotateAttribute>
+        <annotateAttribute name="@PrimaryKeyJoinColumn"/>
+        <annotateAttribute name="@PodamExclude"/>
+      </attributes>
+      <attributes name="carritoItems" visibility="private" datatypeAttribute="//@datatype.12">
+        <annotateAttribute name="@OneToMany">
+          <annotationParameters key="mappedBy" value="&quot;carrito&quot;"/>
+          <annotationParameters key="cascade" value="CascadeType.ALL"/>
+        </annotateAttribute>
+        <annotateAttribute name="@PodamExclude"/>
+      </attributes>
+      <imports name="javax.persistence.Id"/>
+      <imports name="javax.persistence.ManyToOne"/>
+      <imports name="javax.persistence.FetchType"/>
+      <imports name="javax.persistence.PrimaryKeyJoinColumn"/>
+      <imports name="uk.co.jemos.podam.common.PodamExclude"/>
+      <imports name="javax.persistence.CascadeType"/>
+      <imports name="javax.persistence.OneToMany"/>
+      <imports name="java.util.List"/>
+      <imports name="javax.persistence.Entity"/>
+    </classes>
+    <classes name="CarritoItem">
+      <annotateClass name="@Entity"/>
+      <methods datatypeReturn="//@datatype.9" name="getCarrito"/>
+      <methods datatypeReturn="//@datatype.13" name="getItem"/>
+      <methods name="setCarrito">
+        <methodParameters datatypeParameter="//@datatype.9" name="carrito"/>
+      </methods>
+      <methods name="setItem">
+        <methodParameters datatypeParameter="//@datatype.13" name="item"/>
+      </methods>
+      <attributes name="carrito" visibility="private" datatypeAttribute="//@datatype.9">
+        <annotateAttribute name="@Id"/>
+        <annotateAttribute name="@ManyToOne">
+          <annotationParameters key="fetch" value="FetchType.LAZY"/>
+          <annotationParameters key="cascade" value="CascadeType.PERSIST"/>
+        </annotateAttribute>
+        <annotateAttribute name="@PrimaryKeyJoinColumn"/>
+        <annotateAttribute name="@PodamExclude"/>
+      </attributes>
+      <attributes name="item" visibility="private" datatypeAttribute="//@datatype.13">
+        <annotateAttribute name="@Id"/>
+        <annotateAttribute name="@ManyToOne">
+          <annotationParameters key="fetch" value="FetchType.LAZY"/>
+          <annotationParameters key="cascade" value="CascadeType.PERSIST"/>
+        </annotateAttribute>
+        <annotateAttribute name="@PrimaryKeyJoinColumn"/>
+        <annotateAttribute name="@PodamExclude"/>
+      </attributes>
+      <imports name="javax.persistence.Id"/>
+      <imports name="javax.persistence.ManyToOne"/>
+      <imports name="javax.persistence.FetchType"/>
+      <imports name="javax.persistence.PrimaryKeyJoinColumn"/>
+      <imports name="uk.co.jemos.podam.common.PodamExclude"/>
+      <imports name="javax.persistence.CascadeType"/>
+      <imports name="javax.persistence.Entity"/>
+    </classes>
+    <classes name="Item">
+      <annotateClass name="@Entity"/>
+      <methods datatypeReturn="//@datatype.0" name="getId"/>
+      <methods datatypeReturn="//@datatype.0" name="getCantidad"/>
+      <methods datatypeReturn="//@datatype.4" name="getName"/>
+      <methods datatypeReturn="//@datatype.7" name="getProducto"/>
+      <methods datatypeReturn="//@datatype.12" name="getCarritoItems"/>
+      <methods name="setId">
+        <methodParameters datatypeParameter="//@datatype.0" name="id"/>
+      </methods>
+      <methods name="setCantidad">
+        <methodParameters datatypeParameter="//@datatype.0" name="cantidad"/>
+      </methods>
+      <methods name="setName">
+        <methodParameters datatypeParameter="//@datatype.4" name="name"/>
+      </methods>
+      <methods name="setProducto">
+        <methodParameters datatypeParameter="//@datatype.7" name="producto"/>
+      </methods>
+      <methods name="setCarritoItems">
+        <methodParameters datatypeParameter="//@datatype.12" name="carritoItems"/>
+      </methods>
+      <attributes name="id" visibility="private" datatypeAttribute="//@datatype.0">
+        <annotateAttribute name="@Id"/>
+      </attributes>
+      <attributes name="cantidad" visibility="private" datatypeAttribute="//@datatype.0"/>
+      <attributes name="name" visibility="private" datatypeAttribute="//@datatype.4"/>
+      <attributes name="producto" visibility="private" datatypeAttribute="//@datatype.7">
+        <annotateAttribute name="@ManyToOne">
+          <annotationParameters key="fetch" value="FetchType.LAZY"/>
+          <annotationParameters key="cascade" value="CascadeType.PERSIST"/>
+        </annotateAttribute>
+        <annotateAttribute name="@PrimaryKeyJoinColumn"/>
+        <annotateAttribute name="@PodamExclude"/>
+      </attributes>
+      <attributes name="carritoItems" visibility="private" datatypeAttribute="//@datatype.12">
+        <annotateAttribute name="@OneToMany">
+          <annotationParameters key="mappedBy" value="&quot;item&quot;"/>
+          <annotationParameters key="cascade" value="CascadeType.ALL"/>
+        </annotateAttribute>
+        <annotateAttribute name="@PodamExclude"/>
+      </attributes>
+      <imports name="javax.persistence.Id"/>
+      <imports name="javax.persistence.ManyToOne"/>
+      <imports name="javax.persistence.FetchType"/>
+      <imports name="javax.persistence.PrimaryKeyJoinColumn"/>
+      <imports name="uk.co.jemos.podam.common.PodamExclude"/>
+      <imports name="javax.persistence.CascadeType"/>
+      <imports name="javax.persistence.OneToMany"/>
+      <imports name="java.util.List"/>
+      <imports name="javax.persistence.Entity"/>
+    </classes>
+  </packages>
+  <packages name="marketplace">
+    <classes name="MarketPlace">
+      <methods datatypeReturn="//@datatype.6" name="getClients"/>
+      <methods name="addClient">
+        <methodParameters datatypeParameter="//@datatype.5" name="client"/>
+      </methods>
+      <methods name="editClient">
+        <methodParameters datatypeParameter="//@datatype.0" name="id"/>
+        <methodParameters datatypeParameter="//@datatype.4" name="password" order="1"/>
+        <methodParameters datatypeParameter="//@datatype.4" name="name" order="2"/>
+      </methods>
+      <methods name="deleteClient">
+        <methodParameters datatypeParameter="//@datatype.0" name="id"/>
+      </methods>
+      <methods datatypeReturn="//@datatype.5" name="getClient">
+        <methodParameters datatypeParameter="//@datatype.0" name="id"/>
+      </methods>
+      <methods datatypeReturn="//@datatype.8" name="getProductos"/>
+      <methods name="addProducto">
+        <methodParameters datatypeParameter="//@datatype.7" name="producto"/>
+      </methods>
+      <methods name="editProducto">
+        <methodParameters datatypeParameter="//@datatype.4" name="name" order="1"/>
+        <methodParameters datatypeParameter="//@datatype.0" name="id"/>
+      </methods>
+      <methods name="deleteProducto">
+        <methodParameters datatypeParameter="//@datatype.0" name="id"/>
+      </methods>
+      <methods datatypeReturn="//@datatype.7" name="getProducto">
+        <methodParameters datatypeParameter="//@datatype.0" name="id"/>
+      </methods>
+      <methods datatypeReturn="//@datatype.10" name="getCarritos"/>
+      <methods name="addCarrito">
+        <methodParameters datatypeParameter="//@datatype.9" name="carrito"/>
+      </methods>
+      <methods name="editCarrito">
+        <methodParameters datatypeParameter="//@datatype.0" name="id"/>
+        <methodParameters datatypeParameter="//@datatype.4" name="name" order="1"/>
+        <methodParameters datatypeParameter="//@datatype.5" name="client" order="2"/>
+      </methods>
+      <methods name="deleteCarrito">
+        <methodParameters datatypeParameter="//@datatype.0" name="id"/>
+      </methods>
+      <methods datatypeReturn="//@datatype.9" name="getCarrito">
+        <methodParameters datatypeParameter="//@datatype.0" name="id"/>
+      </methods>
+      <methods datatypeReturn="//@datatype.14" name="getItems"/>
+      <methods name="addItem">
+        <methodParameters datatypeParameter="//@datatype.13" name="item"/>
+      </methods>
+      <methods name="editItem">
+        <methodParameters datatypeParameter="//@datatype.0" name="id"/>
+        <methodParameters datatypeParameter="//@datatype.0" name="cantidad" order="1"/>
+        <methodParameters datatypeParameter="//@datatype.4" name="name" order="2"/>
+        <methodParameters datatypeParameter="//@datatype.7" name="producto" order="3"/>
+      </methods>
+      <methods name="deleteItem">
+        <methodParameters datatypeParameter="//@datatype.0" name="id"/>
+      </methods>
+      <methods datatypeReturn="//@datatype.13" name="getItem">
+        <methodParameters datatypeParameter="//@datatype.0" name="id"/>
+      </methods>
+      <attributes name="PERSISTENCE_UNIT_NAME" visibility="private" datatypeAttribute="//@datatype.4" modifier="static final" value="&quot;ManejadorPersistencia-Test&quot;"/>
+      <attributes name="emf" visibility="private" datatypeAttribute="//@datatype.17" modifier="static"/>
+      <attributes name="em" visibility="private" datatypeAttribute="//@datatype.18"/>
+      <imports name="java.util.List"/>
+      <imports name="javax.persistence.EntityManager"/>
+      <imports name="javax.persistence.EntityManagerFactory"/>
+      <imports name="javax.persistence.Persistence"/>
+      <imports name="javax.persistence.Query"/>
+      <imports name="entities.*"/>
+    </classes>
+  </packages>
+  <packages name="test">
+    <classes name="ClientTest">
+      <annotateClass name="@FixMethodOrder">
+        <annotationParameters value="MethodSorters.NAME_ASCENDING"/>
+      </annotateClass>
+      <methods name="prepareTest">
+        <annotateMethod name="@Before"/>
+      </methods>
+      <methods name="test1ClientAdd">
+        <annotateMethod name="@Test"/>
+      </methods>
+      <methods name="test2GetClient">
+        <annotateMethod name="@Test"/>
+      </methods>
+      <methods name="test3ClientEdit">
+        <annotateMethod name="@Test"/>
+      </methods>
+      <methods name="test4ClientDelete">
+        <annotateMethod name="@Test"/>
+      </methods>
+      <attributes name="mp" visibility="private" datatypeAttribute="//@datatype.15"/>
+      <attributes name="factory" visibility="private" datatypeAttribute="//@datatype.16"/>
+      <imports name="uk.co.jemos.podam.api.PodamFactory"/>
+      <imports name="uk.co.jemos.podam.api.PodamFactoryImpl"/>
+      <imports name="org.junit.Before"/>
+      <imports name="org.junit.Test"/>
+      <imports name="static org.junit.Assert.*"/>
+      <imports name="entities.Client"/>
+      <imports name="marketplace.MarketPlace"/>
+      <imports name="org.junit.FixMethodOrder"/>
+      <imports name="org.junit.runners.MethodSorters"/>
+    </classes>
+    <classes name="ProductoTest">
+      <annotateClass name="@FixMethodOrder">
+        <annotationParameters value="MethodSorters.NAME_ASCENDING"/>
+      </annotateClass>
+      <methods name="prepareTest">
+        <annotateMethod name="@Before"/>
+      </methods>
+      <methods name="test1ProductoAdd">
+        <annotateMethod name="@Test"/>
+      </methods>
+      <methods name="test2GetProducto">
+        <annotateMethod name="@Test"/>
+      </methods>
+      <methods name="test3ProductoEdit">
+        <annotateMethod name="@Test"/>
+      </methods>
+      <methods name="test4ProductoDelete">
+        <annotateMethod name="@Test"/>
+      </methods>
+      <attributes name="mp" visibility="private" datatypeAttribute="//@datatype.15"/>
+      <attributes name="factory" visibility="private" datatypeAttribute="//@datatype.16"/>
+      <imports name="uk.co.jemos.podam.api.PodamFactory"/>
+      <imports name="uk.co.jemos.podam.api.PodamFactoryImpl"/>
+      <imports name="org.junit.Before"/>
+      <imports name="org.junit.Test"/>
+      <imports name="static org.junit.Assert.*"/>
+      <imports name="entities.Producto"/>
+      <imports name="marketplace.MarketPlace"/>
+      <imports name="org.junit.FixMethodOrder"/>
+      <imports name="org.junit.runners.MethodSorters"/>
+    </classes>
+    <classes name="CarritoTest">
+      <annotateClass name="@FixMethodOrder">
+        <annotationParameters value="MethodSorters.NAME_ASCENDING"/>
+      </annotateClass>
+      <methods name="prepareTest">
+        <annotateMethod name="@Before"/>
+      </methods>
+      <methods name="test1CarritoAdd">
+        <annotateMethod name="@Test"/>
+      </methods>
+      <methods name="test2GetCarrito">
+        <annotateMethod name="@Test"/>
+      </methods>
+      <methods name="test3CarritoEdit">
+        <annotateMethod name="@Test"/>
+      </methods>
+      <methods name="test4CarritoDelete">
+        <annotateMethod name="@Test"/>
+      </methods>
+      <attributes name="mp" visibility="private" datatypeAttribute="//@datatype.15"/>
+      <attributes name="factory" visibility="private" datatypeAttribute="//@datatype.16"/>
+      <imports name="uk.co.jemos.podam.api.PodamFactory"/>
+      <imports name="uk.co.jemos.podam.api.PodamFactoryImpl"/>
+      <imports name="org.junit.Before"/>
+      <imports name="org.junit.Test"/>
+      <imports name="static org.junit.Assert.*"/>
+      <imports name="entities.Carrito"/>
+      <imports name="marketplace.MarketPlace"/>
+      <imports name="org.junit.FixMethodOrder"/>
+      <imports name="org.junit.runners.MethodSorters"/>
+    </classes>
+    <classes name="ItemTest">
+      <annotateClass name="@FixMethodOrder">
+        <annotationParameters value="MethodSorters.NAME_ASCENDING"/>
+      </annotateClass>
+      <methods name="prepareTest">
+        <annotateMethod name="@Before"/>
+      </methods>
+      <methods name="test1ItemAdd">
+        <annotateMethod name="@Test"/>
+      </methods>
+      <methods name="test2GetItem">
+        <annotateMethod name="@Test"/>
+      </methods>
+      <methods name="test3ItemEdit">
+        <annotateMethod name="@Test"/>
+      </methods>
+      <methods name="test4ItemDelete">
+        <annotateMethod name="@Test"/>
+      </methods>
+      <attributes name="mp" visibility="private" datatypeAttribute="//@datatype.15"/>
+      <attributes name="factory" visibility="private" datatypeAttribute="//@datatype.16"/>
+      <imports name="uk.co.jemos.podam.api.PodamFactory"/>
+      <imports name="uk.co.jemos.podam.api.PodamFactoryImpl"/>
+      <imports name="org.junit.Before"/>
+      <imports name="org.junit.Test"/>
+      <imports name="static org.junit.Assert.*"/>
+      <imports name="entities.Item"/>
+      <imports name="marketplace.MarketPlace"/>
+      <imports name="org.junit.FixMethodOrder"/>
+      <imports name="org.junit.runners.MethodSorters"/>
+    </classes>
+  </packages>
+  <datatype xsi:type="mmJavaMinimalista:Primitive"/>
+  <datatype xsi:type="mmJavaMinimalista:Primitive" typeName="String"/>
+  <datatype xsi:type="mmJavaMinimalista:Primitive" typeName="float"/>
+  <datatype name="Date"/>
+  <datatype name="String"/>
+  <datatype name="Client"/>
+  <datatype xsi:type="mmJavaMinimalista:ListType" name="Client"/>
+  <datatype name="Producto"/>
+  <datatype xsi:type="mmJavaMinimalista:ListType" name="Producto"/>
+  <datatype name="Carrito"/>
+  <datatype xsi:type="mmJavaMinimalista:ListType" name="Carrito"/>
+  <datatype name="CarritoItem"/>
+  <datatype xsi:type="mmJavaMinimalista:ListType" name="CarritoItem"/>
+  <datatype name="Item"/>
+  <datatype xsi:type="mmJavaMinimalista:ListType" name="Item"/>
+  <datatype name="MarketPlace"/>
+  <datatype name="PodamFactory"/>
+  <datatype name="EntityManagerFactory"/>
+  <datatype name="EntityManager"/>
+</mmJavaMinimalista:Project>

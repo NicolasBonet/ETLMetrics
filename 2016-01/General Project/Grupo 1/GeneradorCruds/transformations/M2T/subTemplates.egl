@@ -1,0 +1,102 @@
+[%	
+import "./operations.eol";
+%]
+[** SubTemplate para declarar una clase**]
+[% @template
+operation Class declaration() { %]
+[%=self.visibility%] class [%=self.name%]
+[% } %]
+
+[** SubTemplate para declarar un atributo**]
+[% @template
+operation Attribute declaration() { %]
+[% 
+var modifier = "";
+var type = self.datatypeAttribute.getTypeAsText(); 
+if (self.modifier <> java!Modifier#none)
+{
+	modifier=" "+self.modifier.literal;
+}
+%]
+[%=self.visibility%][%=modifier%] [%=type%] [%=self.name%]
+[% } %]
+
+[** SubTemplate para declarar un metodo**]
+[% @template
+operation Method declaration() { %]
+[% 
+var modifier = "";
+var parameters = self.getTextRepresentationForMethodParameters() ;
+var returnType="void";
+if (self.modifier <> java!Modifier#none)
+{
+	modifier=self.modifier;
+}
+if (self.datatypeReturn.isDefined())
+{
+	returnType=self.datatypeReturn.getTypeAsText();
+}
+%]
+[%=self.visibility%] [%=modifier%] [%=returnType%] [%=self.name%]([%=parameters%])
+[% } %]
+
+
+[** SubTemplate para anotar una clase**]
+[% @template
+operation Class annotationsText(){ 
+	for (annotation in self.annotateClass) {
+		var textParameters:String = annotation.getTextRepresentationForAnnotationKeyValues();
+		%][%= annotation.name %][%= textParameters%]
+	[%}
+}%]
+
+[** SubTemplate para anotar un atributo**]
+[% @template
+operation Attribute annotationsText(){ 
+	for (annotation in self.annotateAttribute) {
+		var textParameters:String = annotation.getTextRepresentationForAnnotationKeyValues();
+		%][%= annotation.name %][%= textParameters%]
+	[%}
+}%]
+
+[** SubTemplate para anotar un metodo**]
+[% @template
+operation Method annotationsText(){ 
+	for (annotation in self.annotateMethod) {
+		var textParameters:String = annotation.getTextRepresentationForAnnotationKeyValues();
+		%][%= annotation.name %][%= textParameters%]
+	[%}
+}%]
+
+[**SubTemplate para crear un AssertEquals, el contexto debe ser una clase entity
+//attributeToCompare = atributo a compara entre clases entity
+//mp = atributo que representa entitiesmanager
+//idText = texto de la varible o texto de una operacion para obtener un id de busqueda de un elemento. 
+busqueda ejecutada por el entitiesmanager para la comparacion.
+ **]
+[% @template
+operation Class createAssertEquals(attrToCompare:Attribute, mp:Attribute, idText:String ){%]
+assertEquals([%= self.name.firstToLowerCase()%].get[%=attrToCompare.name.firstToUpperCase()%](), [%= mp.name%].get[%= self.name.firstToUpperCase()%]([%= idText%]).get[%=attrToCompare.name.firstToUpperCase()%]());[%
+}%]
+
+[**Subtemplate para manufacturar y poblar un pojo, el contexto debe ser una clase entity**]
+[% @template
+operation Class manufactureAndPopulatePojo(factory:Attribute){%]
+[%=self.getTypeAsText()%] [%= self.name.firstToLowerCase()%] = [%= factory.name%].manufacturePojo([%=self.getTypeAsText()%].class);
+[%= factory.name%].populatePojo([%= self.name.firstToLowerCase()%]);[%
+}%]
+
+[**Subtemplate para crear parametros de un metodo basado en los getters de un entity**]
+[% @template
+operation Class gettersAsParamsText(){ %]
+[%
+var textParameters:String = "";
+var validAttributes = self.attributes->select(a | a.name<>'id' and not a.datatypeAttribute.isTypeOf(java!ListType));
+		for (va in validAttributes) {
+			textParameters = textParameters + self.name.firstToLowerCase()+ '.' + 'get' + va.name.firstToUpperCase() + '()';
+			if (hasMore) {
+				textParameters = textParameters + ", "; 	
+			}
+		}
+%][%= textParameters %][%
+}%]

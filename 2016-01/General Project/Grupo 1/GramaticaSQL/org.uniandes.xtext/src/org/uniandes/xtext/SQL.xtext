@@ -1,0 +1,46 @@
+grammar org.uniandes.xtext.SQL with org.eclipse.xtext.common.Terminals
+
+generate sQL "http://www.uniandes.org/xtext/SQL"
+
+DataBase returns DataBase:
+	{DataBase}
+	table+=Table+
+;
+
+Table returns Table:
+	CREATE CTABLE name=ID
+	LPARENT
+	column+=Column+
+	primarykey=PrimaryKey
+	foreignkey+=ForeignKey*
+	RPARENT
+;
+
+Column returns Column:
+	name=ID (type=DataType (LPARENT NUMBER RPARENT)? isNull?=(NOT_NULL)?)? (COMMA)? 
+;
+
+PrimaryKey returns PrimaryKey:
+	 PRIMARY KEY LPARENT column+=[Column] (COMMA + column+=[Column])* RPARENT (COMMA)?
+;
+
+ForeignKey returns ForeignKey:
+	FOREIGN KEY LPARENT column+=[Column] (COMMA + column+=[Column])* RPARENT REFERENCES tableRef=[Table]  LPARENT columnsRef+=[Column] (COMMA + columnsRef+=[Column])* RPARENT  (COMMA)?
+;
+
+enum DataType: 
+  varchar | int | boolean | date | number
+;
+
+terminal CREATE: "CREATE";
+terminal CTABLE: "TABLE";
+terminal LPARENT: "(";
+terminal RPARENT: ")";
+terminal COMMA: ",";
+terminal FOREIGN: "FOREIGN";
+terminal PRIMARY: "PRIMARY";
+terminal KEY: "KEY";
+terminal NOT_NULL: "NOT NULL";
+terminal REFERENCES: "REFERENCES";
+terminal ID: ("A".."z")(("0".."9")|("A".."Z")|("a".."z"))*;
+terminal NUMBER: ("0".."9")*;

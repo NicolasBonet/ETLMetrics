@@ -1,0 +1,91 @@
+
+/**
+* Create test class for each entity saved
+*/
+operation java!Class testEntityClass() : java!Class {
+	var testClass = new java!Class;
+	testClass.name = self.name + "Test";
+	testClass.visibility = java!Visibility#public;
+	
+	// Add FixMethodOrder annotation
+	var keyValue = new java!KeyValue;
+	keyValue.value = "MethodSorters.NAME_ASCENDING";
+	var methodOrder = getAnnotation("@FixMethodOrder");
+	methodOrder.annotationParameters.add(keyValue);
+	testClass.annotateClass.add(methodOrder);
+	
+	// Add test attributes
+	testClass.addTestAttributes();
+	
+	// Add test methods
+	testClass.addTestMethods(self.name);
+	
+	// Add general required imports for test class
+	testClass.imports.add(getImport("static org.junit.Assert.*"));
+	testClass.imports.add(getImport("entities." + self.name));
+	testClass.imports.add(getImport("marketplace.MarketPlace"));
+	testClass.imports.add(getImport("org.junit.FixMethodOrder"));
+	testClass.imports.add(getImport("org.junit.runners.MethodSorters"));
+	
+	return testClass;
+}
+
+/**
+* Add required attributes to perform the tests
+*/
+operation java!Class addTestAttributes() {
+
+	// Add required imports for attributes
+	self.imports.add(getImport("uk.co.jemos.podam.api.PodamFactory"));
+	self.imports.add(getImport("uk.co.jemos.podam.api.PodamFactoryImpl"));
+
+	// Add MarketPlace attribute
+	var mp = new java!Attribute;
+	mp.name = "mp";
+	mp.visibility = java!Visibility#private;
+	mp.datatypeAttribute = typeMap.get(mp.name);
+	self.attributes.add(mp);
+	
+	// Add PodamFactory attribute
+	var factory = new java!Attribute;
+	factory.name = "factory";
+	factory.visibility = java!Visibility#private;
+	factory.datatypeAttribute = typeMap.get(factory.name);
+	self.attributes.add(factory);
+}
+
+/**
+* Add test methods
+*/
+operation java!Class addTestMethods(baseName : String) {
+
+	// Add required imports for methods
+	self.imports.add(getImport("org.junit.Before"));
+	self.imports.add(getImport("org.junit.Test"));
+
+	// Method to execute before make the test
+	var prepareTest = getMethod("prepareTest");
+	prepareTest.annotateMethod.add(getAnnotation("@Before"));
+	self.methods.add(prepareTest);
+	
+	// Add test method
+	var test1CarritoAdd = getMethod("test1" + baseName + "Add");
+	test1CarritoAdd.annotateMethod.add(getAnnotation("@Test"));
+	self.methods.add(test1CarritoAdd);
+	
+	// Get test method
+	var test2GetCarrito = getMethod("test2Get" + baseName);
+	test2GetCarrito.annotateMethod.add(getAnnotation("@Test"));
+	self.methods.add(test2GetCarrito);
+	
+	// Edit test method
+	var test3CarritoEdit = getMethod("test3" + baseName + "Edit");
+	test3CarritoEdit.annotateMethod.add(getAnnotation("@Test"));
+	self.methods.add(test3CarritoEdit);
+	
+	// Delete test method
+	var test4CarritoDelete = getMethod("test4" + baseName + "Delete");
+	test4CarritoDelete.annotateMethod.add(getAnnotation("@Test"));
+	self.methods.add(test4CarritoDelete);
+}
+
