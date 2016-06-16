@@ -1,0 +1,23 @@
+[%
+	//var root : sql!Table:= sql!Table.all;
+	for(t in sql!Table.all)
+	{
+		var implementation:Template:= TemplateFactory.load('transformacionSQL.egl');
+		var dataBase = sql!Table.all;
+		implementation.populate('dataBase',dataBase);
+		implementation.populate('tables',t);
+		TemplateFactory.setOutputRoot('src/marketplace');
+		implementation.generate(t.name+'.java');
+	 }
+/*	 
+	for(t in sql!Table.all)
+	{
+		var implementation:Template:= TemplateFactory.load('transformacionSQLTest.egl');
+		var dataBase = sql!Table.all;
+		implementation.populate('dataBase',dataBase);
+		implementation.populate('table',t);
+		TemplateFactory.setOutputRoot('src/test');
+		implementation.generate(t.name+'Test'+'.java');
+	 }
+	 */
+%]

@@ -1,0 +1,194 @@
+package marketplace;
+
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.PrimaryKeyJoinColumn;
+
+import uk.co.jemos.podam.common.PodamExclude;
+
+@Entity
+public class [%=tables.name%]
+{
+  [%
+ for(atributos in tables.columns)
+  {
+	  var esForanea = false;
+	  var campo = "";
+	  
+	  //validacion de primarykey
+	  for(pks in tables.primarykey.columns)
+	  {
+			if (atributos.name==pks.name)
+			{
+			   campo=campo.concat("@Id \n");
+			   break;
+	   		}
+ 	  }
+  
+	  //validacion si es foraneo
+	  for(fks in tables.foreignkeys)
+	  {
+		  //si la FK tiene la columna actual, se referencia a la Clase
+		   for(colFk in fks.columns)
+		   {
+			    if (atributos.name==colFk.name)
+			    {
+				   campo=campo.concat("@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST) \n");
+				   campo=campo.concat("@PrimaryKeyJoinColumn \n");
+				   campo=campo.concat("@PodamExclude  \n");
+				   campo=campo.concat("private "+fks.tableRef.name+" "+fks.tableRef.name.firstToLowerCase()+";");
+				   esForanea = true;
+				   break;
+		    	}
+   			}
+   
+  		}
+	    if(esForanea==false)
+	    {
+			campo=campo.concat("private ");
+			if(atributos.SQLType.asString().startsWith('varchar'))
+		   	{ 
+		   		campo=campo.concat("String ").concat(atributos.name+";");
+		   } 
+		   else 
+		   {
+		   	campo=campo.concat(atributos.SQLType+" ").concat(atributos.name+";");
+		   }
+   		}
+   %]
+   [%=campo%]
+   [%
+  }
+  %]
+  
+  [%
+  var campo = "";
+  var esMany = false;
+  //validacion referencia de tabla actual en otras tablas
+  for(tablas in dataBase){
+   //la tabla actual debe ser diferente a la tabla a validar
+   if (tablas.name <> tables.name){
+    campo = "";
+    esMany=false;
+    //Navegacion de las FKs
+    for(fks in tablas.foreignkeys){
+    //si la tabla referenciada es la actual
+     if(fks.tableRef.name == tables.name){
+      esMany = true;
+campo=campo.concat("@OneToMany(cascade = CascadeType.ALL, mappedBy=\""+tables.name.firstToLowerCase()+"\")
+");
+campo=campo.concat("@PodamExclude
+");
+campo=campo.concat("private List<"+tablas.name+"> "+tablas.name.firstToLowerCase()+";");
+     
+     //Solo se puede referenciar una vez
+      break;
+     }
+    }
+    if (esMany == true){
+     %]
+     [%=campo%]
+     [%
+    }
+   }
+  }
+  %]
+  
+  
+  public [%=tables.name%]()
+  {
+  
+  }
+  
+  [%
+ //getters y setters
+ for(atributos in tables.columns)
+  {
+  
+  var esForanea = false;
+  var tablaRef = "";
+  
+  //validacion de si es foraneo
+  for(fks in tables.foreignkeys){
+  //si la FK tiene la columna actual, se referencia a la Clase
+   for(colFk in fks.columns){
+    if (atributos.name==colFk.name){
+    tablaRef = fks.tableRef.name;esForanea = true;
+    break;
+    }
+   }
+   
+  }
+  
+  var campoGet = "public ";
+  var campoSet = "public void set";
+  if (esForanea == true){
+    campoSet=campoSet.concat(tablaRef+"(");
+    //campoGet=campoGet.concat(tablaRef.firstToLowerCase()+" ");
+    campoGet=campoGet.concat(tablaRef+" ");
+    campoSet=campoSet.concat(tablaRef+" ");
+    campoGet=campoGet.concat("get"+tablaRef+"(){ return "+tablaRef.firstToLowerCase()+";}");
+    campoSet=campoSet.concat(tablaRef.firstToLowerCase()+"){this."+tablaRef.firstToLowerCase()+"="+tablaRef.firstToLowerCase()+";}");
+  } else {
+   campoSet=campoSet.concat(atributos.name.firstToUpperCase()+"(");
+   if(atributos.SQLType.asString().startsWith('varchar'))
+    { 
+    campoGet=campoGet.concat("String ");
+    campoSet=campoSet.concat("String ");
+    } else {
+    campoGet=campoGet.concat(atributos.SQLType+" ");
+    campoSet=campoSet.concat(atributos.SQLType+" ");
+    }
+    campoGet=campoGet.concat("get"+atributos.name.firstToUpperCase()+"(){ return "+atributos.name+";}");
+     campoSet=campoSet.concat(atributos.name+"){this."+atributos.name+"="+atributos.name+";}");
+  }
+   %]
+   [%=campoGet%]
+   [%=campoSet%]
+   [%
+  }
+  %]
+  
+  [%
+  var tablaMany = "";
+  var esMany = false;
+  var campoGet = "public ";
+  var campoSet = "public void set";
+  //validacion referencia de tabla actual en otras tablas
+  for(tablas in dataBase){
+   //la tabla actual debe ser diferente a la tabla a validar
+   if (tablas.name <> tables.name){
+    //Navegacion de las FKs
+    esMany = false;
+    for(fks in tablas.foreignkeys){
+    //si la tabla referenciada es la actual
+     if(fks.tableRef.name == tables.name){
+     esMany = true;
+     tablaMany = tablas.name;
+     //solo se puede referenciar una vez
+     break;
+     }
+    }
+    if(esMany==true){
+    campoGet=campoGet.concat("List<"+tablaMany+"> get"+tablaMany+"s(){");
+    campoGet=campoGet.concat("return "+ tablaMany.firstToLowerCase() +" ;}");
+    campoSet=campoSet.concat(tablaMany+"s(List<"+tablaMany+"> "+tablaMany.firstToLowerCase()+"s){");
+    campoSet=campoSet.concat("this."+tablaMany.firstToLowerCase()+" = "+tablaMany.firstToLowerCase()+"s;");
+    campoSet=campoSet.concat("}");
+     %]
+      [%=campoGet%]
+      [%=campoSet%]
+     [%
+    }
+   }
+  }
+  
+  %]
+  
+}

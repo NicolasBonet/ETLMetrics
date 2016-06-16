@@ -1,0 +1,74 @@
+package marketplace;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+
+public class MarketPlace
+{
+	private static final String PERSISTENCE_UNIT_NAME = "MarketPlace-Test";
+    private static EntityManagerFactory emf;
+    private EntityManager em;
+	
+    /*
+	 * MarketPlace
+	 */
+	public MarketPlace()
+	{
+		emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+        em = emf.createEntityManager();
+	}
+	
+[%
+for(class in Class.all){
+%]
+
+ 	/*
+	 * [%=class.name%]
+	 */
+	public List<[%=class.name%]> get[%=class.name%]s()
+	{
+		Query q = em.createQuery("SELECT c FROM [%=class.name%] c");
+        return q.getResultList();
+	}
+	
+	public void add[%=class.name%]([%=class.name%] [%=class.name.firstToLowerCase()%])
+	{
+		em.getTransaction().begin();
+        em.persist([%=class.name.firstToLowerCase()%]);
+        em.getTransaction().commit();
+	}
+	
+	public void edit[%=class.name%](int id[%for(attr in class.attributes){if (attr.name<>'id'){%], [%=attr.jType.name%] [%=attr.name%] [%}}%])
+	{
+		[%=class.name%] [%=class.name.firstToLowerCase()%] = em.find([%=class.name%].class, id);
+		em.getTransaction().begin();
+		[%for(meth in class.methods){
+			if (meth.name.startsWith('set') and meth.name <> ('setId')){%]
+		[%=class.name.firstToLowerCase()%].[%=meth.name%]([%=meth.parameters.at(0).name%]);
+			[%
+			}
+		}%]
+		em.getTransaction().commit();
+	}
+	
+	public void delete[%=class.name%](int id)
+	{
+		[%=class.name%] [%=class.name.firstToLowerCase()%] = em.find([%=class.name%].class, id);
+		em.getTransaction().begin();
+		em.remove([%=class.name.firstToLowerCase()%]);
+		em.getTransaction().commit();
+	}
+	
+	public [%=class.name%] get[%=class.name%](int id)
+	{
+		return em.find([%=class.name%].class, id);
+	}
+[%
+}
+%]
+}
+	

@@ -1,0 +1,112 @@
+package test.java;
+
+import static org.junit.Assert.*;
+
+import marketplace.[%=mClass.entity.name%];
+import marketplace.MarketPlace;
+
+import org.junit.runners.MethodSorters;
+import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+
+import uk.co.jemos.podam.api.PodamFactory;
+import uk.co.jemos.podam.api.PodamFactoryImpl;
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class [%=mClass.name%]
+{
+	private MarketPlace mp;
+	private PodamFactory factory;
+	
+	@Before
+	public void prepareTest()
+	{
+		mp = new [%= mClass.dao.name %]();
+		factory = new PodamFactoryImpl();
+	}
+	
+	@Test
+	public void test1[%= mClass.entity.name %]Add()
+	{	
+		[%
+			var variable = mClass.entity.name.firstToLowerCase();
+		%]
+		[%= mClass.entity.name %] [%= variable %] = factory.manufacturePojo([%= mClass.entity.name %].class);
+		factory.populatePojo([%= variable %]);
+		mp.add[%= mClass.entity.name %]([%= variable %]);
+		
+		assertEquals([%= variable %].getId(), mp.get[%= mClass.entity.name %]([%= variable %].getId()).getId());
+[% 
+	var vars = mClass.entity.getClassVars();	
+	for(myVar in vars) {
+		var name = myVar.name; 
+%]		
+		assertEquals([%= variable %].get[%= name.firstToUpperCase() %](), mp.get[%= mClass.entity.name %]([%= variable %].getId()).get[%=name.firstToUpperCase()%]());
+[%
+	}
+%]
+	}
+	
+	@Test
+	public void test2Get[%=mClass.entity.name%]()
+	{	
+		assertNotNull(mp.get[%= mClass.entity.name %](mp.get[%= mClass.entity.name %]s().get(0).getId()));
+	}
+	
+	@Test
+	public void test3[%= mClass.entity.name %]Edit()
+	{	
+	[%
+			var variable = mClass.entity.name.firstToLowerCase();
+	%]
+		[%= mClass.entity.name %] [%= variable %] = factory.manufacturePojo([%= mClass.entity.name %].class);
+		factory.populatePojo([%=variable%]);
+		
+		int primerId = mp.get[%= mClass.entity.name %]s().get(0).getId();
+		
+		mp.edit[%= mClass.entity.name %](primerId
+		[% 
+			var vars = mClass.entity.getClassVars();	
+			for(myVar in vars) 
+			{ 
+				var type = myVar.name.firstToUpperCase;
+		%]
+			, [%= variable %].get[%= type %]()
+		[% 	} %]
+		);
+		
+		[%
+			for(myVar in vars)
+			{
+				var type = myVar.name.firstToUpperCase;
+		%]
+		assertEquals([%= variable %].get[%= type %](), mp.get[%= mClass.entity.name %](primerId).get[%= type %]());
+		[% 	} %]
+		
+	}
+	
+	@Test
+	public void test4[%= mClass.entity.name %]Delete()
+	{	
+		int primerId = mp.get[%= mClass.entity.name %]s().get(0).getId();
+		
+		assertNotNull(mp.get[%= mClass.entity.name %](primerId));
+		
+		mp.delete[%= mClass.entity.name %](primerId);
+		
+		assertNull(mp.get[%= mClass.entity.name %](primerId));
+	}
+
+}
+
+
+
+
+[%
+	
+	operation java!Class getClassVars(){
+		return self.attributes.select(a | a.name <> "id").select(a | not a.type.isKindOf(java!Container));
+	}
+	
+%]

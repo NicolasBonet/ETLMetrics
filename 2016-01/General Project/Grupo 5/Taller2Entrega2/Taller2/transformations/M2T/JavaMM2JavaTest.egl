@@ -1,0 +1,84 @@
+package test.java;
+
+import static org.junit.Assert.*;
+import marketplace.Carrito;
+import marketplace.MarketPlace;
+
+import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+import uk.co.jemos.podam.api.PodamFactory;
+import uk.co.jemos.podam.api.PodamFactoryImpl;
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class [%= clase.nombre %]Test
+{	
+
+	private PodamFactory factory;
+	private MarketPlace mp;
+
+	@Before
+	public void prepareTest()
+	{
+		factory = new PodamFactoryImpl();
+		mp = new MarketPlace();
+	}
+	
+	@Test
+	public void test[%= clase.nombre %]add()
+	{
+		[%= clase.nombre %] obj = factory.manufacturePojo([%= clase.nombre %].class);
+		factory.populatePojo(obj);
+		mp.add[%= clase.nombre %](obj);
+		
+		[%
+		for(atributo in clase.atributos)
+		{
+		%]
+			assertEquals(obj.get[%= atributo.nombre %](), mp.get[%= clase.nombre %](obj.getId()).get[%= atributo.nombre %]());
+		[%
+		}
+		%] 
+	}
+	
+	@Test
+	public void test[%= clase.nombre %]get()
+	{
+		assertNotNull(mp.get[%= clase.nombre %](mp.get[%= clase.nombre %]s().get(0).getId()));
+	}
+	
+	@Test
+	public void test[%= clase.nombre %]edit()
+	{
+		[%= clase.nombre %] obj = factory.manufacturePojo([%= clase.nombre %].class);
+		factory.populatePojo(obj);
+		
+		int primerId = mp.get[%= clase.nombre %]s().get(0).getId();
+		
+		mp.edit[%= clase.nombre %](primerId, [% for(atributo in clase.atributos){ %]obj.get[%= atributo.nombre %](), [% } %]);
+		
+		[%
+		for(atributo in clase.atributos)
+		{
+		%]
+			assertEquals(obj.get[%= atributo.nombre %](), mp.get[%= clase.nombre %](primerId).get[%= atributo.nombre %]());
+		[%
+		}
+		%] 
+	}
+	
+	@Test
+	public void test[%= clase.nombre %]delete()
+	{
+		int primerId = mp.get[%= clase.nombre %]s().get(0).getId();
+		
+		assertNotNull(mp.get[%= clase.nombre %](primerId));
+		
+		mp.delete[%= clase.nombre %](primerId);
+		
+		assertNull(mp.get[%= clase.nombre %](primerId));
+	}
+
+}

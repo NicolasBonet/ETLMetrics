@@ -1,0 +1,136 @@
+package [%=class.eContainer.name%];
+
+import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.CascadeType;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.FetchType;
+import uk.co.jemos.podam.common.PodamExclude;
+
+[%
+var className = class.name.firstToUpperCase();
+
+//Print class annotations
+for(annotation in class.annotations){
+%]
+@[%=annotation.name%]
+[%
+}
+//Print class name
+%]
+public class [%=className%]
+{
+
+[%
+//Print class attributes
+for(attribute in class.structuredElements){
+	if(attribute.isTypeOf(java!Attribute)){
+		//Print attribute annotations
+		attribute.printAnnotations();
+		
+		//Finding attribute type name	
+		var attributeTypeName = attribute.getTypeName();
+%]
+	private [%=attributeTypeName%] [%=attribute.name.toLowerCase()%];
+	
+[%
+	}
+}
+		
+//Set referencing classes names
+var referencingClassNamesSeq = new Sequence;
+for(_class in classes){
+	if(_class.name <> class.name){
+		if(_class.structuredElements.select(c|c.isTypeOf(java!Attribute) and c.type.isTypeOf(java!Class) and c.type.name == class.name).size() > 0){
+			referencingClassNamesSeq.add(_class.name);
+		}
+	}
+}
+		
+for(referencingClassName in referencingClassNamesSeq){
+%]
+	@OneToMany(cascade = CascadeType.ALL, mappedBy="[%=className.toLowerCase()%]")
+	@PodamExclude
+	private List<[%=referencingClassName.firstToUpperCase()%]> [%=referencingClassName.firstToLowerCase()%]s;
+		
+[%
+		}
+	
+//Print constructor
+%]
+	public [%=className%](){
+	
+	}
+	
+[%
+//Print getters and setters
+for(attribute in class.structuredElements){
+	if(attribute.isTypeOf(java!Attribute)){
+		//Print getter
+		var attributeName = attribute.name.toLowerCase();
+		var attributeTypeName = attribute.getTypeName();
+%]
+	public [%=attributeTypeName%] get[%=attributeName.firstToUpperCase%](){
+		return [%=attributeName%];
+	}
+	
+	public void set[%=attributeName.firstToUpperCase()%]([%=attributeTypeName%] [%=attributeName%]){
+		this.[%=attributeName%] = [%=attributeName%]; 
+	}
+	
+[%
+	}
+}
+
+for(referencingClassName in referencingClassNamesSeq){
+%]
+	public List<[%=referencingClassName.firstToUpperCase()%]> get[%=referencingClassName.firstToUpperCase()%]s()
+	{
+		return [%=referencingClassName.firstToLowerCase()%]s;
+	}
+	
+	public void set[%=referencingClassName.firstToUpperCase()%]s(List<[%=referencingClassName.firstToUpperCase()%]> [%=referencingClassName.firstToLowerCase()%]s)
+	{
+		this.[%=referencingClassName.firstToLowerCase()%]s = [%=referencingClassName.firstToLowerCase()%]s;
+	}
+		
+[%
+}
+%]
+}
+
+[%
+operation java!Attribute printAnnotations(){
+	for(annotation in self.annotations){
+		var annotationParameters = "";
+		if(annotation.parameters.notEmpty()){
+			annotationParameters = "(";
+			for(parameter in annotation.parameters){
+				if(parameter.key <> null){
+					annotationParameters = annotationParameters.concat(parameter.key).concat(" = ");
+				}
+				annotationParameters = annotationParameters.concat(parameter.value).concat(", ");
+			}
+			
+			annotationParameters = annotationParameters.substring(0, annotationParameters.length()-2);
+			annotationParameters = annotationParameters.concat(")");
+		}
+	%]
+	@[%=annotation.name%][%=annotationParameters%]
+	[%
+	}
+}
+
+operation java!Attribute getTypeName() : String {
+	var attributeTypeName = "";	
+	if(self.type.isTypeOf(java!Primitive)){
+		attributeTypeName = self.type.primitiveType.literal;
+	} else {
+		attributeTypeName = self.type.name;
+	}
+	return attributeTypeName;
+}
+%]

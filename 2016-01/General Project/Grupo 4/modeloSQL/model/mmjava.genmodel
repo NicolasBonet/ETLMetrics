@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/modeloSQL/src" modelPluginID="modeloSQL" modelName="Mmjava"
+    rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="8.0" copyrightFields="false" operationReflection="true" importOrganizing="true">
+  <foreignModel>file:/C:/Users/de.paniagua/Downloads/co.edu.uniandes.javamm/JavaMM.ecore</foreignModel>
+  <genPackages prefix="JavaMM" disposableProviderFactory="true" ecorePackage="JavaMM.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="JavaMM.ecore#//PrimitiveDataType">
+      <genEnumLiterals ecoreEnumLiteral="JavaMM.ecore#//PrimitiveDataType/INT"/>
+      <genEnumLiterals ecoreEnumLiteral="JavaMM.ecore#//PrimitiveDataType/BOOLEAN"/>
+      <genEnumLiterals ecoreEnumLiteral="JavaMM.ecore#//PrimitiveDataType/CHAR"/>
+      <genEnumLiterals ecoreEnumLiteral="JavaMM.ecore#//PrimitiveDataType/DOUBLE"/>
+      <genEnumLiterals ecoreEnumLiteral="JavaMM.ecore#//PrimitiveDataType/LONG"/>
+      <genEnumLiterals ecoreEnumLiteral="JavaMM.ecore#//PrimitiveDataType/FLOAT"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="JavaMM.ecore#//Modifier">
+      <genEnumLiterals ecoreEnumLiteral="JavaMM.ecore#//Modifier/PRIVATE"/>
+      <genEnumLiterals ecoreEnumLiteral="JavaMM.ecore#//Modifier/STATIC"/>
+      <genEnumLiterals ecoreEnumLiteral="JavaMM.ecore#//Modifier/PROTECTED"/>
+      <genEnumLiterals ecoreEnumLiteral="JavaMM.ecore#//Modifier/FINAL"/>
+      <genEnumLiterals ecoreEnumLiteral="JavaMM.ecore#//Modifier/ABSTRACT"/>
+      <genEnumLiterals ecoreEnumLiteral="JavaMM.ecore#//Modifier/SYNCHRONIZED"/>
+      <genEnumLiterals ecoreEnumLiteral="JavaMM.ecore#//Modifier/PUBLIC"/>
+      <genEnumLiterals ecoreEnumLiteral="JavaMM.ecore#//Modifier/PRIVATE.1"/>
+      <genEnumLiterals ecoreEnumLiteral="JavaMM.ecore#//Modifier/PROTECTED.1"/>
+    </genEnums>
+    <genClasses ecoreClass="JavaMM.ecore#//Application">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference JavaMM.ecore#//Application/package"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference JavaMM.ecore#//Application/datatype"/>
+    </genClasses>
+    <genClasses ecoreClass="JavaMM.ecore#//Package">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference JavaMM.ecore#//Package/subPackages"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference JavaMM.ecore#//Package/classifier"/>
+    </genClasses>
+    <genClasses ecoreClass="JavaMM.ecore#//Classifier"/>
+    <genClasses ecoreClass="JavaMM.ecore#//Class">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference JavaMM.ecore#//Class/annotations"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference JavaMM.ecore#//Class/structuredElements"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference JavaMM.ecore#//Class/modifier"/>
+    </genClasses>
+    <genClasses ecoreClass="JavaMM.ecore#//Method">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference JavaMM.ecore#//Method/return"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference JavaMM.ecore#//Method/parameters"/>
+    </genClasses>
+    <genClasses ecoreClass="JavaMM.ecore#//Attribute">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference JavaMM.ecore#//Attribute/type"/>
+    </genClasses>
+    <genClasses ecoreClass="JavaMM.ecore#//DataType"/>
+    <genClasses ecoreClass="JavaMM.ecore#//Primitive">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute JavaMM.ecore#//Primitive/primitiveType"/>
+    </genClasses>
+    <genClasses ecoreClass="JavaMM.ecore#//Collection">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference JavaMM.ecore#//Collection/dataType"/>
+    </genClasses>
+    <genClasses ecoreClass="JavaMM.ecore#//List"/>
+    <genClasses ecoreClass="JavaMM.ecore#//NamedElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute JavaMM.ecore#//NamedElement/name"/>
+    </genClasses>
+    <genClasses ecoreClass="JavaMM.ecore#//Annotation">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference JavaMM.ecore#//Annotation/parameters"/>
+    </genClasses>
+    <genClasses ecoreClass="JavaMM.ecore#//KeyValue">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute JavaMM.ecore#//KeyValue/key"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute JavaMM.ecore#//KeyValue/value"/>
+    </genClasses>
+    <genClasses ecoreClass="JavaMM.ecore#//Modifier.1">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute JavaMM.ecore#//Modifier.1/modifiers"/>
+    </genClasses>
+    <genClasses ecoreClass="JavaMM.ecore#//Parameter">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference JavaMM.ecore#//Parameter/type"/>
+    </genClasses>
+    <genClasses ecoreClass="JavaMM.ecore#//StructuredElement">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference JavaMM.ecore#//StructuredElement/modifier"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference JavaMM.ecore#//StructuredElement/annotations"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

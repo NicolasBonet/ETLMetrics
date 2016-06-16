@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="Java" nsURI="http://www.example.org/taller2" nsPrefix="Java">
+  <eClassifiers xsi:type="ecore:EClass" name="Paquete">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="clases" upperBound="-1"
+        eType="#//Clase" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Clase">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="atributos" upperBound="-1"
+        eType="#//Atributo" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="relaciones" upperBound="-1"
+        eType="#//Relacion" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="metodos" upperBound="-1"
+        eType="#//Metodo" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="metodosUser" eType="#//MetodoUser"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Atributo">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipo" eType="#//TiposAtributo"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Relacion">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tipo" lowerBound="1" eType="#//Clase"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="cardinalidad" eType="#//Cardinalidades"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Metodo">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parametros" upperBound="-1"
+        eType="#//Parametro"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipoRetorno" eType="#//TiposRetorno"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parametrosUser" upperBound="-1"
+        eType="#//ParametroUser"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TiposAtributo">
+    <eLiterals name="String"/>
+    <eLiterals name="int" value="1"/>
+    <eLiterals name="double" value="2"/>
+    <eLiterals name="float" value="3"/>
+    <eLiterals name="boolean" value="4"/>
+    <eLiterals name="byte" value="5"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Cardinalidades">
+    <eLiterals name="OneToOne"/>
+    <eLiterals name="OneToMany" value="1"/>
+    <eLiterals name="ManyToOne" value="2"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Parametro">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipo" eType="#//TiposAtributo"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TiposRetorno">
+    <eLiterals name="void"/>
+    <eLiterals name="String" value="1"/>
+    <eLiterals name="int" value="2"/>
+    <eLiterals name="double" value="3"/>
+    <eLiterals name="float" value="4"/>
+    <eLiterals name="boolean" value="5" literal="boolean"/>
+    <eLiterals name="byte" value="6"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="MetodoUser">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tipoRetorno" lowerBound="1"
+        eType="#//Clase"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parametrosUser" upperBound="-1"
+        eType="#//ParametroUser"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parametros" upperBound="-1"
+        eType="#//Parametro"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ParametroUser">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tipo" lowerBound="1" eType="#//Clase"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+</ecore:EPackage>

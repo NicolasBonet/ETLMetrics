@@ -1,0 +1,301 @@
+pre {
+  "Inicia ETL".println();
+}
+
+post {
+  "Finaliza ETL".println();
+}
+
+rule SQL2Java
+	transform
+		db:sql!DataBase
+	to
+		app:java!Application{
+			app.types = db.createJavaType();
+			app.modifiers = db.createModifiers();
+			app.classes = db.Tables.equivalent();
+		}
+
+@lazy
+rule Table2Class
+	transform
+		tab:sql!Table
+	to
+		cl:java!Class{
+			
+			cl.name = tab.name;
+			cl.attributes = tab.columns.equivalent();
+			cl.annotations = tab.getAnnotations();
+			cl.modifiers = cl.getModifiersOfClass();
+			cl.methods = tab.getMethods();
+		}
+
+@lazy
+rule Column2Attribute
+	transform
+		col:sql!column
+	to
+		attr:java!Attribute{
+			attr.name = col.name;
+			attr.modifiers = attr.getModifierOfAttribute();
+			attr.jType = col.getTypeOfAttribute();
+			attr.annotations = attr.getAnnotationsOfAttribute();
+		}
+		
+
+//Operación para crear el metodo constructor de la clase
+operation java!Class createMethodConstructor(): Set(java!Method) {
+
+	var setOfMethods = new Set;
+	var constructorMethod = new java!Method;
+	constructorMethod.name = self.name;
+	constructorMethod.modifiers = constructorMethod.getModifierOfMethod();
+	setOfMethods.add(constructorMethod);
+	return setOfMethods;
+}
+
+//Operación que devuelve los tipos de un atributo
+operation sql!column getTypeOfAttribute(): java!Type {	
+	//Verificar si el atributo hace referencia a un ForeignKey para devolver el tipo de la tabla
+	for (foreignkey in foreignKey.all){
+		if (self.name = foreignkey.name){
+			var ClassType = java!Type.allInstances.select(s | s.name = foreignkey.reftable.name).first();
+			return ClassType;
+		}
+	}
+	
+	if (self.type.toString() = sql!DataType#INT.toString()){
+		var primitiveTypeOfJava = java!Type.allInstances.select(s | s.name = 'int').first();
+		return primitiveTypeOfJava;
+	}
+	else if (self.type.toString() = sql!DataType#VARCHAR255.toString()){
+		var primitiveTypeOfJava = java!Type.allInstances.select(s | s.name = 'String').first();
+		return primitiveTypeOfJava;
+	}
+	
+}
+
+//Operación que devuelve los modificadores de un atributo
+operation java!Attribute getModifierOfAttribute(): Set(java!Modifier) {   
+	var modifier = java!Modifier.allInstances.select(s | s.name.literal = 'private').first();
+	var setOfModifiers : Set;
+	setOfModifiers.add(modifier);
+	return setOfModifiers;
+} 
+
+//Operación que devuelve los modificadores de un metodo
+operation java!Method getModifierOfMethod(): Set(java!Modifier) {   
+	var modifier = java!Modifier.allInstances.select(s | s.name.literal = 'public').first();
+	var setOfModifiers : Set;
+	setOfModifiers.add(modifier);
+	return setOfModifiers;
+}
+
+//Operación que devuelve los modificadores de una clase
+operation java!Class getModifiersOfClass(): Set(java!Modifier) {   
+	var modifier = java!Modifier.allInstances.select(s | s.name.literal = 'public').first();
+	var setOfModifiers : Set;
+	setOfModifiers.add(modifier);
+	return setOfModifiers;
+}
+
+//Operación que devuelve los parametros de un metodo
+operation sql!column getParametersOfMethod(): Set(java!Parameter) {   
+	var parameter = new java!Parameter;
+	var setOfParameter : Set;
+	parameter.name = self.name;
+	parameter.jType = self.getTypeOfAttribute();
+	
+	for (foreignkey in foreignKey.all){
+		if (self.name = foreignkey.name){
+			parameter.name = foreignkey.reftable.name.firstToLowerCase();
+		}
+	}
+	setOfParameter.add(parameter);
+	return setOfParameter;
+}
+
+//Operación que devuelve las anotaciones de una clase
+operation java!Class getAnnotationsOfClass(): Set(java!Annotation) {   
+	var annotation = new java!Annotation;
+	var setOfAnnotations = new Set;
+	annotation.annotation = "Entity";
+	setOfAnnotations.add(annotation);
+	return setOfAnnotations;
+}
+
+//Operación que devuelve las anotaciones de un atributo
+operation java!Attribute getAnnotationsOfAttribute(): Set(java!Annotation) {   
+	var setOfAnnotations = new Set;
+	if (self.name = "id"){
+		var annotation = new java!Annotation;
+		annotation.annotation = "Id";
+		setOfAnnotations.add(annotation);
+		return setOfAnnotations;
+	}
+
+	for (foreignkey in foreignKey.all){
+		if (self.name = foreignkey.name){
+			var annotationManyToOne = new java!Annotation;
+			annotationManyToOne.annotation = "ManyToOne";
+			annotationManyToOne.value = foreignkey.reftable.name;
+			self.name = foreignkey.reftable.name.firstToLowerCase();
+			setOfAnnotations.add(annotationManyToOne);
+		}
+	}
+	return setOfAnnotations;
+}
+
+//Operación para crear los tipos primitivos de datos de Java
+operation Any createJavaType(): Set(java!Type) {
+
+	var setOfJavaTypes = new Set;
+	var intJavaType = new java!PrimitiveType;
+	var stringJavaType = new java!PrimitiveType;
+	var doubleJavaType = new java!PrimitiveType;
+	var charJavaType = new java!PrimitiveType;
+	var longJavaType = new java!PrimitiveType;
+	var floatJavaType = new java!PrimitiveType;
+	var booleanJavaType = new java!PrimitiveType;
+	
+	intJavaType.dataType = java!PrimitiveDataType#INT; intJavaType.name = java!PrimitiveDataType#INT.literal;
+	stringJavaType.dataType = java!PrimitiveDataType#STRING; stringJavaType.name = java!PrimitiveDataType#STRING.literal;
+	doubleJavaType.dataType = java!PrimitiveDataType#DOUBLE; doubleJavaType.name = java!PrimitiveDataType#DOUBLE.literal;
+	charJavaType.dataType = java!PrimitiveDataType#CHAR; charJavaType.name = java!PrimitiveDataType#CHAR.literal;
+	longJavaType.dataType = java!PrimitiveDataType#LONG; longJavaType.name = java!PrimitiveDataType#LONG.literal;
+	floatJavaType.dataType = java!PrimitiveDataType#FLOAT; floatJavaType.name = java!PrimitiveDataType#FLOAT.literal;
+	booleanJavaType.dataType = java!PrimitiveDataType#BOOLEAN; booleanJavaType.name = java!PrimitiveDataType#BOOLEAN.literal;
+	
+	setOfJavaTypes.add(intJavaType);
+	setOfJavaTypes.add(stringJavaType);
+	setOfJavaTypes.add(doubleJavaType);
+	setOfJavaTypes.add(charJavaType);
+	setOfJavaTypes.add(longJavaType);
+	setOfJavaTypes.add(floatJavaType);
+	setOfJavaTypes.add(booleanJavaType);
+	
+	return setOfJavaTypes;
+}
+
+//Operación para crear los modificadores de Java
+operation Any createModifiers(): Set(java!Modifier) {
+
+	var setOfModifiers = new Set;
+	var publicModifier = new java!Modifier;
+	var privateModifier = new java!Modifier;
+	var protectedModifier = new java!Modifier;
+	var abstractModifier = new java!Modifier;
+	var staticModifier = new java!Modifier;
+	var finalModifier = new java!Modifier;
+	var syncronizedModifier = new java!Modifier;
+	var transientModifier = new java!Modifier;
+	var volatileModifier = new java!Modifier;
+	
+	publicModifier.name = java!ModifierEnum#PUBLIC;
+	privateModifier.name = java!ModifierEnum#PRIVATE;
+	protectedModifier.name = java!ModifierEnum#PROTECTED;
+	abstractModifier.name = java!ModifierEnum#ABSTRACT;
+	staticModifier.name = java!ModifierEnum#STATIC;
+	finalModifier.name = java!ModifierEnum#FINAL;
+	syncronizedModifier.name = java!ModifierEnum#SYNCRONIZED;
+	transientModifier.name = java!ModifierEnum#TRANSIENT;
+	volatileModifier.name = java!ModifierEnum#VOLATILE;
+	
+	publicModifier.name = java!ModifierEnum#PUBLIC;
+	privateModifier.name = java!ModifierEnum#PRIVATE;
+	protectedModifier.name = java!ModifierEnum#PROTECTED;
+	abstractModifier.name = java!ModifierEnum#ABSTRACT;
+	staticModifier.name = java!ModifierEnum#STATIC;
+	finalModifier.name = java!ModifierEnum#FINAL;
+	syncronizedModifier.name = java!ModifierEnum#SYNCRONIZED;
+	transientModifier.name = java!ModifierEnum#TRANSIENT;
+	volatileModifier.name = java!ModifierEnum#VOLATILE;
+	
+	setOfModifiers.add(publicModifier);
+	setOfModifiers.add(privateModifier);
+	setOfModifiers.add(protectedModifier);
+	setOfModifiers.add(abstractModifier);
+	setOfModifiers.add(staticModifier);
+	setOfModifiers.add(finalModifier);
+	setOfModifiers.add(syncronizedModifier);
+	setOfModifiers.add(transientModifier);
+	setOfModifiers.add(volatileModifier);
+	
+	return setOfModifiers;
+}
+//Operacion para crear los metodos de una clase
+operation sql!Table getMethods(): Set(java!Method) {   
+	var setOfJavaMethods = new Set;
+	
+	//Crear metodo constructor con sus modificadores
+	var constructorMethod = new java!Method;
+	constructorMethod.name = self.name.firstToUpperCase();
+	constructorMethod.isConstructor = true;
+	constructorMethod.modifiers = constructorMethod.getModifierOfMethod();
+	setOfJavaMethods.add(constructorMethod);
+	
+	//Crear metodos setter y getter definiendo sus parametros, tipos y modificadores
+	for (column in self.columns){
+		var getterJavaMethod = new java!Method;
+		var setterJavaMethod = new java!Method;
+		
+		getterJavaMethod.name = "get" + column.name.firstToUpperCase();
+		getterJavaMethod.isConstructor = false;
+		getterJavaMethod.jType = column.getTypeOfAttribute();
+		getterJavaMethod.modifiers = getterJavaMethod.getModifierOfMethod();
+		setterJavaMethod.name = "set" + column.name.firstToUpperCase();
+		setterJavaMethod.isConstructor = false;
+		setterJavaMethod.parameters = column.getParametersOfMethod();
+		setterJavaMethod.modifiers = setterJavaMethod.getModifierOfMethod();
+		for (foreignkey in foreignKey.all){
+			if (column.name = foreignkey.name){
+				getterJavaMethod.name = "get" + foreignkey.reftable.name.firstToUpperCase();
+				setterJavaMethod.name = "set" + foreignkey.reftable.name.firstToUpperCase();
+			}
+		}
+		setOfJavaMethods.add(getterJavaMethod);
+		setOfJavaMethods.add(setterJavaMethod);
+	}
+	
+	return setOfJavaMethods;
+}
+
+
+//Operacion para crear las anotaciones de una clase
+operation sql!Table getAnnotations(): Set(java!Annotation) {   
+	var setOfAnnotations = new Set;
+	
+	var annotationEntity = new java!Annotation;
+	annotationEntity.annotation = "Entity";
+	setOfAnnotations.add(annotationEntity);
+	
+	for (foreignkey in foreignKey.all){
+		if(self.name = foreignkey.reftable.name){
+			var annotationOneToMany = new java!Annotation;
+			annotationOneToMany.annotation = "OneToMany";
+			annotationOneToMany.value = foreignkey.eContainer().name;
+			setOfAnnotations.add(annotationOneToMany);
+			
+			for (class in java!Class.all){
+			if (class.name = annotationOneToMany.value){
+				for (attrib in class.attributes){
+					if(attrib.name = self.name.firstToLowerCase()){
+						attrib.jType = java!Type.allInstances.select(s | s.name = self.name).first();
+					}
+				}
+				for (meth in class.methods){
+					if(meth.name = "get" + self.name){
+						meth.jType = java!Type.allInstances.select(s | s.name = self.name).first();
+					}
+					if(meth.name = "set" + self.name){
+						for (parameter in meth.parameters){
+							parameter.jType = java!Type.allInstances.select(s | s.name = self.name).first();
+						}
+					}
+				}
+			}
+			}		
+		}
+	}
+	return setOfAnnotations;
+}

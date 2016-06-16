@@ -1,0 +1,34 @@
+Luis Esteban Florez, codigo: 200923473
+
+La gramtica Xtext esta en la carpeta:
+sqlDsl4
+
+En la segunda instancia de eclipse importar los siguientes proyectos:
+
+El proyecto con el archivo .sql:
+TestSQL
+
+El metamodelo de Java:
+TallerE1Java
+Es el archivo:
+tallerE1Java.ecore
+
+El EGL que pasa de xtext al metamodelo de Java esta en la carpeta:
+JavaEGL
+
+El ETL para pasar del modelo java al codigo java esta en la carpeta:
+Java2TextEGL
+
+#----------------------------------------
+
+Para correr la cadena primero correr el archivo:
+sql2java.launch
+Que genera el modelo de Java en ./models/java.xmi
+
+Luego para correr el egl correr:
+java.launch
+Que genera el codigo java en la carpeta:
+../generated/
+
+
+

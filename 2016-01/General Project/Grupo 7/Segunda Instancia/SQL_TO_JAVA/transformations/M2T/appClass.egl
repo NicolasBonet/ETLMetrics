@@ -1,0 +1,45 @@
+[%
+	import 'utilities.egl';
+%]
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+
+///Class[%=class.name%]]
+public class [%=class.name%]{
+	/**
+	* Attributes
+	*/
+	[%
+		for(attribute : JAVA!Attribute in class.structuredElements){
+			attribute.renderAttribute();
+		}
+	%]
+	/**
+	*Methods
+	*/
+	[%
+		for(method : JAVA!Method in class.structuredElements){
+			if(method.name = null){
+				%]
+				/*
+				Crud Methods
+				*/
+				[%
+				method.renderAppClassConstructor();
+			} else if (method.name.startsWith("get") and method.name.endsWith("s")) {				
+				method.renderGetAllMethod();
+			} else if (method.name.startsWith("add")) {				
+				method.renderAddMethod();
+			} else if (method.name.startsWith("edit")) {				
+				method.renderEditMethod();
+			} else if (method.name.startsWith("delete")) {				
+				method.renderDeleteMethod();
+			} else if (method.name.startsWith("get")) {				
+				method.renderGetMethod();
+			}
+		}
+	%]
+}

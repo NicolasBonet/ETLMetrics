@@ -1,0 +1,85 @@
+[%
+var className = class.name;
+%]
+package test.java;
+
+import static org.junit.Assert.*;
+import marketplace.[%=className%];
+import marketplace.MarketPlace;
+
+import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+import uk.co.jemos.podam.api.PodamFactory;
+import uk.co.jemos.podam.api.PodamFactoryImpl;
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class [%=className%]Test
+{
+	private MarketPlace mp;
+	private PodamFactory factory;
+	
+	@Before
+	public void prepareTest()
+	{
+		mp = new MarketPlace();
+		factory = new PodamFactoryImpl();
+	}
+	
+	@Test
+	public void test1[%=className%]Add()
+	{	
+		[%=className%] [%=className.firstToLowerCase()%] = factory.manufacturePojo([%=className%].class);
+		factory.populatePojo([%=className.firstToLowerCase()%]);
+		mp.add[%=className%]([%=className.firstToLowerCase()%]);
+		
+		[%for(attrib in class.attributes)
+		{
+		%]
+		assertEquals([%=className.firstToLowerCase()%].get[%=attrib.name.firstToUpperCase()%](), mp.get[%=className%]([%=className.firstToLowerCase()%].getId()).get[%=attrib.name.firstToUpperCase()%]());
+		[%
+		}
+		%]
+	}
+		
+	@Test
+	public void test2Get[%=className%]()
+	{	
+		assertNotNull(mp.get[%=className%](mp.get[%=className%]s().get(0).getId()));
+	}	
+	
+	@Test
+	public void test3[%=className%]Edit()
+	{	
+		[%=className%] [%=className.firstToLowerCase()%] = factory.manufacturePojo([%=className%].class);
+		factory.populatePojo([%=className.firstToLowerCase()%]);
+		
+		int primerId = mp.get[%=className%]s().get(0).getId();
+		
+		mp.edit[%=className%](primerId[%for(attr in class.attributes){if (attr.name<>'id'){%], [%=className.firstToLowerCase()%].get[%=attr.name.firstToUpperCase()%]()[%}}%]);
+				
+		[%for (attrib in class.attributes){
+			if (attrib.name <> 'id'){
+		%]
+		assertEquals([%=className.firstToLowerCase()%].get[%=attrib.name.firstToUpperCase()%](), mp.get[%=className%](primerId).get[%=attrib.name.firstToUpperCase()%]());
+		[%
+			}
+		}
+		%]
+	}
+	
+	@Test
+	public void test4[%=className%]Delete()
+	{	
+		int primerId = mp.get[%=className%]s().get(0).getId();
+		
+		assertNotNull(mp.get[%=className%](primerId));
+		
+		mp.delete[%=className%](primerId);
+		
+		assertNull(mp.get[%=className%](primerId));
+	}
+
+}	

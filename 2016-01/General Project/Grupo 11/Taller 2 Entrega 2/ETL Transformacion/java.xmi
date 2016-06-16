@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="ASCII"?>
+<metamodeloJava:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:metamodeloJava="http://www.example.org/metamodeloJava">
+  <types xsi:type="metamodeloJava:PrimitiveType" name="int"/>
+  <types xsi:type="metamodeloJava:PrimitiveType" name="double" dataType="double"/>
+  <types xsi:type="metamodeloJava:PrimitiveType" name="float" dataType="float"/>
+  <types xsi:type="metamodeloJava:PrimitiveType" name="long" dataType="long"/>
+  <types xsi:type="metamodeloJava:PrimitiveType" name="boolean" dataType="boolean"/>
+  <types xsi:type="metamodeloJava:PrimitiveType" name="String" dataType="String"/>
+  <types xsi:type="metamodeloJava:PrimitiveType" name="char" dataType="char"/>
+  <modifiers name="transient"/>
+  <modifiers name="volatile"/>
+  <modifiers name="private"/>
+  <modifiers name="static"/>
+  <modifiers name="final"/>
+  <modifiers name="syncronized"/>
+  <modifiers/>
+  <modifiers name="abstract"/>
+  <modifiers name="protected"/>
+  <classes name="Client" modifiers="//@modifiers.6">
+    <attributes modifiers="//@modifiers.2" jType="//@types.0" name="id">
+      <annotations annotation="Id"/>
+    </attributes>
+    <attributes modifiers="//@modifiers.2" jType="//@types.5" name="password"/>
+    <attributes modifiers="//@modifiers.2" jType="//@types.5" name="name"/>
+    <methods modifiers="//@modifiers.6" jType="//@types.5" name="getPassword"/>
+    <methods modifiers="//@modifiers.6" name="Client" isConstructor="true"/>
+    <methods modifiers="//@modifiers.6" name="setPassword">
+      <parameters jType="//@types.5" name="password"/>
+    </methods>
+    <methods modifiers="//@modifiers.6" name="setId">
+      <parameters jType="//@types.0" name="id"/>
+    </methods>
+    <methods modifiers="//@modifiers.6" jType="//@types.0" name="getId"/>
+    <methods modifiers="//@modifiers.6" jType="//@types.5" name="getName"/>
+    <methods modifiers="//@modifiers.6" name="setName">
+      <parameters jType="//@types.5" name="name"/>
+    </methods>
+    <annotations annotation="OneToMany" value="Carrito"/>
+    <annotations annotation="Entity"/>
+  </classes>
+  <classes name="Producto" modifiers="//@modifiers.6">
+    <attributes modifiers="//@modifiers.2" jType="//@types.5" name="name"/>
+    <attributes modifiers="//@modifiers.2" jType="//@types.0" name="id">
+      <annotations annotation="Id"/>
+    </attributes>
+    <methods modifiers="//@modifiers.6" jType="//@types.0" name="getId"/>
+    <methods modifiers="//@modifiers.6" name="Producto" isConstructor="true"/>
+    <methods modifiers="//@modifiers.6" name="setId">
+      <parameters jType="//@types.0" name="id"/>
+    </methods>
+    <methods modifiers="//@modifiers.6" name="setName">
+      <parameters jType="//@types.5" name="name"/>
+    </methods>
+    <methods modifiers="//@modifiers.6" jType="//@types.5" name="getName"/>
+    <annotations annotation="Entity"/>
+    <annotations annotation="OneToMany" value="Item"/>
+  </classes>
+  <classes name="Carrito" modifiers="//@modifiers.6">
+    <attributes modifiers="//@modifiers.2" jType="//@types.0" name="id">
+      <annotations annotation="Id"/>
+    </attributes>
+    <attributes modifiers="//@modifiers.2" jType="//@types.5" name="name"/>
+    <attributes modifiers="//@modifiers.2" jType="//@classes.0" name="client">
+      <annotations annotation="ManyToOne" value="Client"/>
+    </attributes>
+    <methods modifiers="//@modifiers.6" name="setClient">
+      <parameters jType="//@classes.0" name="client"/>
+    </methods>
+    <methods modifiers="//@modifiers.6" jType="//@types.5" name="getName"/>
+    <methods modifiers="//@modifiers.6" name="setId">
+      <parameters jType="//@types.0" name="id"/>
+    </methods>
+    <methods modifiers="//@modifiers.6" name="setName">
+      <parameters jType="//@types.5" name="name"/>
+    </methods>
+    <methods modifiers="//@modifiers.6" jType="//@classes.0" name="getClient"/>
+    <methods modifiers="//@modifiers.6" name="Carrito" isConstructor="true"/>
+    <methods modifiers="//@modifiers.6" jType="//@types.0" name="getId"/>
+    <annotations annotation="Entity"/>
+    <annotations annotation="OneToMany" value="CarritoItem"/>
+  </classes>
+  <classes name="CarritoItem" modifiers="//@modifiers.6">
+    <attributes modifiers="//@modifiers.2" jType="//@types.0" name="id">
+      <annotations annotation="Id"/>
+    </attributes>
+    <attributes modifiers="//@modifiers.2" jType="//@classes.2" name="carrito">
+      <annotations annotation="ManyToOne" value="Carrito"/>
+    </attributes>
+    <attributes modifiers="//@modifiers.2" jType="//@classes.4" name="item">
+      <annotations annotation="ManyToOne" value="Item"/>
+    </attributes>
+    <methods modifiers="//@modifiers.6" name="setItem">
+      <parameters jType="//@classes.4" name="item"/>
+    </methods>
+    <methods modifiers="//@modifiers.6" name="CarritoItem" isConstructor="true"/>
+    <methods modifiers="//@modifiers.6" jType="//@classes.2" name="getCarrito"/>
+    <methods modifiers="//@modifiers.6" name="setCarrito">
+      <parameters jType="//@classes.2" name="carrito"/>
+    </methods>
+    <methods modifiers="//@modifiers.6" jType="//@types.0" name="getId"/>
+    <methods modifiers="//@modifiers.6" jType="//@classes.4" name="getItem"/>
+    <methods modifiers="//@modifiers.6" name="setId">
+      <parameters jType="//@types.0" name="id"/>
+    </methods>
+    <annotations annotation="Entity"/>
+  </classes>
+  <classes name="Item" modifiers="//@modifiers.6">
+    <attributes modifiers="//@modifiers.2" jType="//@types.0" name="id">
+      <annotations annotation="Id"/>
+    </attributes>
+    <attributes modifiers="//@modifiers.2" jType="//@types.0" name="cantidad"/>
+    <attributes modifiers="//@modifiers.2" jType="//@types.5" name="name"/>
+    <attributes modifiers="//@modifiers.2" jType="//@classes.1" name="producto">
+      <annotations annotation="ManyToOne" value="Producto"/>
+    </attributes>
+    <methods modifiers="//@modifiers.6" name="setName">
+      <parameters jType="//@types.5" name="name"/>
+    </methods>
+    <methods modifiers="//@modifiers.6" jType="//@types.5" name="getName"/>
+    <methods modifiers="//@modifiers.6" jType="//@classes.1" name="getProducto"/>
+    <methods modifiers="//@modifiers.6" jType="//@types.0" name="getId"/>
+    <methods modifiers="//@modifiers.6" jType="//@types.0" name="getCantidad"/>
+    <methods modifiers="//@modifiers.6" name="setCantidad">
+      <parameters jType="//@types.0" name="cantidad"/>
+    </methods>
+    <methods modifiers="//@modifiers.6" name="Item" isConstructor="true"/>
+    <methods modifiers="//@modifiers.6" name="setId">
+      <parameters jType="//@types.0" name="id"/>
+    </methods>
+    <methods modifiers="//@modifiers.6" name="setProducto">
+      <parameters jType="//@classes.1" name="producto"/>
+    </methods>
+    <annotations annotation="OneToMany" value="CarritoItem"/>
+    <annotations annotation="Entity"/>
+  </classes>
+</metamodeloJava:Application>

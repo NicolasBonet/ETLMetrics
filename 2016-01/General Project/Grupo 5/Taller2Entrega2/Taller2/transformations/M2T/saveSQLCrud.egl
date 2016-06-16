@@ -1,0 +1,16 @@
+[% 
+	var t:Template:= TemplateFactory.load('Market.egl');
+	t.generate('../../../co.edu.uniandes.sqlcrud/src/marketplace/MarketPlace.java');
+	
+	for(clase in java!Clase.all)
+	{
+		var t:Template:= TemplateFactory.load('JavaMM2JavaCode.egl');
+		t.populate("clase",clase);
+		t.generate('../../../co.edu.uniandes.sqlcrud/src/entities/' + clase.nombre + '.java');
+		
+		var p:Template:= TemplateFactory.load('JavaMM2JavaTest.egl');
+		p.populate("clase",clase);
+		p.generate('../../../co.edu.uniandes.sqlcrud/src/test.java/' + clase.nombre + 'Test.java');
+	}
+	
+%]

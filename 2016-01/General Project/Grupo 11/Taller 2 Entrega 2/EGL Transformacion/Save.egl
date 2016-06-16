@@ -1,0 +1,44 @@
+[%	
+
+//Se generan las clases de entidades
+TemplateFactory.setOutputRoot("C:/Proyecto/co.edu.uniandes.sqlcrud/src/marketplace");
+for(p in Class.all)
+{
+	var plantillaClassesEntidades:Template:= TemplateFactory.load('ClassesEntities.egl');
+	plantillaClassesEntidades.populate("class",p);
+	plantillaClassesEntidades.generate(p.name + ".java");
+}
+
+//Se genera la clase MarketPlace
+var plantillaMarketPlace:Template:= TemplateFactory.load('ClassMarketPlace.egl');
+plantillaMarketPlace.generate("MarketPlace.java");
+
+//Se generan las clases de Test
+TemplateFactory.setOutputRoot("C:/Proyecto/co.edu.uniandes.sqlcrud/src/test/java");
+for(t in Class.all)
+{
+	var plantillaClassesTest:Template:= TemplateFactory.load('ClassesTest.egl');
+	plantillaClassesTest.populate("class",t);
+	plantillaClassesTest.generate(t.name + "Test.java");
+}
+
+//Se genera persistence.xml
+TemplateFactory.setOutputRoot("C:/Proyecto/co.edu.uniandes.sqlcrud/src/META-INF");
+var plantillaPersistence:Template:= TemplateFactory.load('Persistence.egl');
+plantillaPersistence.generate("persistence.xml");
+
+//Se genera pom.xml
+TemplateFactory.setOutputRoot("C:/Proyecto/co.edu.uniandes.sqlcrud");
+var plantillaPom:Template:= TemplateFactory.load('Pom.egl');
+plantillaPom.generate("pom.xml");
+
+//Se genera .project
+var plantillaProject:Template:= TemplateFactory.load('Project.egl');
+plantillaProject.generate(".project");
+
+//Se genera .classpath
+var plantillaProject:Template:= TemplateFactory.load('ClassPath.egl');
+plantillaProject.generate(".classpath");
+
+%]
+	

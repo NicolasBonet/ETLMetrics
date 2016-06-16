@@ -1,0 +1,471 @@
+/**
+* rule: SQL2JAVA
+* obj: Crear una conjunto de paquetes y clases que constituyen el esqueleto de aplicacion java.
+*/
+rule SQL2JAVA
+	transform
+		s:SQL!Schema
+	to
+		t:JAVA!Application{
+			//Añadir Tipos de Dato Primitivos
+			var type = new JAVA!Primitive();	
+			type.primitiveType = JAVA!PrimitiveDataType#STRING;
+			t.datatype.add(type);
+			
+			type = new JAVA!Primitive();	
+			type.primitiveType = JAVA!PrimitiveDataType#INT;
+			t.datatype.add(type);
+			
+			//Crear oaquete principal y estructura de paquetes
+			var p = new JAVA!Package();
+			p.name = "co.edu.uniandes.sqlcrud";
+			
+			var test = new JAVA!Package();
+			test.name = "test";
+			
+			var marketplace = new JAVA!Package();
+			marketplace.name = "marketplace";	
+			
+			var MarketPlace = new JAVA!Class();
+			MarketPlace.name = "MarketPlace";
+			
+			var PodamFactory = new JAVA!Class();
+			PodamFactory.name = "PodamFactory";
+			
+			var EntityManagerFactory = new JAVA!Class();
+			EntityManagerFactory.name = "EntityManagerFactory";
+			
+			var EntityManager = new JAVA!Class();
+			EntityManager.name = "EntityManager";
+			
+			var utils = new JAVA!Package();
+			utils.name = "utils";		
+			utils.classifier.add(MarketPlace);
+			utils.classifier.add(PodamFactory);
+			utils.classifier.add(EntityManagerFactory);
+			utils.classifier.add(EntityManager);
+			
+			var src = new JAVA!Package();
+			src.name = "src";
+			src.subPackages.add(utils);
+			src.subPackages.add(test);
+			src.subPackages.add(marketplace);
+			
+			p.subPackages.add(src);
+			
+			//Crear clases a partir de tablas dentro del paquete marketplace
+			marketplace.classifier = s.tables.equivalent("Table2EntityClass");
+			marketplace.classifier.add(getApplicationClass(s));
+			
+			//Crear clases de test de cada entidad dentro del paquete de test
+			test.classifier = s.tables.equivalent("Table2TestClass");
+			
+			t.package.add(p);
+		}
+		
+/********************
+* Clases de Entidad *
+*********************/
+
+/**
+* rule: Table2EntityClass
+* obj: Crear una entidad de clase por cada tabla en el molo SQL.
+*/
+@lazy
+rule Table2EntityClass
+	transform
+		s:SQL!Table
+	to
+		t:JAVA!Class{
+			var attribute;
+			t.name = s.name.firstToUpperCase();
+			
+			//Crear constructor
+			var modifier = new JAVA!Modifier();
+			modifier.modifiers.add(JAVA!Modifiers#PUBLIC);
+			
+			var constructor = new JAVA!Method();
+			constructor.returnValue = t;		
+			constructor.modifier = modifier;	
+			t.structuredElements.add(constructor);
+			
+			//Crear atributos de llaves primarias			
+			for(column : Column in s.primaryKey.ids){
+				attribute = column.equivalent("PrimaryKey2Attribute");
+				t.structuredElements.add(attribute);
+				t.structuredElements.add(getGetterMethod(attribute));
+				t.structuredElements.add(getSetterMethod(attribute));
+			}
+			
+			//Crear atributos de llaves foraneas
+			for(foreignKey : ForeignKey in s.foreignsKeys){
+				attribute = foreignKey.equivalent("ForeignKey2Attribute");
+				t.structuredElements.add(attribute);
+				t.structuredElements.add(getGetterMethod(attribute));
+				t.structuredElements.add(getSetterMethod(attribute));
+			}
+			
+			//Crear demás atributos
+			for(column : Column in s.columns){
+				var isPrimary = false;
+				var isForeign = false;
+				
+				for(primary : Column in s.primaryKey.ids){
+					if(column.name = primary.name){
+						isPrimary = true;
+					}
+				}
+				
+				for(foreign : ForeignKey in s.foreignsKeys){
+					if(column.name = foreign.refsTo.name){
+						isForeign = true;
+					}
+				}
+				
+				if(isPrimary <> true and isForeign <> true) {
+					attribute = column.equivalent("Column2Attribute");
+					t.structuredElements.add(attribute);
+					t.structuredElements.add(getGetterMethod(attribute));
+					t.structuredElements.add(getSetterMethod(attribute));
+				}
+			}
+			
+			
+			
+				
+		}
+
+/**
+* rule: PrimaryKey2Attribute
+* obj: 	Crear un atributo con sus respectivas anotaciones 
+* 		por cada columna que sea llave primaria en una tabla
+*/
+@lazy
+rule PrimaryKey2Attribute 
+	transform
+		s:SQL!Column
+	to
+		t:JAVA!Attribute{
+		
+			var modifier = new JAVA!Modifier();
+			modifier.modifiers.add(JAVA!Modifiers#PRIVATE);
+			
+			var annotation = new JAVA!Annotation();
+			annotation.name = "@Id";
+			
+			t.name = s.name;
+			t.type=getType(s.datatype.datatype.tostring());
+			t.modifier = modifier;
+			t.annotations.add(annotation);
+		}
+
+/**
+* rule: ForeignKey2Attribute
+* obj:	Crear un atributo con sus respectivas anotaciones 
+* 		por cada columna que sea llave foranea en una tabla
+*/
+@lazy
+rule ForeignKey2Attribute
+	transform
+		s:SQL!ForeignKey
+	to
+		t:JAVA!Attribute{
+		
+			var modifier = new JAVA!Modifier();
+			modifier.modifiers.add(JAVA!Modifiers#PRIVATE);
+			t.modifier = modifier;
+			
+			//Add ManyToOne annotation
+			var annotation = new JAVA!Annotation();
+			annotation.name = "@ManyToOne";
+			
+			var keyValue = new JAVA!KeyValue();
+			keyValue.key = "fetch";
+			keyValue.value = "FetchType.LAZY";
+			annotation.parameters.add(keyValue);
+			
+			var keyValue = new JAVA!KeyValue();
+			keyValue.key = "cascade";
+			keyValue.value = "CascadeType.PERSIST";
+			annotation.parameters.add(keyValue);
+			
+			t.annotations.add(annotation);
+			
+			//Add Primary Key Join Column Annotation
+			var annotation = new JAVA!Annotation();
+			annotation.name = "@PrimaryKeyJoinColumn";
+			t.annotations.add(annotation);
+			
+			//Add Podam Exclude annotation
+			var annotation = new JAVA!Annotation();
+			annotation.name = "@PodamExclude";
+			t.annotations.add(annotation);
+						
+			t.name = s.reference.name.toLowerCase();	
+			t.type= getType(s.reference.name.tostring());	
+		}
+	
+	
+/**
+* rule:  Column2Attribute
+* obj: 	Construye un atributo a partir de una columna de una tabla perteneciente a la base de datos
+*/
+@lazy	
+rule Column2Attribute
+	transform
+		s:SQL!Column
+	to
+		t:JAVA!Attribute{
+			
+			var modifier = new JAVA!Modifier();
+			modifier.modifiers.add(JAVA!Modifiers#PRIVATE);
+			t.modifier = modifier;
+			
+			t.name = s.name;
+			t.type= getType(s.datatype.datatype.tostring());
+		}
+
+/**
+* operation: Column2GetterMethods
+* obj: 	Construir los métodos de acceso por cada atributo.
+*/		
+operation getGetterMethod (attribute : JAVA!Attribute) : JAVA!Method{
+	var modifier = new JAVA!Modifier();
+	modifier.modifiers.add(JAVA!Modifiers#PUBLIC);
+			
+	var method = new JAVA!Method();
+	method.modifier = modifier;
+	method.name = "get"+attribute.name.firstToUpperCase();
+	method.returnValue=attribute.type;
+	return method;
+}
+
+/**
+* operation: Column2GetterMethods
+* obj: 	Construir los métodos de modificación por cada atributo.
+*/		
+operation getSetterMethod (attribute : JAVA!Attribute) : JAVA!Method {
+	var modifier = new JAVA!Modifier();
+	modifier.modifiers.add(JAVA!Modifiers#PUBLIC);
+	
+	var parameter = new JAVA!Parameter();
+	parameter.type=attribute.type;
+	parameter.name = attribute.name;
+	
+	var method = new JAVA!Method();
+	method.modifier = modifier;
+	method.name = "set"+attribute.name.firstToUpperCase();
+	method.parameters.add(parameter);
+	
+	return method;
+	
+}
+
+/*******************
+* Clases de prueba *
+********************/
+
+/**
+* rule:	Table2TestClass
+* obj:	Crear una clase de Test por cada tabla de SQL.
+*/	
+@lazy
+rule Table2TestClass
+	transform
+		s:SQL!Table
+	to
+		t:JAVA!Class{
+			//Nombre clase de prueba
+			t.name = s.name.firstToUpperCase() + "Test";			
+			
+			//Atributos clase de prueba
+			var marketplace = new JAVA!Attribute();
+			marketplace.type = getType("MarketPlace");
+			marketplace.name = "mp";
+			marketplace.modifier = getPrivateModifier();
+			t.structuredElements.add(marketplace);
+			
+			var factory = new JAVA!Attribute();
+			factory.type = getType("PodamFactory");
+			factory.name = "factory";
+			factory.modifier = getPrivateModifier();
+			t.structuredElements.add(factory);			
+			
+			//Metodo que prepara la prueba
+			t.structuredElements.add(getPrepareTestMethod());
+			
+			//Metodos de prueba
+			var testMethod = getTestMethod("test1" + s.name.firstToUpperCase() + "Add");
+			t.structuredElements.add(testMethod);
+				
+			var testMethod = getTestMethod("test2Get" + s.name.firstToUpperCase());			
+			t.structuredElements.add(testMethod);
+			
+			var testMethod = getTestMethod("test3" + s.name.firstToUpperCase() + "Edit");			
+			t.structuredElements.add(testMethod);
+			
+			var testMethod = getTestMethod("test4" + s.name.firstToUpperCase() + "Delete");			
+			t.structuredElements.add(testMethod);
+		}
+
+/**
+* operation:	getPrepareTestMethod
+* obj: Construir el metodo prepare test
+*/
+operation getPrepareTestMethod () : JAVA!Method {
+	var before = new JAVA!Annotation();
+	before.name = "@Before";
+	
+	var prepareTest = new JAVA!Method();
+	prepareTest.name = "prepareTest";
+	prepareTest.modifier = getPublicModifier();
+	prepareTest.annotations.add(before);
+	
+	return prepareTest;
+}
+/**
+* operation:	getPrepareTestMethod
+* obj: Construye un método de test
+* param: name-Nombre del metodo a construir
+*/
+operation getTestMethod (name : String) : JAVA!Method {
+	var test = new JAVA!Annotation();
+	test.name = "@Test";
+	
+	var testMethod = new JAVA!Method();
+	testMethod.name = name;
+	testMethod.modifier = getPublicModifier();
+	testMethod.annotations.add(test);
+	
+	return testMethod;
+}
+
+/********************
+* Application class *
+*********************/
+/**
+* operation:	getApplicationClass
+* obj: Copnstruye una clase de  aplciacion dado un esquema de base de datos de SQL
+*/
+operation getApplicationClass (schema : SQL!Schema) : JAVA!Class {
+	var classAplication = new JAVA!Class();
+	
+	//Nombre de la clase de Aplicación
+	classAplication.name = schema.name.firstToUpperCase();
+	
+	//Atributos de la clase de aplicación
+	var PERSISTENCE_UNIT_NAME = new JAVA!Attribute();
+	PERSISTENCE_UNIT_NAME.type = getType("varchar");
+	PERSISTENCE_UNIT_NAME.name = "PERSISTENCE_UNIT_NAME";
+	PERSISTENCE_UNIT_NAME.modifier = getPrivateModifier();
+	PERSISTENCE_UNIT_NAME.modifier.modifiers.add(JAVA!Modifiers#STATIC);
+	PERSISTENCE_UNIT_NAME.modifier.modifiers.add(JAVA!Modifiers#FINAL);
+	classAplication.structuredElements.add(PERSISTENCE_UNIT_NAME);
+	
+	
+	var emf = new JAVA!Attribute();
+	emf.type = getType("EntityManagerFactory");
+	emf.name = "emf";
+	emf.modifier = getPrivateModifier();
+	emf.modifier.modifiers.add(JAVA!Modifiers#STATIC);
+	classAplication.structuredElements.add(emf);
+	
+	var em = new JAVA!Attribute();
+	em.type = getType("EntityManager");
+	em.name = "em";
+	em.modifier = getPrivateModifier();
+	classAplication.structuredElements.add(em);
+	
+	//Metodo constructor
+	var constructor = new JAVA!Method();
+	constructor.modifier = getPublicModifier();
+	constructor.returnValue = classAplication;
+	classAplication.structuredElements.add(constructor);
+	
+	//Metodos CRUD de la clase de aplicación
+	for(table:Table in schema.tables){		
+		classAplication.structuredElements.add(getMethod("get"+table.name.firstToUpperCase()+"s",1,null));
+		classAplication.structuredElements.add(getMethod("add"+table.name.firstToUpperCase(),null,getParameters(table, 1)));
+		classAplication.structuredElements.add(getMethod("edit"+table.name.firstToUpperCase(),null,null));
+		classAplication.structuredElements.add(getMethod("delete"+table.name.firstToUpperCase(),null,null));
+		classAplication.structuredElements.add(getMethod("get"+table.name.firstToUpperCase(),null,null));
+	}
+	
+	return classAplication;
+}
+/**
+* operation:	getMethod
+* obj: Construye un metodo dado su nombre, retorno y parametros
+*/
+operation getMethod (name:String, returnValue:Integer, parameters:Sequence) : JAVA!Method {
+	var method = new JAVA!Method();
+	method.name = name;
+	method.modifier = getPublicModifier();	
+	method.parameters = parameters;	
+	
+	return method;
+}
+/**
+* operation:	getParameters
+* obj:Construye los parametros dada una table
+*/
+operation getParameters (table : Table, option : Integer) : Sequence{
+	var parameters : Sequence;
+	
+	switch(option){
+		case 1:
+			var p = new JAVA!Parameter();
+			p.name = table.name.toLowerCase();
+			parameters.add(p);
+			break;
+	}
+	
+	return parameters;
+}
+
+
+/************************
+* Operaciones generales *
+*************************/
+
+/**
+* operation:	getPrivateModifier
+* obj: Obtiene el modifier correspondiente a private
+*/
+operation getPrivateModifier() : JAVA!Modifier {
+	var modifier = new JAVA!Modifier();
+	modifier.modifiers.add(JAVA!Modifiers#PRIVATE);
+	return modifier;
+}
+/**
+* operation:	getPublicModifier
+* obj: Obtiene al modifier correspondiente a public
+*/
+operation getPublicModifier() : JAVA!Modifier {
+	var modifier = new JAVA!Modifier();
+	modifier.modifiers.add(JAVA!Modifiers#PUBLIC);
+	return modifier;
+}
+/**
+* operation:	getType
+* obj: Obtiene el clasificador correspondiente a un tipo de dato 
+* param: nombre del tipo de dato
+*/
+operation getType(name:String): JAVA!Classifier {
+	//evaluando si es varchar
+	if(name=="varchar"){
+		return JAVA!Primitive.allInstances.select(p|p.primitiveType=JAVA!PrimitiveDataType#STRING).first();
+	}//evaluando si es un entero
+	 else if(name=="int") {
+		return JAVA!Primitive.allInstances.select(p|p.primitiveType=JAVA!PrimitiveDataType#INT).first();
+	} else {
+	//si no es un varchar ni un int se obtiene la clase respectiva
+		var classType = JAVA!Class.allInstances.select(c|c.name=name).first();
+		if(classType = null) {
+			//classType = new JAVA!Class();
+			//classType.name = name;
+		}
+		return classType;
+	}
+}
+

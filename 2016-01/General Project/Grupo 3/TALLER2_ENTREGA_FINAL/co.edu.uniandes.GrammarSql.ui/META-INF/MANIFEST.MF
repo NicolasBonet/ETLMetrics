@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: co.edu.uniandes.GrammarSql.ui
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: co.edu.uniandes.GrammarSql.ui; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: co.edu.uniandes.GrammarSql,
+ co.edu.uniandes.GrammarSql.ide,
+ org.eclipse.xtext.ui,
+ org.eclipse.xtext.ui.shared,
+ org.eclipse.xtext.ui.codetemplates.ui,
+ org.eclipse.ui.editors;bundle-version="3.5.0",
+ org.eclipse.ui.ide;bundle-version="3.5.0",
+ org.eclipse.ui,
+ org.eclipse.compare,
+ org.eclipse.xtext.builder,
+ org.eclipse.xtend.lib;resolution:=optional,
+ org.eclipse.xtext.xbase.lib
+Import-Package: org.apache.log4j
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: co.edu.uniandes.ui.quickfix,
+ co.edu.uniandes.ui.contentassist,
+ co.edu.uniandes.GrammarSql.ui.internal
+Bundle-Activator: co.edu.uniandes.GrammarSql.ui.internal.GrammarSqlActivator

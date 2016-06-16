@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="sql" nsURI="http://www.edu.co/uniandes/tallerM2M/Sql" nsPrefix="sql">
+  <eClassifiers xsi:type="ecore:EClass" name="Database">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tablas" upperBound="-1"
+        eType="#//Tabla" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Tabla">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="columnas" upperBound="-1"
+        eType="#//Columna" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="primarys" upperBound="-1"
+        eType="#//Primary" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="foreigns" upperBound="-1"
+        eType="#//ForeignKey" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Columna">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipo" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="notNull" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Primary">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="column" unique="false"
+        upperBound="-1" eType="#//Columna"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ForeignKey">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="referenceTable" eType="#//Tabla"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="referenceColumn" eType="#//Columna"/>
+  </eClassifiers>
+</ecore:EPackage>

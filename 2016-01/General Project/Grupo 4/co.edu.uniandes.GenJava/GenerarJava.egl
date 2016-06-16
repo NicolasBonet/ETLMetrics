@@ -1,0 +1,16 @@
+[%
+	for(t in sql!Table.all)
+	{
+		TemplateFactory.setOutputRoot('src/marketplace');
+		var implementation:Template:= TemplateFactory.load('transformacionSQL.egl');
+		var dataBase = sql!Table.all;
+		implementation.populate('dataBase',dataBase);
+		implementation.populate('tables',t);
+		implementation.generate(t.name+'.java');
+	 }
+
+	  TemplateFactory.setOutputRoot('src/META-INF');
+	  var implementationPer:Template:= TemplateFactory.load('TransformacionSQLPersistence.egl');
+      implementationPer.generate('persistence.xml');
+      
+%]

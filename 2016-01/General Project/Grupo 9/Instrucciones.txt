@@ -1,0 +1,17 @@
+1. Abrir la gramática gramaticaSQL en Eclipse y desplegar la segunda instancia.
+
+2. Cargar el proyecto CrudGenerator en la segunda instancia.
+
+3. Ejecutar la transformación M2M cuya configuración se encuentra en el archivo SQL2Java.launch.
+
+4. Ejecutar la transformación M2T cuya configuración se encuentra en el archivo generateCrud.launch.
+
+5. Al correr la transformación M2T se crea un nuevo proyecto Eclipse en la misma ubicación del proyecto CrudGenerator (Dada la configuración entregada el proyecto generado debe llamarse co.edu.uniandes.sqlcrud).
+
+5. Importar en Eclipse el proyecto generado.
+
+6. En caso de que el proyecto cargue sin la dependencia de JRE, es necesario realizar un maven > update project.
+
+7. Ejecutar pruebas unitarias.
+
+NOTA: El metamodelo Java se encuentra en la carpeta metamodel del proyecto CrudGenerator.

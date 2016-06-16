@@ -1,0 +1,201 @@
+package marketplace;
+
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.PrimaryKeyJoinColumn;
+
+import uk.co.jemos.podam.common.PodamExclude;
+[% 
+var entro=true;
+for (clases in app!Class.all ){
+	var nomTabla = clases.name;
+	if (nomTabla = nomClaseGenerando){
+	
+	nomTabla.println("Generando ... ");
+%]
+
+@Entity
+public class [%=nomTabla%]
+{
+	[%
+	//Se generan los atributos
+	var nomPK = "";
+	var tipoPK = "";
+	var esPivot = false;
+	--clases.annotations.select(a|a.name="primary").parameters.select(a|a.key<>"").key.println();
+	for(pK in clases.annotations.select(a|a.name="primary").parameters.select(a|a.key<>"")){
+		if(pK.size()==1){
+			nomPK = pK.get(0).key;
+			tipoPK = pK.get(0).value;
+		}else {
+			nomPK = "id";
+			tipoPK = "int";
+			esPivot = true;
+		}
+	}
+	if(tipoPK=="string"){tipoPK = "String";}
+	%] 
+		@Id
+		private [%=tipoPK%] [%=nomPK%];
+	[%
+		
+	for(columna in clases.structuredElements.select(a|a.name <> nomPK)){
+		var nomCol = columna.name;
+		var tipoCol = columna.primitiveType;
+		--var noNull = columna.NotNull;
+		
+		//Se definen los ManyToOne
+		if(clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").isEmpty()==false and clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").key.isEmpty()==false){		   
+			var indi=0;
+			var nomTabRef = "";	
+			var nomForeing = "";
+for (cantidad in clases.annotations.select(a|a.name="foreign").parameters.select(a|a.size()>0)){
+		nomTabRef = clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").value[indi]; 
+		nomForeing = clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").key[indi];
+				
+--		if(nomForeing.size()>0){
+				nomForeing=nomForeing.get(indi);
+				nomTabRef=nomTabRef.get(indi);
+--				nomForeing.println(" ** " +nomCol + " ** " + nomTabRef + " -- " + indice + " foreign-> ");
+
+				if(nomForeing == nomCol){
+				nomCol.println(" - ");
+	%]
+		@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+		@PrimaryKeyJoinColumn
+		@PodamExclude	
+	[%
+					tipoCol = nomTabRef;
+					nomCol = nomForeing;
+				}
+				indi=indi+1;
+				
+	--		}
+				
+		--}
+				
+				--indice.println("INDICE ");
+			}
+		}
+		
+		
+	if(tipoCol.isTypeOf(EEnumLiteral))
+		{
+		
+		if(tipoCol.literal=="String"){
+	%]
+		private String [%=nomCol%];
+		
+	[%	
+		}
+		
+		}
+		
+		else{
+	%]
+		private [%=tipoCol%] [%=nomCol%]; 
+	
+	[%
+		}
+		
+	}
+	
+	// Se definen los OneToMany
+if(nomClaseReferencia <> false){
+%]
+	@OneToMany(cascade= CascadeType.ALL, mappedBy="[%=nomClaseGenerando.toLowerCase()%]")
+	@PodamExclude
+    private List<[%=nomClaseReferencia%]> [%=nomClaseReferencia.firstToLowerCase()%]s;
+    
+[%
+}
+	%] 
+		public [%=nomTabla%]()
+		{
+		
+		}
+		
+	[%	
+	//Se definen los Metodos Get y Set
+	if(esPivot){
+	%]
+		public [%=tipoPK%] get[%=nomPK.firstToUpperCase()%](){
+			return [%=nomPK.ToLowerCase()%];
+		}
+		
+		public void set[%=nomPK.firstToUpperCase()%]([%=tipoPK%] [%=nomPK.ToLowerCase()%]){
+			this.[%=nomPK.ToLowerCase()%] = [%=nomPK.ToLowerCase()%];
+		}
+	[%
+	}
+	for(columna in clases.annotations.select(a|a.name="primary").parameters.select(a|a.key<>"")){
+		var nomCol = columna.get(0).key.toString().firstToUpperCase();
+		var tipoCol = columna.get(0).value.toString();	
+		if(columna.get(0).key=="id"){%]
+		public [%=tipoCol%] get[%=nomCol%](){
+			return [%=nomCol.ToLowerCase()%];
+		}
+		
+		public void set[%=nomCol%]([%=tipoCol%] [%=nomCol%]){
+			this.[%=nomCol.ToLowerCase()%] = [%=nomCol%];
+		}
+		
+	[%	}
+		else{
+		
+		
+			if(columna.get(0).value=="String"){
+	%]
+		public String get[%=nomCol%](){
+			return [%=nomCol.ToLowerCase()%];
+		}
+		
+		public void set[%=nomCol%](String [%=nomCol%]){
+			this.[%=nomCol.ToLowerCase()%] = [%=nomCol%];
+		}
+		
+	[%		}
+		}
+	}
+	if(clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").isEmpty()==false and  clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").key.isEmpty()==false){
+		var indice1=0;
+		
+		for (cantidad2 in clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"")){
+			var nomTabRef = clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").value[indice1]; 
+			var nomForeing = clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").key[indice1];
+			
+			if(nomTabRef.size()>0){
+			nomTabRef=nomTabRef.get(indice1);
+			nomForeing=nomForeing.get(indice1);
+			
+	%]
+		public [%=nomTabRef%] get[%=nomTabRef.toString()%]()
+		{
+			return [%=nomForeing.toString()%];
+		}
+		
+		public void set[%=nomTabRef%] ([%=nomTabRef%] [%=nomForeing.toString().ToLowerCase()%])
+		{
+			this.[%=nomForeing.toString()%] = [%=nomForeing%];
+		}
+		
+	[%
+	}
+			indice1=indice1+1;
+		}
+	}
+	
+	/*RE ORGANIZAR desde class_copia por que no entendi donde se definia la varianle 'nomTabRerencia''
+	*/
+	%]
+}
+[%	
+	}//Fin if
+}//Fin for
+%]

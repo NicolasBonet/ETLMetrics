@@ -1,0 +1,124 @@
+package [%=package.name%];
+
+import javax.persistence.*;
+import uk.co.jemos.podam.common.PodamExclude;
+import java.util.List;
+
+[%=class.getAnntations()%]
+public class [%=class.name%] {
+
+   /*Properties*/
+[%/*Imprime los atributos de la clase.*/
+  for (attr in class.attributes){%]
+    [%=attr.getAnntations()%]
+	private [%=attr.type%] [%=attr.name.firstToLowerCase()%];
+[%}%]
+[%/*Imprime los atributos tipo creado por el usuario de la clase.*/
+  for (utyp in class.usertypes){%]
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@PrimaryKeyJoinColumn
+	private [%=utyp.class.name%] [%=utyp.class.name.firstToLowerCase()%];
+[%}%]
+[%/*Imprime los atributos tipo collection de clase.*/
+  for (catr in class.collectionatributes){%]
+	@OneToMany(cascade= CascadeType.ALL, mappedBy="[%=class.name.firstToLowerCase()%]")
+	@PodamExclude
+	private List<[%=catr.class.name.firstToUpperCase()%]> [%=catr.class.name.firstToLowerCase()%]s;
+[%}%]
+
+   /*Getters and Setters*/
+[%/*Imprime los get y set atributos de la clase.*/
+  for (attr in class.attributes){%]
+	[%=attr.getMetodo()%]
+	[%=attr.setMetodo()%]
+[%}%]
+[%/*Imprime los get y set atributos de la clase.*/
+  for (utyp in class.usertypes){%]
+	[%=utyp.getMetodo()%]
+	[%=utyp.setMetodo()%]
+[%}%]
+[%/*Imprime los get y set collection de la clase.*/
+  for (catr in class.collectionatributes){%]
+	[%=catr.getMetodo()%]
+	[%=catr.setMetodo()%]
+[%}%]
+
+   /*Methods*/
+[%/*Imprime los metodos de la clase.*/
+  for (mthd in class.methods){%]
+    [%=mthd.getAnntations()%]
+	public [%=mthd.returnType%] [%=mthd.name%]([%=mthd.getParameters()%]){};
+[%}%]
+
+}
+
+
+
+
+ [% 
+ /*Operacion que imprime las entidades de un objeto*/ 
+ operation Class getAnntations () {
+ 	for (anntn in self.annotations){
+ %]@[%=anntn.name.firstToUpperCase()%][% 
+ 	}
+ }
+
+ /*Operacion que imprime las entidades de un objeto*/ 
+ operation Attribute getAnntations () {
+ 	for (anntn in self.annotations){
+ %]@[%=anntn.name.firstToUpperCase()%][% 
+ 	}
+ }
+
+ /*Operacion que imprime las entidades de un objeto*/ 
+ operation Methods getAnntations () {
+ 	for (anntn in self.annotations){
+ %]@[%=anntn.name.firstToUpperCase()%][% 
+ 	}
+ }
+
+/*Operacion que imprime el metodo get del atributo*/ 
+ operation UserType getMetodo () {
+%]public [%=self.class.name%] get[%=self.class.name.firstToUpperCase()%]() { return [%=self.class.name.firstToLowerCase()%]; }[%
+}
+
+/*Operacion que imprime el metodo get del atributo*/ 
+ operation CollectionAtribute getMetodo () {
+%]public List<[%=self.class.name%]> get[%=self.class.name.firstToUpperCase()%]s() { return [%=self.class.name.firstToLowerCase()%]s; }[%
+}
+
+/*Operacion que imprime el metodo get del atributo*/ 
+ operation Attribute getMetodo () {
+%]public [%=self.type%] get[%=self.name.firstToUpperCase()%]() { return [%=self.name.firstToLowerCase()%]; }[%
+}
+
+  /*Operacion que imprime el metodo set del atributo*/ 
+  operation UserType setMetodo () {
+%]public void set[%=self.class.name.firstToUpperCase()%]([%=self.class.name.firstToUpperCase()%] [%=self.class.name.firstToLowerCase()%]){this.[%=self.class.name.firstToLowerCase()%]= [%=self.class.name.firstToLowerCase()%];}[%
+}
+
+  /*Operacion que imprime el metodo set del atributo*/ 
+  operation CollectionAtribute setMetodo () {
+%]public void set[%=self.class.name.firstToUpperCase()%]s(List<[%=self.class.name.firstToUpperCase()%]> [%=self.class.name.firstToLowerCase()%]s){this.[%=self.class.name.firstToLowerCase()%]s = [%=self.class.name.firstToLowerCase()%]s;}[%
+}
+
+
+  /*Operacion que imprime el metodo set del atributo*/ 
+  operation Attribute setMetodo () {
+%]public void set[%=self.name.firstToUpperCase()%]([%=self.type%] [%=self.name.firstToLowerCase()%]){this.[%=self.name.firstToLowerCase()%]= [%=self.name.firstToLowerCase()%];}[%
+}
+
+
+ /*Operacion que imprime los parametros de un metodo*/ 
+ operation Methods getParameters () {
+    var cont;
+    cont = 1;
+ 	for (prm in self.parameter){
+ 	if(cont > 1){%],[%}
+ %][%=prm.type%] [%=prm.name%][%
+ 	cont = cont+1;
+ 	}
+ }
+
+%]
+ 

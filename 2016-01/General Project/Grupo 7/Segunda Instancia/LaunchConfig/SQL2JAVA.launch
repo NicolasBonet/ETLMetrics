@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.epsilon.etl.eclipse.dt.launching.EtlLaunchConfigurationDelegate">
+<booleanAttribute key="fine_grained_profiling" value="false"/>
+<listAttribute key="models">
+<listEntry value="isMetamodelFileBased=false&#10;name=SQL&#10;readOnLoad=true&#10;storeOnDisposal=false&#10;aliases=SQL&#10;cached=true&#10;fileBasedMetamodelUri=&#10;metamodelUri=http\://www.uniandes.edu/automatizacion/sql_crud_generator/SqlCrudGenerator&#10;modelUri=platform\:/resource/SQL_TO_JAVA/models/sqlM.sql&#10;reuseUnmodifiedFileBasedMetamodels=true&#10;type=EMF&#10;modelFile=/SQL_TO_JAVA/models/sqlM.sql&#10;expand=true&#10;metamodelFile="/>
+<listEntry value="isMetamodelFileBased=true&#10;name=JAVA&#10;readOnLoad=false&#10;storeOnDisposal=true&#10;aliases=JAVA&#10;cached=true&#10;fileBasedMetamodelUri=platform\:/resource/SQL_TO_JAVA/metamodels/JavaMM.ecore&#10;metamodelUri=&#10;modelUri=platform\:/resource/SQL_TO_JAVA/models/JAVA.xmi&#10;reuseUnmodifiedFileBasedMetamodels=true&#10;type=EMF&#10;modelFile=/SQL_TO_JAVA/models/JAVA.xmi&#10;expand=true&#10;metamodelFile=/SQL_TO_JAVA/metamodels/JavaMM.ecore"/>
+</listAttribute>
+<listAttribute key="parameters"/>
+<booleanAttribute key="profile_model_loading" value="false"/>
+<booleanAttribute key="profiling_enabled" value="false"/>
+<booleanAttribute key="reset_profiler" value="false"/>
+<stringAttribute key="source" value="/SQL_TO_JAVA/transformations/M2M/SQL2JAVA.etl"/>
+</launchConfiguration>

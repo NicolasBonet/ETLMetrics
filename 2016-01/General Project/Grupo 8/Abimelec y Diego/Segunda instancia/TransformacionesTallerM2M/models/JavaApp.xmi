@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ASCII"?>
+<JavaMM:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:JavaMM="http://co.edu.uniandes/javamm" name="Market Place App">
+  <package xsi:type="JavaMM:Class" name="Client">
+    <structuredElements xsi:type="JavaMM:Classifier" name="id"/>
+    <structuredElements xsi:type="JavaMM:Classifier" name="password"/>
+    <structuredElements xsi:type="JavaMM:Classifier" name="name"/>
+  </package>
+  <package xsi:type="JavaMM:Class" name="Producto">
+    <structuredElements xsi:type="JavaMM:Classifier" name="name"/>
+    <structuredElements xsi:type="JavaMM:Classifier" name="id"/>
+  </package>
+  <package xsi:type="JavaMM:Class" name="Carrito">
+    <structuredElements xsi:type="JavaMM:Classifier" name="id"/>
+    <structuredElements xsi:type="JavaMM:Classifier" name="name"/>
+    <structuredElements xsi:type="JavaMM:Classifier" name="clientId"/>
+  </package>
+  <package xsi:type="JavaMM:Class" name="Carritoitem">
+    <structuredElements xsi:type="JavaMM:Classifier" name="carritoId"/>
+    <structuredElements xsi:type="JavaMM:Classifier" name="itemId"/>
+  </package>
+  <package xsi:type="JavaMM:Class" name="Item">
+    <structuredElements xsi:type="JavaMM:Classifier" name="id"/>
+    <structuredElements xsi:type="JavaMM:Classifier" name="cantidad"/>
+    <structuredElements xsi:type="JavaMM:Classifier" name="name"/>
+    <structuredElements xsi:type="JavaMM:Classifier" name="productoId"/>
+  </package>
+</JavaMM:Application>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Java:Paquete xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:Java="http://www.example.org/taller2" nombre="Losduros">
+  <clases nombre="Client">
+    <atributos nombre="id" tipo="int"/>
+    <atributos nombre="password"/>
+    <atributos nombre="name"/>
+  </clases>
+  <clases nombre="Producto">
+    <atributos nombre="name"/>
+    <atributos nombre="id" tipo="int"/>
+  </clases>
+  <clases nombre="Carrito">
+    <atributos nombre="id" tipo="int"/>
+    <atributos nombre="name"/>
+    <atributos nombre="clientId" tipo="int"/>
+    <relaciones nombre="id" tipo="//@clases.0"/>
+  </clases>
+  <clases nombre="Carritoitem">
+    <atributos nombre="carritoId" tipo="int"/>
+    <atributos nombre="itemId" tipo="int"/>
+    <relaciones nombre="id" tipo="//@clases.2"/>
+    <relaciones nombre="id"/>
+  </clases>
+  <clases nombre="Item">
+    <atributos nombre="id" tipo="int"/>
+    <atributos nombre="cantidad" tipo="int"/>
+    <atributos nombre="name"/>
+    <atributos nombre="productoId" tipo="int"/>
+    <relaciones nombre="id"/>
+  </clases>
+</Java:Paquete>

@@ -1,0 +1,51 @@
+[%
+	import 'utilities.egl';
+%]
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.PrimaryKeyJoinColumn;
+
+import uk.co.jemos.podam.common.PodamExclude;
+
+/*
+* class [%=class.name%]
+*/
+@Entity
+public class [%=class.name%]{
+	
+	/**
+	* Attributes
+	*/
+	[%
+		for(attribute : JAVA!Attribute in class.structuredElements){
+			attribute.renderAttribute();
+		}
+	%]
+	
+	/**
+	* Methods
+	*/
+	
+	[%
+		for(method : JAVA!Method in class.structuredElements){
+			if(method.name = null){
+				%]
+	/**
+	* Constructor
+	*/
+				[%
+				method.renderConstructor();
+			} else if (method.parameters.size() > 0) {
+				method.renderSetter();
+			} else {
+				method.renderGetter();
+			}
+		}
+	%]
+}

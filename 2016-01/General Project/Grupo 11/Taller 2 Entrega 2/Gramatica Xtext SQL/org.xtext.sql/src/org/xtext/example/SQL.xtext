@@ -1,0 +1,62 @@
+grammar org.xtext.example.SQL with org.eclipse.xtext.common.Terminals
+
+generate sQL "http://uniandes.edu.co/sqlCrud"
+
+
+
+DataBase:
+Tables+=Table+	
+;
+
+Table:
+	CREATE TABLA
+	name=ID
+	LPAREN
+	columns+=column+
+	primaryKey=primaryKey
+	foreignkeys+=foreignKey*
+	RPAREN
+;
+
+
+column:
+	//name=ID type=(INTEGER|VARCHAR|CHARACTER|BOOLEAN|DATE|TIME|FLOAT|DECIMAL|NUMERIC) NOT? NULL? COMA?
+	name=ID type=DataType NOT? NULL? COMA?
+;
+
+primaryKey:
+	PRIMARY KEY LPAREN name=ID  (COMA ID)* RPAREN COMA?
+;
+
+foreignKey:
+	FOREIGN KEY LPAREN name=ID RPAREN 
+	REFERENCES reftable=[Table] LPAREN ref=[column] RPAREN COMA?
+;
+
+enum DataType:
+VARCHAR255="varchar(255)" | VARCHAR="varchar" | INT="int" | CHAR="character" | BOOL="boolean" | DATE="date" | TIME="time" | FLOAT="float" | DECIMAL="decimal" | NUMERIC="numeric"
+;
+
+//terminal VARCHAR: "varchar" LPAREN LENGTH RPAREN;
+//terminal INTEGER: "int" LPAREN? LENGTH? RPAREN?;
+//terminal CHARACTER: "character" LPAREN LENGTH RPAREN;
+//terminal BOOLEAN: "boolean";
+//terminal DATE: "date";
+//terminal TIME: "time";
+//terminal FLOAT: "float" LPAREN? LENGTH? RPAREN?;
+//terminal DECIMAL: "decimal" LPAREN LENGTH COMA LENGTH RPAREN;
+//terminal NUMERIC: "numeric" LPAREN LENGTH COMA LENGTH RPAREN;
+terminal CREATE: "CREATE";
+terminal TABLA: "TABLE";
+terminal LPAREN: "(";
+terminal RPAREN: ")";
+terminal COMA: ",";
+terminal PRIMARY: "PRIMARY";
+terminal FOREIGN: "FOREIGN";
+terminal REFERENCES: "REFERENCES";
+terminal KEY: "KEY";
+terminal NOT: "NOT";
+terminal NULL: "NULL";
+//terminal LENGTH: ('0'..'9')+;
+terminal ID: (('a'..'z')|('A'..'Z'))+('0'..'9')*;
+

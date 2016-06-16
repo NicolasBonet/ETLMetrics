@@ -1,0 +1,98 @@
+package marketplace;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+
+public class [%= mClass.name %]
+{
+
+	private static final String PERSISTENCE_UNIT_NAME = "MarketPlace-Test";
+	private static EntityManagerFactory emf;
+	private EntityManager em;
+	
+	
+	/*
+	 * [%= mClass.name %]
+	 */
+	public [%= mClass.name %]()
+	{
+		emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+		em = emf.createEntityManager();
+	}
+	
+[%
+	for(e in mClass.entities)
+	{
+	var firstLetter = e.name.substring(0,1).toLowerCase();
+%]
+
+	/*
+	 * [%= e.name %]
+	 */
+	public List<[%= e.name %]> get[%= e.name %]s()
+	{
+		Query q = em.createQuery("SELECT [%= firstLetter%] FROM [%= e.name %] [%= firstLetter%]");
+		return q.getResultList();
+	}
+	
+	public void add[%= e.name %]([%= e.name %] [%= e.name.firstToLowerCase %])
+	{
+		em.getTransaction().begin();
+		em.persist([%= e.name.firstToLowerCase %]);
+		em.getTransaction().commit();
+	}
+	
+	public void edit[%= e.name %](int id [%= e.getVarsParamList()%])
+	{
+		[%= e.name %] [%= e.name.firstToLowerCase %] = em.find([%= e.name %].class, id);
+		em.getTransaction().begin();
+[%
+		for(a in e.getClassVars()){
+%]			
+		[%= e.name.firstToLowerCase %].set[%= a.name.firstToUpperCase %]([%= a.name %]);
+[%	
+		}
+%]			
+		em.getTransaction().commit();
+	}
+	
+	public void delete[%= e.name %](int id)
+	{
+		[%= e.name %] [%= e.name.firstToLowerCase %] = em.find([%= e.name %].class, id);
+		em.getTransaction().begin();
+		em.remove([%= e.name.firstToLowerCase %]);
+		em.getTransaction().commit();
+	}
+	
+	public [%= e.name %] get[%= e.name %](int id)
+	{
+		return em.find([%= e.name %].class, id);
+	}
+[%
+	}
+%]
+
+	
+}
+
+
+
+[%	
+	operation java!Class getClassVars(){
+		return self.attributes.select(a | a.name <> "id").select(a | not a.type.isKindOf(java!Container));
+	}
+		
+	operation java!Class getVarsParamList(){
+		var vars = self.getClassVars();
+		var res = "";
+		for(myVar in vars) {
+			res = res + ", " + myVar.type.name + " " + myVar.name;
+		}
+		return res;
+	}
+
+%]

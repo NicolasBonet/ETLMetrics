@@ -1,0 +1,109 @@
+grammar edu.uniandes.automatizacion.sql_crud_generator.SqlCrudGenerator with org.eclipse.xtext.common.Terminals
+
+generate sqlCrudGenerator "http://www.uniandes.edu/automatizacion/sql_crud_generator/SqlCrudGenerator"
+
+
+Schema :
+	WCREATE WNEW WSCHEMA name=ID SEMICOLON
+	 
+	tables += Table*
+;
+
+Table :
+	WCREATE WTABLE name = ID 
+	PARENTHESIS_IZQ
+		columns += Column*
+		primaryKey = PrimaryKey?
+		foreignsKeys += ForeignKey*
+	PARENTHESIS_DER
+;
+
+Column :
+	name = ID dataType = DataType (WNOT WNULL)? COMA?
+;
+
+PrimaryKey :
+	WPRIMARY_KEY PARENTHESIS_IZQ ids += [Column] (COMA ids += [Column])* PARENTHESIS_DER COMA?
+;
+
+ForeignKey :
+	WFOREIGN_KEY PARENTHESIS_IZQ refsTo = [Column] PARENTHESIS_DER WREFERENCES reference=[Table] PARENTHESIS_IZQ refsFrom = [Column] PARENTHESIS_DER COMA?
+;
+
+DataType:
+	dataType = ENUM_DATA_TYPE (PARENTHESIS_IZQ precision = INT PARENTHESIS_DER)?
+;
+
+enum ENUM_DATA_TYPE :
+	CHARACTER = "CHARACTER" | 
+	VARCHAR = "VARCHAR" |
+	VARYING = "VARYING" |
+	BOOLEAN = "BOOLEAN" |
+	VARBINARY = "VARBINARY" |
+	BINARY = "BINARY" |
+	INTEGER = "INTEGER" |
+	SMALLINT = "SMALLINT" |
+	INT = "INT" |
+	BIGINT = "BIGINT" |
+	DECIMAL = "DECIMAL" |
+	NUMERIC = "NUMERIC" |
+	FLOAT = "FLOAT" |
+	REAL = "REAL" |
+	DATE = "DATE" |
+	TIME = "TIME" |
+	TIMESTAMP = "TIMESTAMP" |
+	INTERVAL = "INTERVAL" |
+	ARRAY = "ARRAY" |
+	MULTISET = "MULTISET" |
+	XML = "XML" |
+	CHARACTER_M = "character" | 
+	VARCHAR_M = "varchar" |
+	VARYING_M = "varying" |
+	BOOLEAN_M = "boolean" |
+	VARBINARY_M = "varbinary" |
+	BINARY_M = "binary" |
+	INTEGER_M = "integer" |
+	SMALLINT_M = "smallint" |
+	INT_M = "int" |
+	BIGINT_M = "bigint" |
+	DECIMAL_M = "decimal" |
+	NUMERIC_M = "numeric" |
+	FLOAT_M = "float" |
+	REAL_M = "real" |
+	DATE_M = "date" |
+	TIME_M = "time" |
+	TIMESTAMP_M = "timestamp" |
+	INTERVAL_M = "interval" |
+	ARRAY_M = "array" |
+	MULTISET_M = "multiset" |
+	XML_M = "xml" 
+	
+	
+;
+
+terminal WNEW:"NEW";
+
+terminal WSCHEMA:"SCHEMA";
+
+terminal WCREATE:"CREATE";
+
+terminal WTABLE:"TABLE";
+
+terminal WPRIMARY_KEY:"PRIMARY KEY";
+
+terminal WFOREIGN_KEY:"FOREIGN KEY";
+
+terminal WREFERENCES:"REFERENCES";
+
+terminal WNOT:"NOT";
+
+terminal WNULL:"NULL";
+
+terminal PARENTHESIS_IZQ:"(";
+
+terminal PARENTHESIS_DER:")";
+
+terminal SEMICOLON:";";
+
+terminal COMA:",";
+

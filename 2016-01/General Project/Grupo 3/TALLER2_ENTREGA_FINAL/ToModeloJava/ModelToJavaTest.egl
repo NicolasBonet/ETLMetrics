@@ -1,0 +1,113 @@
+package Test;
+
+import static org.junit.Assert.*;
+import [%=package.name%].[%=class.name%];
+import [%=package.name%].[%=application.name%];
+
+import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+import uk.co.jemos.podam.api.PodamFactory;
+import uk.co.jemos.podam.api.PodamFactoryImpl;
+
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING) 
+public class [%=class.name.firstToUpperCase()%]Test { 
+	private [%=application.name%] mp;
+	private PodamFactory factory; 
+	
+	@Before
+	public void prepareTest()
+	{
+	    mp = new [%=application.name%]();
+		factory = new PodamFactoryImpl();
+	}
+	
+	@Test
+	public void test1[%=class.name%]Add()
+	{	
+	    [%=class.name.firstToUpperCase()%] [%=class.name.firstToLowerCase()%] = factory.manufacturePojo([%=class.name.firstToUpperCase()%].class);
+		factory.populatePojo([%=class.name.firstToLowerCase()%]);
+		mp.add[%=class.name.firstToUpperCase()%]([%=class.name.firstToLowerCase()%]);
+		
+		[%/*Imprime los atributos de la clase.*/
+		  for (attr in class.attributes){
+		  %]		assertEquals([%=class.name.firstToLowerCase()%].get[%=attr.name.firstToUpperCase()%](),mp.get[%=class.name.firstToUpperCase()%]([%=class.name.firstToLowerCase()%].get[%=class.getID()%]()).get[%=attr.name.firstToUpperCase()%]());
+		  [%}%]
+				[%/*Imprime los atributos de la clase.*/
+		  for (usrt in class.usertypes){
+		  %]		assertEquals([%=class.name.firstToLowerCase()%].get[%=usrt.class.name.firstToUpperCase()%](),mp.get[%=class.name.firstToUpperCase()%]([%=class.name.firstToLowerCase()%].get[%=class.getID()%]()).get[%=usrt.class.name.firstToUpperCase()%]());
+		  [%}%]
+		
+	}
+
+	@Test
+	public void test2Get[%=class.name%]()
+	{
+		assertNotNull(mp.get[%=class.name.firstToUpperCase()%](mp.get[%=class.name.firstToUpperCase()%]s().get(0).get[%=class.getID()%]()));
+	}
+	
+	@Test
+	public void test3[%=class.name%]Edit()
+	{
+	    [%=class.name.firstToUpperCase()%] [%=class.name.firstToLowerCase()%] = factory.manufacturePojo([%=class.name.firstToUpperCase()%].class);
+		factory.populatePojo([%=class.name.firstToLowerCase()%]);
+		[%=class.getIDType()%] primerId = mp.get[%=class.name.firstToUpperCase()%]s().get(0).get[%=class.getID()%]();
+		
+		mp.edit[%=class.name.firstToUpperCase()%]([%
+	var contador = 1;
+	for(attr in class.attributes){
+	if(contador > 1){%] , [%}
+	contador=contador+1;
+	if(attr.name <> class.attributes.select(a|a.annotations.select(an|an.name = "Id").size() > 0).at(0).name ){%][%=class.name.firstToLowerCase()%].get[%=attr.name.firstToUpperCase()%]()[%}else{%] primerId[%} }
+	for(utyp in class.usertypes){
+	if(contador > 1){%] , [%}
+	contador=contador+1;
+	%][%=class.name.firstToLowerCase()%].get[%=utyp.class.name%]()[%
+	}
+	%]);
+		
+	[%/*Imprime los atributos de la clase.*/
+	  for (attr in class.attributes){
+	  if(attr.name <> class.attributes.select(a|a.annotations.select(an|an.name = "Id").size() > 0).at(0).name){
+	  %]		assertEquals([%=class.name.firstToLowerCase()%].get[%=attr.name.firstToUpperCase()%](),mp.get[%=class.name.firstToUpperCase()%](primerId).get[%=attr.name.firstToUpperCase()%]());
+	  [%}}%]
+			[%/*Imprime los atributos de la clase.*/
+	  for (usrt in class.usertypes){
+	  %]		assertEquals([%=class.name.firstToLowerCase()%].get[%=usrt.class.name.firstToUpperCase()%](),mp.get[%=class.name.firstToUpperCase()%](primerId).get[%=usrt.class.name.firstToUpperCase()%]());
+	  [%}%]
+	}
+
+	@Test
+	public void test4[%=class.name%]Delete()
+	{
+		[%=class.getIDType()%] primerId = mp.get[%=class.name.firstToUpperCase()%]s().get(0).get[%=class.getID()%]();
+
+		assertNotNull(mp.get[%=class.name.firstToUpperCase()%](primerId));
+		
+		mp.delete[%=class.name.firstToUpperCase()%](primerId);
+		
+		assertNull(mp.get[%=class.name.firstToUpperCase()%](primerId));
+	
+	}
+	
+	 
+}
+
+ [% 
+ /*Operacion que imprime las entidades de un objeto*/ 
+ operation Class getID () {
+	 if(self.attributes.select(a|a.annotations.select(an|an.name = "Id").size() > 0).size()  > 0){
+	 %][%=self.attributes.select(a|a.annotations.select(an|an.name = "Id").size() > 0).at(0).name.firstToUpperCase()%][% 
+	 }
+ }
+
+ operation Class getIDType () {
+	 if(self.attributes.select(a|a.annotations.select(an|an.name = "Id").size() > 0).size()  > 0){
+	 %][%=self.attributes.select(a|a.annotations.select(an|an.name = "Id").size() > 0).at(0).type%][% 
+	 }
+ }
+
+%]

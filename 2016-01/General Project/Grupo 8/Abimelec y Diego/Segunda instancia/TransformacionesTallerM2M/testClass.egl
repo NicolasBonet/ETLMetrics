@@ -1,0 +1,195 @@
+package marketplace;
+
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.PrimaryKeyJoinColumn;
+
+import uk.co.jemos.podam.common.PodamExclude;
+
+[% 
+
+var entro=true;
+var parametros = "primerId";
+var sentencias = "";
+var nomPK = "";
+var tipoPK = "";
+var nomCol = "";
+var nomColMay = ""; 
+var nomTabRef = ""; 
+var nomForeing = ""; 
+var nomTablaMay = "";
+var nomPKMayu = "";
+var indice=0;
+var esForeing = false;
+
+for (clases in app!Class.all ){
+	var nomTabla = clases.name;
+	var nomTablaMin = nomTabla.firstToLowerCase();
+	if (nomTabla = nomClassGenerando){
+	nomTablaMay = nomTabla.firstToUpperCase();
+--for(pK in tablas.primarys.column.select(a|a.name.isEmpty()==false)){
+for(pK in clases.annotations.select(a|a.name="primary").parameters.select(a|a.key<>"")){
+		if(pK.size()==1){
+			nomPK = pK.get(0).key;
+			tipoPK = pK.get(0).value;
+		}else {
+			nomPK = "id";
+			tipoPK = "int";
+		}
+	}
+	nomPKMayu = nomPK.firstToUpperCase();
+	
+%]
+package test.java;
+
+import static org.junit.Assert.*;
+
+import marketplace.[%=nomTabla%];
+import marketplace.MarketPlace;
+
+import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+import uk.co.jemos.podam.api.PodamFactory;
+import uk.co.jemos.podam.api.PodamFactoryImpl;
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class [%=nomTabla%]Test
+{
+	private MarketPlace mp;
+	private PodamFactory factory;
+	
+	@Before
+	public void prepareTest()
+	{
+		mp = new MarketPlace();
+		factory = new PodamFactoryImpl();
+	}
+	[%
+	
+	%]
+	@Test
+	public void test1[%=nomTabla%]Add()
+	{	
+		[%=nomTabla%] [%=nomTablaMin%] = factory.manufacturePojo([%=nomTabla%].class);
+		factory.populatePojo([%=nomTablaMin%]);
+		mp.add[%=nomTabla%]([%=nomTablaMin%]);
+		
+		[%
+		//por defecto todos los test 1 tienen un id
+		%]
+		assertEquals([%=nomTablaMin%].getId(), mp.get[%=nomTabla%]([%=nomTablaMin%].getId()).getId());
+		[%
+		//Se buscan los foreigns
+		for(columna in clases.structuredElements.select(a|a.name <> nomPK)){
+		--for(columna in tablas.columnas.select(a|a.name<>nomPK)){
+			nomCol = columna.name;
+			nomColMay = columna.name.firstToUpperCase();
+			esForeing = false;
+		--	if(tablas.foreigns.isEmpty()==false and tablas.foreigns.name.isEmpty()==false){
+		if(clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").isEmpty()==false and clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").key.isEmpty()==false){
+				indice = 0;
+				for (cantidad in clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"")){
+				nomTabRef = clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").value[indice]; 
+				nomForeing = clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").key[indice];
+			
+					
+					if(nomForeing == nomCol){
+						sentencias = sentencias + "assertEquals(" + nomTablaMin + ".get" + nomTabRef + "(), mp.get" + nomTablaMay+ "(" + nomTablaMin+ ".get" + nomPKMayu+ "()).get" + nomTabRef+ "()); \n";					
+						
+						esForeing = true;
+						break;
+					}
+				indice=indice+1;
+				}
+			}
+			if(esForeing==false){
+				sentencias = sentencias + "assertEquals("+ nomTablaMin +".get"+ nomColMay +"(), mp.get"+ nomTabla +"(" + nomTablaMin+ ".get" + nomPKMayu+ "()).get"+ nomColMay +"()); \n";
+			}
+		}
+		%]
+		[%=sentencias%]	
+	}
+	@Test
+	public void test2Get[%=nomTabla%]()
+	{	
+		
+		[%
+		//todos los test 2 
+		%]
+		assertEquals(mp.get[%=nomTabla%](mp.get[%=nomTabla%]().get(0).getId()));
+		
+	}
+	@Test
+	public void test3[%=nomTabla%]Edit()
+	{	
+		[%=nomTabla%] [%=nomTablaMin%] = factory.manufacturePojo([%=nomTabla%].class);
+		factory.populatePojo([%=nomTablaMin%]);
+		int primerId = mp.get[%=nomTabla%]().get(0).getId();
+					
+	[%
+	--Contruyendo el 3 test
+	for(columna in clases.structuredElements.select(a|a.name <> nomPK)){
+		--for(columna in tablas.columnas.select(a|a.name<>nomPK)){
+			nomCol = columna.name;
+			nomColMay = columna.name.firstToUpperCase();
+			esForeing = false;
+			var primera="mp.edit"+nomTabla+"(primerId, "+nomTablaMin+".get"+nomCol.toUpperCase()+"(), "+nomTablaMin+".get"+nomTablaMay+"())";
+		--	if(tablas.foreigns.isEmpty()==false and tablas.foreigns.name.isEmpty()==false){
+		if(clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").isEmpty()==false and clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").key.isEmpty()==false){
+				indice = 0;
+				
+				for (cantidad in clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"")){
+				nomTabRef = clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").value[indice]; 
+				nomForeing = clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").key[indice];
+			
+				if(nomForeing == nomCol){
+						sentencias = sentencias + "assertEquals(" + nomTablaMin + ".get" + nomTabRef + "(), mp.get" + nomTablaMay+ "(primerId).get" + nomTabRef+ "()); \n";					
+						esForeing = true;
+						break;
+					}
+				indice=indice+1;
+				}
+			}
+			if(esForeing==false){
+				sentencias = sentencias + "assertEquals("+ nomTablaMin +".get"+ nomColMay +"(), mp.get"+ nomTabla +"(primerId).get"+ nomColMay +"()); \n";					
+			}
+		}
+		%]
+		[%=sentencias%]
+	
+	}
+	[%
+    ---Test 4
+	%]
+	@Test
+	public void test4[%=nomTabla%]Delete()
+	{
+		
+		int primerId = mp.get[%=nomTabla%]().get(0).getId();
+		
+		assertNotNull(mp.get[%=nomTabla%](primerId));
+		
+		mp.delete[%=nomTabla%](primerId);
+		
+		assertNull(mp.get[%=nomTabla%](primerId));
+		
+		 
+		
+	}
+	
+	
+	
+}	
+[% 
+}
+}
+%]

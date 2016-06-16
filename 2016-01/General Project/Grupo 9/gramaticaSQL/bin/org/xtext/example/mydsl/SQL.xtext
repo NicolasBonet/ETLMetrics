@@ -1,0 +1,111 @@
+grammar org.xtext.example.mydsl.SQL with org.eclipse.xtext.common.Terminals
+
+generate sQL "http://uniandes.edu.co/sqlCrud"
+
+Database returns Database:
+	
+{Database}
+
+tables+=Table*;
+
+Table returns Table:
+	CREATE_TABLE name=ID
+	LPAR
+		columns+=Column (COMMA columns+=Column)*
+		primaryKey=PrimaryKey?
+		foreignKeys+=ForeignKey*
+	RPAR
+;
+
+Column returns Column:
+	name=ID dataType=DATA_TYPE notNull=NOT_NULL?
+;
+
+PrimaryKey returns PrimaryKey:
+	COMMA PRIMARY_KEY LPAR columns+=[Column] (COMMA columns+=[Column])* RPAR
+;
+
+ForeignKey returns ForeignKey:
+	COMMA FOREIGN_KEY 
+	LPAR columns+=[Column] (COMMA columns+=[Column])* RPAR
+	REFERENCES refTable=[Table] 
+	LPAR refColumns+=[Column] (COMMA refColumns+=[Column])* RPAR
+;
+	
+terminal CREATE_TABLE:
+"CREATE TABLE";
+
+terminal NOT_NULL:
+"NOT NULL";
+
+terminal PRIMARY_KEY:
+"PRIMARY KEY";
+
+terminal FOREIGN_KEY:
+"FOREIGN KEY";
+
+terminal REFERENCES:
+"REFERENCES";
+
+terminal COMMA:
+",";
+
+terminal LPAR:
+"(";
+
+terminal RPAR:
+")";
+
+terminal TINT:
+"int" MAX_LENGTH?;
+
+terminal TVARCHAR:
+"varchar" MAX_LENGTH;
+
+terminal TCHARACTER:
+"char" MAX_LENGTH;
+
+terminal TBINARY:
+"binary" MAX_LENGTH;
+
+terminal TBOOLEAN:
+"boolean";
+
+terminal TVARBINARY:
+"varbinary" MAX_LENGTH;
+
+terminal TSMALLINT:
+"smallint";
+
+terminal TBIGINT:
+"bigint";
+
+terminal TDECIMAL:
+"decimal" PRECISION;
+
+terminal TNUMERIC:
+"numeric" PRECISION;
+
+terminal TFLOAT:
+"float";
+
+terminal TDATE:
+"date";
+
+terminal TTIME:
+"time";
+
+terminal TTIMESTAMP:
+"timestamp";
+
+terminal DATA_TYPE: 
+	
+(TINT | TVARCHAR | TCHARACTER | TBINARY | TBOOLEAN | TVARBINARY | TSMALLINT | TBIGINT | TDECIMAL | TNUMERIC | TFLOAT | TDATE | TTIME | TTIMESTAMP);
+
+terminal MAX_LENGTH:
+
+LPAR INT RPAR;
+
+terminal PRECISION:
+	
+LPAR INT COMMA INT RPAR;

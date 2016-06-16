@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ASCII"?>
+<genSql:DataBase xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:genSql="http://www.edu.co/uniandes/GenSql">
+  <tables name="Client">
+    <columns name="id" SQLType="int"/>
+    <columns name="password" SQLType="varchar" Longitud="(255)"/>
+    <columns name="name" SQLType="varchar" Longitud="(255)"/>
+    <primarykey columns="//@tables.0/@columns.0"/>
+  </tables>
+  <tables name="Producto">
+    <columns name="name" SQLType="varchar" Longitud="(255)"/>
+    <columns name="id" SQLType="int"/>
+    <primarykey columns="//@tables.1/@columns.1"/>
+  </tables>
+  <tables name="Carrito">
+    <columns name="id" SQLType="int"/>
+    <columns name="name" SQLType="varchar" Longitud="(255)"/>
+    <columns name="clientId" SQLType="int"/>
+    <primarykey columns="//@tables.2/@columns.0"/>
+    <foreignkeys columns="//@tables.2/@columns.2" tableRef="//@tables.0" columnsRef="//@tables.1/@columns.1"/>
+  </tables>
+  <tables name="Carritoitem">
+    <columns name="carritoId" SQLType="int"/>
+    <columns name="itemId" SQLType="int"/>
+    <primarykey columns="//@tables.3/@columns.0 //@tables.3/@columns.1"/>
+    <foreignkeys columns="//@tables.3/@columns.0" tableRef="//@tables.2" columnsRef="//@tables.2/@columns.0"/>
+    <foreignkeys columns="//@tables.3/@columns.1" tableRef="//@tables.4" columnsRef="//@tables.4/@columns.0"/>
+  </tables>
+  <tables name="Item">
+    <columns name="id" SQLType="int"/>
+    <columns name="cantidad" SQLType="int"/>
+    <columns name="name" SQLType="varchar" Longitud="(255)"/>
+    <columns name="productoId" SQLType="int"/>
+    <primarykey columns="//@tables.4/@columns.0"/>
+    <foreignkeys columns="//@tables.4/@columns.3" tableRef="//@tables.1" columnsRef="//@tables.2/@columns.0"/>
+  </tables>
+</genSql:DataBase>

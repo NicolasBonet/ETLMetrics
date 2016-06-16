@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: edu.uniandes.automatizacion.sql_crud_generator
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: edu.uniandes.automatizacion.sql_crud_generator; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext,
+ org.eclipse.xtext.xbase,
+ org.eclipse.equinox.common;bundle-version="3.5.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext.xbase.lib,
+ org.antlr.runtime,
+ org.eclipse.xtext.util,
+ org.eclipse.xtend.lib,
+ org.eclipse.emf.common
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: edu.uniandes.automatizacion.sql_crud_generator.sqlCrudGenerator.impl,
+ edu.uniandes.automatizacion.sql_crud_generator.parser.antlr,
+ edu.uniandes.automatizacion.sql_crud_generator.validation,
+ edu.uniandes.automatizacion.sql_crud_generator.services,
+ edu.uniandes.automatizacion.sql_crud_generator.parser.antlr.internal,
+ edu.uniandes.automatizacion.sql_crud_generator.sqlCrudGenerator,
+ edu.uniandes.automatizacion.sql_crud_generator.serializer,
+ edu.uniandes.automatizacion.sql_crud_generator.generator,
+ edu.uniandes.automatizacion.sql_crud_generator.sqlCrudGenerator.util,
+ edu.uniandes.automatizacion.sql_crud_generator,
+ edu.uniandes.automatizacion.sql_crud_generator.scoping
+Import-Package: org.apache.log4j

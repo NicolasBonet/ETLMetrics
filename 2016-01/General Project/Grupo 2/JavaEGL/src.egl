@@ -1,0 +1,55 @@
+package marketplace;
+
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.PrimaryKeyJoinColumn;
+
+import uk.co.jemos.podam.common.PodamExclude;
+
+@Entity
+public class [%= mClass.name %]
+{
+
+[%
+	for(att in mClass.attributes)
+	{
+		for(a in att.annotations){
+		%]
+	@[%= a.type %][%= a.content %]	
+		[%
+		}
+%]
+	[%= att.visibility %] [%= att.type.name %] [%= att.name %];
+	
+[%
+	}
+%]
+	
+	public [%= mClass.name %](){
+	
+	}
+	
+[%
+	for(att in mClass.attributes)
+	{
+%]
+	public [%= att.type.name %] get[%= att.name.firstToUpperCase %](){
+		return [%= att.name %];
+	}
+	
+	public void set[%= att.name.firstToUpperCase %]([%= att.type.name %] [%= att.name %]){
+		this.[%= att.name %] = [%= att.name %];
+	}
+	
+[%
+	}
+%]
+	
+	
+}

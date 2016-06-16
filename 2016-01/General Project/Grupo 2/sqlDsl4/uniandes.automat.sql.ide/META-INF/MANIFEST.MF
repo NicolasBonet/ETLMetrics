@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: uniandes.automat.sql.ide
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: uniandes.automat.sql.ide; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: uniandes.automat.sql,
+ org.eclipse.xtext.ide,
+ org.eclipse.xtext.xbase.ide
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: uniandes.automat.sql.ide.contentassist.antlr,
+ uniandes.automat.sql.ide.contentassist.antlr.internal
+

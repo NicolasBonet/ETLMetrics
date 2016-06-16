@@ -1,0 +1,126 @@
+package test.java;
+
+[%
+var _managerName = managerName.firstToUpperCase();
+var className = class.name.firstToUpperCase();
+
+//Get @Id attribute properties
+var idAttributeName = "";
+var idAttributeTypeName = "";
+for(attribute in class.structuredElements){
+	if(attribute.isTypeOf(java!Attribute)){
+		for(annotation in attribute.annotations){
+			if(annotation.name == "Id"){
+				idAttributeName = attribute.name.firstToUpperCase();
+				idAttributeTypeName = attribute.getTypeName();
+				break;
+			}
+		}
+	}
+}
+%]
+import static org.junit.Assert.*;
+import [%=modelPackageName%].[%=className%];
+import [%=modelPackageName%].[%=_managerName%];
+
+import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+import uk.co.jemos.podam.api.PodamFactory;
+import uk.co.jemos.podam.api.PodamFactoryImpl;
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class [%=className%]Test{
+
+	private [%=_managerName%] mp;
+	private PodamFactory factory;
+	
+	@Before
+	public void prepareTest()
+	{
+		mp = new [%=_managerName%]();
+		factory = new PodamFactoryImpl();
+	}
+	
+	@Test
+	public void test1[%=className%]Add()
+	{
+		[%=className%] [%=className.firstToLowerCase%] = factory.manufacturePojo([%=className%].class);
+		factory.populatePojo([%=className.firstToLowerCase()%]);
+		mp.add[%=className%]([%=className.firstToLowerCase()%]);
+		
+		[%
+		for(attribute in class.structuredElements){
+			if(attribute.isTypeOf(java!Attribute)){
+				//Print getter
+				var attributeName = attribute.name.firstToLowerCase();
+				var attributeTypeName = attribute.getTypeName();
+		%]
+		assertEquals([%=className.firstToLowerCase()%].get[%=attributeName.firstToUpperCase()%](), mp.get[%=className.firstToUpperCase()%]([%=className.firstToLowerCase()%].get[%=idAttributeName.firstToUpperCase()%]()).get[%=attributeName.firstToUpperCase()%]());
+		[%
+				
+			}
+		}
+		%]
+	}
+	
+	@Test
+	public void test2Get[%=className%]()
+	{
+		assertNotNull(mp.get[%=className%](mp.get[%=className%]s().get(0).get[%=idAttributeName.firstToUpperCase()%]()));
+	}
+	
+	@Test
+	public void test3[%=className%]Edit()
+	{
+		[%=className%] [%=className.firstToLowerCase()%] = factory.manufacturePojo([%=className%].class);
+		factory.populatePojo([%=className.firstToLowerCase()%]);
+		
+		[%=idAttributeTypeName%] primer[%=idAttributeName%] = mp.get[%=className%]s().get(0).get[%=idAttributeName%]();
+		
+		[%
+		var columnsGetters = "";
+		for(attribute in class.structuredElements){
+			if(attribute.isTypeOf(java!Attribute)){
+				//Print getter
+				var attributeName = attribute.name.firstToLowerCase();
+				var attributeTypeName = attribute.getTypeName();
+				
+				if(attributeName == idAttributeName.firstToLowerCase()){
+					columnsGetters = columnsGetters.concat("primer").concat(idAttributeName).concat(", ");
+				} else {
+					columnsGetters = columnsGetters.concat(className.firstToLowerCase()).concat(".get").concat(attributeName.firstToUpperCase()).concat("(), ");
+				}
+			}
+		}
+		columnsGetters = columnsGetters.substring(0, columnsGetters.length() - 2);
+		%]
+		mp.edit[%=className%]([%=columnsGetters%]);
+	}
+	
+	@Test
+	public void test4[%=className%]Delete()
+	{	
+		[%=idAttributeTypeName%] primer[%=idAttributeName%] = mp.get[%=className%]s().get(0).get[%=idAttributeName%]();
+		
+		assertNotNull(mp.get[%=className%](primer[%=idAttributeName%]));
+		
+		mp.delete[%=className%](primer[%=idAttributeName%]);
+		
+		assertNull(mp.get[%=className%](primer[%=idAttributeName%]));
+	}
+
+}
+[%
+operation java!Attribute getTypeName() : String {
+	var attributeTypeName = "";	
+	if(self.type.isTypeOf(java!Primitive)){
+		attributeTypeName = self.type.primitiveType.literal;
+	} else {
+		attributeTypeName = self.type.name;
+	}
+	return attributeTypeName;
+}
+%]

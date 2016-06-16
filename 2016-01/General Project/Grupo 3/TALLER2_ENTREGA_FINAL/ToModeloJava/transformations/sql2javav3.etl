@@ -1,0 +1,44 @@
+pre{
+ sql!Model.all.collect(d|d.getAplication()).println();
+}
+
+operation sql!Model getAplication(): java!Application {
+var j= new java!Application;
+j.name="crud";
+var p = new java!Package  ;
+p.name ="crud";
+p.classes = self.tables.collect(c|c.getClasses()) ;
+j.packages.add(p);
+return j;
+}
+
+operation sql!Table getClasses():  java!Class {
+var r2 ;
+var r = new java!Attribute;
+var at = new java!Annotation;
+var s= new java!Class;
+
+
+s.name=self.name; 
+r2 = self.Elements->asSequence().at(0);
+r.name = r2.name; 
+at.name = r2.name; 
+r.type = java!Type#String;
+r.annotations.add(at);
+s.attributes.add(r); 
+
+
+r2 = self.Elements->asSequence().at(1);
+r.name = r2.name; 
+r.type = java!Type#String;
+s.attributes.add(r); 
+
+return s;
+}
+
+operation sql!Column  getAttributes():  java!Attribute {
+var a= new java!Attribute;
+a.name=self.name; 
+a.type = java!Type#String;
+return a;
+}

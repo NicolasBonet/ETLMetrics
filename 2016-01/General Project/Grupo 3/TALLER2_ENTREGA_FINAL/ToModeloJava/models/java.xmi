@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ASCII"?>
+<toModeloJava:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:toModeloJava="http://www.example.org/toModeloJava" name="crud">
+  <packages name="crud">
+    <classes name="Client">
+      <attributes name="id">
+        <annotations name="id"/>
+      </attributes>
+      <attributes name="password"/>
+      <attributes name="name"/>
+      <annotations name="Entity"/>
+    </classes>
+    <classes name="Producto">
+      <attributes name="name"/>
+      <attributes name="id">
+        <annotations name="id"/>
+      </attributes>
+      <annotations name="Entity"/>
+    </classes>
+    <classes name="Carrito">
+      <attributes name="id">
+        <annotations name="id"/>
+      </attributes>
+      <attributes name="name"/>
+      <attributes name="clientId"/>
+      <annotations name="Entity"/>
+    </classes>
+    <classes name="CarritoItem">
+      <attributes name="carritoId"/>
+      <attributes name="itemId"/>
+      <annotations name="Entity"/>
+    </classes>
+    <classes name="Item">
+      <attributes name="id">
+        <annotations name="id"/>
+      </attributes>
+      <attributes name="productoId"/>
+      <attributes name="cantidad"/>
+      <attributes name="name"/>
+      <attributes name="productoId"/>
+      <annotations name="Entity"/>
+    </classes>
+  </packages>
+</toModeloJava:Application>

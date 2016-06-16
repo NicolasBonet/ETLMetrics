@@ -1,0 +1,50 @@
+pre{
+ sql!Model.all.collect(d|d.getAplication());
+}
+
+// Creacion de nodos base  Application 
+operation sql!Model getAplication(): java!Application {
+var j= new java!Application;
+j.name="crud";
+var p = new java!Package  ;
+p.name ="crud";
+p.classes = self.tables.collect(c|c.getClasses()) ;
+j.packages.add(p);
+return j;
+}
+
+// Metodo optine instancias clases  adicional arma atributos y anotaciones 
+operation sql!Table getClasses():  java!Class {
+var s= new java!Class;
+var r3 = self.Elements->asSequence();
+s.name=self.name; 
+
+   
+for(rm in r3) {
+
+ if(rm.isTypeOf(sql!Column)){ 
+   var r = new java!Attribute;
+   r.name = rm.name;  
+   r.type = java!Type#String;
+   if(r.name == "id")
+   {
+      var ty  = new java!Annotation; 
+      ty.name = rm.name;
+      r.annotations.add (ty) ;    
+   } 
+   s.attributes.add(r); 
+  }
+  
+}
+var ty  = new java!Annotation; 
+ ty.name = "Entity";
+ s.annotations.add (ty) ;
+return s;
+}
+
+operation sql!Column  getAttributes():  java!Attribute {
+var a= new java!Attribute;
+a.name=self.name; 
+a.type = java!Type#String;
+return a;
+}

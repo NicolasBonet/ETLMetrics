@@ -1,0 +1,68 @@
+grammar org.uniandes.edu.co.SqlCrud with org.eclipse.xtext.common.Terminals
+
+generate sqlCrud "http://uniandes.edu.co/SqlCrud"
+
+Database returns Database:
+	{Database}
+	tables+=Table+
+;
+
+
+Table returns Table:
+	CREATE ' ' TABLA ' ' nombre=NOMBRE ' '?
+	LPAR
+	columnas+=Columna+ 
+	prkey=PrimaryKey 
+	forkeys+=ForeignKey*
+	RPAR ' '?
+;
+	
+PrimaryKey returns PrimaryKey:
+	PK ' '? LPAR cols+=NOMBRE 
+	(COMMA ' '? cols+=NOMBRE)*
+	RPAR
+;
+
+ForeignKey returns ForeignKey:
+	COMMA ' '? FK ' '? LPAR ' '? column=NOMBRE 
+	RPAR ' '? REFERENCES ' ' referencetab=NOMBRE ' '? 
+	LPAR ' '? referencecol=NOMBRE RPAR ' '?
+;
+
+Columna returns Columna:
+	nombre=NOMBRE ' '
+	tipo=ColumnTipoEnum 
+	(' '	notnullable=NOTNULL)?  COMMA
+;
+
+ColumnTipoEnum:
+	(intt=TIPOINT | varchart=Varchar | smallintt='SMALLINT' | bigintt='BIGINT' | booleant='BOOLEAN' | realt='REAL' | floatt='FLOAT'
+		| binaryt=Binary | varbinaryt=VarBinary | datet='DATE' | timestampt='TIMESTAMP' | multisett='MULTISET' | xmlt='XML'
+	)
+;
+
+Varchar returns Varchar:
+	VARCH LPAR max=ENTERO RPAR
+;
+
+Binary returns Binary:
+	'BINARY' LPAR max=ENTERO RPAR
+;
+
+VarBinary returns Binary:
+	'VARBINARY' LPAR max=ENTERO RPAR
+;
+
+terminal CREATE : 'CREATE';
+terminal TABLA : 'TABLE';
+terminal LPAR : '(';
+terminal RPAR : ')';
+terminal COMMA : ',';
+terminal PK : 'PRIMARY KEY';
+terminal FK : 'FOREIGN KEY';
+terminal REFERENCES : 'REFERENCES';
+terminal NOTNULL : 'NOT NULL';
+terminal VARCH : ('VARCHAR'|'varchar');
+terminal TIPOINT : ('INT'|'int');
+terminal ENTERO : ('0'..'9')+;
+terminal NOMBRE : (('A'..'Z')|('a'..'z')|('0'..'9'))*;

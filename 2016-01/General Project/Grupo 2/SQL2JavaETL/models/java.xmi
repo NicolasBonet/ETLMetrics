@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="ASCII"?>
+<tallerE1Java:Program xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tallerE1Java="http://www.example.org/tallerE1Java">
+  <packages name="marketplace">
+    <classes xsi:type="tallerE1Java:EntityClass" name="Client">
+      <attributes name="id" type="//@primitiveTypes.1">
+        <annotations type="Id"/>
+      </attributes>
+      <attributes name="password" type="//@primitiveTypes.0"/>
+      <attributes name="name" type="//@primitiveTypes.0"/>
+      <attributes name="carritos" type="//@containerTypes.2">
+        <annotations type="OneToMany" content="(cascade = CascadeType.ALL, mappedBy=&quot;client&quot;)"/>
+        <annotations type="PodamExclude"/>
+      </attributes>
+    </classes>
+    <classes xsi:type="tallerE1Java:EntityClass" name="Producto">
+      <attributes name="id" type="//@primitiveTypes.1">
+        <annotations type="Id"/>
+      </attributes>
+      <attributes name="name" type="//@primitiveTypes.0"/>
+      <attributes name="items" type="//@containerTypes.4">
+        <annotations type="OneToMany" content="(cascade = CascadeType.ALL, mappedBy=&quot;producto&quot;)"/>
+        <annotations type="PodamExclude"/>
+      </attributes>
+    </classes>
+    <classes xsi:type="tallerE1Java:EntityClass" name="Carrito">
+      <attributes name="id" type="//@primitiveTypes.1">
+        <annotations type="Id"/>
+      </attributes>
+      <attributes name="name" type="//@primitiveTypes.0"/>
+      <attributes name="client" type="//@packages.0/@classes.0">
+        <annotations type="ManyToOne" content="(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)"/>
+        <annotations type="PrimaryKeyJoinColumn"/>
+        <annotations type="PodamExclude"/>
+      </attributes>
+      <attributes name="carritoitems" type="//@containerTypes.3">
+        <annotations type="OneToMany" content="(cascade = CascadeType.ALL, mappedBy=&quot;carrito&quot;)"/>
+        <annotations type="PodamExclude"/>
+      </attributes>
+    </classes>
+    <classes xsi:type="tallerE1Java:EntityClass" name="Carritoitem">
+      <attributes name="id" type="//@primitiveTypes.1">
+        <annotations type="Id"/>
+      </attributes>
+      <attributes name="item" type="//@packages.0/@classes.4">
+        <annotations type="ManyToOne" content="(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)"/>
+        <annotations type="PrimaryKeyJoinColumn"/>
+        <annotations type="PodamExclude"/>
+      </attributes>
+      <attributes name="carrito" type="//@packages.0/@classes.2">
+        <annotations type="ManyToOne" content="(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)"/>
+        <annotations type="PrimaryKeyJoinColumn"/>
+        <annotations type="PodamExclude"/>
+      </attributes>
+    </classes>
+    <classes xsi:type="tallerE1Java:EntityClass" name="Item">
+      <attributes name="id" type="//@primitiveTypes.1">
+        <annotations type="Id"/>
+      </attributes>
+      <attributes name="name" type="//@primitiveTypes.0"/>
+      <attributes name="cantidad" type="//@primitiveTypes.1"/>
+      <attributes name="producto" type="//@packages.0/@classes.1">
+        <annotations type="ManyToOne" content="(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)"/>
+        <annotations type="PrimaryKeyJoinColumn"/>
+        <annotations type="PodamExclude"/>
+      </attributes>
+      <attributes name="carritoitems" type="//@containerTypes.3">
+        <annotations type="OneToMany" content="(cascade = CascadeType.ALL, mappedBy=&quot;item&quot;)"/>
+        <annotations type="PodamExclude"/>
+      </attributes>
+    </classes>
+    <classes xsi:type="tallerE1Java:DAOClass" name="MarketPlace" entities="//@packages.0/@classes.0 //@packages.0/@classes.1 //@packages.0/@classes.2 //@packages.0/@classes.3 //@packages.0/@classes.4"/>
+  </packages>
+  <packages name="test.java">
+    <classes xsi:type="tallerE1Java:TestClass" name="ClientTest" dao="//@packages.0/@classes.5" entity="//@packages.0/@classes.0"/>
+    <classes xsi:type="tallerE1Java:TestClass" name="ProductoTest" dao="//@packages.0/@classes.5" entity="//@packages.0/@classes.1"/>
+    <classes xsi:type="tallerE1Java:TestClass" name="CarritoTest" dao="//@packages.0/@classes.5" entity="//@packages.0/@classes.2"/>
+    <classes xsi:type="tallerE1Java:TestClass" name="CarritoitemTest" dao="//@packages.0/@classes.5" entity="//@packages.0/@classes.3"/>
+    <classes xsi:type="tallerE1Java:TestClass" name="ItemTest" dao="//@packages.0/@classes.5" entity="//@packages.0/@classes.4"/>
+  </packages>
+  <primitiveTypes name="String"/>
+  <primitiveTypes name="int"/>
+  <containerTypes name="List&lt;Client>" param="//@packages.0/@classes.0" type="List"/>
+  <containerTypes name="List&lt;Producto>" param="//@packages.0/@classes.1" type="List"/>
+  <containerTypes name="List&lt;Carrito>" param="//@packages.0/@classes.2" type="List"/>
+  <containerTypes name="List&lt;Carritoitem>" param="//@packages.0/@classes.3" type="List"/>
+  <containerTypes name="List&lt;Item>" param="//@packages.0/@classes.4" type="List"/>
+  <containerTypes name="List&lt;MarketPlace>" param="//@packages.0/@classes.5" type="List"/>
+</tallerE1Java:Program>

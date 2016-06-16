@@ -1,0 +1,132 @@
+package marketplace;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+
+public class MarketPlace
+{
+	private static final String PERSISTENCE_UNIT_NAME = "MarketPlace-Test";
+    private static EntityManagerFactory emf;
+    private EntityManager em;
+	
+    /*
+	 * MarketPlace
+	 */
+	public MarketPlace()
+	{
+		emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+        em = emf.createEntityManager();
+        
+	}
+[% 
+for (clases in app!Class.all.sortBy(a|a.name)){
+	var nomTabla = clases.name;
+	var nomTablaMin = clases.name.firstToLowerCase();
+	var sentenciaPk = "";
+	var sentenciasParam = "";
+	var nomPK = "";
+	var tipoPK = "";
+	var parametros = "";
+	var i = 0;
+	var coma = ", ";	
+	var esPivot = false;
+//para la PK	
+	--for(pK in tablas.primarys.column.select(a|a.name.isEmpty()==false)){
+for(pK in clases.annotations.select(a|a.name="primary").parameters.select(a|a.key<>"")){
+		if(pK.size()==1){
+			nomPK = pK.get(0).key;
+			tipoPK = pK.get(0).value;
+		}else {
+			nomPK = "id";
+			tipoPK = "int";
+			esPivot = true;
+		}
+	}
+	
+	parametros = tipoPK +" "+ nomPK;
+	sentenciaPk =  nomTabla + " " + nomTablaMin +" = em.find("+ nomTabla +".class, "+ nomPK +");";	
+%]
+
+	/*
+	 * [%=nomTabla%]
+	 */	 
+	public List<[%=nomTabla%]> get[%=nomTabla%]s()
+	{
+		Query q = em.createQuery("SELECT c FROM [%=nomTabla%] c");
+        return q.getResultList();
+	}
+	
+	public void add[%=nomTabla%]([%=nomTabla%] [%=nomTablaMin%])
+	{
+		em.getTransaction().begin();
+        em.persist([%=nomTablaMin%]);
+        em.getTransaction().commit();
+[%
+	for(columna in clases.structuredElements.select(a|a.name <> nomPK)){
+		var nomCol = columna.name;
+		var nomColMay = columna.name.firstToUpperCase();
+		var tipoCol = columna.primitiveType;
+		var colForeing = false;	
+		
+		if(tipoCol=="String"){
+			tipoCol = "String";
+		}
+		
+		//var formatParamEdit = formatParamEdit.format("%4$2s %3$2s %2$2s %1$2s", "a", "b", "c", "d");
+		
+		//Se buscan los foreigns
+		if(clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").isEmpty()==false and clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").key.isEmpty()==false){		   
+			var indice=0;
+			var nomTabRef = "";
+			var nomForeing = "";
+			for (cantidad in clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"")){
+				nomTabRef = clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").value[indice]; 
+				nomForeing = clases.annotations.select(a|a.name="foreign").parameters.select(a|a.key<>"").key[indice];
+				 if(nomCol == nomForeing){
+				 	parametros = parametros + ", " + nomTabRef + " " + nomForeing;
+				 	colForeing = true;
+				 }
+				indice=indice+1;
+			}
+		}
+		if(colForeing==false and nomCol <> nomPK){
+			parametros = parametros +", "+ tipoCol.literal +" "+ nomCol;
+			
+		}	
+		
+		if(nomCol <> nomPK){
+			sentenciasParam = sentenciasParam + nomTablaMin + ".set"+nomColMay+"("+nomCol+");\n";
+		}
+		
+	}
+%]
+	}
+	
+	public void edit[%=nomTabla%]([%=parametros%])
+	{
+		[%=sentenciaPk%]
+		em.getTransaction().begin();
+		[%=sentenciasParam%] 
+		em.getTransaction().commit();
+	}
+	
+	public void delete[%=nomTabla%](int [%=nomPK%])
+	{
+		[%=nomTabla%] [%=nomTablaMin%] = em.find([%=nomTabla%].class, [%=nomPK%]);
+		em.getTransaction().begin();
+		em.remove([%=nomTablaMin%]);
+		em.getTransaction().commit();
+	}
+	
+	public [%=nomTabla%] get[%=nomTabla%](int [%=nomPK%])
+	{
+		return em.find([%=nomTabla%].class, [%=nomPK%]);
+	}
+[%	
+}
+%]	
+}

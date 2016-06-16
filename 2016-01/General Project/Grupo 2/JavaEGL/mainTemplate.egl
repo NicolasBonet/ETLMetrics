@@ -1,0 +1,38 @@
+[% 
+	var root: java!Program:= java!Program.all.at(0);
+	//var root : mp!Database:= mp!Database.all.at(0); 
+	
+	TemplateFactory.setOutputRoot("../generated/co.edu.uniandes.sqlcrud");
+	var tPom:Template:= TemplateFactory.load('createPOM.egl');
+	tPom.generate('pom.xml');
+	
+	var tPersistance:Template:= TemplateFactory.load('createPesistanceXML.egl');
+	tPersistance.generate('./src/META-INF/persistence.xml');
+	
+	var tClassPath:Template:= TemplateFactory.load('createClassPath.egl');
+	tClassPath.generate('.classpath');
+	
+	
+	
+	for(package in root.packages) {
+		for(c in package.classes){
+			if(c.isTypeOf(java!EntityClass)){
+				var tSrc:Template:= TemplateFactory.load('src.egl');
+				tSrc.populate('mClass', c);
+				tSrc.generate('./src/marketplace/' + c.name + '.java');
+			}
+			else if(c.isTypeOf(java!DAOClass)){
+				var tSrcMarketplace:Template:= TemplateFactory.load('srcMarketplace.egl');
+				tSrcMarketplace.populate('mClass', c);
+				tSrcMarketplace.generate('./src/marketplace/MarketPlace.java');
+			}
+			else if(c.isTypeOf(java!TestClass)){
+				var tTest:Template:= TemplateFactory.load('test.egl');
+				tTest.populate('mClass', c);
+				tTest.generate('./src/test/java/' + c.name + '.java');
+			}
+		}
+	}
+	
+	
+%]

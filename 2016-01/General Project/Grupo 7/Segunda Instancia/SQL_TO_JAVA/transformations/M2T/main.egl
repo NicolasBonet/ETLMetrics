@@ -1,0 +1,30 @@
+[%
+	/*
+	Obtiene cada clase dentro de la aplicacion , carga el appClass.egl
+	Realiza la estrucuta de carpetas y carga el entity.egl para generar el código de la clase
+	*/
+	var application = JAVA!Application.all.get(0);
+	for(classifier : JAVA!Classifier in application.package[0].subPackages[0].subPackages[2].classifier){
+		if(classifier.isKindOf(JAVA!Class)){
+			if(classifier.structuredElements.size() >= 25) {
+				var t:Template:=TemplateFactory.load('appClass.egl');
+				t.populate('class', classifier);
+				t.generate('../../generated/entities/' + classifier.name + '.java');
+			} else {
+				var t:Template:=TemplateFactory.load('entity.egl');
+				t.populate('class', classifier);
+				t.generate('../../generated/entities/' + classifier.name + '.java');
+			}
+		}
+	}
+	/*
+	Por cada clasificador carga el test.egl y lo coloca en la carpeta generated
+	*/
+	for(classifier : JAVA!Classifier in application.package[0].subPackages[0].subPackages[1].classifier){
+		var t:Template:=TemplateFactory.load('test.egl');
+		t.populate('class', classifier);
+		//carga el codigo en la carpeta generated
+		t.generate('../../generated/test/' + classifier.name + '.java');
+		
+	}
+%]

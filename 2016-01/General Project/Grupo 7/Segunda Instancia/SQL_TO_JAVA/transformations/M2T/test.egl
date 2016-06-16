@@ -1,0 +1,42 @@
+[%
+	import 'utilities.egl';
+%]
+import static org.junit.Assert.*;
+
+import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+import uk.co.jemos.podam.api.PodamFactory;
+import uk.co.jemos.podam.api.PodamFactoryImpl;
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class [%=class.name%]{
+
+	[%
+	//carga los atributos de la clase y los renderiza
+		for(attribute : JAVA!Attribute in class.structuredElements){
+			attribute.renderAttribute();
+		}
+		//Por cada método del la clase carga sus métodos de test
+		for(method : JAVA!Method in class.structuredElements){
+			//renderiza el metodo prepare test
+			if(method.name.startsWith("prepare")){
+				method.renderPrepareMethod();
+				//renderiza el add
+			} else if(method.name.startsWith("test1")){
+				method.renderTest1();
+				//renderiza el metodo get
+			} else if(method.name.startsWith("test2")){
+				method.renderTest2();
+				//renderiza el metodo edit
+			} else if(method.name.startsWith("test3")){
+				method.renderTest3();
+				//renderiza el metodo delete
+			} else if(method.name.startsWith("test4")){
+				method.renderTest4();
+			}
+		}
+	%]
+}

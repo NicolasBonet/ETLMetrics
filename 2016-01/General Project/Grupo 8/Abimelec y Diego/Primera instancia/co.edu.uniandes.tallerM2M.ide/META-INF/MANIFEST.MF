@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: co.edu.uniandes.tallerM2M.ide
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: co.edu.uniandes.tallerM2M.ide; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: co.edu.uniandes.tallerM2M,
+ org.eclipse.xtext.ide,
+ org.eclipse.xtext.xbase.ide
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: co.edu.uniandes.tallerM2M.ide.contentassist.antlr,
+ co.edu.uniandes.tallerM2M.ide.contentassist.antlr.internal
+

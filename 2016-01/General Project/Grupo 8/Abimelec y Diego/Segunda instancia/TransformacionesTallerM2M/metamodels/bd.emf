@@ -1,0 +1,40 @@
+@namespace(uri="bd", prefix="bd")
+package bd;
+
+class NamedElement {
+  attr String name;
+}
+
+class Database extends NamedElement {
+  val Table[*]#database tables;
+}
+
+class Table extends NamedElement {
+  ref Database#tables database;
+  val Column[*]#table columns;
+}
+
+class Column extends NamedElement {
+  ref Table#columns table;
+  attr DataType dataType;
+  attr int size;
+  val PrimaryKey primaryKey;
+  val ForeignKey[*] foreignKeys;
+}
+
+class PrimaryKey {
+  ref Table table;
+  ref Column[*] pkColumns;
+}
+
+class ForeignKey {
+  ref Table parent;
+  ref Table child;
+  ref Column[*] fkColumns;
+}
+
+enum DataType {
+  int = 0;
+  varchar = 0;
+}
+

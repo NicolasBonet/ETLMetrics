@@ -1,0 +1,68 @@
+
+rule app2class
+  transform application : Application {
+
+
+
+  parameters {
+    // These parameters will be made available
+    // to the invoked template as variables
+    var params : new Map;
+    params.put("classes", Class.all);
+    params.put("package", Package.all.select(p|p.classes.select(c|c.name = Class.all.at(0).name).size()>0).at(0));
+    params.put("application", Application.all.at(0));
+    return params;
+  }
+
+  // The EGL template to be invoked
+  template : "mainTest.egl"
+
+  // Output file
+  target : "src/"+Package.all.select(p|p.classes.select(c|c.name = Class.all.at(0).name).size()>0).at(0).name+"/"+Application.all.at(0).name+".java"
+  //target : "src/co/" + table.Name+ ".java"
+
+}
+
+
+rule mClass2JClass
+  transform class : Class {
+
+
+
+  parameters {
+    var params : new Map;
+    params.put("class", Class.all.at(Class.all.indexOf(class)));
+    params.put("package", Package.all.select(p|p.classes.select(c|c.name = class.name).size()>0).at(0));
+    return params;
+  }
+
+  //  EGL creacion de clases Java por objeto Class del MM
+  template : "ModelToJava.egl"
+
+  // Output file
+  target : "src/"+Package.all.select(p|p.classes.select(c|c.name = class.name).size()>0).at(0).name+"/" + class.name+ ".java"
+  //target : "src/co/" + table.Name+ ".java"
+
+}
+
+rule mClass2JClassTest
+  transform class : Class {
+
+
+
+  parameters {
+    var params : new Map;
+    params.put("class", Class.all.at(Class.all.indexOf(class)));
+    params.put("package", Package.all.select(p|p.classes.select(c|c.name = class.name).size()>0).at(0));
+    params.put("application", Application.all.at(0));
+    return params;
+  }
+
+  //  EGL creacion de clases Java por objeto Class del MM
+  template : "ModelToJavaTest.egl"
+
+  // Output file
+  target : "src/Test/" + class.name+ "Test.java"
+  //target : "src/co/" + table.Name+ ".java"
+
+}

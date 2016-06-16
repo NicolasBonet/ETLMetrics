@@ -1,0 +1,156 @@
+
+package marketplace;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+[% var manyToOne = false;
+for (attrib in class.attributes){
+	for (annot in attrib.annotations){
+		if (annot.annotation = "ManyToOne"){
+			manyToOne = true;
+		}
+	}
+}
+if (manyToOne = true){
+		%]
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
+[%
+}
+%]
+
+
+[% //Se agregan las librerias correspondientes y las anotaciones de la clase
+for(annot in class.annotations)
+{
+	if(annot.annotation = "OneToMany"){
+	%]
+import java.util.List;
+import javax.persistence.OneToMany;
+	[%
+	}
+}%]
+import uk.co.jemos.podam.common.PodamExclude;
+
+[%
+
+for(annot in class.annotations)
+{
+	if(annot.annotation <> "OneToMany"){
+	%]
+@[%=annot.annotation%]
+	[%
+	}
+}
+
+//Se imprime la definicion de la clase con sus respectivos modificadores
+for (modif in class.modifiers){
+	%][%=modif.name%] [% } %] class [%=class.name%]
+{
+
+[%//Se imprime la definicion de cada atributo con sus respectivas anotaciones y modificadores
+for (attrib in class.attributes){
+	//Se imprime cada anotacion de cada atributo
+	for (annot in attrib.annotations){
+		if (annot.annotation = "ManyToOne"){
+		%]
+	@[%=annot.annotation%](fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@PrimaryKeyJoinColumn
+	@PodamExclude
+		[%
+		}
+		else{
+		   %]
+	@[%=annot.annotation%]
+		   [%
+		   }
+		   }
+		   //Se imprime los modificadores de cada atributo
+		for (modif in attrib.modifiers){
+			
+			%]
+	[%=modif.name%] [%}%] [%=attrib.jType.name%] [%=attrib.name%];
+	
+	[%
+}
+%]
+
+[%
+//Se imprime la anotacion OneToMany si existe
+for(annot in class.annotations){
+	if (annot.annotation = "OneToMany"){
+	%]
+	@[%=annot.annotation%](cascade = CascadeType.ALL, mappedBy="[%=class.name.firstToLowerCase()%]")
+	@PodamExclude
+    private List<[%=annot.value%]> [%=annot.value.firstToLowerCase() + "s"%];
+	[%
+	}
+}
+
+%]
+
+[% //Definicion del metodo constructor sus respectivos modificadores, tipos y parametros
+for (met in class.methods){
+	//
+	if (met.isConstructor = true){
+	//Se imprime los modificadores del metodo constructor
+	for (modif in met.modifiers){
+		%]
+	[%=modif.name%] [%}%]  [%=met.name%]()
+	{
+	}
+	
+	[%
+	}
+}
+
+//Definicion de los metodos setter y getter conr sus respectivos modificadores, tipos y parametros
+for (met in class.methods){
+	
+	if (met.isConstructor = false){	
+	   //Se imprime los modificadores de cada metodo, parametros y tipos
+		for (modif in met.modifiers){
+			%]
+	[%=modif.name%] [%} if (met.name.startsWith("set")){%] void[% } else{%] [%=met.jType.name%][%}%] [%=met.name%]([% for (param in met.parameters){%][%=param.jType.name%] [%=param.name%][%}%])
+	{
+[%
+		if (met.name.startsWith("set")){
+			for(param in met.parameters){
+				%]
+		this.[%=param.name%] = [%=param.name%];[%
+			}
+		}
+		if (met.name.startsWith("get")){
+				%]
+		return [%=met.name.replace('get','').toLowerCase()%];[%
+		}
+%]
+
+	}
+
+	[%
+	}
+}
+//Metodos setter y getter List
+for(annot in class.annotations)
+{
+	if(annot.annotation = "OneToMany"){
+	%]
+	public List<[%=annot.value%]> get[%=annot.value%]s()
+	{
+		return [%=annot.value.firstToLowerCase()%]s;
+	}
+	
+	public void set[%=annot.value%]s(List<[%=annot.value%]> [%=annot.value.firstToLowerCase()%]s)
+	{
+		this.[%=annot.value.firstToLowerCase()%]s = [%=annot.value.firstToLowerCase()%]s;
+	}
+	
+	[%
+	}
+}
+
+%]
+}

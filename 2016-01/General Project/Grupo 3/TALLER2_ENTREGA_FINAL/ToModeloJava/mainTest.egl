@@ -1,0 +1,104 @@
+package [%=package.name%];
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+
+public class [%=application.name.firstToUpperCase()%]
+{
+	private static final String PERSISTENCE_UNIT_NAME = "[%=application.name.firstToUpperCase()%]-Test";
+    private static EntityManagerFactory emf;
+    private EntityManager em;
+	
+    /*
+	 * [%=application.name.firstToUpperCase()%]
+	 */
+	public [%=application.name.firstToUpperCase()%]()
+	{
+		emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+        em = emf.createEntityManager();
+	}
+
+	[%
+	for(class in classes){
+	%]	
+	/*
+	 * [%=class.name%]
+	 */
+	public List<[%=class.name%]> get[%=class.name%]s()
+	{
+		Query q = em.createQuery("SELECT c FROM [%=class.name%] c");
+        return q.getResultList();
+	}
+	
+	public void add[%=class.name%]([%=class.name%] [%=class.name.firstToLowerCase()%])
+	{
+		em.getTransaction().begin();
+        em.persist([%=class.name.firstToLowerCase()%]);
+        em.getTransaction().commit();
+	}
+	
+	public void edit[%=class.name%]([%
+	/*Se imprimen los atributos como parametros del metodo*/
+	var contador = 1;
+	for(attr in class.attributes){
+	if(contador > 1){%] , [%}
+	contador=contador+1;
+	%][%=attr.type%] [%=attr.name%][% }
+	for(utyp in class.usertypes){
+	if(contador > 1){%] , [%}
+	contador=contador+1;
+	%][%=utyp.class.name.firstToUpperCase()%] [%=utyp.class.name.firstToLowerCase()%][%
+	}
+	%])
+	{
+		[%=class.name%] [%=class.name.firstToLowerCase()%] = em.find([%=class.name%].class, [%=class.getID()%]);
+		em.getTransaction().begin();
+		[%/*Se setean os atributos de la instancia*/
+		for(attr in class.attributes){
+		if(attr.name <> class.attributes.select(a|a.annotations.select(an|an.name = "Id").size() > 0).at(0).name){%]
+		[%=class.name.firstToLowerCase()%].set[%=attr.name.firstToUpperCase()%]([%=attr.name.firstToLowerCase()%]);
+		 [%} }%]
+		em.getTransaction().commit();
+	}
+		
+	public void delete[%=class.name%]([%=class.getIDType()%] [%=class.getID()%])
+	{
+		[%=class.name%] [%=class.name.firstToLowerCase()%] = em.find([%=class.name%].class, [%=class.getID()%]);
+		em.getTransaction().begin();
+		em.remove([%=class.name.firstToLowerCase()%]);
+		em.getTransaction().commit();
+	}
+	
+	public [%=class.name%] get[%=class.name%]([%=class.getIDType()%] [%=class.getID()%])
+	{
+		return em.find([%=class.name%].class, [%=class.getID()%]);
+	}
+
+	[%
+	}
+	%]
+}
+
+ [% operation Column getType () {
+    if (self.type = "varchar" ){%]String[%}else{%][%=self.type%][%}%]
+ [%}
+ 
+  /*Operacion que imprime las entidades de un objeto*/ 
+ operation Class getID () {
+	 if(self.attributes.select(a|a.annotations.select(an|an.name = "Id").size() > 0).size()  > 0){
+	 %][%=self.attributes.select(a|a.annotations.select(an|an.name = "Id").size() > 0).at(0).name.firstToLowerCase()%][% 
+	 }
+ }
+ operation Class getIDType () {
+	 if(self.attributes.select(a|a.annotations.select(an|an.name = "Id").size() > 0).size()  > 0){
+	 %][%=self.attributes.select(a|a.annotations.select(an|an.name = "Id").size() > 0).at(0).type%][% 
+	 }
+ }
+
+ 
+ 
+ %]

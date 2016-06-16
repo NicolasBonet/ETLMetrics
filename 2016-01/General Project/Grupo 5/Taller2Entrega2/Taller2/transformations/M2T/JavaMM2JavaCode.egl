@@ -1,0 +1,70 @@
+package entities;
+
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.PrimaryKeyJoinColumn;
+
+import uk.co.jemos.podam.common.PodamExclude;
+
+@Entity
+public class [%= clase.nombre %]
+{
+[% 	
+for(atributo in clase.atributos)
+{
+	%]
+	[% 
+	if(atributo.nombre == 'id'){ %]@Id[% } %]
+		private [%= atributo.tipo + ' ' + atributo.nombre %]
+		
+	[%
+}		
+for(relacion in clase.relaciones.select(r | r.tipo <> null))
+{%]
+	
+	@[%= relacion.cardinalidad %][% if(relacion.cardinalidad == 'ManyToOne'){ %](fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)			
+	@PrimaryKeyToJoinColumn[% } %]
+	@PodamExclude
+	private [%= relacion.tipo.nombre + ' ' + relacion.nombre %];					
+[%
+}%]
+			
+	public [%= clase.nombre %]()
+	{
+			
+	}
+
+[% 	
+for(atributo in clase.atributos)
+{
+	%]
+		public [%= atributo.tipo + ' get' + atributo.nombre %]()
+		{
+			return [%= atributo.nombre %];
+		}
+		
+		public void set[%= atributo.nombre %]([%= atributo.tipo + ' ' + atributo.nombre %])
+		{
+			this.[%= atributo.nombre %] = [%= atributo.nombre %];
+		}
+	[%
+}		
+for(relacion in clase.relaciones.select(r | r.tipo <> null))
+{	%]
+		public [%= relacion.tipo.nombre + ' get' + relacion.nombre %]()
+		{
+			return [%= relacion.nombre %];
+		}
+		
+		public void set[%= relacion.nombre %]([%= relacion.tipo.nombre + ' ' + relacion.nombre %])
+		{
+			this.[%= relacion.nombre %] = [%= relacion.nombre %];
+		}
+	[%
+}%]

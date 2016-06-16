@@ -1,0 +1,45 @@
+grammar co.edu.uniandes.tallerM2M.Sql with org.eclipse.xtext.common.Terminals
+
+generate sql "http://www.edu.co/uniandes/tallerM2M/Sql"
+
+//Reglas para la Gramatica
+Database:
+{Database}
+tablas+=Tabla+
+;
+
+Tabla returns Tabla:
+TCREATE ' ' TTABLE ' ' name=ID
+PARENTESISA
+columnas+=Columna+
+primarys+=Primary+
+foreigns+=ForeingKey*
+PARENTESISB;
+
+Columna returns Columna:
+name=ID ' ' tipo=(VVARCHAR | VINT | VVARCHAR255)notNull=(' NOT NULL')? COMA*;
+
+Primary returns Primary:
+TPRIMARY ' ' TKEY ' ' PARENTESISA column+=[Columna] (COMA ' ' column+=[Columna])* PARENTESISB COMA*;
+
+ForeingKey returns ForeignKey:
+TFOREIGN ' ' TKEY ' ' PARENTESISA name=ID PARENTESISB ' ' 
+TREFERENCES ' ' referenceTable=[Tabla] PARENTESISA (referenceColumn=[Columna]) PARENTESISB  COMA*;
+
+//Desde aca las terminales para el .sql
+terminal TCREATE:"CREATE";
+terminal TTABLE:"TABLE";
+terminal TPRIMARY:"PRIMARY";
+terminal TKEY:"KEY";
+terminal TFOREIGN:"FOREIGN";
+terminal TCOLUMNAS:"COLUMNAS";
+terminal TREFERENCES:"REFERENCES";
+terminal TNOT:"NOT"; 
+terminal TNULL:"NULL";
+terminal PARENTESISA:"(";
+terminal PARENTESISB:")";
+terminal COMA:",";
+terminal VINT:"int";
+terminal VVARCHAR:"varchar";
+terminal VVARCHAR255:"varchar(255)";
+

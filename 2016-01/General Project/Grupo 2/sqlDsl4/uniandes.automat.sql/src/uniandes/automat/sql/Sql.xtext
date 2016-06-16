@@ -1,0 +1,50 @@
+grammar uniandes.automat.sql.Sql with org.eclipse.xtext.common.Terminals
+
+generate sql "http://uniandes.edu.co/sqlCrud"
+
+Model:
+	database+=Database;
+	
+Database returns Database:
+	tables+=Table*
+;
+	
+Table returns Table:
+	"CREATE" "TABLE" name=ID "(" 
+		facts+=(Column | PrimaryKey | ForeignKey) 
+		("," facts+=(Column | PrimaryKey | ForeignKey))*
+	")"
+;
+
+//TableFacts:
+//	facts+=TableFact ( "," facts+=TableFact )*
+//;
+//
+//TableFact:
+//	Column | PrimaryKey | ForeignKey
+//;
+	
+Column returns Column:
+	name=ID type= DataType isNotNull?='NOT NULL'?
+;
+
+PrimaryKey returns PrimaryKey:
+	"PRIMARY" "KEY" "(" 
+		col+=[Column] ("," col+=[Column])* 
+	")"
+;
+
+ForeignKey returns ForeignKey:
+	"FOREIGN" "KEY" "(" 
+		localColumns+=[Column] ("," localColumns+=[Column])* 
+	")" 
+	"REFERENCES" foreignTable=[Table] "(" 
+		foreignColumns+=[Column] ("," foreignColumns+=[Column])* 
+	")"
+;
+
+
+enum DataType:
+	VARCHAR255="varchar(255)" | INT="int"
+;
+	

@@ -1,0 +1,44 @@
+[%
+	//Configurations
+	var managerName = "MarketPlace";
+
+	//Iterate all the packages
+	for(package in java!Package.all){
+		//out.println(package.name);
+		//Iterate all the classes inside each package
+		for(class in package.classifier){
+			//Generate classes
+			if(class.isTypeOf(java!Class)){
+				var entityTemplate:Template:= TemplateFactory.load('entityClass.egl');
+				entityTemplate.populate('class', class);
+				entityTemplate.populate('classes', package.classifier);
+				entityTemplate.generate('../../co.edu.uniandes.sqlcrud/src/'+package.name+'/'+class.name.firstToUpperCase()+'.java');
+				
+				var unitTestTemplate:Template:= TemplateFactory.load('unitTestClass.egl');
+				unitTestTemplate.populate('class', class);
+				unitTestTemplate.populate('modelPackageName', package.name);
+				unitTestTemplate.populate('managerName', managerName);
+				unitTestTemplate.generate('../../co.edu.uniandes.sqlcrud/src/test/java/'+class.name.firstToUpperCase()+'Test.java');
+			}
+		}
+		
+		var manager:Template:= TemplateFactory.load('manager.egl');
+		manager.populate('managerName', managerName);
+		manager.populate('packageName', package.name);
+		manager.populate('classes', package.classifier);
+		manager.generate('../../co.edu.uniandes.sqlcrud/src/'+package.name+'/'+managerName.firstToUpperCase()+'.java');
+	}
+	
+	var pom:Template:= TemplateFactory.load('../files/pom.xml');
+	pom.generate('../../co.edu.uniandes.sqlcrud/pom.xml');
+	
+	var persistence:Template:= TemplateFactory.load('persistence.egl');
+	persistence.populate('managerName', managerName);
+	persistence.generate('../../co.edu.uniandes.sqlcrud/src/META-INF/persistence.xml');
+	
+	var classpath:Template:= TemplateFactory.load('../files/classpath.xml');
+	classpath.generate('../../co.edu.uniandes.sqlcrud/.classpath');
+	
+	var project:Template:= TemplateFactory.load('../files/project');
+	project.generate('../../co.edu.uniandes.sqlcrud/.project');
+%]

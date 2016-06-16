@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ASCII"?>
+<JavaMM:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:JavaMM="http://co.edu.uniandes/javamm" name="Market Place App">
+  <package xsi:type="JavaMM:Class" name="Client" modifiers="public">
+    <annotations name="primary">
+      <parameters key="id" value="int"/>
+    </annotations>
+    <annotations name="foreign"/>
+    <structuredElements xsi:type="JavaMM:Attribute" name="id"/>
+    <structuredElements xsi:type="JavaMM:Attribute" name="password" primitiveType="String"/>
+    <structuredElements xsi:type="JavaMM:Attribute" name="name" primitiveType="String"/>
+  </package>
+  <package xsi:type="JavaMM:Class" name="Producto" modifiers="public">
+    <annotations name="primary">
+      <parameters key="id" value="int"/>
+    </annotations>
+    <annotations name="foreign"/>
+    <structuredElements xsi:type="JavaMM:Attribute" name="name" primitiveType="String"/>
+    <structuredElements xsi:type="JavaMM:Attribute" name="id"/>
+  </package>
+  <package xsi:type="JavaMM:Class" name="Carrito" modifiers="public">
+    <annotations name="primary">
+      <parameters key="id" value="int"/>
+    </annotations>
+    <annotations name="foreign">
+      <parameters key="clientId" value="Client"/>
+    </annotations>
+    <structuredElements xsi:type="JavaMM:Attribute" name="id"/>
+    <structuredElements xsi:type="JavaMM:Attribute" name="name" primitiveType="String"/>
+    <structuredElements xsi:type="JavaMM:Attribute" name="clientId"/>
+  </package>
+  <package xsi:type="JavaMM:Class" name="Carritoitem" modifiers="public">
+    <annotations name="primary">
+      <parameters key="carritoId" value="int"/>
+      <parameters key="itemId" value="int"/>
+    </annotations>
+    <annotations name="foreign">
+      <parameters key="carritoId" value="Carrito"/>
+      <parameters key="itemId" value="Item"/>
+    </annotations>
+    <structuredElements xsi:type="JavaMM:Attribute" name="carritoId"/>
+    <structuredElements xsi:type="JavaMM:Attribute" name="itemId"/>
+  </package>
+  <package xsi:type="JavaMM:Class" name="Item" modifiers="public">
+    <annotations name="primary">
+      <parameters key="id" value="int"/>
+    </annotations>
+    <annotations name="foreign">
+      <parameters key="productoId" value="Producto"/>
+    </annotations>
+    <structuredElements xsi:type="JavaMM:Attribute" name="id"/>
+    <structuredElements xsi:type="JavaMM:Attribute" name="cantidad"/>
+    <structuredElements xsi:type="JavaMM:Attribute" name="name" primitiveType="String"/>
+    <structuredElements xsi:type="JavaMM:Attribute" name="productoId"/>
+  </package>
+</JavaMM:Application>

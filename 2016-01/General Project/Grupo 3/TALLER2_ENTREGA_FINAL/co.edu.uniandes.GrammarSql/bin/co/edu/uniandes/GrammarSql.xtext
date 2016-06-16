@@ -1,0 +1,62 @@
+grammar co.edu.uniandes.GrammarSql with org.eclipse.xtext.common.Terminals
+
+generate grammarSql "http://www.edu.co/uniandes/GrammarSql"
+
+Model:
+tables+=Table+
+;
+
+Table returns Table:
+	"CREATE" "TABLE" name=ID LPAR 
+		elements+=(Column | PrimaryKey | ForeignKey) 
+		("," elements+=(Column | PrimaryKey | ForeignKey))*	
+	RPAR
+;
+
+Column returns Column:
+	name=ID type= ('int'|'varchar'|'Double'|'Float') Tamano? isNotNull?=NOTNULL?
+;
+
+PrimaryKey returns PrimaryKey:
+	"PRIMARY" "KEY" LPAR 
+		col+=[Column] ("," col+=[Column])* 
+	RPAR
+;
+
+ForeignKey returns ForeignKey:
+	"FOREIGN" "KEY" LPAR 
+		localColumns+=[Column] ("," localColumns+=[Column])* 
+	RPAR 
+	ref=Reference
+;
+
+Reference returns Reference:
+	"REFERENCES" fromT+=[Table] LPAR 
+		fromC+=[Column] ("," fromC+=[Column])* 
+	RPAR
+;
+
+Tamano :
+	LPAR (INT)* RPAR
+;
+
+//enum DataType:
+//	INT='int'|varchar='varchar'|DOUBLE='Double'|FLOAT='Float'
+//;
+
+terminal CREATE:
+"CREATE" "TABLE"	
+;
+
+terminal LPAR:
+"("
+;
+
+
+terminal RPAR:
+")"
+;
+
+terminal NOTNULL:
+	'NOT NULL'
+;

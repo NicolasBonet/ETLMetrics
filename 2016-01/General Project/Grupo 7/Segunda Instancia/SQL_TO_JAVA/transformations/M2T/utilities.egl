@@ -1,0 +1,338 @@
+
+[%
+
+/************************************************************
+*EGL de utilidades necesarias para la generacion del código *
+*************************************************************/
+/**
+* operation: renderAtribute
+* obj: Cosntruye un atributo de JAVA.
+*/
+operation JAVA!Attribute renderAttribute (){
+	for(annotation : JAVA!Annotation in self.annotations){
+		annotation.renderAnnotation();
+	}
+	%][%=self.renderModifier() + self.type.renderType() + self.name%];
+	
+	[%
+}
+%]
+
+[%
+/**
+* operation: renderAtribute
+* obj: Cosntruye un constructor de JAVA.
+*/
+operation JAVA!Method renderConstructor () {
+	%][%=self.renderModifier() + self.returnValue.name%] () {
+	
+	}
+	
+	[%
+}
+%]
+
+[%
+/**
+* operation: renderSetter
+* obj: Renderiza el metodo setter en java.
+*/
+operation JAVA!Method renderSetter (){
+	%][%=self.renderModifier()%]void [%=self.name%] ([%=self.parameters[0].name%]) {
+		this.[%=self.parameters[0].name%] = [%=self.parameters[0].name%]; 
+	}
+	
+	[%
+}
+%]
+
+[%
+/**
+* operation: renderGetter
+* obj: Renderiza el metodo getter en java.
+*/
+operation JAVA!Method renderGetter (){
+	%][%=self.renderModifier()%] [% if (self.returnValue <> null) {%][%=self.returnValue.renderType()%][%} else {%] void [%}%] [%=self.name%] () {
+		return this.[%=self.name.substring(3).toLowerCase()%];
+	}
+	
+	[%
+}
+%]
+
+[%
+/**
+* operation: renderModifier
+* obj: Renderiza un modificador de java.
+*/
+operation JAVA!StructuredElement renderModifier (){
+	for(modifier in self.modifier.modifiers){
+	%][%='\t' + modifier.literal + ' '%][%
+	}
+}
+%]
+
+[%
+/**
+* operation: renderType
+* obj: Renderiza un tipo de dato, ya sea primitivo o una clase.
+*/
+operation JAVA!Classifier renderType() {
+	if(self.isKindOf(JAVA!Class)){
+		return self.name + ' ';
+	}else if(self.isKindOf(JAVA!DataType)){
+		return self.primitiveType.literal + ' ';
+	}
+}
+%]
+
+[%
+/**
+* operation: renderAnnotation
+* obj: Renderiza una anotacion de JAVA.
+*/
+operation JAVA!Annotation renderAnnotation() {
+	%]	[%=self.name%][%
+	var comaCount = 1;
+	if(self.parameters.size() > 0) {
+	%]([%
+		for(keyValue : JAVA!KeyValue in self.parameters){
+			keyValue.renderKeyValue();
+			if(comaCount < self.parameters.size()){
+				%], [%
+				comaCount = comaCount + 1;
+			}
+		}
+	%])
+	[%
+	} else {
+	%]
+	
+	[%
+	}
+}
+%]
+
+[%
+/**
+* operation: renderkeyValue
+* obj: Renderiza una pareja de elementos llave valor.
+*/
+operation JAVA!KeyValue renderKeyValue () {
+	%][%=self.key%] = [%=self.value%][%
+}
+%]
+
+[%/*********** TEST.egl *********/%]
+[%
+/**
+* operation: getClassName
+* obj: Retorna una clase.
+*/
+operation String getClassName (start : Integer, end : Integer) {
+	return self.substring(start,end);
+}
+%]
+
+[%
+/**
+* operation: renderPrepareMethod
+* obj: Renderiza el método de preparacion del TEST de java.
+*/
+operation JAVA!Method renderPrepareMethod () {
+	for(annotation : JAVA!Annotation in self.annotations){
+		annotation.renderAnnotation();
+	}
+	%][%=self.renderModifier()%]void [%=self.name%] () {
+		mp = new MarketPlace();
+		factory = new PodamFactoryImpl();
+	}
+	
+	[%
+}
+%]
+
+[%
+/**
+* operation: renderTest1
+* obj: Renderiza el test1 de adicion de una clase.
+*/
+operation JAVA!Method renderTest1 () {
+	var className = self.name.getClassName(5,self.name.length()-3);
+	for(annotation : JAVA!Annotation in self.annotations){
+		annotation.renderAnnotation();
+	}
+	%][%=self.renderModifier()%]void [%=self.name%] () {
+		[%=className%] [%=className.toLowerCase()%] = factory.manufacturePojo([%=className%].class);
+		factory.populatePojo([%=className.toLowerCase()%]);
+		mp.add[%=className%]([%=className.toLowerCase()%]);
+		
+	}
+	
+	[%
+}
+%]
+
+[%
+/**
+* operation: renderTest2
+* obj: Renderiza el test2 de get Item de una clase.
+*/
+operation JAVA!Method renderTest2 () {
+	var className = self.name.getClassName(8,self.name.length());
+	for(annotation : JAVA!Annotation in self.annotations){
+		annotation.renderAnnotation();
+	}
+	%][%=self.renderModifier()%]void [%=self.name%] () {
+		assertNotNull(mp.get[%=className%](mp.get[%=className%]s().get(0).getId()));
+	}
+	
+	[%
+}
+%]
+
+[%
+/**
+* operation: renderTest3
+* obj: Renderiza el test3 de edicion de una clase.
+*/
+operation JAVA!Method renderTest3 () {
+	var className = self.name.getClassName(5,self.name.length()-4);
+	for(annotation : JAVA!Annotation in self.annotations){
+		annotation.renderAnnotation();
+	}
+	%][%=self.renderModifier()%]void [%=self.name%] () {
+		[%=className%] [%=className.toLowerCase()%] = factory.manufacturePojo([%=className%].class);
+		factory.populatePojo([%=className.toLowerCase%]);
+		
+		int primerId = mp.get[%=className%]s().get(0).getId();
+	}
+	
+	[%
+}
+%]
+
+[%
+/**
+* operation: renderTest4
+* obj: Renderiza el test4 de eliminacion de una clase.
+*/
+operation JAVA!Method renderTest4 () {
+	var className = self.name.getClassName(5,self.name.length()-6);
+	for(annotation : JAVA!Annotation in self.annotations){
+		annotation.renderAnnotation();
+	}
+	%][%=self.renderModifier()%]void [%=self.name%] () {
+		int primerId = mp.get[%=className%]s().get(0).getId();
+		
+		assertNotNull(mp.get[%=className%](primerId));
+		
+		mp.delete[%=className%](primerId);
+		
+		assertNull(mp.get[%=className%](primerId));
+	}
+	
+	[%
+}
+%]
+
+[%/*********** APPCLASS.egl *********/%]
+[%
+/**
+* operation: renderAppClassConstructor
+* obj: Renderiza el metodo constructor de la clase de la aplicacion.
+*/
+operation JAVA!Method renderAppClassConstructor () {
+	%][%=self.renderModifier() + self.returnValue.name%] () {
+		emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+    		em = emf.createEntityManager();
+	}
+	
+	[%
+}
+%]
+
+[%
+/**
+* operation: renderGetAllMethod
+* obj: Renderiza el metodo get all.
+*/
+operation JAVA!Method renderGetAllMethod () {
+	var className = self.name.getClassName(3,self.name.length()-1);
+	%]
+	/**
+	* [%=className%]
+	*/
+[%=self.renderModifier()%]List<[%=className%]> [%=self.name%] () {
+		Query q = em.createQuery("SELECT e FROM [%=className%] e");
+        return q.getResultList();
+	}
+	
+	[%
+}
+%]
+
+[%
+/**
+* operation: renderAddMethod
+* obj: Renderiza el metodo add.
+*/
+operation JAVA!Method renderAddMethod () {
+	var className = self.name.getClassName(3,self.name.length());
+	%][%=self.renderModifier()%]void [%=self.name%] () {
+		em.getTransaction().begin();
+        em.persist([%=className.toLowerCase()%]);
+        em.getTransaction().commit();
+	}
+	
+	[%
+}
+%]
+
+[%
+/**
+* operation: renderEditMethod
+* obj: Renderiza el metodo edit.
+*/
+operation JAVA!Method renderEditMethod () {
+	var className = self.name.getClassName(4,self.name.length());
+	%][%=self.renderModifier()%]void [%=self.name%] () {
+		
+	}
+	
+	[%
+}
+%]
+
+[%
+/**
+* operation: renderDeleteMethod
+* obj: Renderiza el metodo delete.
+*/
+operation JAVA!Method renderDeleteMethod () {
+	var className = self.name.getClassName(6,self.name.length());
+	%][%=self.renderModifier()%]void [%=self.name%] () {
+		[%=className%] [%=className.toLowerCase%] = em.find([%=className%].class, id);
+		em.getTransaction().begin();
+		em.remove([%=className.toLowerCase%]);
+		em.getTransaction().commit();
+	}
+	
+	[%
+}
+%]
+
+[%
+/**
+* operation: renderGetMethod
+* obj: Renderiza el metodo get.
+*/
+operation JAVA!Method renderGetMethod () {
+	var className = self.name.getClassName(3,self.name.length());
+	%][%=self.renderModifier()%][%=className%] [%=self.name%] () {
+		return em.find([%=className%].class, id);
+	}
+	
+	[%
+}
+%]

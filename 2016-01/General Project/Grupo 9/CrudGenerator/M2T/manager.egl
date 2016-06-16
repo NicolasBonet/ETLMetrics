@@ -1,0 +1,123 @@
+[%
+var _managerName = managerName.firstToUpperCase();
+%]
+
+package [%=packageName%];
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+
+public class [%=_managerName%]
+{
+
+	private static final String PERSISTENCE_UNIT_NAME = "[%=_managerName%]-Test";
+    private static EntityManagerFactory emf;
+    private EntityManager em;
+	
+    /*
+	 * [%=_managerName%]
+	 */
+	public [%=_managerName%]()
+	{
+		emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+        em = emf.createEntityManager();
+	}
+	[%
+
+	for(class in classes){
+		if(class.isTypeOf(java!Class)){
+			
+			var className = class.name.firstToUpperCase();
+			var classFirstChar = className.toLowerCase().charAt(0);
+			//Get @Id attribute properties
+			var idAttributeName = "";
+			var idAttributeTypeName = "";
+			for(attribute in class.structuredElements){
+				if(attribute.isTypeOf(java!Attribute)){
+					for(annotation in attribute.annotations){
+						if(annotation.name == "Id"){
+							idAttributeName = attribute.name.firstToUpperCase();
+							idAttributeTypeName = attribute.getTypeName();
+							break;
+						}
+					}
+				}
+			}
+	%]
+	
+	/*
+	* [%=className%]
+	*/
+	public List<[%=className%]> get[%=className%]s()
+	{
+		Query q = em.createQuery("SELECT [%=classFirstChar%] FROM [%=className%] [%=classFirstChar%]");
+        return q.getResultList();
+	}
+	
+	public void add[%=className%]([%=className%] [%=className.firstToLowerCase()%])
+	{
+		em.getTransaction().begin();
+        em.persist([%=className.firstToLowerCase()%]);
+        em.getTransaction().commit();
+	}
+	[%
+			var attributesNamesStr = "";
+			for(attribute in class.structuredElements){
+				if(attribute.isTypeOf(java!Attribute)){
+					//Print getter
+					var attributeName = attribute.name.firstToLowerCase();
+					var attributeTypeName = attribute.getTypeName();
+					attributesNamesStr = attributesNamesStr.concat(attributeTypeName).concat(" ").concat(attributeName).concat(", ");
+				}
+			}
+			attributesNamesStr = attributesNamesStr.substring(0, attributesNamesStr.length()-2);
+	%]
+	public void edit[%=className%]([%=attributesNamesStr%])	
+	{
+		[%=className%] [%=className.firstToLowerCase()%] = em.find([%=className%].class, [%=idAttributeName.firstToLowerCase()%]);
+		em.getTransaction().begin();
+		
+		[%
+		for(attribute in class.structuredElements){
+			if(idAttributeName.firstToLowerCase() <> attribute.name.firstToLowerCase()){
+		%]
+		[%=className.firstToLowerCase()%].set[%=attribute.name.firstToUpperCase()%]([%=attribute.name.firstToLowerCase()%]);
+		[%
+			}
+		}
+		%]
+		em.getTransaction().commit();
+	}
+	
+	public void delete[%=className%]([%=idAttributeTypeName%] [%=idAttributeName.firstToLowerCase()%])
+	{
+		[%=className%] [%=className.firstToLowerCase()%] = em.find([%=className%].class, [%=idAttributeName.firstToLowerCase()%]);
+		em.getTransaction().begin();
+		em.remove([%=className.firstToLowerCase()%]);
+		em.getTransaction().commit();
+	}
+	
+	public [%=className%] get[%=className%]([%=idAttributeTypeName%] [%=idAttributeName.firstToLowerCase()%])
+	{
+		return em.find([%=className%].class, [%=idAttributeName.firstToLowerCase()%]);
+	}
+	[%
+		}
+	}
+%]
+}
+[%
+operation java!Attribute getTypeName() : String {
+	var attributeTypeName = "";	
+	if(self.type.isTypeOf(java!Primitive)){
+		attributeTypeName = self.type.primitiveType.literal;
+	} else {
+		attributeTypeName = self.type.name;
+	}
+	return attributeTypeName;
+}
+%]

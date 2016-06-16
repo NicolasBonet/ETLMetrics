@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/metamodeloJava/src" modelPluginID="metamodeloJava"
+    modelName="MetamodeloJava" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="8.0" copyrightFields="false"
+    operationReflection="true" importOrganizing="true">
+  <foreignModel>metamodeloJava.ecore</foreignModel>
+  <genPackages prefix="MetamodeloJava" disposableProviderFactory="true" ecorePackage="metamodeloJava.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="metamodeloJava.ecore#//ModifierEnum">
+      <genEnumLiterals ecoreEnumLiteral="metamodeloJava.ecore#//ModifierEnum/PUBLIC"/>
+      <genEnumLiterals ecoreEnumLiteral="metamodeloJava.ecore#//ModifierEnum/PRIVATE"/>
+      <genEnumLiterals ecoreEnumLiteral="metamodeloJava.ecore#//ModifierEnum/PROTECTED"/>
+      <genEnumLiterals ecoreEnumLiteral="metamodeloJava.ecore#//ModifierEnum/ABSTRACT"/>
+      <genEnumLiterals ecoreEnumLiteral="metamodeloJava.ecore#//ModifierEnum/STATIC"/>
+      <genEnumLiterals ecoreEnumLiteral="metamodeloJava.ecore#//ModifierEnum/FINAL"/>
+      <genEnumLiterals ecoreEnumLiteral="metamodeloJava.ecore#//ModifierEnum/SYNCRONIZED"/>
+      <genEnumLiterals ecoreEnumLiteral="metamodeloJava.ecore#//ModifierEnum/TRANSIENT"/>
+      <genEnumLiterals ecoreEnumLiteral="metamodeloJava.ecore#//ModifierEnum/VOLATILE"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="metamodeloJava.ecore#//PrimitiveDataType">
+      <genEnumLiterals ecoreEnumLiteral="metamodeloJava.ecore#//PrimitiveDataType/INT"/>
+      <genEnumLiterals ecoreEnumLiteral="metamodeloJava.ecore#//PrimitiveDataType/BOOLEAN"/>
+      <genEnumLiterals ecoreEnumLiteral="metamodeloJava.ecore#//PrimitiveDataType/CHAR"/>
+      <genEnumLiterals ecoreEnumLiteral="metamodeloJava.ecore#//PrimitiveDataType/DOUBLE"/>
+      <genEnumLiterals ecoreEnumLiteral="metamodeloJava.ecore#//PrimitiveDataType/LONG"/>
+      <genEnumLiterals ecoreEnumLiteral="metamodeloJava.ecore#//PrimitiveDataType/FLOAT"/>
+      <genEnumLiterals ecoreEnumLiteral="metamodeloJava.ecore#//PrimitiveDataType/STRING"/>
+    </genEnums>
+    <genClasses ecoreClass="metamodeloJava.ecore#//Application">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Application/interfaces"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute metamodeloJava.ecore#//Application/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Application/types"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Application/modifiers"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Application/packages"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Application/classes"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Package/classes"/>
+    </genClasses>
+    <genClasses ecoreClass="metamodeloJava.ecore#//Class">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Class/attributes"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Class/methods"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Class/interfaces"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Class/superClass"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Class/modifiers"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Class/annotations"/>
+    </genClasses>
+    <genClasses ecoreClass="metamodeloJava.ecore#//Attribute">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Attribute/modifiers"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Attribute/jType"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute metamodeloJava.ecore#//Attribute/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Attribute/annotations"/>
+    </genClasses>
+    <genClasses ecoreClass="metamodeloJava.ecore#//Modifier">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute metamodeloJava.ecore#//Modifier/name"/>
+    </genClasses>
+    <genClasses ecoreClass="metamodeloJava.ecore#//Type">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute metamodeloJava.ecore#//Type/name"/>
+    </genClasses>
+    <genClasses ecoreClass="metamodeloJava.ecore#//Interface">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Interface/methods"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Interface/modifiers"/>
+    </genClasses>
+    <genClasses ecoreClass="metamodeloJava.ecore#//Method">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Method/parameters"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Method/modifiers"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Method/jType"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute metamodeloJava.ecore#//Method/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute metamodeloJava.ecore#//Method/isConstructor"/>
+    </genClasses>
+    <genClasses ecoreClass="metamodeloJava.ecore#//Parameter">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Parameter/jType"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute metamodeloJava.ecore#//Parameter/name"/>
+    </genClasses>
+    <genClasses ecoreClass="metamodeloJava.ecore#//PrimitiveType">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute metamodeloJava.ecore#//PrimitiveType/dataType"/>
+    </genClasses>
+    <genClasses ecoreClass="metamodeloJava.ecore#//Package">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute metamodeloJava.ecore#//Package/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Package/classes"/>
+    </genClasses>
+    <genClasses ecoreClass="metamodeloJava.ecore#//Annotation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute metamodeloJava.ecore#//Annotation/annotation"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute metamodeloJava.ecore#//Annotation/value"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference metamodeloJava.ecore#//Annotation/keyvalues"/>
+    </genClasses>
+    <genClasses ecoreClass="metamodeloJava.ecore#//KeyValue">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute metamodeloJava.ecore#//KeyValue/key"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute metamodeloJava.ecore#//KeyValue/value"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

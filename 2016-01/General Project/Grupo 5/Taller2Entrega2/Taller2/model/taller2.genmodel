@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/Taller2/src" modelPluginID="Taller2" modelName="Taller2"
+    rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="8.0" copyrightFields="false" operationReflection="true" importOrganizing="true">
+  <foreignModel>taller2.ecore</foreignModel>
+  <genPackages prefix="Taller2" disposableProviderFactory="true" ecorePackage="taller2.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="taller2.ecore#//TiposAtributo">
+      <genEnumLiterals ecoreEnumLiteral="taller2.ecore#//TiposAtributo/String"/>
+      <genEnumLiterals ecoreEnumLiteral="taller2.ecore#//TiposAtributo/int"/>
+      <genEnumLiterals ecoreEnumLiteral="taller2.ecore#//TiposAtributo/double"/>
+      <genEnumLiterals ecoreEnumLiteral="taller2.ecore#//TiposAtributo/float"/>
+      <genEnumLiterals ecoreEnumLiteral="taller2.ecore#//TiposAtributo/boolean"/>
+      <genEnumLiterals ecoreEnumLiteral="taller2.ecore#//TiposAtributo/byte"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="taller2.ecore#//Cardinalidades">
+      <genEnumLiterals ecoreEnumLiteral="taller2.ecore#//Cardinalidades/OneToOne"/>
+      <genEnumLiterals ecoreEnumLiteral="taller2.ecore#//Cardinalidades/OneToMany"/>
+      <genEnumLiterals ecoreEnumLiteral="taller2.ecore#//Cardinalidades/ManyToOne"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="taller2.ecore#//TiposRetorno">
+      <genEnumLiterals ecoreEnumLiteral="taller2.ecore#//TiposRetorno/void"/>
+      <genEnumLiterals ecoreEnumLiteral="taller2.ecore#//TiposRetorno/String"/>
+      <genEnumLiterals ecoreEnumLiteral="taller2.ecore#//TiposRetorno/int"/>
+      <genEnumLiterals ecoreEnumLiteral="taller2.ecore#//TiposRetorno/double"/>
+      <genEnumLiterals ecoreEnumLiteral="taller2.ecore#//TiposRetorno/float"/>
+      <genEnumLiterals ecoreEnumLiteral="taller2.ecore#//TiposRetorno/boolean"/>
+      <genEnumLiterals ecoreEnumLiteral="taller2.ecore#//TiposRetorno/byte"/>
+    </genEnums>
+    <genClasses ecoreClass="taller2.ecore#//Paquete">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute taller2.ecore#//Paquete/nombre"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference taller2.ecore#//Paquete/clases"/>
+    </genClasses>
+    <genClasses ecoreClass="taller2.ecore#//Clase">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute taller2.ecore#//Clase/nombre"/>
+      <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference taller2.ecore#//Clase/atributos"/>
+      <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference taller2.ecore#//Clase/relaciones"/>
+      <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference taller2.ecore#//Clase/metodos"/>
+      <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference taller2.ecore#//Clase/metodosUser"/>
+    </genClasses>
+    <genClasses ecoreClass="taller2.ecore#//Atributo">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute taller2.ecore#//Atributo/nombre"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute taller2.ecore#//Atributo/tipo"/>
+    </genClasses>
+    <genClasses ecoreClass="taller2.ecore#//Relacion">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute taller2.ecore#//Relacion/nombre"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference taller2.ecore#//Relacion/tipo"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute taller2.ecore#//Relacion/cardinalidad"/>
+    </genClasses>
+    <genClasses ecoreClass="taller2.ecore#//Metodo">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute taller2.ecore#//Metodo/nombre"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference taller2.ecore#//Metodo/parametros"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute taller2.ecore#//Metodo/tipoRetorno"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference taller2.ecore#//Metodo/parametrosUser"/>
+    </genClasses>
+    <genClasses ecoreClass="taller2.ecore#//Parametro">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute taller2.ecore#//Parametro/nombre"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute taller2.ecore#//Parametro/tipo"/>
+    </genClasses>
+    <genClasses ecoreClass="taller2.ecore#//MetodoUser">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference taller2.ecore#//MetodoUser/tipoRetorno"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute taller2.ecore#//MetodoUser/nombre"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference taller2.ecore#//MetodoUser/parametrosUser"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference taller2.ecore#//MetodoUser/parametros"/>
+    </genClasses>
+    <genClasses ecoreClass="taller2.ecore#//ParametroUser">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference taller2.ecore#//ParametroUser/tipo"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute taller2.ecore#//ParametroUser/nombre"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

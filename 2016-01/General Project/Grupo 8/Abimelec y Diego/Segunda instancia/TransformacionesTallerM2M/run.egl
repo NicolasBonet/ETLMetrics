@@ -1,0 +1,45 @@
+[% 
+for (clases in app!Class.all.sortBy(a|a.name)){
+	var nomClaseActual = clases.name;
+	var t:Template:= TemplateFactory.load('class.egl');
+	t.populate("nomClaseGenerando", clases.name);
+	
+	//Se verifica si el nomClaseActual que se esta contruyendo es referenciada desde otra clase 
+	var nomClaseReferencia= false;
+	for(clases in app!Class.all.select(a|a.name <> "")){
+		var nomClaseAux = clases.name;
+		
+		for(foreignC in clases.annotations.select(a|a.name = "foreign").parameters.select(a|a.key<>"")){
+		
+			if(foreignC.exists(a|a.value == nomClaseActual)){
+					nomClaseReferencia = nomClaseAux;
+		--			nomClaseActual.println(" Clase padre -> ");
+			--		nomClaseReferencia.println(" Tiene referencia -> ");
+				break;
+			} 
+		}
+	}
+	t.populate("nomClaseReferencia", nomClaseReferencia);
+		
+	t.generate("../TransformacionesTallerM2M/generated/co.edu.uniandes.taller2/src/marketplace/"+clases.name+'.java');
+	
+}
+
+//Para generar las clases de TEST
+for (clases in app!Class.all ){
+	
+	var nomClassActual = clases.name;
+	var test:Template:= TemplateFactory.load('testClass.egl');
+	
+	test.populate("nomClassGenerando", clases.name);
+	
+	test.generate("../TransformacionesTallerM2M/generated/co.edu.uniandes.taller2/src/test/java/"+clases.name+'Test.java');
+}
+
+//Para generar la clase Marketplace
+
+    var marketplace:Template:= TemplateFactory.load('market.egl');
+		
+	marketplace.generate("../TransformacionesTallerM2M/generated/co.edu.uniandes.taller2/src/marketplace/"+'MarketPlace.java');
+
+%]

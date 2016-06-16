@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/ToModeloJava/src" modelPluginID="ToModeloJava"
+    modelName="ToModeloJava" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="8.0" copyrightFields="false"
+    operationReflection="true" importOrganizing="true">
+  <foreignModel>toModeloJava.ecore</foreignModel>
+  <genPackages prefix="ToModeloJava" disposableProviderFactory="true" ecorePackage="toModeloJava.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="toModeloJava.ecore#//Type">
+      <genEnumLiterals ecoreEnumLiteral="toModeloJava.ecore#//Type/String"/>
+      <genEnumLiterals ecoreEnumLiteral="toModeloJava.ecore#//Type/int"/>
+      <genEnumLiterals ecoreEnumLiteral="toModeloJava.ecore#//Type/double"/>
+      <genEnumLiterals ecoreEnumLiteral="toModeloJava.ecore#//Type/List"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="toModeloJava.ecore#//typeReturn">
+      <genEnumLiterals ecoreEnumLiteral="toModeloJava.ecore#//typeReturn/String"/>
+      <genEnumLiterals ecoreEnumLiteral="toModeloJava.ecore#//typeReturn/int"/>
+      <genEnumLiterals ecoreEnumLiteral="toModeloJava.ecore#//typeReturn/Double"/>
+      <genEnumLiterals ecoreEnumLiteral="toModeloJava.ecore#//typeReturn/Void"/>
+      <genEnumLiterals ecoreEnumLiteral="toModeloJava.ecore#//typeReturn/List"/>
+    </genEnums>
+    <genClasses ecoreClass="toModeloJava.ecore#//Class">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute toModeloJava.ecore#//Class/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference toModeloJava.ecore#//Class/attributes"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference toModeloJava.ecore#//Class/methods"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference toModeloJava.ecore#//Class/annotations"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference toModeloJava.ecore#//Class/usertypes"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference toModeloJava.ecore#//Class/collectionatributes"/>
+    </genClasses>
+    <genClasses ecoreClass="toModeloJava.ecore#//Attribute">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute toModeloJava.ecore#//Attribute/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute toModeloJava.ecore#//Attribute/type"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference toModeloJava.ecore#//Attribute/annotations"/>
+    </genClasses>
+    <genClasses ecoreClass="toModeloJava.ecore#//Package">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference toModeloJava.ecore#//Package/classes"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute toModeloJava.ecore#//Package/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference toModeloJava.ecore#//Package/packages"/>
+    </genClasses>
+    <genClasses ecoreClass="toModeloJava.ecore#//Methods">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute toModeloJava.ecore#//Methods/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute toModeloJava.ecore#//Methods/returnType"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference toModeloJava.ecore#//Methods/parameters"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference toModeloJava.ecore#//Methods/annotations"/>
+    </genClasses>
+    <genClasses ecoreClass="toModeloJava.ecore#//Annotation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute toModeloJava.ecore#//Annotation/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference toModeloJava.ecore#//Annotation/anottationparameters"/>
+    </genClasses>
+    <genClasses ecoreClass="toModeloJava.ecore#//Parameter">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute toModeloJava.ecore#//Parameter/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute toModeloJava.ecore#//Parameter/type"/>
+    </genClasses>
+    <genClasses ecoreClass="toModeloJava.ecore#//AnottationParameter">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute toModeloJava.ecore#//AnottationParameter/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute toModeloJava.ecore#//AnottationParameter/value"/>
+    </genClasses>
+    <genClasses ecoreClass="toModeloJava.ecore#//Application">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference toModeloJava.ecore#//Application/packages"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute toModeloJava.ecore#//Application/name"/>
+    </genClasses>
+    <genClasses ecoreClass="toModeloJava.ecore#//UserType">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference toModeloJava.ecore#//UserType/class"/>
+    </genClasses>
+    <genClasses ecoreClass="toModeloJava.ecore#//CollectionAtribute">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference toModeloJava.ecore#//CollectionAtribute/class"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

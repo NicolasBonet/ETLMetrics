@@ -1,0 +1,688 @@
+<?xml version="1.0" encoding="ASCII"?>
+<JavaMM:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:JavaMM="http://co.edu.uniandes/javamm">
+  <package name="co.edu.uniandes.sqlcrud">
+    <subPackages name="src">
+      <subPackages name="utils">
+        <classifier xsi:type="JavaMM:Class" name="MarketPlace"/>
+        <classifier xsi:type="JavaMM:Class" name="PodamFactory"/>
+        <classifier xsi:type="JavaMM:Class" name="EntityManagerFactory"/>
+        <classifier xsi:type="JavaMM:Class" name="EntityManager"/>
+      </subPackages>
+      <subPackages name="test">
+        <classifier xsi:type="JavaMM:Class" name="ClientTest">
+          <structuredElements xsi:type="JavaMM:Attribute" name="mp" type="//@package.0/@subPackages.0/@subPackages.0/@classifier.0">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="factory" type="//@package.0/@subPackages.0/@subPackages.0/@classifier.1">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="prepareTest">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Before"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test1ClientAdd">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test2GetClient">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test3ClientEdit">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test4ClientDelete">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+        </classifier>
+        <classifier xsi:type="JavaMM:Class" name="ProductoTest">
+          <structuredElements xsi:type="JavaMM:Attribute" name="mp" type="//@package.0/@subPackages.0/@subPackages.0/@classifier.0">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="factory" type="//@package.0/@subPackages.0/@subPackages.0/@classifier.1">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="prepareTest">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Before"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test1ProductoAdd">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test2GetProducto">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test3ProductoEdit">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test4ProductoDelete">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+        </classifier>
+        <classifier xsi:type="JavaMM:Class" name="CarritoTest">
+          <structuredElements xsi:type="JavaMM:Attribute" name="mp" type="//@package.0/@subPackages.0/@subPackages.0/@classifier.0">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="factory" type="//@package.0/@subPackages.0/@subPackages.0/@classifier.1">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="prepareTest">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Before"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test1CarritoAdd">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test2GetCarrito">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test3CarritoEdit">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test4CarritoDelete">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+        </classifier>
+        <classifier xsi:type="JavaMM:Class" name="ItemTest">
+          <structuredElements xsi:type="JavaMM:Attribute" name="mp" type="//@package.0/@subPackages.0/@subPackages.0/@classifier.0">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="factory" type="//@package.0/@subPackages.0/@subPackages.0/@classifier.1">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="prepareTest">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Before"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test1ItemAdd">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test2GetItem">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test3ItemEdit">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test4ItemDelete">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+        </classifier>
+        <classifier xsi:type="JavaMM:Class" name="CarritoitemTest">
+          <structuredElements xsi:type="JavaMM:Attribute" name="mp" type="//@package.0/@subPackages.0/@subPackages.0/@classifier.0">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="factory" type="//@package.0/@subPackages.0/@subPackages.0/@classifier.1">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="prepareTest">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Before"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test1CarritoitemAdd">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test2GetCarritoitem">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test3CarritoitemEdit">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="test4CarritoitemDelete">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <annotations name="@Test"/>
+          </structuredElements>
+        </classifier>
+      </subPackages>
+      <subPackages name="marketplace">
+        <classifier xsi:type="JavaMM:Class" name="Client">
+          <structuredElements xsi:type="JavaMM:Method" returnValue="//@package.0/@subPackages.0/@subPackages.2/@classifier.0">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="id" type="//@datatype.1">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+            <annotations name="@Id"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getId" returnValue="//@datatype.1">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="setId">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="id" type="//@datatype.1"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="password" type="//@datatype.0">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getPassword" returnValue="//@datatype.0">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="setPassword">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="password" type="//@datatype.0"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="name" type="//@datatype.0">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getName" returnValue="//@datatype.0">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="setName">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="name" type="//@datatype.0"/>
+          </structuredElements>
+        </classifier>
+        <classifier xsi:type="JavaMM:Class" name="Producto">
+          <structuredElements xsi:type="JavaMM:Method" returnValue="//@package.0/@subPackages.0/@subPackages.2/@classifier.1">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="id" type="//@datatype.1">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+            <annotations name="@Id"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getId" returnValue="//@datatype.1">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="setId">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="id" type="//@datatype.1"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="name" type="//@datatype.0">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getName" returnValue="//@datatype.0">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="setName">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="name" type="//@datatype.0"/>
+          </structuredElements>
+        </classifier>
+        <classifier xsi:type="JavaMM:Class" name="Carrito">
+          <structuredElements xsi:type="JavaMM:Method" returnValue="//@package.0/@subPackages.0/@subPackages.2/@classifier.2">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="id" type="//@datatype.1">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+            <annotations name="@Id"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getId" returnValue="//@datatype.1">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="setId">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="id" type="//@datatype.1"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="client" type="//@package.0/@subPackages.0/@subPackages.2/@classifier.0">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+            <annotations name="@ManyToOne">
+              <parameters key="fetch" value="FetchType.LAZY"/>
+              <parameters key="cascade" value="CascadeType.PERSIST"/>
+            </annotations>
+            <annotations name="@PrimaryKeyJoinColumn"/>
+            <annotations name="@PodamExclude"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getClient" returnValue="//@package.0/@subPackages.0/@subPackages.2/@classifier.0">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="setClient">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="client" type="//@package.0/@subPackages.0/@subPackages.2/@classifier.0"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="name" type="//@datatype.0">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getName" returnValue="//@datatype.0">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="setName">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="name" type="//@datatype.0"/>
+          </structuredElements>
+        </classifier>
+        <classifier xsi:type="JavaMM:Class" name="Item">
+          <structuredElements xsi:type="JavaMM:Method" returnValue="//@package.0/@subPackages.0/@subPackages.2/@classifier.3">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="id" type="//@datatype.1">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+            <annotations name="@Id"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getId" returnValue="//@datatype.1">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="setId">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="id" type="//@datatype.1"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="producto" type="//@package.0/@subPackages.0/@subPackages.2/@classifier.1">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+            <annotations name="@ManyToOne">
+              <parameters key="fetch" value="FetchType.LAZY"/>
+              <parameters key="cascade" value="CascadeType.PERSIST"/>
+            </annotations>
+            <annotations name="@PrimaryKeyJoinColumn"/>
+            <annotations name="@PodamExclude"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getProducto" returnValue="//@package.0/@subPackages.0/@subPackages.2/@classifier.1">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="setProducto">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="producto" type="//@package.0/@subPackages.0/@subPackages.2/@classifier.1"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="cantidad" type="//@datatype.1">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getCantidad" returnValue="//@datatype.1">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="setCantidad">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="cantidad" type="//@datatype.1"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="name" type="//@datatype.0">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getName" returnValue="//@datatype.0">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="setName">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="name" type="//@datatype.0"/>
+          </structuredElements>
+        </classifier>
+        <classifier xsi:type="JavaMM:Class" name="Carritoitem">
+          <structuredElements xsi:type="JavaMM:Method" returnValue="//@package.0/@subPackages.0/@subPackages.2/@classifier.4">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="id" type="//@datatype.1">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+            <annotations name="@Id"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getId" returnValue="//@datatype.1">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="setId">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="id" type="//@datatype.1"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="carrito" type="//@package.0/@subPackages.0/@subPackages.2/@classifier.2">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+            <annotations name="@ManyToOne">
+              <parameters key="fetch" value="FetchType.LAZY"/>
+              <parameters key="cascade" value="CascadeType.PERSIST"/>
+            </annotations>
+            <annotations name="@PrimaryKeyJoinColumn"/>
+            <annotations name="@PodamExclude"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getCarrito" returnValue="//@package.0/@subPackages.0/@subPackages.2/@classifier.2">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="setCarrito">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="carrito" type="//@package.0/@subPackages.0/@subPackages.2/@classifier.2"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="item" type="//@package.0/@subPackages.0/@subPackages.2/@classifier.3">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+            <annotations name="@ManyToOne">
+              <parameters key="fetch" value="FetchType.LAZY"/>
+              <parameters key="cascade" value="CascadeType.PERSIST"/>
+            </annotations>
+            <annotations name="@PrimaryKeyJoinColumn"/>
+            <annotations name="@PodamExclude"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getItem" returnValue="//@package.0/@subPackages.0/@subPackages.2/@classifier.3">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="setItem">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="item" type="//@package.0/@subPackages.0/@subPackages.2/@classifier.3"/>
+          </structuredElements>
+        </classifier>
+        <classifier xsi:type="JavaMM:Class" name="MarketPlace">
+          <structuredElements xsi:type="JavaMM:Attribute" name="PERSISTENCE_UNIT_NAME" type="//@datatype.0">
+            <modifier>
+              <modifiers>private</modifiers>
+              <modifiers>static</modifiers>
+              <modifiers>final</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="emf" type="//@package.0/@subPackages.0/@subPackages.0/@classifier.2">
+            <modifier>
+              <modifiers>private</modifiers>
+              <modifiers>static</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Attribute" name="em" type="//@package.0/@subPackages.0/@subPackages.0/@classifier.3">
+            <modifier>
+              <modifiers>private</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" returnValue="//@package.0/@subPackages.0/@subPackages.2/@classifier.5">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getClients">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="addClient">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="client"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="editClient">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="deleteClient">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getClient">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getProductos">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="addProducto">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="producto"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="editProducto">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="deleteProducto">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getProducto">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getCarritos">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="addCarrito">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="carrito"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="editCarrito">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="deleteCarrito">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getCarrito">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getItems">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="addItem">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="item"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="editItem">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="deleteItem">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getItem">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getCarritoitems">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="addCarritoitem">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+            <parameters name="carritoitem"/>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="editCarritoitem">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="deleteCarritoitem">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+          <structuredElements xsi:type="JavaMM:Method" name="getCarritoitem">
+            <modifier>
+              <modifiers>public</modifiers>
+            </modifier>
+          </structuredElements>
+        </classifier>
+      </subPackages>
+    </subPackages>
+  </package>
+  <datatype xsi:type="JavaMM:Primitive" primitiveType="String"/>
+  <datatype xsi:type="JavaMM:Primitive"/>
+</JavaMM:Application>
