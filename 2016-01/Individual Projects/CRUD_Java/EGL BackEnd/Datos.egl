@@ -1,0 +1,52 @@
+package GIA.PortalEmpleo.Datos;
+
+import java.util.List;
+
+import org.hibernate.SessionFactory;
+import com.google.common.base.Optional;
+
+import GIA.PortalEmpleo.Negocio.[%=bEntity.name%];
+import io.dropwizard.hibernate.AbstractDAO;
+
+//Clase de datos de [%=bEntity.name.firstToLowerCase()%]
+public class [%=bEntity.name%]DAL extends AbstractDAO<[%=bEntity.name%]> {
+
+	// Crea la sesion en BD de [%=bEntity.name.firstToLowerCase()%]
+	public [%=bEntity.name%]DAL(SessionFactory factory) {
+		super(factory);
+	}
+
+	// Obtiene un registro de [%=bEntity.name.firstToLowerCase()%] por id
+	public Optional<[%=bEntity.name%]> getById(Long id) {
+		return Optional.fromNullable(get(id));
+	}
+
+	// Crea un registro de [%=bEntity.name.firstToLowerCase()%]
+	public [%=bEntity.name%] create[%=bEntity.name%]([%=bEntity.name%] [%=bEntity.name.firstToLowerCase()%]) {
+		return persist([%=bEntity.name.firstToLowerCase()%]);
+	}
+
+	// Modifica un registro de [%=bEntity.name.firstToLowerCase()%]
+	public [%=bEntity.name%] update[%=bEntity.name%]([%=bEntity.name%] [%=bEntity.name.firstToLowerCase()%]) {		
+	   		return persist([%=bEntity.name.firstToLowerCase()%]);
+	}
+	
+	// Elimina un registro de [%=bEntity.name.firstToLowerCase()%]
+    public void delete[%=bEntity.name%]([%=bEntity.name%] [%=bEntity.name.firstToLowerCase()%]) {    	
+		   currentSession().delete([%=bEntity.name.firstToLowerCase()%]);		
+    }
+	
+    // Obtiene una lista de registros de [%=bEntity.name.firstToLowerCase()%]
+	public List<[%=bEntity.name%]> get[%=bEntity.name%]s() {
+		return list(namedQuery("[%=bEntity.name%].get[%=bEntity.name%]s"));
+	}
+  
+ [%for (association in Association.allInstances.select(a | a.typeAssociation = 'Composition')){
+ 	if (association.target = bEntity.name){%]
+	// Obtiene una lista de registros de [%=bEntity.name.firstToLowerCase()%] por [%=association.source.firstToLowerCase()%]
+	public List<[%=bEntity.name%]> get[%=bEntity.name%]sBy[%=association.source%](Long id[%=association.source%]) {
+		return list(namedQuery("[%=bEntity.name%].get[%=bEntity.name%]sBy[%=association.source%]").setParameter("id[%=association.source%]", id[%=association.source%]));		
+	} 	
+ 	[%}
+ }%]
+}

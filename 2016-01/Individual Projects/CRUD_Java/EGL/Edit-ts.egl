@@ -1,0 +1,102 @@
+/// <reference path="../../../../../typings/tsd.d.ts" />
+
+// Angular 2
+import {Component, View, Directive, coreDirectives} from 'angular2/angular2';
+import {formDirectives, FormBuilder, Control, ControlGroup, Validators} from 'angular2/forms';
+import {RouteParams, Router} from 'angular2/router';
+import {Inject} from 'angular2/di';
+
+import {[%=webPage.entityName%]Service} from '../../services/[%=webPage.entityName%]Service';
+import {[%=webPage.entityName%]} from '../../models/[%=webPage.entityName%]';
+
+
+// Simple component
+@Component({
+    selector: 'edit-[%=webPage.entityName.firstToLowerCase()%]'
+})
+
+@View({
+    templateUrl: './app/pages/edit/edit-[%=webPage.entityName.firstToLowerCase()%].html',
+	directives: [coreDirectives, formDirectives]
+})
+
+export class Edit[%=webPage.entityName%] {
+    edit[%=webPage.entityName%]Form: ControlGroup;
+[%for (input in Modelo.allInstances().select(m | m.name = webPage.entityName).first().attributes){%]
+	[%=input.name%]Input: Control;
+[%}%]
+
+    [%=webPage.entityName.firstToLowerCase()%]: [%=webPage.entityName%];
+
+[%if (webPage.master <> ''){%]
+	id:string;
+	idMaster:string;
+[%}%]
+   
+    canShowUpdateSuccessMsg: boolean;
+    canShowUpdateFailedMsg: boolean;
+    updateFailedMsg: string;
+
+    constructor(@Inject(RouteParams) params, public [%=webPage.entityName.firstToLowerCase()%]Service:[%=webPage.entityName%]Service, public formBuilder: FormBuilder, private router:Router) {
+        this.[%=webPage.entityName.firstToLowerCase()%] = new [%=webPage.entityName%]();
+        this.canShowUpdateFailedMsg = false;
+        this.canShowUpdateSuccessMsg = false;
+        this.updateFailedMsg = null;
+
+[%if (webPage.master <> ''){%]
+		this.id = params.get('id');
+		this.idMaster = params.get('idMaster');
+[%}%]
+        this.get[%=webPage.entityName%](params.get('id'));
+
+        this.edit[%=webPage.entityName%]Form = <ControlGroup>formBuilder.group({
+[%
+var size = Modelo.allInstances().select(m | m.name = webPage.entityName).first().attributes.size();
+for (input in Modelo.allInstances().select(m | m.name = webPage.entityName).first().attributes){%]
+			'[%=input.name%]': [%if (input.isPK = true or input.isRequired = false){%][''][%}else{%]['', Validators.required][%}if (input.name <> Modelo.allInstances().select(m | m.name = webPage.entityName).first().attributes.get(size-1).name){%],
+[%}
+}%]
+        });
+
+[%for (input in Modelo.allInstances().select(m | m.name = webPage.entityName).first().attributes){%]
+		this.[%=input.name%]Input = this.edit[%=webPage.entityName%]Form.controls.[%=input.name%];
+[%}%]
+    }
+
+    get[%=webPage.entityName%](id:string) {
+        this.[%=webPage.entityName.firstToLowerCase()%]Service.get[%=webPage.entityName%]([%if (webPage.master <> ""){%]this.idMaster, [%}%]id)
+            .map(res => res.json())
+            .subscribe(res => this.[%=webPage.entityName.firstToLowerCase()%] = [%=webPage.entityName%].fromJSON(res));
+    }
+
+    update[%=webPage.entityName%]_successHandler(response) {
+        if (response.status !== 200) {
+            this.canShowUpdateFailedMsg = true;
+            this.updateFailedMsg = 'La actualización ha fallado';
+        }
+
+        response.json().then(data => {
+            this.canShowUpdateSuccessMsg = true;
+            this.[%=webPage.entityName.firstToLowerCase()%] = [%=webPage.entityName%].fromJSON(data);
+        });
+    }
+
+    update[%=webPage.entityName%]_errorHandler(error) {
+        this.updateFailedMsg = error;
+    }
+
+    update[%=webPage.entityName%]() {
+        this.canShowUpdateSuccessMsg = false;
+        this.canShowUpdateFailedMsg = false;
+		
+        this.[%=webPage.entityName.firstToLowerCase()%]Service.update[%=webPage.entityName%](this.[%=webPage.entityName.firstToLowerCase()%].toJSON([%if (webPage.master <> ""){%]this.idMaster), this.idMaster[%}else{%])[%}%])
+            .then(response => this.update[%=webPage.entityName%]_successHandler(response))
+            .catch(error => this.update[%=webPage.entityName%]_errorHandler(error));
+    }
+
+[%if (webPage.master <> ''){%]	
+	volver(){
+		this.router.parent.navigate('/list[%=webPage.entityName%]/' + this.idMaster);
+	}
+[%}%]
+}

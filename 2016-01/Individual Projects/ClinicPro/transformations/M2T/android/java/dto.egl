@@ -1,0 +1,142 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO LAS CLASES DTO ASOCIADAS A CADA ENTIDAD
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+package app.hospital.uniandes.edu.co.hospital.dtos;
+
+/**
+ * Created by diego on 17/04/2016.
+ */
+ 
+//variables generadas por GENERADOR
+        [% 
+			var atributos="";
+			for (activity in AndroidApplication!Activity.all){
+		
+				var nomActivityActual = activity.name;
+				
+				if(nombreClaseGenerar==nomActivityActual){
+				
+				%]
+public class [%=nombreClaseGenerar%]DTO {
+
+    private Long id;
+
+				[%
+				--verifico los componentes que hacen la activity.
+					for(atributos in activity.components){
+					--verifico el tipo de campo que viene.
+						if(atributos.isTypeOf(TextField))
+						{
+							if(atributos.type.isTypeOf(EEnumLiteral))
+							{
+								if(atributos.type.literal=='Number'){
+								    var name=atributos.name.firstToLowerCase();		
+									%]
+	private Long  [%=name%];						        	
+									[%
+
+								}
+								if(atributos.type.literal=='Double'){
+								    var name=atributos.name.firstToLowerCase();		
+									%]
+	private Double  [%=name%];						        	
+									[%
+
+								}
+								if(atributos.type.literal=='Text'){
+										var name=atributos.name.firstToLowerCase();
+										--parametrizacion mientras
+										
+									%]
+	private String [%=name%];
+									[%
+							 	}
+							}									
+						}
+					}
+				}
+			}
+%]
+ 
+ 
+//metodos generados por GENERADOR
+ 
+       [% 
+			var atributos="";
+			for (activity in AndroidApplication!Activity.all){
+		
+				var nomActivityActual = activity.name;
+				
+				if(nombreClaseGenerar==nomActivityActual){
+
+				--verifico los componentes que hacen la activity.
+					for(atributos in activity.components){
+					--verifico el tipo de campo que viene.
+					var nameMin=atributos.name.firstToLowerCase();
+					var nameMay=atributos.name.firstToUpperCase();	
+						if(atributos.isTypeOf(TextField))
+						{
+							if(atributos.type.isTypeOf(EEnumLiteral))
+							{
+								if(atributos.type.literal=='Number'){
+								    	
+									%]
+public Long get[%=nameMay%]() {
+        return [%=nameMin%];
+}
+
+public void set[%=nameMay%](Long [%=nameMin%]) {
+        this.[%=nameMin%] = [%=nameMin%];
+}
+						        	
+									[%
+
+								}
+								if(atributos.type.literal=='Double'){
+								    var name=atributos.name.firstToLowerCase();		
+									%]
+public Double get[%=nameMay%]() {
+        return [%=nameMin%];
+}
+
+public void set[%=nameMay%](Double [%=nameMin%]) {
+        this.[%=nameMin%] = [%=nameMin%];
+}					        	
+									[%
+
+								}
+								if(atributos.type.literal=='Text'){
+										var name=atributos.name.firstToLowerCase();
+										--parametrizacion mientras
+										
+									%]
+public String get[%=nameMay%]() {
+        return [%=nameMin%];
+}
+
+public void set[%=nameMay%](String [%=nameMin%]) {
+        this.[%=nameMin%] = [%=nameMin%];
+}
+									[%
+							 	}
+							}									
+						}
+					}
+				}
+			}
+%]
+public Long getId() {
+        return id;
+}
+
+public void setId(Long id) {
+        this.id = id;
+}
+
+}

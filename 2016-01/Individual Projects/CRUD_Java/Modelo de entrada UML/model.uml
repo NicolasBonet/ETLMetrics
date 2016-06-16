@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Profile="http:///schemas/Profile/_bU6oUB1BEeaEnquhDn4fcQ/15" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xsi:schemaLocation="http:///schemas/Profile/_bU6oUB1BEeaEnquhDn4fcQ/15 ../PerfilPortalEmpleo/model.profile.uml#_bVEZUB1BEeaEnquhDn4fcQ">
+  <uml:Model xmi:id="_ftpBsBfTEeahurcidpmMQg" name="model">
+    <packagedElement xmi:type="uml:Enumeration" xmi:id="_dRF_YBfWEeahurcidpmMQg" name="TipoIdentificacion">
+      <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_dRF_YRfWEeahurcidpmMQg" name="CEDULA"/>
+      <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_dRF_YhfWEeahurcidpmMQg" name="NIT"/>
+      <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_dRF_YxfWEeahurcidpmMQg" name="PASAPORTE"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_8yssUBfTEeahurcidpmMQg" name="Usuario">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_CsUyIBfUEeahurcidpmMQg" name="id">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EBigInteger"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_DMp4ABfUEeahurcidpmMQg" name="nombre">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_DpwqwBfUEeahurcidpmMQg" name="correo">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_ELllcBfUEeahurcidpmMQg" name="tipoIdentificacion" type="_dRF_YBfWEeahurcidpmMQg"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_Fp59kBfUEeahurcidpmMQg" name="numeroIdentificacion">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_KdZ2EBgGEeaNcLq85Z6Ftw" memberEnd="_KdZ2ERgGEeaNcLq85Z6Ftw _KdWLsBgGEeaNcLq85Z6Ftw">
+      <ownedEnd xmi:type="uml:Property" xmi:id="_KdZ2ERgGEeaNcLq85Z6Ftw" name="aspirante" type="_1naYEBfYEeahurcidpmMQg" association="_KdZ2EBgGEeaNcLq85Z6Ftw">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_KdZ2EhgGEeaNcLq85Z6Ftw" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_KdZ2ExgGEeaNcLq85Z6Ftw" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_1naYEBfYEeahurcidpmMQg" name="Aspirante">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_KdWLsBgGEeaNcLq85Z6Ftw" name="usuario" type="_8yssUBfTEeahurcidpmMQg" association="_KdZ2EBgGEeaNcLq85Z6Ftw">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_KdWLsRgGEeaNcLq85Z6Ftw" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_KdWLshgGEeaNcLq85Z6Ftw" value="1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_EemjEBgLEeaNcLq85Z6Ftw" name="edad">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EInt"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_E92D0BgLEeaNcLq85Z6Ftw" name="profesion">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_MtgVUBlXEearK-AUN8iltg" name="class1" type="_-k1xgBlWEearK-AUN8iltg" association="_MtkmwBlXEearK-AUN8iltg">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_MtgVURlXEearK-AUN8iltg" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_MtgVUhlXEearK-AUN8iltg" value="1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_y5AnEBlXEearK-AUN8iltg" name="informacionAcademica" type="__MpYYBlWEearK-AUN8iltg" association="_y5CcQBlXEearK-AUN8iltg">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_y5AnERlXEearK-AUN8iltg" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_y5AnEhlXEearK-AUN8iltg" value="1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_eP9cEB4QEeaezIXUppLYmA" name="otroIdioma">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_pil5AB4zEeafEp8wFGkLhw" name="ciudad">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_2F6R8BfYEeahurcidpmMQg" name="Empresa">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_LvvAoBgGEeaNcLq85Z6Ftw" name="usuario" type="_8yssUBfTEeahurcidpmMQg" association="_LvyrABgGEeaNcLq85Z6Ftw">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_LvvAoRgGEeaNcLq85Z6Ftw" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_LvvAohgGEeaNcLq85Z6Ftw" value="1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_LHJkYBgLEeaNcLq85Z6Ftw" name="sectorEconomico">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_TFcSUBlYEearK-AUN8iltg" name="vacante" type="_A2nKYBlYEearK-AUN8iltg" association="_TFdgcBlYEearK-AUN8iltg">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_TFcSURlYEearK-AUN8iltg" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_TFcSUhlYEearK-AUN8iltg" value="1"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_LvyrABgGEeaNcLq85Z6Ftw" memberEnd="_LvyrARgGEeaNcLq85Z6Ftw _LvvAoBgGEeaNcLq85Z6Ftw">
+      <name xsi:nil="true"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_LvyrARgGEeaNcLq85Z6Ftw" name="empresa" type="_2F6R8BfYEeahurcidpmMQg" association="_LvyrABgGEeaNcLq85Z6Ftw">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_LvyrAhgGEeaNcLq85Z6Ftw" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_LvyrAxgGEeaNcLq85Z6Ftw" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Enumeration" xmi:id="_Hd7O4BlTEeaKx8rCiG99Mg" name="Enumeration1">
+      <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_IG4sUBlTEeaKx8rCiG99Mg" name="EnumerationLiteral1"/>
+      <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_IdhDoBlTEeaKx8rCiG99Mg" name="EnumerationLiteral2"/>
+      <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_I4w1MBlTEeaKx8rCiG99Mg" name="EnumerationLiteral3"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_-k1xgBlWEearK-AUN8iltg" name="Empleo">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_Y7IIwBlXEearK-AUN8iltg" name="id">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EBigInteger"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_fti3wBlXEearK-AUN8iltg" name="compania">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_itnWgBlXEearK-AUN8iltg" name="cargo">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_dqGe0BpTEeaZOrjf_yqzfw" name="desde">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EDate"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_h6jnYBpTEeaZOrjf_yqzfw" name="hasta">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EDate"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="__MpYYBlWEearK-AUN8iltg" name="Estudio">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_cHhzUBlXEearK-AUN8iltg" name="id">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EBigInteger"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_nQxYoBlXEearK-AUN8iltg" name="institucion">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_plyvQBlXEearK-AUN8iltg" name="tituloObtenido">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_21AoEBpTEeaZOrjf_yqzfw" name="desde">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EDate"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_57ge8BpTEeaZOrjf_yqzfw" name="hasta">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EDate"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_MtkmwBlXEearK-AUN8iltg" memberEnd="_MtkmwRlXEearK-AUN8iltg _MtgVUBlXEearK-AUN8iltg">
+      <name xsi:nil="true"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_MtkmwRlXEearK-AUN8iltg" name="aspirante" type="_1naYEBfYEeahurcidpmMQg" association="_MtkmwBlXEearK-AUN8iltg">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_MtkmwhlXEearK-AUN8iltg" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_MtkmwxlXEearK-AUN8iltg" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_y5CcQBlXEearK-AUN8iltg" memberEnd="_y5CcQRlXEearK-AUN8iltg _y5AnEBlXEearK-AUN8iltg">
+      <name xsi:nil="true"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_y5CcQRlXEearK-AUN8iltg" name="aspirante" type="_1naYEBfYEeahurcidpmMQg" association="_y5CcQBlXEearK-AUN8iltg">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_y5CcQhlXEearK-AUN8iltg" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_y5CcQxlXEearK-AUN8iltg" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_A2nKYBlYEearK-AUN8iltg" name="Vacante">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_H1Uo8BlYEearK-AUN8iltg" name="id">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EBigInteger"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_JipGYBlYEearK-AUN8iltg" name="cargo">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_K6V5IBlYEearK-AUN8iltg" name="salario">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EDouble"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_MDMXkBlYEearK-AUN8iltg" name="fechaIngreso">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EDate"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_NQf4MBlYEearK-AUN8iltg" name="fechaPublicacion">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EDate"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_PsUaYBlYEearK-AUN8iltg" name="fechaCierre">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EDate"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_aK5pgBpSEeaZOrjf_yqzfw" name="descripcion">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_TFdgcBlYEearK-AUN8iltg" memberEnd="_TFdgcRlYEearK-AUN8iltg _TFcSUBlYEearK-AUN8iltg">
+      <name xsi:nil="true"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_TFdgcRlYEearK-AUN8iltg" name="empresa" type="_2F6R8BfYEeahurcidpmMQg" association="_TFdgcBlYEearK-AUN8iltg">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_TFdgchlYEearK-AUN8iltg" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_TFdgcxlYEearK-AUN8iltg" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_KdXaoBfWEeahurcidpmMQg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_drs5gB1BEeaEnquhDn4fcQ" source="PapyrusVersion">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_drs5gR1BEeaEnquhDn4fcQ" key="Version" value="0.0.16"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_drs5gh1BEeaEnquhDn4fcQ" key="Comment" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_drs5gx1BEeaEnquhDn4fcQ" key="Copyright" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_drs5hB1BEeaEnquhDn4fcQ" key="Date" value="2016-05-18"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_drs5hR1BEeaEnquhDn4fcQ" key="Author" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Ke99IBfWEeahurcidpmMQg" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="../PerfilPortalEmpleo/model.profile.uml#_bVEZUB1BEeaEnquhDn4fcQ"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="../PerfilPortalEmpleo/model.profile.uml#_rklwcAaOEearhvWsIbtNcQ"/>
+    </profileApplication>
+  </uml:Model>
+  <Profile:Heritage xmi:id="_UWzAQBgKEeaNcLq85Z6Ftw" base_Association="_KdZ2EBgGEeaNcLq85Z6Ftw" source="Aspirante" target="Usuario"/>
+  <Profile:Heritage xmi:id="_A4Tx0BgLEeaNcLq85Z6Ftw" base_Association="_LvyrABgGEeaNcLq85Z6Ftw" source="Empresa" target="Usuario"/>
+  <Profile:Attribute xmi:id="_VVWdwBgLEeaNcLq85Z6Ftw" base_Property="_CsUyIBfUEeahurcidpmMQg" isPrimaryKey="true" isRequired="true"/>
+  <Profile:Attribute xmi:id="_avsmkBgLEeaNcLq85Z6Ftw" base_Property="_DMp4ABfUEeahurcidpmMQg" isRequired="true" showInGrid="true" label="Nombre"/>
+  <Profile:Attribute xmi:id="_ejkg0BgLEeaNcLq85Z6Ftw" base_Property="_DpwqwBfUEeahurcidpmMQg" isRequired="true" label="Correo"/>
+  <Profile:Attribute xmi:id="_jJN2QBgLEeaNcLq85Z6Ftw" base_Property="_ELllcBfUEeahurcidpmMQg" isRequired="true" showInGrid="true" label="Tipo Ident"/>
+  <Profile:Attribute xmi:id="_qAZwgBgLEeaNcLq85Z6Ftw" base_Property="_Fp59kBfUEeahurcidpmMQg" isRequired="true" showInGrid="true" label="Identificacion"/>
+  <Profile:Attribute xmi:id="_u_2GABgLEeaNcLq85Z6Ftw" base_Property="_EemjEBgLEeaNcLq85Z6Ftw" isRequired="true" label="Edad"/>
+  <Profile:Attribute xmi:id="_xSHDkBgLEeaNcLq85Z6Ftw" base_Property="_E92D0BgLEeaNcLq85Z6Ftw" isRequired="true" label="Profesion"/>
+  <Profile:Attribute xmi:id="_4iT6wBgLEeaNcLq85Z6Ftw" base_Property="_LHJkYBgLEeaNcLq85Z6Ftw" isRequired="true" label="Sector economico"/>
+  <Profile:Entity xmi:id="_mudlABgTEeaFm-pmCHg2Lg" base_Class="_2F6R8BfYEeahurcidpmMQg"/>
+  <Profile:Entity xmi:id="_nlFrABgTEeaFm-pmCHg2Lg" base_Class="_1naYEBfYEeahurcidpmMQg"/>
+  <Profile:Entity xmi:id="_hsLMsBhcEeaxtbJT3SvK-w" base_Class="_8yssUBfTEeahurcidpmMQg" isAbstract="true"/>
+  <Profile:Entity xmi:id="_VaEc0BlXEearK-AUN8iltg" base_Class="_-k1xgBlWEearK-AUN8iltg"/>
+  <Profile:Entity xmi:id="_WdPKABlXEearK-AUN8iltg" base_Class="__MpYYBlWEearK-AUN8iltg"/>
+  <Profile:Composition xmi:id="_0rWHYBlXEearK-AUN8iltg" base_Association="_y5CcQBlXEearK-AUN8iltg" source="Aspirante" target="Estudio"/>
+  <Profile:Composition xmi:id="_5Jo3oBlXEearK-AUN8iltg" base_Association="_MtkmwBlXEearK-AUN8iltg" source="Aspirante" target="Empleo"/>
+  <Profile:Entity xmi:id="_SHZVsBlYEearK-AUN8iltg" base_Class="_A2nKYBlYEearK-AUN8iltg"/>
+  <Profile:Composition xmi:id="_T3MfYBlYEearK-AUN8iltg" base_Association="_TFdgcBlYEearK-AUN8iltg" source="Empresa" target="Vacante"/>
+  <Profile:Attribute xmi:id="_oPhN8BlZEearK-AUN8iltg" base_Property="_Y7IIwBlXEearK-AUN8iltg" isPrimaryKey="true" isRequired="true"/>
+  <Profile:Attribute xmi:id="_r9_q0BlZEearK-AUN8iltg" base_Property="_fti3wBlXEearK-AUN8iltg" isRequired="true" showInGrid="true" label="Empresa"/>
+  <Profile:Attribute xmi:id="_3w_-0BlZEearK-AUN8iltg" base_Property="_itnWgBlXEearK-AUN8iltg" isRequired="true" showInGrid="true" label="Cargo"/>
+  <Profile:Attribute xmi:id="_65ahQBlZEearK-AUN8iltg" base_Property="_cHhzUBlXEearK-AUN8iltg" isPrimaryKey="true" isRequired="true"/>
+  <Profile:Attribute xmi:id="_8yzr0BlZEearK-AUN8iltg" base_Property="_nQxYoBlXEearK-AUN8iltg" isRequired="true" showInGrid="true" label="Institucion"/>
+  <Profile:Attribute xmi:id="_Ba9isBlaEearK-AUN8iltg" base_Property="_plyvQBlXEearK-AUN8iltg" isRequired="true" showInGrid="true" label="Titulo obtenido"/>
+  <Profile:Attribute xmi:id="_oLChIBlaEearK-AUN8iltg" base_Property="_H1Uo8BlYEearK-AUN8iltg" isPrimaryKey="true" isRequired="true"/>
+  <Profile:Attribute xmi:id="_rauwQBlaEearK-AUN8iltg" base_Property="_JipGYBlYEearK-AUN8iltg" isRequired="true" showInGrid="true" label="Cargo"/>
+  <Profile:Attribute xmi:id="_wegMIBlaEearK-AUN8iltg" base_Property="_K6V5IBlYEearK-AUN8iltg" isRequired="true" label="Salario"/>
+  <Profile:Attribute xmi:id="_zY2dYBlaEearK-AUN8iltg" base_Property="_MDMXkBlYEearK-AUN8iltg" isRequired="true" label="Fecha de ingreso"/>
+  <Profile:Attribute xmi:id="_7LM_YBlaEearK-AUN8iltg" base_Property="_NQf4MBlYEearK-AUN8iltg" isRequired="true" label="Fecha de publicacion"/>
+  <Profile:Attribute xmi:id="__4IokBlaEearK-AUN8iltg" base_Property="_PsUaYBlYEearK-AUN8iltg" isRequired="true" showInGrid="true" label="Fecha de cierre"/>
+  <Profile:Attribute xmi:id="_bd4UUBpSEeaZOrjf_yqzfw" base_Property="_aK5pgBpSEeaZOrjf_yqzfw" isRequired="true" label="Descripcion"/>
+  <Profile:Attribute xmi:id="_nKKf0BpTEeaZOrjf_yqzfw" base_Property="_h6jnYBpTEeaZOrjf_yqzfw" isRequired="true" label="Hasta"/>
+  <Profile:Attribute xmi:id="_s-nKsBpTEeaZOrjf_yqzfw" base_Property="_dqGe0BpTEeaZOrjf_yqzfw" isRequired="true" label="Desde"/>
+  <Profile:Attribute xmi:id="_-aw4gBpTEeaZOrjf_yqzfw" base_Property="_57ge8BpTEeaZOrjf_yqzfw" isRequired="true" label="Hasta"/>
+  <Profile:Attribute xmi:id="_CfFCgBpUEeaZOrjf_yqzfw" base_Property="_21AoEBpTEeaZOrjf_yqzfw" isRequired="true" label="Desde"/>
+  <Profile:Attribute xmi:id="_uBs2gB4QEeaezIXUppLYmA" base_Property="_eP9cEB4QEeaezIXUppLYmA" isRequired="true" label="Otro Idioma"/>
+  <Profile:Attribute xmi:id="_s5EFkB4zEeafEp8wFGkLhw" base_Property="_pil5AB4zEeafEp8wFGkLhw" isRequired="true" label="Ciudad"/>
+</xmi:XMI>

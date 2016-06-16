@@ -1,0 +1,53 @@
+/// <reference path="../../../../../typings/tsd.d.ts" />
+
+// Angular 2
+import {Component, View, Directive} from 'angular2/angular2';
+import {RouteParams} from 'angular2/router';
+import {Inject} from 'angular2/di';
+
+import {[%=webPage.entityName%]Service} from '../../services/[%=webPage.entityName%]Service';
+import {[%=webPage.entityName%]} from '../../models/[%=webPage.entityName%]';
+
+import {RouteConfig, RouterOutlet, RouterLink, Router} from 'angular2/router';
+
+@Component({
+    selector: 'view-[%=webPage.entityName.firstToLowerCase()%]'
+})
+
+@View({
+    templateUrl: './app/pages/view/view-[%=webPage.entityName.firstToLowerCase()%].html'
+})
+
+export class View[%=webPage.entityName%] {
+    [%=webPage.entityName.firstToLowerCase()%]: [%=webPage.entityName%] = new [%=webPage.entityName%]();
+[%if (webPage.master <> ''){%]	idMaster:string;
+[%}%]
+	id:string;
+	
+    constructor(@Inject(RouteParams) params, public [%=webPage.entityName.firstToLowerCase()%]Service:[%=webPage.entityName%]Service, public router : Router) {
+		this.id = params.get('id');
+[%if (webPage.master <> ''){%]		this.idMaster = params.get('idMaster');
+[%}%]
+        this.get[%=webPage.entityName%](params.get('id'));
+    }
+
+    get[%=webPage.entityName%](id:string) {
+        this.[%=webPage.entityName.firstToLowerCase()%]Service.get[%=webPage.entityName%]([%if (webPage.master <> ''){%]this.idMaster, [%}%]id)
+            .map(res => res.json())
+            .subscribe(res => this.[%=webPage.entityName.firstToLowerCase()%] = [%=webPage.entityName%].fromJSON(res));
+    }
+	[%if (webPage.master <> ''){%]
+	
+	volver(){
+		this.router.parent.navigate('/list[%=webPage.entityName%]/' + this.idMaster);
+	}
+	[%}%]
+	[%for (detail in webPage.buttons){
+		if (detail.name <> 'Volver'){%]
+		
+	list[%=detail.name%]() {
+        this.router.parent.navigate('/list[%=detail.name%]/' + this.id);
+    }
+		[%}
+	}%]
+}

@@ -1,0 +1,153 @@
+[% 
+/*
+DESCRIPCION:
+Esta es la transformación general que toma todos los archivos egl de las carpetas Java para generar 
+cada uno de los artefactos usados por la aplicación QUE HACE DE BACKEND.
+
+SE REALIZA UN CICLO GENERAL PARA LA IDENTIFICACION DE LAS ENTIDADES Y ASOCIARLAS A SUS 
+ 	--ENTITY
+	--DTO
+	--PERSISTENCE
+	--BEAN
+	--SERVICIOS REST
+*/
+%]
+[%
+var nomApp = "";
+var nameEntity = "";
+var nameEntityMin = "";
+var nameEntityMay = "";
+
+for (business in backend!Business.all){
+	nomApp =  business.name;
+}
+
+	
+var primary = "";
+var primaryMay = "";
+var typePrimary = "";
+var vecAtributos = "";
+var t:Template:= TemplateFactory.load('pom.egl');
+	t.generate("../../../gen/backend/pom.xml");
+for (entidades in backend!BusinessEntity.all){
+	nameEntity = entidades.name;
+	nameEntityMin = nameEntity.toLowerCase();
+	nameEntityMay = nameEntity.firstToUpperCase();
+	
+	vecAtributos = backend!BusinessEntity.all.select(a|a.name=nameEntity).attributes.select(a|a.name<>"");
+	for(parametros in vecAtributos){
+		for(param in parametros){
+			if(param.unique.toLowerCase() == "true"){
+				primary = param.name.toLowerCase();
+				primaryMay = primary.firstToUpperCase();
+				typePrimary = param.type.literal;
+				break;
+			}
+	 	}
+	}
+	
+	
+	
+	//Para generar el archivo pom de /hospital.logic/
+	t:= TemplateFactory.load('logic/pom.egl');
+	t.generate("../../../gen/backend/hospital.logic/pom.xml");
+	
+	//Para generar el los archivos de /logic/../api/
+	t:= TemplateFactory.load('logic/api.egl');
+	t.populate("nameEntityMayGenerando",nameEntityMay);
+	t.populate("primary",primary);
+	t.populate("typePrimary",typePrimary);	
+	t.generate("../../../gen/backend/hospital.logic/src/main/java/co/edu/uniandes/hospital/api/I"+ nameEntityMay +"Logic.java");
+	
+	//Para generar el los archivos de /logic/../ejbs/
+	t:= TemplateFactory.load('logic/ejbs.egl');
+	t.populate("nameEntityMayGenerando",nameEntityMay);
+	t.populate("primary",primary);
+	t.populate("typePrimary",typePrimary);
+	t.generate("../../../gen/backend/hospital.logic/src/main/java/co/edu/uniandes/hospital/ejbs/"+ nameEntityMay +"Logic.java");
+	
+	//Para generar el los archivos de /logic/../entities/
+	t:= TemplateFactory.load('logic/entities.egl');
+	t.populate("nameEntityGenerando",nameEntity);
+	t.populate("nameEntityMayGenerando",nameEntityMay);
+	t.populate("vecAtributos",vecAtributos);
+	t.generate("../../../gen/backend/hospital.logic/src/main/java/co/edu/uniandes/hospital/entities/"+ nameEntityMay +"Entity.java");
+	
+	//Para generar el los archivos de /logic/../exceptions/
+	t:= TemplateFactory.load('logic/exceptions.egl');
+	t.generate("../../../gen/backend/hospital.logic/src/main/java/co/edu/uniandes/hospital/exceptions/BusinessLogicException.java");
+	
+	//Para generar el los archivos de /logic/../persistence/
+	t:= TemplateFactory.load('logic/persistence.egl');
+	t.populate("nameEntityGenerando",nameEntity);
+	t.populate("nameEntityMayGenerando",nameEntityMay);
+	t.populate("vecAtributos",vecAtributos);
+	t.populate("primary",primary);
+	t.populate("primaryMay",primaryMay);
+	t.populate("typePrimary",typePrimary);	
+	t.generate("../../../gen/backend/hospital.logic/src/main/java/co/edu/uniandes/hospital/persistence/"+ nameEntityMay +"Persistence.java");
+	
+	//Para generar el archivos pom de /hospital.api/../main/resources/META-INF/
+	t:= TemplateFactory.load('logic/beans.egl');
+	t.generate("../../../gen/backend/hospital.logic/src/main/resources/META-INF/beans.xml");
+	t:= TemplateFactory.load('logic/persistencexml.egl');
+	t.generate("../../../gen/backend/hospital.logic/src/main/resources/META-INF/persistence.xml");
+	
+	//Para generar el archivo pom de /hospital.api/
+	t:= TemplateFactory.load('api/pom.egl');
+	t.generate("../../../gen/backend/hospital.api/pom.xml");
+	
+	//Para generar el los archivos de /api/../converters/
+	t:= TemplateFactory.load('api/converter.egl');
+	t.populate("nameEntityMayGenerando",nameEntityMay);
+	t.populate("vecAtributos",vecAtributos);
+	t.generate("../../../gen/backend/hospital.api/src/main/java/co/edu/uniandes/rest/hospital/converters/"+ nameEntityMay +"Converter.java");
+	t:= TemplateFactory.load('api/logicExceptionMapper.egl');
+	t.populate("nameEntityMayGenerando",nameEntityMay);
+	t.generate("../../../gen/backend/hospital.api/src/main/java/co/edu/uniandes/rest/hospital/converters/"+ nameEntityMay +"LogicExceptionMapper.java");
+	
+	//Para generar el los archivos de /api/../dtos/
+	t:= TemplateFactory.load('api/dtos.egl');
+	t.populate("nameEntityMayGenerando",nameEntityMay);
+	t.populate("vecAtributos",vecAtributos);
+	t.generate("../../../gen/backend/hospital.api/src/main/java/co/edu/uniandes/rest/hospital/dtos/"+ nameEntityMay +"DTO.java");
+	
+	//Para generar el los archivos de /api/../exceptions/
+	t:= TemplateFactory.load('api/exceptions.egl');
+	t.populate("nameEntityMayGenerando",nameEntityMay);
+	t.generate("../../../gen/backend/hospital.api/src/main/java/co/edu/uniandes/rest/hospital/exceptions/"+ nameEntityMay +"LogicException.java");
+	
+	//Para generar el los archivos de /api/../mocks/
+	t:= TemplateFactory.load('api/mocks.egl');
+	t.populate("nameEntityGenerando",nameEntity);
+	t.populate("nameEntityMayGenerando",nameEntityMay);
+	t.populate("vecAtributos",vecAtributos);
+	t.generate("../../../gen/backend/hospital.api/src/main/java/co/edu/uniandes/rest/hospital/mocks/"+ nameEntityMay +"LogicMock.java");
+	
+	//Para generar el los archivos de /api/../resources/
+	t:= TemplateFactory.load('api/resource.egl');
+	t.populate("nameEntityGenerando",nameEntity);
+	t.populate("nameEntityMayGenerando",nameEntityMay);
+	t.populate("nameEntityMinGenerando",nameEntityMin);
+	t.populate("primary",primary);
+	t.populate("typePrimary",typePrimary);
+	t.generate("../../../gen/backend/hospital.api/src/main/java/co/edu/uniandes/rest/hospital/resources/"+ nameEntityMay +"Resource.java");		
+}
+	
+	//Para generar el los archivos de /api/../resources/
+	t:= TemplateFactory.load('api/restConfig.egl');
+	t.generate("../../../gen/backend/hospital.api/src/main/java/co/edu/uniandes/rest/hospital/resources/RestConfig.java");
+	
+	//Para generar el los archivos de /api/../Webapp/
+	t:= TemplateFactory.load('api/index.egl');
+	t.generate("../../../gen/backend/hospital.api/src/main/webapp/index.html");
+	
+	//Para generar el los archivos de /api/../Webapp/WEB-INF/
+	t:= TemplateFactory.load('api/web.egl');
+	t.generate("../../../gen/backend/hospital.api/src/main/webapp/WEB-INF/web.xml");
+	t:= TemplateFactory.load('api/beans.egl');
+	t.generate("../../../gen/backend/hospital.api/src/main/webapp/WEB-INF/beans.xml");
+	t:= TemplateFactory.load('api/infoBD.egl');
+	t.generate("../../../gen/backend/hospital.api/src/main/webapp/WEB-INF/glassfish-resources.xml");
+
+%]

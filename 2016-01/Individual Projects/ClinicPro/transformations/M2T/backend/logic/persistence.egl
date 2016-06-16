@@ -1,0 +1,111 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO LAS CLASES PERSISTENCE QUE POSEEN EL CRUD DE LA APLICACON
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+package co.edu.uniandes.hospital.persistence;
+
+import co.edu.uniandes.hospital.entities.[%=nameEntityMayGenerando%]Entity;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+@Stateless
+public class [%=nameEntityMayGenerando%]Persistence {
+
+    private static final Logger logger = Logger.getLogger([%=nameEntityMayGenerando%]Persistence.class.getName());
+
+    @PersistenceContext(unitName = "HospitalPU")
+    protected EntityManager em;
+
+    public [%=nameEntityMayGenerando%]Entity create([%=nameEntityMayGenerando%]Entity entity) {
+        logger.info("Creando un [%=nameEntityMayGenerando%] nuevo");
+
+        try {
+[%	
+	if (primary <> ""){
+%]
+			//Verificar si existe ya la cedula
+	        [%=typePrimary.firstToUpperCase()%] [%=primary%] = entity.get[%=primaryMay%]();
+	        
+	        [%=nameEntityMayGenerando%]Entity [%=nameEntityMayGenerando%]Existe = findByPK([%=primary%]);            
+            if ([%=nameEntityGenerando%]Existe != null) {
+                if ([%=nameEntityGenerando%]Existe.get[%=primaryMay%]() == [%=primary%]) {
+                    logger.info("[%=nameEntityGenerando%] ya existe, con el siguiente [%=primary%]");
+                }
+                return null;
+            } else {
+                em.persist(entity);
+                logger.info("[%=nameEntityGenerando%] creado");
+                return entity;
+            }
+	        
+[%        		
+ 	}else{
+%]
+			em.persist(entity);
+            logger.info("[%=nameEntityGenerando%] creado");
+            return entity;
+[% 		
+ 	}
+%]        
+        
+            
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    public [%=nameEntityMayGenerando%]Entity update([%=nameEntityMayGenerando%]Entity entity) {
+        logger.log(Level.INFO, "Actualizando [%=nameEntityMayGenerando%] con id={0}", entity.getId());
+        return em.merge(entity);
+    }
+
+    public void delete(Long id) {
+        logger.log(Level.INFO, "Borrando [%=nameEntityMayGenerando%] con id={0}", id);
+        [%=nameEntityMayGenerando%]Entity entity = em.find([%=nameEntityMayGenerando%]Entity.class, id);
+        em.remove(entity);
+    }
+
+    public [%=nameEntityMayGenerando%]Entity find(Long id) {
+        try {
+            logger.log(Level.INFO, "Consultando [%=nameEntityMayGenerando%] con id={0}", id);
+            return em.find([%=nameEntityMayGenerando%]Entity.class, id);
+        } catch (NoResultException e) {
+
+            return null;
+        }
+
+    }
+[%	
+if (primary <> ""){
+%]
+    public [%=nameEntityMayGenerando%]Entity findByPK([%=typePrimary.firstToUpperCase()%] [%=primary%]) {
+
+        try {
+            logger.log(Level.INFO, "Consultando [%=nameEntityMayGenerando%] con [%=primary%]={0}", [%=primary%]);
+            Query q = em.createQuery("select u from [%=nameEntityMayGenerando%]Entity u where u.[%=primary%]=:[%=primary%]", [%=nameEntityMayGenerando%]Entity.class);
+            return ([%=nameEntityMayGenerando%]Entity) q.setParameter("[%=primary%]", [%=primary%]).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+
+    }
+[%        		
+    }
+%]
+    public List<[%=nameEntityMayGenerando%]Entity> findAll() {
+        logger.info("Consultando todos los [%=nameEntityMayGenerando%]s findAll");
+        Query q = em.createQuery("select u from [%=nameEntityMayGenerando%]Entity u");
+        return q.getResultList();
+    }
+}

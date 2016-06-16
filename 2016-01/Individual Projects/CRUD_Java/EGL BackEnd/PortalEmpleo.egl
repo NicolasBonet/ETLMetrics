@@ -1,0 +1,116 @@
+package GIA.PortalEmpleo;
+
+import java.util.EnumSet;
+import java.util.Map;
+import javax.servlet.DispatcherType;
+import javax.servlet.FilterRegistration;
+import org.eclipse.jetty.servlets.CrossOriginFilter;
+import GIA.PortalEmpleo.Cli.RenderCommand;
+import GIA.PortalEmpleo.Datos.EmpresaDAL;
+import GIA.PortalEmpleo.Datos.EstudioDAL;
+import GIA.PortalEmpleo.Datos.VacanteDAL;
+import GIA.PortalEmpleo.Datos.AspiranteDAL;
+import GIA.PortalEmpleo.Datos.EmpleoDAL;
+import GIA.PortalEmpleo.Health.TemplateHealthCheck;
+import GIA.PortalEmpleo.Negocio.Empresa;
+import GIA.PortalEmpleo.Negocio.Estudio;
+import GIA.PortalEmpleo.Negocio.Aspirante;
+import GIA.PortalEmpleo.Negocio.Empleo;
+import GIA.PortalEmpleo.Negocio.Template;
+import GIA.PortalEmpleo.Negocio.Usuario;
+import GIA.PortalEmpleo.Negocio.Vacante;
+import GIA.PortalEmpleo.Servicios.EmpresaResource;
+import GIA.PortalEmpleo.Servicios.AspiranteResource;
+import io.dropwizard.Application;
+import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
+import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.hibernate.HibernateBundle;
+import io.dropwizard.migrations.MigrationsBundle;
+import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
+import io.dropwizard.views.ViewBundle;
+
+public class PortalEmpleoApplication extends Application<PortalEmpleoConfiguration> {
+	public static void main(String[] args) throws Exception {
+		new PortalEmpleoApplication().run(args);
+	}
+[%var size = BusinessEntity.all.size();%]
+	private final HibernateBundle<PortalEmpleoConfiguration> hibernateBundle =
+			// Incluir las clases usadas por hibernate
+			new HibernateBundle<PortalEmpleoConfiguration>([%for (bEntity in BusinessEntity.all){%]
+			
+															[%=bEntity.name%].class[%if(bEntity.name <> BusinessEntity.allInstances().get(size-1).name){%],[%}%]
+														[%}%] 
+					                                       ) {
+				@Override
+				public DataSourceFactory getDataSourceFactory(PortalEmpleoConfiguration configuration) {
+					return configuration.getDataSourceFactory();
+				}
+			};
+
+	@Override
+	public String getName() {
+		return "Portal-Empleo";
+	}
+
+	@Override
+	public void initialize(Bootstrap<PortalEmpleoConfiguration> bootstrap) {
+		// Habilitar las variables de ambiente
+		bootstrap.setConfigurationSourceProvider(new SubstitutingSourceProvider(
+				bootstrap.getConfigurationSourceProvider(), new EnvironmentVariableSubstitutor(false)));
+
+		bootstrap.addCommand(new RenderCommand());
+		bootstrap.addBundle(new AssetsBundle());
+		bootstrap.addBundle(new MigrationsBundle<PortalEmpleoConfiguration>() {
+			@Override
+			public DataSourceFactory getDataSourceFactory(PortalEmpleoConfiguration configuration) {
+				return configuration.getDataSourceFactory();
+			}
+		});
+		bootstrap.addBundle(hibernateBundle);
+		bootstrap.addBundle(new ViewBundle<PortalEmpleoConfiguration>() {
+			@Override
+			public Map<String, Map<String, String>> getViewConfiguration(PortalEmpleoConfiguration configuration) {
+				return configuration.getViewRendererConfiguration();
+			}
+		});
+	}
+
+	@Override
+	public void run(PortalEmpleoConfiguration configuration, Environment environment) {
+
+		// Cross-Origin Resource Sharing (CORS)
+		// Habilitar CORS headers
+		final FilterRegistration.Dynamic cors = environment.servlets().addFilter("CORS", CrossOriginFilter.class);
+
+		// Configurar CORS parameters
+		cors.setInitParameter("allowedOrigins", "*");
+		cors.setInitParameter("allowedHeaders", "X-Requested-With,Content-Type,Accept,Origin");
+		cors.setInitParameter("allowedMethods", "OPTIONS,GET,PUT,POST,DELETE,HEAD");
+
+		// Adicionar URL mapping CORS
+		cors.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
+
+		// Obtener sesiones Hibernate
+[%for (bEntity in BusinessEntity.all){
+	if (bEntity.isAbstract = false){%]
+		final [%=bEntity.name%]DAL [%=bEntity.name.firstToLowerCase()%]DAL = new [%=bEntity.name%]DAL(hibernateBundle.getSessionFactory());
+	[%}
+}%]
+
+		// Registrar health
+		final Template template = configuration.buildTemplate();
+		environment.healthChecks().register("template", new TemplateHealthCheck(template));
+
+		// Registrar recursos Portal Empleo
+[%for(cl in BusinessEntity.all){
+	if (cl.services.size() > 0){
+		var sizeServ = cl.services.size();%]
+		environment.jersey().register(new [%=cl.name%]Resource([%=cl.name.firstToLowerCase()%]DAL, [%for(serv in cl.services){%][%=serv.name.firstToLowerCase()%]DAL[%if(serv.name <> cl.services.get(sizeServ-1).name){%], [%}}%]));
+	[%}
+}%]
+
+	}
+}

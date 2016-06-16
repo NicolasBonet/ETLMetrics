@@ -1,0 +1,38 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO EL MANEJO DE EXCEPTIONS
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+package co.edu.uniandes.rest.hospital.converters;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
+
+import co.edu.uniandes.rest.hospital.exceptions.[%=nameEntityMayGenerando%]LogicException;
+
+/**
+ * Convertidor de Excepciones [%=nameEntityMayGenerando%]LogicException a mensajes REST.
+ */
+@Provider
+public class [%=nameEntityMayGenerando%]LogicExceptionMapper implements ExceptionMapper<[%=nameEntityMayGenerando%]LogicException> {
+
+	/**
+	 * Generador de una respuesta a partir de una excepción
+	 * @param ex excecpión a convertir a una respuesta REST
+	 */
+	@Override
+	public Response toResponse([%=nameEntityMayGenerando%]LogicException ex) {
+		// retorna una respuesta
+		return Response
+				.status(Response.Status.NOT_FOUND)	// estado HTTP 404
+				.entity(ex.getMessage())                // mensaje adicional
+				.type("text/plain")
+				.build();
+	}
+	
+}

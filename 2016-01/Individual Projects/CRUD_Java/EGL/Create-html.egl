@@ -1,0 +1,71 @@
+<BR>
+<BR>
+<BR>
+<h1> Crear [%=webPage.entityName%] </h1>
+<HR>
+
+<div class="alert alert-danger" role="alert"
+     [hidden]="!canShowCreateFailedMsg">
+    {{ createFailedMsg }}
+</div>
+
+<form [ng-form-model]="create[%=webPage.entityName%]Form"
+      class="form-horizontal"
+      role="form"
+      novalidate>
+[%for (input in webPage.inputs){%]
+    <div class="form-group"
+		[class.has-error]="![%=input.name%]Input.valid && [%=input.name%]Input.touched">
+        <label class="control-label col-sm-3"
+               for="input[%=input.name.firstToUpperCase()%]">[%=input.label%]:</label>
+        <div class="col-sm-9">
+            <input type="[%if (input.type = 'EDate'){%]date[%}else{%]text[%}%]"
+                   class="form-control"
+                   id="[%=input.name.firstToUpperCase()%]"
+                   [(ng-model)]="[%=webPage.entityName.firstToLowerCase()%].[%=input.name%]"
+                   [ng-form-control]="[%=input.name%]Input"
+[%if (input.name = webPage.inputs.get(0).name){%]
+				   autofocus[%}%]
+[%if (input.isRequired = true){%]
+                   required[%}%]>
+        </div>
+[%if (input.isRequired = true){%]
+		<span class="col-sm-offset-2 col-sm-9 help-block"
+              *ng-if="![%=input.name%]Input.valid && [%=input.name%]Input.touched">
+            El campo [%=input.label%] es requerido.
+        </span>[%}%]
+    </div>
+[%}%]
+
+[%for (select in webPage.selects){%]
+    <div class="form-group"
+         [class.has-error]="![%=select.name%]Input.valid && [%=select.name%]Input.touched">
+        <label class="control-label col-sm-3"
+               for="input[%=select.name.firstToUpperCase()%]">[%=select.label%]:</label>
+        <div class="col-sm-9">
+            <select class="form-control"
+				id="input[%=select.name.firstToUpperCase()%]"
+				[(ng-model)]="[%=webPage.entityName.firstToLowerCase()%].tipoIdentificacion"
+				[ng-form-control]="[%=select.name%]Input"
+[%if (select.isRequired = true){%]
+                required[%}%]>
+[%for (item in select.items){%]
+				<option value="[%=item.name%]">[%=item.name%]</option>
+[%}%]
+			</select>
+        </div>
+[%if (select.isRequired = true){%]
+        <span class="col-sm-offset-2 col-sm-9 help-block"
+              *ng-if="![%=select.name%]Input.valid && [%=select.name%]Input.touched">
+            El tipoIdentificacion es requerido.
+        </span>[%}%]
+    </div>
+[%}%]
+
+    <div class="row text-center">
+        <button class="btn btn-primary"
+			    (click)="create[%=webPage.entityName%]()"
+                [disabled]="!create[%=webPage.entityName%]Form.valid"
+                type="submit">Guardar</button>
+    </div>
+</form>

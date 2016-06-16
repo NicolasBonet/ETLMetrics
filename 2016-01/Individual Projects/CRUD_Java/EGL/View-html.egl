@@ -1,0 +1,36 @@
+<BR>
+<BR>
+<BR>
+<h3> Ver [%=webPage.entityName%] </h3>
+<HR>
+<form [ng-form-model]="view[%=webPage.entityName%]Form"
+      class="form-horizontal"
+      role="form"
+      novalidate>
+
+[%for (input in webPage.inputs){%]
+    <div class="form-group">
+        <label class="control-label col-sm-3"
+               for="value[%=input.name.firstToUpperCase()%]">[%=input.label%]:</label>
+        <div class="col-sm-9">
+			<p class="form-control-static"
+            id="value[%=input.name.firstToUpperCase()%]">{{ [%=webPage.entityName.firstToLowerCase()%].[%=input.name%] }}</p>
+        </div>
+    </div>
+[%}%]
+</form>
+
+
+[%for (button in webPage.buttons){
+if(button.name = 'Volver'){
+%]
+<button type="button"
+    class="btn btn-primary"
+    (click)="volver()">Volver</button>
+[%}
+else {%]
+<button type="button"
+    class="btn btn-success"
+    (click)="list[%=button.name%]()">[%=button.name%]s</button>
+[%}
+}%]

@@ -1,0 +1,19 @@
+<div class="container">
+    <div>
+        <div class="list-group col-md-2">
+[%for (modelo in Modelo.all){
+	if (modelo.master = ''){
+%]
+             <ul class="nav navbar-nav">
+			 <li>
+                 <a router-link="list[%=modelo.name%]">[%=modelo.name%]s</a>
+             </li>			
+			 </ul>
+[%}
+}%]
+        </div>
+        <div class="col-md-9">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

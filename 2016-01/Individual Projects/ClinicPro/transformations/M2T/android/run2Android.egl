@@ -1,0 +1,382 @@
+[% 
+/*
+DESCRIPCION:
+Esta es la transformación general que toma todos los archivos egl de las carpetas Java, Otro y Res para generar 
+cada uno de los artefactos usados por la aplicación Android.
+
+SE ENCUENTRAN VARIOS PASOS:
+
+1. Generar las clases Java dependiendo de las entidades de entrada junto con sus atributos.
+2. Generar los archivos que componen la carpeta RES que corresponde a todo el Layout de la aplicación Android. 
+En esta se crea una por cada entidad.
+3. Generar los recursos adicionales, como configuración del gradle y Manifest de la aplicación
+
+A continuación, la descripción de cada uno de ellos: Se encuentra dividida en bloques de código.
+*/
+
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO LAS CLASES JAVA PARA LA CARPETA JAVA DE ACUERDO A CADA ENTIDAD DEL MODELO DE ENTRADA
+***********************************************************************************************
+***********************************************************************************************
+*/
+
+/* 
+Creando las clases DTO
+*/
+var rutaGen='../../../gen/front/android/';
+
+for (activity in AndroidApplication!Activity.all.sortBy(a|a.name)){
+	
+	var activityActual = activity.name;		
+	var activities:Template:= TemplateFactory.load('java/dto.egl');
+	activities.populate("activityName", activity.name);
+	activities.populate("nombreClaseGenerar", activityActual);
+	
+	activities.generate(rutaGen+"HospitalApp/app/src/main/java/app/hospital/uniandes/edu/co/hospital/dtos/"+activity.name+'DTO.java');
+	
+}
+
+/* 
+Creando las clases CRUD - Create
+*/
+for (activity in AndroidApplication!Activity.all.sortBy(a|a.name)){
+	
+	var activityActual = activity.name;
+	var activities:Template:= TemplateFactory.load('java/create.egl');
+	activities.populate("activityName", activity.name);
+	
+	activities.populate("nombreClaseGenerar", activityActual); 
+
+	var nameFolder=activity.name.firstToLowerCase();
+	activities.generate(rutaGen+"HospitalApp/app/src/main/java/app/hospital/uniandes/edu/co/hospital/"+nameFolder+"/"+activity.name+'Create.java');
+	
+}
+
+/* 
+Creando las clases CRUD - Edit
+*/
+for (activity in AndroidApplication!Activity.all.sortBy(a|a.name)){
+	
+	var activityActual = activity.name;
+	var activities:Template:= TemplateFactory.load('java/edit.egl');
+	activities.populate("activityName", activity.name);
+	
+     activities.populate("nombreClaseGenerar", activityActual); 
+	
+	var nameFolder=activity.name.firstToLowerCase();
+	activities.generate(rutaGen+"HospitalApp/app/src/main/java/app/hospital/uniandes/edu/co/hospital/"+nameFolder+"/"+activity.name+'Edit.java');
+	
+}
+
+/* 
+Creando las clases CRUD - List
+*/
+for (activity in AndroidApplication!Activity.all.sortBy(a|a.name)){
+	
+	var activityActual = activity.name;
+	var activities:Template:= TemplateFactory.load('java/list.egl');
+	activities.populate("activityName", activity.name);	
+	activities.populate("nombreClaseGenerar", activityActual); 
+	
+	var nameFolder=activity.name.firstToLowerCase();
+	activities.generate(rutaGen+"HospitalApp/app/src/main/java/app/hospital/uniandes/edu/co/hospital/"+nameFolder+"/"+activity.name+'List.java');
+	
+}
+
+/* 
+Creando las clases Activity
+
+Para esta opcion hay una restriccion y es que solo una entidad puede ser la activity principal
+En ella se inicia las opciones de busqueda - Ejemplo caso de paciente - Buscar Paciente
+
+*/
+
+/* 
+---------------PRINCIPAL-------------------
+*/
+var primera=true;
+for (activity in AndroidApplication!Activity.all.sortBy(a|a.name)){
+
+	if(primera){
+/* 
+---------------PRINCIPAL CON EL BUSCAR-------------------
+*/
+	    var activityPrincipal = activity.name;
+		var activities:Template:= TemplateFactory.load('java/activityPrincipal.egl');
+		activities.populate("nombreClaseGenerar", activityPrincipal);
+		var nameFolder=activity.name.firstToLowerCase();
+		activities.generate(rutaGen+"HospitalApp/app/src/main/java/app/hospital/uniandes/edu/co/hospital/"+nameFolder+"/"+activity.name+'Activity.java');
+		primera=false;    
+    }
+    else{
+/* 
+---------------SECUNDARIAS CON EL BUSCAR - PERO SIN VISTA EN LA APLICACIÓN -------------------
+*/
+	    var activityActual = activity.name;
+		var activities:Template:= TemplateFactory.load('java/activitySecundaria.egl');
+		activities.populate("nombreClaseGenerar", activity.name);
+		var nameFolder=activity.name.firstToLowerCase();
+		activities.generate(rutaGen+"HospitalApp/app/src/main/java/app/hospital/uniandes/edu/co/hospital/"+nameFolder+"/"+activity.name+'Activity.java');
+	
+    }
+    
+}
+
+/* 
+Creando las clases ConsumeRest por activity
+*/
+for (activity in AndroidApplication!Activity.all.sortBy(a|a.name)){
+	
+	var activityActual = activity.name;
+	var activities:Template:= TemplateFactory.load('java/rest.egl');
+	activities.populate("activityName", activity.name);
+	
+	activities.populate("nombreClaseGenerar", activityActual);
+	
+	activities.generate(rutaGen+"HospitalApp/app/src/main/java/app/hospital/uniandes/edu/co/hospital/rest/ConsumeRest"+activity.name+'.java');
+	
+}
+	
+/* 
+creando la clase HttpRequest util para consumir servicios REST
+*/
+	var rest:Template:= TemplateFactory.load('java/httprequest.egl');	
+	rest.generate(rutaGen+"HospitalApp/app/src/main/java/app/hospital/uniandes/edu/co/hospital/http/HttpRequest.java");
+	
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO LOS XML PARA LA VISTA EN LA CARPETA RES
+***********************************************************************************************
+***********************************************************************************************
+*/
+
+/* 
+Creando los XML por clase activity_entity ... n
+*/
+var primera=true;
+for (activity in AndroidApplication!Activity.all.sortBy(a|a.name)){
+	
+	if(primera){
+	var activityActual = activity.name;
+	var activities:Template:= TemplateFactory.load('res/layout/activity_principal_xml.egl');
+	activities.populate("activityName", activity.name);
+	
+	var nameMin=activity.name.firstToLowerCase();
+	activities.generate(rutaGen+"HospitalApp/app/src/main/res/layout/activity_"+nameMin+'.xml');
+	primera=false;
+	
+	}else{
+	var activityActual = activity.name;
+	var activities:Template:= TemplateFactory.load('res/layout/activity_secundaria_xml.egl');
+	activities.populate("activityName", activity.name);
+	
+	var nameMin=activity.name.firstToLowerCase();
+	activities.generate(rutaGen+"HospitalApp/app/src/main/res/layout/activity_"+nameMin+'.xml');
+	primera=false;
+	}
+	
+	
+}	
+
+/* 
+Creando los XML por clase content_activity ... n
+*/
+for (activity in AndroidApplication!Activity.all.sortBy(a|a.name)){
+	
+	var activityActual = activity.name;
+	var activities:Template:= TemplateFactory.load('res/layout/contentxml.egl');
+	activities.populate("activityName", activity.name);
+	
+	var nameMin=activity.name.firstToLowerCase();
+	activities.generate(rutaGen+"HospitalApp/app/src/main/res/layout/content_"+nameMin+'.xml');
+	
+}	
+
+/* 
+Creando los XML por clase activity_xxx_create ... n
+*/
+for (activity in AndroidApplication!Activity.all.sortBy(a|a.name)){
+	
+	var activityActual = activity.name;
+	var activities:Template:= TemplateFactory.load('res/layout/createxml.egl');
+	activities.populate("activityName", activity.name);
+	
+	var nameMin=activity.name.firstToLowerCase();
+	activities.generate(rutaGen+"HospitalApp/app/src/main/res/layout/activity_"+nameMin+'_create.xml');
+	
+}	
+
+/* 
+Creando los XML por clase activity_xxx_edit ... n
+*/
+for (activity in AndroidApplication!Activity.all.sortBy(a|a.name)){
+	
+	var activityActual = activity.name;
+	var activities:Template:= TemplateFactory.load('res/layout/editxml.egl');
+	activities.populate("activityName", activity.name);
+	
+	var nameMin=activity.name.firstToLowerCase();
+	activities.generate(rutaGen+"HospitalApp/app/src/main/res/layout/activity_"+nameMin+'_edit.xml');
+	
+}	
+
+/* 
+Creando los XML por clase activity_xxx_list ... n
+*/
+for (activity in AndroidApplication!Activity.all.sortBy(a|a.name)){
+	
+	var activityActual = activity.name;
+	var activities:Template:= TemplateFactory.load('res/layout/listxml.egl');
+	activities.populate("activityName", activity.name);
+	
+	var nameMin=activity.name.firstToLowerCase();
+	activities.generate(rutaGen+"HospitalApp/app/src/main/res/layout/activity_"+nameMin+'_list.xml');
+	
+}
+
+
+/* 
+Creando los XML por clase lv de los listview  ... n
+*/
+for (activity in AndroidApplication!Activity.all.sortBy(a|a.name)){
+	
+	var activityActual = activity.name;
+	var activities:Template:= TemplateFactory.load('res/layout/lv.egl');
+	activities.populate("activityName", activity.name);
+	
+	var nameMin=activity.name.firstToLowerCase();
+	activities.generate(rutaGen+"HospitalApp/app/src/main/res/layout/lv"+nameMin+'s_layout.xml');
+	
+}
+
+/* 
+creando el main.xml que se muestra para el recibo
+*/
+	var main:Template:= TemplateFactory.load('res/layout/main.egl');		
+	main.generate(rutaGen+"HospitalApp/app/src/main/res/layout/main.xml");
+	
+/* 
+creando el nav_header_main.xml que se muestra el men� logos
+*/
+	var nav:Template:= TemplateFactory.load('res/layout/nav_header_main.egl');
+	nav.generate(rutaGen+"HospitalApp/app/src/main/res/layout/nav_header_main.xml");
+
+/* 
+creando el app_bar_main.xml que se muestra ppara el men�
+*/
+var primera=true;
+for (activity in AndroidApplication!Activity.all.sortBy(a|a.name)){
+	
+	if(primera){
+	var activityActual = activity.name;
+	var activities:Template:= TemplateFactory.load('res/layout/app_bar_main.egl');
+	
+	activities.populate("activityName", activity.name);
+	
+	activities.generate(rutaGen+"HospitalApp/app/src/main/res/layout/app_bar_main.xml");
+	primera=false;	
+	}
+	
+}
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO LOS RECURSOS ADICIONALES EN LA CARPETA RES
+***********************************************************************************************
+***********************************************************************************************
+*/
+/* 
+**************************************************************
+creando los recursos para toda la carpeta RES/DRAWABLE
+**************************************************************
+*/	
+
+var nav:Template:= TemplateFactory.load('res/drawable/side_nav_bar.egl');
+	nav.generate(rutaGen+"HospitalApp/app/src/main/res/drawable/side_nav_bar.xml");
+		
+/* 
+**************************************************************
+creando los recursos para toda la carpeta RES/MENU
+**************************************************************
+
+LOS MENÚS SON DINAMICOS POR ENDE, SE DEBEN CREAR DEPENDIENDO DE LAS ENTIDADES DEL MODELO
+sólo aplica para activity_main_drawer
+
+*/
+
+var nav:Template:= TemplateFactory.load('res/menu/activity_main_drawer.egl');
+	nav.generate(rutaGen+"HospitalApp/app/src/main/res/menu/activity_main_drawer.xml");
+
+var nav:Template:= TemplateFactory.load('res/menu/main.egl');
+	nav.generate(rutaGen+"HospitalApp/app/src/main/res/menu/main.xml");
+
+/* 
+**************************************************************
+creando los recursos para toda la carpeta RES/VALUES
+**************************************************************
+*/
+//colors
+var nav:Template:= TemplateFactory.load('res/values/colors.egl');
+	nav.generate(rutaGen+"HospitalApp/app/src/main/res/values/colors.xml");
+//dimens
+var nav:Template:= TemplateFactory.load('res/values/dimens.egl');
+	nav.generate(rutaGen+"HospitalApp/app/src/main/res/values/dimens.xml");
+/*strings
+Es dinamico dependiendo de las entidades que ingresen en el modelo
+*/
+var nav:Template:= TemplateFactory.load('res/values/strings.egl');
+	nav.generate(rutaGen+"HospitalApp/app/src/main/res/values/strings.xml");
+//styles
+var nav:Template:= TemplateFactory.load('res/values/styles.egl');
+	nav.generate(rutaGen+"HospitalApp/app/src/main/res/values/styles.xml");
+/* 
+**************************************************************
+creando los recursos para toda la carpeta RES/VALUES-v21
+**************************************************************
+*/
+//styles
+var nav:Template:= TemplateFactory.load('res/values-v21/styles.egl');
+	nav.generate(rutaGen+"HospitalApp/app/src/main/res/values-v21/styles.xml");
+/* 
+**************************************************************
+creando los recursos para toda la carpeta RES/VALUES-w820d
+**************************************************************
+*/
+//styles
+var nav:Template:= TemplateFactory.load('res/values-w820dp/dimens.egl');
+	nav.generate(rutaGen+"HospitalApp/app/src/main/res/values-w820dp/dimens.xml");	
+	
+		
+/* 
+**************************************************************
+creando los archivos necesarios como el manifest y el gradle de Android Studio
+**************************************************************
+*/
+//Manifest
+// Es variable dependiendo de las clases que hayan
+var nav:Template:= TemplateFactory.load('otros/androidmanifest.egl');
+	nav.generate(rutaGen+"HospitalApp/app/src/main/AndroidManifest.xml");
+//Gradle
+var nav:Template:= TemplateFactory.load('otros/gradle.egl');
+	nav.generate(rutaGen+"HospitalApp/app/build.gradle");
+//	proguard-rules.pro			
+var nav:Template:= TemplateFactory.load('otros/proguard.egl');
+	nav.generate(rutaGen+"HospitalApp/app/proguard-rules.pro");
+/*
+Configuración del gradle en el parent project
+*/
+var nav:Template:= TemplateFactory.load('otros/gradleparent.egl');
+	nav.generate(rutaGen+"HospitalApp/build.gradle");
+var nav:Template:= TemplateFactory.load('otros/gradlesettings.egl');
+	nav.generate(rutaGen+"HospitalApp/settings.gradle");
+/*
+***********************************************************************************************
+***********************************************************************************************
+FIN GENERACIÓN DE LA APLICACIÓN ANDROID
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]

@@ -1,0 +1,35 @@
+﻿<Page
+    x:Class="TotalWar.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TotalWar"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:data="using:TotalWar.Data"
+    mc:Ignorable="d"
+    DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Self}}"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Transitions>
+        <TransitionCollection>
+            <NavigationThemeTransition>
+                <NavigationThemeTransition.DefaultNavigationTransitionInfo>
+                    <CommonNavigationTransitionInfo IsStaggeringEnabled="True"/>
+                </NavigationThemeTransition.DefaultNavigationTransitionInfo>
+            </NavigationThemeTransition>
+        </TransitionCollection>
+    </Page.Transitions>
+    
+    <Grid>
+<Pivot Title="TotalWar" FontFamily="Lato" FontSize="16">
+	<PivotItem>
+	<ScrollViewer Height="Auto">
+	 <StackPanel HorizontalAlignment="Center">
+<Button x:ConnectionId='1' Content="EmpireTotalWar" HorizontalAlignment="Stretch" FontFamily="Lato" FontSize="16"                             />
+<Button x:ConnectionId='2' Content="Medieval2TotalWar" HorizontalAlignment="Stretch" FontFamily="Lato" FontSize="16"                                />
+</StackPanel>
+</ScrollViewer>
+</PivotItem>
+</Pivot>
+</Grid>
+    </Page>
+

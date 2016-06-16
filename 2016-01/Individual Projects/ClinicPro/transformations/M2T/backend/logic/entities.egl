@@ -1,0 +1,85 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO LAS CLASES ENTITY DE CADA ENTIDAD
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+package co.edu.uniandes.hospital.entities;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.SequenceGenerator;
+
+@Entity
+// Define a sequence - might also be in another class:
+@SequenceGenerator(name="seq[%=nameEntityMayGenerando%]", initialValue=1, allocationSize=100)
+public class [%=nameEntityMayGenerando%]Entity implements Serializable {
+    
+    // Use the sequence that is defined above:
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq[%=nameEntityMayGenerando%]")
+    @Id
+    private long id;
+[%
+var nomParam = "";
+var nomParamMay = "";
+var typeParam = "";
+
+for(parametros in vecAtributos){
+	for(param in parametros){
+		nomParam = param.name.toLowerCase();
+		nomParamMay = nomParam.firstToUpperCase();
+		typeParam = param.type;
+%]
+    private [%=typeParam%] [%=nomParam%];
+[%
+	}
+}
+%]	    
+    /**
+     * @return the id
+     */
+    public long getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(long id) {
+        this.id = id;
+    }
+
+[%
+for(parametros in vecAtributos){
+	for(param in parametros){
+		nomParam = param.name.toLowerCase();
+		nomParamMay = nomParam.firstToUpperCase();
+		typeParam = param.type;
+%]
+	/**
+     * @return the [%=nomParam%]
+     */
+    public [%=typeParam%] get[%=nomParamMay%]() {
+        return [%=nomParam%];
+    }
+
+    /**
+     * @param [%=nomParam%] the [%=nomParam%] to set
+     */
+    public void set[%=nomParamMay%]([%=typeParam%] [%=nomParam%]) {
+        this.[%=nomParam%] = [%=nomParam%];
+    }
+[%
+	}
+}
+%]	            
+}

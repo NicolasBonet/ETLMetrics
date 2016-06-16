@@ -1,0 +1,111 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO LOS SERVICIOS REST DEPENDIENDO DE LAS ENTIDADES
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+/*
+ * [%=nameEntityMayGenerando%]Resource.java
+ * Clase que representa el recurso "/[%=nameEntityMinGenerando%]s"
+ * Implementa varios métodos para manipular [%=nameEntityGenerando%]s
+ */
+package co.edu.uniandes.rest.hospital.resources;
+
+import co.edu.uniandes.hospital.api.I[%=nameEntityMayGenerando%]Logic;
+import co.edu.uniandes.hospital.entities.[%=nameEntityMayGenerando%]Entity;
+import co.edu.uniandes.rest.hospital.converters.[%=nameEntityMayGenerando%]Converter;
+import co.edu.uniandes.rest.hospital.dtos.[%=nameEntityMayGenerando%]DTO;
+import co.edu.uniandes.rest.hospital.exceptions.[%=nameEntityMayGenerando%]LogicException;
+import java.util.List;
+import javax.inject.Inject;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PUT;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+/**
+ * Clase que implementa el recurso REST correspondiente a "[%=nameEntityMinGenerando%]s".
+ * 
+ * Note que la aplicación (definida en RestConfig.java) define la ruta
+ * "/api" y este recurso tiene la ruta "[%=nameEntityMinGenerando%]s". 
+ * Al ejecutar la aplicación, el recurse será accesibe a través de la 
+ * ruta "/api/[%=nameEntityGenerando%]s" 
+ * 
+ * @author Diego F.
+ */
+@Path("[%=nameEntityMinGenerando%]s")
+@Produces("application/json")
+public class [%=nameEntityMayGenerando%]Resource {
+
+        @Inject
+        I[%=nameEntityMayGenerando%]Logic [%=nameEntityMinGenerando%]Logic;
+	/**
+	 * Obtiene el listado de [%=nameEntityGenerando%]s. 
+	 * @return lista de [%=nameEntityGenerando%]as
+	 * @throws [%=nameEntityMayGenerando%]LogicException excepción retornada por la lógica  
+	 */
+       
+    @GET
+    public List<[%=nameEntityMayGenerando%]DTO> get[%=nameEntityMayGenerando%]s() throws [%=nameEntityMayGenerando%]LogicException {
+        return [%=nameEntityMayGenerando%]Converter.listEntity2DTO([%=nameEntityMinGenerando%]Logic.get[%=nameEntityMayGenerando%]s());
+    }
+          
+    /**
+     * Obtiene una [%=nameEntityMinGenerando%]
+     * @param id identificador de la [%=nameEntityGenerando%]
+     * @return [%=nameEntityMinGenerando%] encontrada
+     * @throws [%=nameEntityMayGenerando%]LogicException cuando la [%=nameEntityMinGenerando%] no existe
+     */
+    @GET
+    @Path("{[%=primary%]: \\d+}")
+    public [%=nameEntityMayGenerando%]DTO get[%=nameEntityMayGenerando%]ByPK(@PathParam("[%=primary%]") [%=typePrimary%] [%=primary%]) throws [%=nameEntityMayGenerando%]LogicException {
+        return [%=nameEntityMayGenerando%]Converter.fullEntity2DTO([%=nameEntityMinGenerando%]Logic.get[%=nameEntityMayGenerando%]ByPK([%=primary%]));
+    }
+
+    /**
+     * Agrega una [%=nameEntityMinGenerando%]
+     * @param [%=nameEntityMinGenerando%] [%=nameEntityGenerando%] a agregar
+     * @return datos de la [%=nameEntityMinGenerando%] a agregar
+     * @throws [%=nameEntityMayGenerando%]LogicException cuando ya existe una [%=nameEntityMinGenerando%] con el id suministrado
+     */
+    
+    @POST
+    public [%=nameEntityMayGenerando%]DTO create[%=nameEntityMayGenerando%]([%=nameEntityMayGenerando%]DTO dto) {     
+        [%=nameEntityMayGenerando%]Entity entity = [%=nameEntityMayGenerando%]Converter.fullDTO2Entity(dto);
+        return [%=nameEntityMayGenerando%]Converter.fullEntity2DTO([%=nameEntityMinGenerando%]Logic.create[%=nameEntityMayGenerando%](entity));
+    }
+    /**
+     * Actualiza los datos de una [%=nameEntityMinGenerando%]
+     * @param id identificador de la [%=nameEntityMinGenerando%] a modificar
+     * @param [%=nameEntityMinGenerando%] [%=nameEntityMinGenerando%] a modificar
+     * @return datos de la [%=nameEntityMinGenerando%] modificada 
+     * @throws [%=nameEntityMayGenerando%]LogicException cuando no existe una [%=nameEntityMinGenerando%] con el id suministrado
+     */
+    @PUT
+    @Path("{id: \\d+}")
+    public [%=nameEntityMayGenerando%]DTO update[%=nameEntityMayGenerando%](@PathParam("id") Long id, [%=nameEntityMayGenerando%]DTO [%=nameEntityMinGenerando%]) throws [%=nameEntityMayGenerando%]LogicException {
+        [%=nameEntityMayGenerando%]Entity entity = [%=nameEntityMayGenerando%]Converter.fullDTO2Entity([%=nameEntityMinGenerando%]);
+        entity.setId(id);
+        [%=nameEntityMayGenerando%]Entity oldEntity = [%=nameEntityMinGenerando%]Logic.get[%=nameEntityMayGenerando%](id);
+        //entity.setBooks(oldEntity.getBooks());
+        return [%=nameEntityMayGenerando%]Converter.fullEntity2DTO([%=nameEntityMinGenerando%]Logic.update[%=nameEntityMayGenerando%](entity));
+    }
+
+    /**
+     * Elimina los datos de una [%=nameEntityMinGenerando%]
+     * @param id identificador de la [%=nameEntityMinGenerando%] a eliminar
+     * @throws [%=nameEntityMayGenerando%]LogicException cuando no existe una [%=nameEntityMinGenerando%] con el id suministrado
+     */
+    @DELETE
+    @Path("{id: \\d+}")
+    public void delete[%=nameEntityMayGenerando%](@PathParam("id") Long id) throws [%=nameEntityMayGenerando%]LogicException {
+    	[%=nameEntityMinGenerando%]Logic.delete[%=nameEntityMayGenerando%](id);
+    }
+
+}

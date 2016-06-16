@@ -1,0 +1,100 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO LAS CLASES ACTIVITY - SECUNDARIAS
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+package app.hospital.uniandes.edu.co.hospital.[%=nombreClaseGenerar.firstToLowerCase()%];
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Objects;
+
+import app.hospital.uniandes.edu.co.hospital.R;
+import app.hospital.uniandes.edu.co.hospital.dtos.[%=nombreClaseGenerar%]DTO;
+
+
+[%
+for (activity in AndroidApplication!Activity.all){
+	var nomActivityActual = activity.name;
+		if(nombreClaseGenerar==nomActivityActual){
+%]
+
+public class [%=nombreClaseGenerar%]Activity extends AppCompatActivity {
+
+[%
+/*
+Variable para armar las propiedades de la clase
+*/
+var atributosStaticos="";
+var atributosConR="";
+				
+				--verifico los componentes que hacen la activity.
+					for(atributos in activity.components){
+					--verifico el tipo de campo que viene.
+					var nameMin=atributos.name.firstToLowerCase();
+					var nameMay=atributos.name.firstToUpperCase();					
+	%]
+    [%
+						if(atributos.isTypeOf(TextField))
+						{
+						
+							if(atributos.type.isTypeOf(EEnumLiteral))
+							{
+								if(atributos.type.literal=='Number'){
+								atributosStaticos=atributosStaticos+"public static EditText editText"+nameMay+";\n";
+								atributosConR=atributosConR+"editText"+nameMay+" = (EditText) findViewById(R.id.editText"+nameMay+");\n";
+									%]
+									[%
+								}
+								if(atributos.type.literal=='Double'){
+								atributosStaticos=atributosStaticos+"public static EditText editText"+nameMay+";\n";
+								atributosConR=atributosConR+"editText"+nameMay+" = (EditText) findViewById(R.id.editText"+nameMay+");\n";
+								}
+								if(atributos.type.literal=='Text'){
+								atributosStaticos=atributosStaticos+"public static EditText editText"+nameMay+";\n";
+								atributosConR=atributosConR+"editText"+nameMay+" = (EditText) findViewById(R.id.editText"+nameMay+");\n";
+									%]
+	
+									[%
+							 	}
+							}	
+						}
+					}//Cierro for de verificar componentes de la activity
+%]
+    
+    [%=atributosStaticos%]
+
+
+    public static ArrayAdapter<String> adapter[%=nombreClaseGenerar%]s;
+    public static ArrayList<String> nombres[%=nombreClaseGenerar%]s = new ArrayList<String>();
+    public static ArrayList<[%=nombreClaseGenerar%]DTO> full[%=nombreClaseGenerar%]s = new ArrayList<[%=nombreClaseGenerar%]DTO>();
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_[%=nombreClaseGenerar.firstToLowerCase()%]);
+        
+            [%=atributosConR%]
+       
+    }
+}
+[%
+				}
+			}
+%]

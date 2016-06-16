@@ -1,0 +1,156 @@
+[%
+
+//renderiza los Grid
+operation wp!Grid render()
+	{%]
+	[%="<Grid>"%]
+[%
+
+
+for(element : wp!GraphicElement in self.subGraphicElement)
+{
+element.render();
+}
+%]
+</Grid>
+[%
+}	
+%]
+
+
+
+[%
+//Renderiza los pivot
+operation wp!Pivot render()
+{%]
+[%='<Pivot Title="'+self.title+'"'+" FontFamily="+'"'+self.fontFamily+'"'+" FontSize="+'"'+self.fontSize+'"'+">"%]
+[%
+
+for(element : wp!GraphicElement in self.subGraphicElement)
+{
+element.render();
+}
+
+%]
+</Pivot>
+[%}
+%]
+[%
+//Renderiza los PivotItem
+operation wp!PivotItem render()
+	{%]
+	[%="<PivotItem>"%]
+[%
+
+
+for(element : wp!GraphicElement in self.subGraphicElement)
+{
+element.render();
+}
+%]
+</PivotItem>
+[%
+}	
+%]
+
+
+[%
+//Renderiza los Scroll Viewer
+operation wp!ScrollViewer render()
+	{%]
+	[%='<ScrollViewer Height="Auto">'%]
+[%
+
+
+for(element : wp!GraphicElement in self.subGraphicElement)
+{
+element.render();
+}
+%]
+</ScrollViewer>
+[%
+}	
+%]
+
+[%
+//Renderiza los Scroll Viewer
+operation wp!StackPanel render()
+	{%]
+	[%=' <StackPanel HorizontalAlignment="Center">'%]
+[%
+
+
+for(element : wp!GraphicElement in self.subGraphicElement)
+{
+element.render();
+}
+%]
+</StackPanel>
+[%
+}	
+%]
+
+[%
+//renderiza la imagen
+operation wp!Image render()
+{%]
+<Image Source="[%=self.Source%]" Height="198" Width="237"/>
+[%
+}
+
+%]
+[%
+//renderiza el text block
+operation wp!TextBlock render()
+{%]
+<TextBlock TextWrapping="Wrap" Text="[%=self.Text%]" FontFamily="[%=self.FontFamily%]" FontSize="[%=self.FontSize%]" Margin="0,0,-0.167,0"/>
+[%
+}
+
+%]
+[%
+//renderiza el boton
+operation wp!Button render()
+{%]
+<Button Content="[%=self.Content%]" HorizontalAlignment="Stretch" FontFamily="[%=self.FontFamily%]" FontSize="[%=self.FontSize%]" Click="[%=self.Content %]_Click"/>
+[%
+//llama al egl que renderiza el xaml
+var t:Template:=TemplateFactory.load('windowsPhone/appXaml.egl');
+				t.populate('xaml', self.navigationTo);
+				t.generate('../../../windows-phone-app/TotalWar/'+self.navigationTo.Name+'.xaml');
+
+
+}
+
+%]
+
+[%
+//evalua si el boton es un elemento grafico y escribe el metodo de navegacion del mismo
+operation wp!GraphicElement searchButtonWriteMethod()
+{
+//evalua si es boton para escribir
+if(self.isKindOf(wp!Button))
+{
+
+%]
+ private void [%=self.Content %]_Click(object sender, RoutedEventArgs e)
+        {
+			Frame.Navigate(typeof([%=self.navigationTo.Name%]));
+        }
+[%//si es un elemento compuesto ejecuta de nuevamente el metodo en sus subelementos graficos
+}else if(self.isKindOf(wp!ComposedGElement))
+{
+
+ for(element : wp!GraphicElement in self.subGraphicElement)
+  {
+  //buscando en el elemento grafico
+  element.searchButtonWriteMethod();
+  
+  
+  }
+}
+
+
+}
+
+%]

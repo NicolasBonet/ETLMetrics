@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/MetamodeloNewsletter/src" modelPluginID="MetamodeloNewsletter"
+    modelName="Newsletter" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="7.0" copyrightFields="false"
+    operationReflection="true" importOrganizing="true">
+  <foreignModel>Newsletter.ecore</foreignModel>
+  <genPackages prefix="MetamodeloNewsletter" disposableProviderFactory="true" ecorePackage="Newsletter.ecore#/">
+    <genClasses ecoreClass="Newsletter.ecore#//Newsletter">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Newsletter.ecore#//Newsletter/table"/>
+    </genClasses>
+    <genClasses ecoreClass="Newsletter.ecore#//Table">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Newsletter.ecore#//Table/rows"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Table/width"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Table/backgroundColor"/>
+    </genClasses>
+    <genClasses ecoreClass="Newsletter.ecore#//Row">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Newsletter.ecore#//Row/cells"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Row/height"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Row/backgroundColor"/>
+    </genClasses>
+    <genClasses ecoreClass="Newsletter.ecore#//Cell">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Newsletter.ecore#//Cell/elements"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Cell/width"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Cell/backgroundColor"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Cell/verticalAlignment"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="Newsletter.ecore#//Element">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Element/link"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Element/align"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Element/width"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Element/height"/>
+    </genClasses>
+    <genClasses ecoreClass="Newsletter.ecore#//Text">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Text/content"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Text/fontFamily"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Text/fontSize"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Text/fontColor"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Text/bold"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Text/italic"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Text/underline"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Text/strikethrough"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Text/textAlign"/>
+    </genClasses>
+    <genClasses ecoreClass="Newsletter.ecore#//Button">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Newsletter.ecore#//Button/text"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Button/color"/>
+    </genClasses>
+    <genClasses ecoreClass="Newsletter.ecore#//Image">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Image/src"/>
+    </genClasses>
+    <genClasses ecoreClass="Newsletter.ecore#//Video">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Newsletter.ecore#//Video/preview"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Newsletter.ecore#//Video/title"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Newsletter.ecore#//Video/button"/>
+    </genClasses>
+    <genClasses ecoreClass="Newsletter.ecore#//Divider">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Newsletter.ecore#//Divider/color"/>
+    </genClasses>
+    <nestedGenPackages prefix="Enums" disposableProviderFactory="true" ecorePackage="Newsletter.ecore#//enums">
+      <genEnums typeSafeEnumCompatible="false" ecoreEnum="Newsletter.ecore#//enums/Color">
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/aqua"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/black"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/blue"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/fuchsia"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/gray"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/green"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/lime"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/maroon"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/navy"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/olive"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/orange"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/purple"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/red"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/silver"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/teal"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/white"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Color/yellow"/>
+      </genEnums>
+      <genEnums typeSafeEnumCompatible="false" ecoreEnum="Newsletter.ecore#//enums/Align">
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Align/left"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Align/center"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/Align/right"/>
+      </genEnums>
+      <genEnums typeSafeEnumCompatible="false" ecoreEnum="Newsletter.ecore#//enums/VerticalAlign">
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/VerticalAlign/top"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/VerticalAlign/middle"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/VerticalAlign/bottom"/>
+      </genEnums>
+      <genEnums typeSafeEnumCompatible="false" ecoreEnum="Newsletter.ecore#//enums/FontFamily">
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/FontFamily/arial"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/FontFamily/helvetica"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/FontFamily/timesNewRoman"/>
+        <genEnumLiterals ecoreEnumLiteral="Newsletter.ecore#//enums/FontFamily/trebuchetMS"/>
+      </genEnums>
+    </nestedGenPackages>
+  </genPackages>
+</genmodel:GenModel>

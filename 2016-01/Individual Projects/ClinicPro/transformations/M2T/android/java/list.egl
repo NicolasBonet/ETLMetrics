@@ -1,0 +1,276 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO LAS CLASES LIST ASOCIADAS A LA ENTIDAD DE MODELO PARA EL CRUD
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+package app.hospital.uniandes.edu.co.hospital.[%=nombreClaseGenerar.firstToLowerCase()%];
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import app.hospital.uniandes.edu.co.hospital.R;
+import app.hospital.uniandes.edu.co.hospital.[%=nombreClaseGenerar.firstToLowerCase()%].[%=nombreClaseGenerar%]Edit;
+
+import app.hospital.uniandes.edu.co.hospital.dtos.[%=nombreClaseGenerar%]DTO;
+[%
+var nombreClaseGenerarMin=nombreClaseGenerar.firstToLowerCase();
+var package="";
+for (activity in AndroidApplication!Activity.all){
+package=package+"import app.hospital.uniandes.edu.co.hospital.rest.ConsumeRest"+activity.name+";\n";
+}
+
+%]
+
+[%=package%]
+
+[%
+/*
+Variable para armar el hashmap con los datos que debe mostrar el listview
+*/
+var hashMap="";
+hashMap=hashMap+"hm.put("+'"id"'+", full"+nombreClaseGenerar+"s.get(i).getId().toString());\n";
+/*
+Variable para armar las propiedades de hashmap con los datos que debe mostrar el listview
+*/
+var propiedadesHash="";
+propiedadesHash=propiedadesHash+""+'"'+nombreClaseGenerarMin+'Pic"'+",";
+/*
+Variable para armar las propiedades de hashmap en R.id con los datos que debe mostrar el listview
+*/
+var propiedadesHashR="";
+propiedadesHashR=propiedadesHashR+"R.id."+nombreClaseGenerarMin+"Pic,";
+/*
+Variable para armar las propiedades del intent a pasar para hacer delete
+*/
+var propiedadesIntent="";
+propiedadesIntent=propiedadesIntent+"intent.putExtra("+'"id"'+", item.get("+'"id"'+"));\n";
+                                
+
+
+var maximo=0;
+for (activity in AndroidApplication!Activity.all){
+	var nomActivityActual = activity.name;
+		if(nombreClaseGenerar==nomActivityActual){
+%]
+
+public class [%=nombreClaseGenerar%]List extends AppCompatActivity {
+
+   public static ArrayList< [%=nombreClaseGenerar%]DTO> full[%=nombreClaseGenerar%]s = new ArrayList<[%=nombreClaseGenerar%]DTO>();
+[%
+				
+				--verifico los componentes que hacen la activity.
+					for(atributos in activity.components){
+					--verifico el tipo de campo que viene.
+					var nameMin=atributos.name.firstToLowerCase();
+					var nameMay=atributos.name.firstToUpperCase();	
+					var namefull=	atributos.name.ToLowerCase();			
+	%]
+    [%
+						if(atributos.isTypeOf(TextField))
+						{
+						
+							if(atributos.type.isTypeOf(EEnumLiteral))
+							{
+								if(atributos.type.literal=='Number'){
+								maximo=maximo+1;
+
+hashMap=hashMap+"hm.put("+'"'+namefull+'"'+", full"+nombreClaseGenerar+"s.get(i).get"+nameMay+"().toString());\n";
+propiedadesHash=propiedadesHash+""+'"'+namefull+'"'+",";
+propiedadesIntent=propiedadesIntent+"intent.putExtra("+'"'+namefull+'"'+", item.get("+'"'+namefull+'"'+"));\n";
+
+									%]
+	
+									[%
+
+								}
+								if(atributos.type.literal=='Double'){
+							    maximo=maximo+1;
+
+hashMap=hashMap+"hm.put("+'"'+namefull+'"'+", full"+nombreClaseGenerar+"s.get(i).get"+nameMay+"().toString());\n";
+propiedadesHash=propiedadesHash+""+'"'+namefull+'"'+",";	
+propiedadesIntent=propiedadesIntent+"intent.putExtra("+'"'+namefull+'"'+", item.get("+'"'+namefull+'"'+"));\n";
+						
+								}
+								if(atributos.type.literal=='Text'){
+								maximo=maximo+1;
+hashMap=hashMap+"hm.put("+'"'+namefull+'"'+", full"+nombreClaseGenerar+"s.get(i).get"+nameMay+"().toString());\n";
+propiedadesHash=propiedadesHash+""+'"'+namefull+'"'+",";		
+propiedadesIntent=propiedadesIntent+"intent.putExtra("+'"'+namefull+'"'+", item.get("+'"'+namefull+'"'+"));\n";
+					
+									%]
+	
+									[%
+							 	}
+							}	
+						}
+					}//Cierro for de verificar componentes de la activity
+hashMap=hashMap+"hm.put("+'"'+nombreClaseGenerarMin+'Pic"'+", Integer.toString("+nombreClaseGenerarMin+"Pic[0]));\n";								
+propiedadesHash=propiedadesHash+""+'"id"'+"";
+//Validar que el último paramentro lo lo ponga con una coma.
+var i=0;
+	for(atributos in activity.components){
+		var nameMin=atributos.name.firstToLowerCase();
+			if(atributos.isTypeOf(TextField))
+			{
+				i=i+1;
+				if(i==maximo){
+				propiedadesHashR=propiedadesHashR+"R.id."+nameMin+"";
+				}else{
+				propiedadesHashR=propiedadesHashR+"R.id."+nameMin+",";
+				}
+			}						
+}
+%]
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_[%=nombreClaseGenerarMin%]_list);
+
+        int[] [%=nombreClaseGenerarMin%]Pic = new int[]{
+                R.drawable.user
+        };
+
+        final ListView listview = (ListView) findViewById(R.id.listView[%=nombreClaseGenerar%]s);
+
+        final ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+
+        for (int i = 0; i < full[%=nombreClaseGenerar%]s.size(); i++) {
+            HashMap<String, String> hm = new HashMap<String, String>();
+
+//Hash map generado basado en las propiedades de las clases
+
+	[%=hashMap%]
+
+            list.add(hm);
+        }
+
+        // Keys used in Hashmap
+                
+        String[] from = {[%=propiedadesHash%]};
+
+        // Ids of views in lvpacientes_layout
+        
+        
+        
+        int[] to = {[%=propiedadesHashR%]};
+        
+        
+        final SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), list, R.layout.lv[%=nombreClaseGenerarMin%]s_layout, from, to);
+
+        listview.setAdapter(adapter);
+
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, final View view,
+                                    final int position, long id) {
+                // final String item = (String) parent.getItemAtPosition(position);
+                final HashMap<String, String> item = (HashMap<String, String>) parent.getItemAtPosition(position);
+
+                AlertDialog.Builder builder1 = new AlertDialog.Builder([%=nombreClaseGenerar%]List.this);
+                builder1.setMessage("¿Que desea hacer?");
+                builder1.setCancelable(true);
+                builder1.setPositiveButton(
+                        "Eliminar",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                                view.animate().setDuration(2000).alpha(0)
+                                        .withEndAction(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Long cc = Long.parseLong(item.get("id"));
+                                                list.remove(item);
+                                                adapter.notifyDataSetChanged();
+                                                view.setAlpha(1);
+                                                String url[%=nombreClaseGenerar%] = String.format("http://157.253.204.6:8080/hospital.api/api/[%=nombreClaseGenerarMin%]s/" + cc, 0);
+                                                String [%=nombreClaseGenerarMin%]Delete = "[%=nombreClaseGenerarMin%]Delete";
+                                                new ConsumeRest[%=nombreClaseGenerar%]().execute(url[%=nombreClaseGenerar%], [%=nombreClaseGenerarMin%]Delete);
+                                                autoLoadRest();
+                                            }
+                                        });
+                            }
+                        });
+
+                builder1.setNegativeButton(
+                        "Editar",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                                //Ir a la activity para editar
+
+                                Intent intent2 = new Intent(view.getContext(), [%=nombreClaseGenerar%]List.class);
+                                startActivity(intent2);
+                                finish();
+                                
+                                
+                               
+
+                                Intent intent = new Intent(view.getContext(), [%=nombreClaseGenerar%]Edit.class);
+                                //Variables para el intent generadas
+                                [%=propiedadesIntent%]
+                                startActivity(intent);
+
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alert11 = builder1.create();
+                alert11.show();
+            }
+        });
+    }
+
+    private class StableArrayAdapter extends ArrayAdapter<String> {
+
+        HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
+
+        public StableArrayAdapter(Context context, int textViewResourceId,
+                                  List<String> objects) {
+            super(context, textViewResourceId, objects);
+            for (int i = 0; i < objects.size(); ++i) {
+                mIdMap.put(objects.get(i), i);
+            }
+        }
+
+        @Override
+        public long getItemId(int position) {
+            String item = getItem(position);
+            return mIdMap.get(item);
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return true;
+        }
+
+    }
+
+    public void autoLoadRest() {
+        String url[%=nombreClaseGenerar%] = String.format("http://157.253.204.6:8080/hospital.api/api/[%=nombreClaseGenerarMin%]s/", 0);
+        String [%=nombreClaseGenerarMin%] = "[%=nombreClaseGenerarMin%]s";
+        new ConsumeRest[%=nombreClaseGenerar%]().execute(url[%=nombreClaseGenerar%], [%=nombreClaseGenerarMin%]);
+    }
+}
+[%
+				}
+			}
+%]

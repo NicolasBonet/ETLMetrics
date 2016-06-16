@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.mtcflow.model:MTC xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:com.mtcflow.model="http://com.mtcflow.mtc/1.1">
+  <files name="HTML5" URI=""/>
+  <files name="Activity" URI=""/>
+  <metamodels name="business" URI="input/Business/Business.ecore" alias="business" metamodelURI="http://co.edu.uniandes.businessplataform"/>
+  <metamodels name="gui" URI="input/GUI/myclinicpro.ecore" alias="gui" metamodelURI="http://www.example.org/myclinicpro"/>
+  <metamodels name="html" URI="output/HTML5/WebPlatform.ecore" alias="html" metamodelURI="http://co.edu.uniandes.webplatform"/>
+  <metamodels name="android" URI="output/Android/Android.ecore" alias="android" metamodelURI="http://co.edu.uniandes.androidplatform"/>
+  <models name="businessM" URI="input/Business/MyClinic_Instancia_MM_Business.xmi" metamodels="//@metamodels.0"/>
+  <models name="guiM" URI="input/GUI/MyClinic_Instancia_MM_GUI.xmi" metamodels="//@metamodels.1"/>
+  <models name="htmlM" URI="/MyClinicPro/models/output/HTML5/MyClinic_Instancia_MM_HTML.xmi" metamodels="//@metamodels.2"/>
+  <models name="androidM" URI="output/Android/MyClinic_Instancia_MM_Android.xmi" metamodels="//@metamodels.3"/>
+  <inputModels model="//@models.0" modelAlias="business" transformation="//@transformations.0"/>
+  <inputModels model="//@models.1" modelAlias="gui" transformation="//@transformations.1"/>
+  <inputModels model="//@models.1" modelAlias="gui" transformation="//@transformations.2"/>
+  <inputModels model="//@models.2" modelAlias="html" transformation="//@transformations.3"/>
+  <inputModels model="//@models.3" modelAlias="AndroidApplication" transformation="//@transformations.4" metamodelAlias="AndroidApplication"/>
+  <transformations xsi:type="com.mtcflow.model:M2MTransformation" name="Business2Gui" URI="input/Business2Gui.etl"/>
+  <transformations xsi:type="com.mtcflow.model:M2MTransformation" name="Gui2Html" URI="output/Gui2Html5.etl"/>
+  <transformations xsi:type="com.mtcflow.model:M2MTransformation" name="Gui2Android" URI="output/Gui2Android.etl"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="Html" URI="html5/run2html5.egl" implementationClass="" target="gen"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="android" URI="android/run2Android.egl" target="gen"/>
+  <outputModels modelAlias="gui" model="//@models.1" transformation="//@transformations.0"/>
+  <outputModels modelAlias="android" model="//@models.3" transformation="//@transformations.2"/>
+  <outputModels modelAlias="html" model="//@models.2" transformation="//@transformations.1"/>
+  <outputFiles transformation="//@transformations.3" file="//@files.0"/>
+  <outputFiles transformation="//@transformations.4" file="//@files.1"/>
+</com.mtcflow.model:MTC>

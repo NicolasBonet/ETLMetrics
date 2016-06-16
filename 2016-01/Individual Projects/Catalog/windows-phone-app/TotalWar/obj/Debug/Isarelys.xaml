@@ -1,0 +1,20 @@
+﻿
+<Page
+    x:Class="TotalWar.Isarelys"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TotalWar"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+	<ScrollViewer Height="Auto">
+	 <StackPanel HorizontalAlignment="Center">
+<TextBlock TextWrapping="Wrap" Text="ISARELYS" FontFamily="Lato" FontSize="16" Margin="0,0,-0.167,0"/>
+<Image Source="http://wiki.totalwar.com/images/a/a1/Ott_i_east_ethnic_musketmen.png" Height="198" Width="237"/>
+<TextBlock TextWrapping="Wrap" Text="These musketeers are a useful addition to any force, even if they lack the fire discipline of regular soldiers. For all its smoke and noise, handling the smoothbore, muzzle-loading musket can be taught to all but the most stupid of men. Once the basic skills of loading have been mastered, it is simply a matter of pointing the loud end at the enemy and pulling the trigger. It is in God�s hands as to what happens next! Even the most inexperienced or cack-handed of peasants can be useful with a musket in his hands. The noise of a volley is often enough to frighten, and any casualties in the enemy ranks are a bonus. Historically, such units of irregular musket men would arrive at a battlefield with all kinds of weapons, from ancient matchlocks handed down from father to son, to modern government-issue weapons looted from the enemy dead. This lack of standardisation did not matter much, as it was the ability to fire at all that made the unit a useful force." FontFamily="Lato" FontSize="16" Margin="0,0,-0.167,0"/>
+</StackPanel>
+</ScrollViewer>
+    
+</Page>
+

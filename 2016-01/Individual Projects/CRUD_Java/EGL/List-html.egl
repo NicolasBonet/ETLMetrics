@@ -1,0 +1,49 @@
+<BR>
+<BR>
+[%if(webPage.master <> ''){%]<h3> {{[%=webPage.master.firstToLowerCase()%].nombre}} </h3>[%}%]
+<BR>
+<h3> Listar [%=webPage.entityName%]s </h3>
+<HR>
+<table class="table table-hover">
+    <thead>
+        <tr>
+[%for (column in webPage.grid.columns){%]
+            <th>[%=column.label%]</th>
+[%}%]
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ng-for="var [%=webPage.entityName.firstToLowerCase()%] of [%=webPage.entityName.firstToLowerCase()%]s; #i = index">
+[%for (column in webPage.grid.columns){%]
+            <td>{{ [%=webPage.entityName.firstToLowerCase()%].[%=column.name%] }}</td>
+[%}%]
+            <td class="pull-left">
+                <button type="button"
+                        id="viewButton-row-{{i + 1}}"
+                        class="btn btn-default"
+                        (click)="view[%=webPage.entityName%]([%=webPage.entityName.firstToLowerCase()%])">Ver</button>
+                <button type="button"
+                        id="editButton-row-{{i + 1}}"
+                        class="btn btn-primary"
+                        (click)="edit[%=webPage.entityName%]([%=webPage.entityName.firstToLowerCase()%])">Editar</button>
+                <button type="button"
+                        id="deleteButton-row-{{i + 1}}"
+                        class="btn btn-danger"
+                        (click)="delete[%=webPage.entityName%]([%=webPage.entityName.firstToLowerCase()%])">Eliminar</button>
+            </td>
+        </tr>
+    </tbody>
+
+</table>
+
+<button type="button"
+    class="btn btn-success"
+    (click)="create[%=webPage.entityName%]()">Crear</button>
+
+  
+[%if (webPage.master <> ''){
+%]
+<button type="button"
+    class="btn btn-primary"
+    (click)="volver()">Volver</button>
+[%}%]

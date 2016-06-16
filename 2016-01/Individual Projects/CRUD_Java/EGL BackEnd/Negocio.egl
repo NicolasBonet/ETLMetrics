@@ -1,0 +1,179 @@
+package GIA.PortalEmpleo.Negocio;
+
+[%
+var parent = false;
+var son = false;
+var sonTarget = '';
+for (association in Association.allInstances.select(a | a.typeAssociation = 'Heritage')){
+ 	if (association.target = bEntity.name){
+		parent = true;
+ 	}
+ 	else if (association.source = bEntity.name){
+ 		son = true;
+ 		sonTarget = association.target;
+ 	}
+}
+
+if (parent = true){%]
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+[%}
+else if (son = true){%]
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+[%}
+%]
+
+[%var comp = false;
+var compSource = '';
+for (association in Association.allInstances.select(a | a.typeAssociation = 'Composition')){
+ 	if (association.target = bEntity.name){
+ 		comp = true;
+ 		compSource = association.source;%]
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import java.util.Date;
+ 	[%}
+}%]
+
+
+// Clase de negocio [%=bEntity.name%] 
+@Entity
+[%if (comp = true or parent = true){%]
+@Table(name = "[%=bEntity.name%]")
+[%}
+if (parent = true){%]
+@DiscriminatorColumn(name = "tipo[%=bEntity.name%]", discriminatorType = DiscriminatorType.STRING)
+
+public abstract class [%=bEntity.name%] implements java.io.Serializable {
+[%}
+else if (son = true){%]
+@DiscriminatorValue("[%=bEntity.name%]")	
+[%}%]
+
+[%if (parent = false){
+	if (comp =true){%]
+@NamedQueries({	    
+	    @NamedQuery(name = "[%=bEntity.name%].get[%=bEntity.name%]s", query = "SELECT e FROM [%=bEntity.name%] e"),
+		@NamedQuery(name = "[%=bEntity.name%].get[%=bEntity.name%]sBy[%=compSource%]", query = "SELECT e FROM [%=bEntity.name%] e WHERE e.[%=compSource.firstToLowerCase()%].id = :id[%=compSource%]") })
+
+public class [%=bEntity.name%] implements java.io.Serializable {
+[%} else if (son = true){%]
+@NamedQueries({
+    @NamedQuery(name = "[%=bEntity.name%].get[%=bEntity.name%]s", query = "SELECT u FROM [%=sonTarget%] u WHERE tipo[%=sonTarget%] = '[%=bEntity.name%]'") })
+
+public class [%=bEntity.name%] extends [%=sonTarget%] implements java.io.Serializable {
+[%} else if (parent = true){%]
+
+public abstract class [%=bEntity.name%] implements java.io.Serializable {
+[%}
+}%]
+
+	private static final long serialVersionUID = 1L;
+
+[%for (attribute in bEntity.attributes){%]
+	private [%=attribute.dataType%] [%=attribute.name%];
+[%}
+if (comp = true){%]
+	private [%=compSource%] [%=compSource.firstToLowerCase()%];
+[%}
+for (association in Association.allInstances.select(a | a.typeAssociation = 'Composition')){
+	if (association.source = bEntity.name){%]
+	private Set<[%=association.target%]> [%=association.target.firstToLowerCase()%]s;
+	[%}
+}
+%]	
+
+	// Constructor de la clase
+	public [%=bEntity.name%]() {
+	}
+
+[%for (attribute in bEntity.attributes){
+	if (attribute.isPK = true){%]
+	// id
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	public [%=attribute.dataType%] get[%=attribute.name.firstToLowerCase()%]() {
+		return this.[%=attribute.name%];
+	}
+[%}
+else {%]
+	// [%=attribute.name%]
+	
+	@Column(name = "[%=attribute.name%]", [%if (attribute.dataType <> 'int' and attribute.dataType <> 'long'){%]length = 100,[%}%] nullable = false)
+	public [%=attribute.dataType%] get[%=attribute.name.firstToUpperCase()%]() {
+		return this.[%=attribute.name%];
+	}
+[%}
+}
+
+if (comp = true){%]
+	// [%=compSource%]	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id[%=compSource%]", nullable = false)
+	public [%=compSource%] get[%=compSource%]() {
+		return this.[%=compSource.firstToLowerCase()%];
+	}
+[%}
+for (association in Association.allInstances.select(a | a.typeAssociation = 'Composition')){
+	if (association.source = bEntity.name){%]
+	// [%=association.target%]s
+	@JsonIgnore	
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "[%=bEntity.name.firstToLowerCase()%]")
+	public Set<[%=association.target%]> get[%=association.target%]s() {
+		return this.[%=association.target.firstToLowerCase()%]s;
+	}	
+	[%}
+}
+%]
+
+//Metodos Setter
+
+[%for (attribute in bEntity.attributes){%]
+
+	public void set[%=attribute.name.firstToUpperCase()%]([%=attribute.dataType%] [%=attribute.name%]) {
+		this.[%=attribute.name%] = [%=attribute.name%];
+	}
+[%}
+
+if (comp = true){%]
+
+	public void set[%=compSource%]([%=compSource%] [%=compSource.firstToLowerCase()%]) {
+		this.[%=compSource.firstToLowerCase()%] = [%=compSource.firstToLowerCase()%];
+	}
+[%}
+for (association in Association.allInstances.select(a | a.typeAssociation = 'Composition')){
+	if (association.source = bEntity.name){%]
+	
+	public void set[%=association.target%]s(Set<[%=association.target%]> [%=association.target.firstToLowerCase()%]s) {
+		this.[%=association.target.firstToLowerCase()%]s = [%=association.target.firstToLowerCase()%]s;
+	}
+	[%}
+}
+%]
+
+}

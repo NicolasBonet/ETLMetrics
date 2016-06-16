@@ -1,0 +1,76 @@
+/// <reference path="../../../../typings/tsd.d.ts" />
+
+import {Inject} from 'angular2/di';
+import {Http, BaseRequestOptions, Headers, httpInjectables} from 'angular2/http';
+
+export class [%=service.name%]Service {
+    http: Http;
+    baseURL: string;
+    baseRequestOptions: BaseRequestOptions;
+
+    constructor(@Inject(Http) http, @Inject(BaseRequestOptions) baseRequestOptions) {
+        this.http = http;        
+		this.baseURL = 'http://localhost:9999/[%if(service.master <> ''){%][%=service.master.firstToLowerCase() + 's/'%][%}else{%][%=service.name.firstToLowerCase() + 's'%][%}%]';
+        this.baseRequestOptions = baseRequestOptions;
+    }
+
+    _callAPI(url:string, method:string, data:any) {
+        return window.fetch(url, {
+            method: method,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+    }
+
+[%if (service.master = '') {%] 
+    get[%=service.name%]s() {
+        return this.http.get(this.baseURL);
+    }
+
+    get[%=service.name%](id:string) {
+        return this.http.get(this.baseURL + '/' + id);
+    }
+
+    update[%=service.name%](data:any) {
+		return this._callAPI(this.baseURL, 'PUT', data);
+    }
+
+    create[%=service.name%](data:any) {
+        return this._callAPI(this.baseURL, 'POST', data);
+    }
+
+    delete[%=service.name%](data:any) {
+		return this._callAPI(this.baseURL, 'DELETE', data);
+    }
+[%}
+else{%]
+	get[%=service.name%]s(id:string) {
+        return this.http.get(this.baseURL + id + '/[%=service.name.firstToLowerCase()%]s');
+    }
+
+    get[%=service.name%](idMaster:string, id:string) {
+        return this.http.get(this.baseURL + idMaster + '/[%=service.name.firstToLowerCase()%]s/' + id);
+    }
+
+    update[%=service.name%](data:any, idMaster:string) {        
+		return this._callAPI(this.baseURL + idMaster + '/[%=service.name.firstToLowerCase()%]s', 'PUT', data);
+    }
+
+    create[%=service.name%](data:any, id:string) {
+        return this._callAPI(this.baseURL + id + '/[%=service.name.firstToLowerCase()%]s', 'POST', data);
+    }
+
+    delete[%=service.name%](data:any, id:string) {
+		return this._callAPI(this.baseURL + id + '/[%=service.name.firstToLowerCase()%]s', 'DELETE', data);
+    }
+
+[%}%]
+}
+
+export let [%=service.name.firstToLowerCase()%]ServiceInjectables = [
+    [%=service.name%]Service,
+    httpInjectables
+];

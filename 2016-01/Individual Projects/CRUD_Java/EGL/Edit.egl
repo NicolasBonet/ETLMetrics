@@ -1,0 +1,86 @@
+/// <reference path="../../../../../typings/tsd.d.ts" />
+
+// Angular 2
+import {Component, View, Directive, coreDirectives} from 'angular2/angular2';
+import {formDirectives, FormBuilder, Control, ControlGroup, Validators} from 'angular2/forms';
+import {RouteParams} from 'angular2/router';
+import {Inject} from 'angular2/di';
+
+import {[%=modelo.name%]Service} from '../../services/[%=modelo.name%]Service';
+import {[%=modelo.name%]} from '../../models/[%=modelo.name%]';
+
+// Simple component
+@Component({
+    selector: 'edit-[%=modelo.name.firstToLowerCase()%]'
+})
+
+@View({
+    templateUrl: './app/pages/edit/edit-[%=modelo.name.firstToLowerCase()%].html',
+    directives: [coreDirectives, formDirectives]
+})
+
+export class Edit[%=modelo.name%] {
+    edit[%=modelo.name%]Form: ControlGroup;
+[% for (attribute in modelo.attributes){ 
+%]	[%=attribute.name%]Input: Control;
+[%
+}%]
+
+    [%=modelo.name.firstToLowerCase()%]: [%=modelo.name%];
+
+    canShowUpdateSuccessMsg: boolean;
+    canShowUpdateFailedMsg: boolean;
+    updateFailedMsg: string;
+
+    constructor(@Inject(RouteParams) params, public [%=modelo.name.firstToLowerCase()%]Service:[%=modelo.name%]Service, public formBuilder: FormBuilder) {
+        this.[%=modelo.name.firstToLowerCase()%] = new [%=modelo.name%]();
+        this.canShowUpdateFailedMsg = false;
+        this.canShowUpdateSuccessMsg = false;
+        this.updateFailedMsg = null;
+
+        this.get[%=modelo.name%](params.get('[%=modelo.attributes.select(at | at.isPrimaryKey = true).first().name%]'));
+
+        this.edit[%=modelo.name%]Form = <ControlGroup>formBuilder.group({
+[% for (attribute in modelo.attributes){ 
+%]			'[%=attribute.name%]':[''[%if (attribute.isPrimaryKey = false and attribute.isRequired = true){%], Validators.required[%}%]];
+[%
+}%]
+        });
+
+[% for (attribute in modelo.attributes){ 
+%]		this.[%=attribute.name%]Input = this.edit[%=modelo.name%]Form.controls.[%=modelo.name%];
+[%
+}%]
+    }
+
+    get[%=modelo.name%]([%=modelo.attributes.select(at | at.isPrimaryKey = true).first().name%]:string) {
+        this.[%=modelo.name.firstToLowerCase()%]Service.get[%=modelo.name%]([%=modelo.attributes.select(at | at.isPrimaryKey = true).first().name%])
+            .map(res => res.json())
+            .subscribe(res => this.[%=modelo.name.firstToLowerCase()%] = [%=modelo.name%].fromJSON(res));
+    }
+
+    update[%=modelo.name%]_successHandler(response) {
+        if (response.status !== 200) {
+            this.canShowUpdateFailedMsg = true;
+            this.updateFailedMsg = 'La actualización ha fallado';
+        }
+
+        response.json().then(data => {
+            this.canShowUpdateSuccessMsg = true;
+            this.[%=modelo.name.firstToLowerCase()%] = [%=modelo.name%].fromJSON(data);
+        });
+    }
+
+    update[%=modelo.name%]_errorHandler(error) {
+        this.updateFailedMsg = error;
+    }
+
+    update[%=modelo.name%]() {
+        this.canShowUpdateSuccessMsg = false;
+        this.canShowUpdateFailedMsg = false;
+
+        this.[%=modelo.name.firstToLowerCase()%]Service.update[%=modelo.name%](this.[%=modelo.name.firstToLowerCase()%].[%=modelo.attributes.select(at | at.isPrimaryKey = true).first().name%], this.[%=modelo.name.firstToLowerCase()%].toJSON())
+            .then(response => this.update[%=modelo.name%]_successHandler(response))
+            .catch(error => this.update[%=modelo.name%]_errorHandler(error));
+    }
+}

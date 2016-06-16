@@ -1,0 +1,30 @@
+[%
+ import 'utilities.egl';
+ //obteniendo informacion de la aplicacion
+var application = wp!Application.all.get(0);
+%]
+
+<Page
+    x:Class="[%=application.Name%].[%=xaml.Name%]"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:[%=application.Name%]"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+	 [%for(element : wp!GraphicElement in xaml.graphicElements)
+  {
+  
+  element.render();
+  
+  
+  }
+    //llama la escritura del .class
+    var t:Template:=TemplateFactory.load('windowsPhone/appXamlClass.egl');
+				t.populate('xaml', xaml);
+				t.generate('../../../windows-phone-app/TotalWar/'+xaml.Name+'.xaml.cs');
+    
+    %]
+    
+</Page>

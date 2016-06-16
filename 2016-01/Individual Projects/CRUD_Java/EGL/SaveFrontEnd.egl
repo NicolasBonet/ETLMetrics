@@ -1,0 +1,99 @@
+[%
+
+TemplateFactory.setOutputRoot("C:/FrontEnd/models");
+for(m in Modelo.all){
+	//Se generan los archivos models en typescript 
+	var plantillaModels:Template:= TemplateFactory.load('Models.egl');
+	plantillaModels.populate("modelo", m);
+	plantillaModels.generate(m.name.firstToLowerCase() + ".ts");
+}
+
+TemplateFactory.setOutputRoot("C:/FrontEnd/services");
+for(s in Service.all){
+	//Se generan los archivos service en typescript 
+	var plantillaServices:Template:= TemplateFactory.load('Services.egl');
+	plantillaServices.populate("service", s);
+	plantillaServices.generate(s.name + "Service.ts");
+}
+
+TemplateFactory.setOutputRoot("C:/FrontEnd/services");
+//Se genera el service.ts typescript 
+var plantillaService:Template:= TemplateFactory.load('Service.egl');
+plantillaService.generate("services.ts");
+
+TemplateFactory.setOutputRoot("C:/FrontEnd/pages/view");
+for (wp in WebPage.all){
+	if (wp.name.startsWith('view-')){
+		//Se generan los archivos view en typescript
+		var plantillaViewts:Template:= TemplateFactory.load('View-ts.egl');
+		plantillaViewts.populate("webPage", wp);
+		plantillaViewts.generate('view-' + wp.entityName.firstToLowerCase() + ".ts");
+		
+		//Se generan los archivos view en html
+		var plantillaViewhtml:Template:= TemplateFactory.load('View-html.egl');
+		plantillaViewhtml.populate("webPage", wp);
+		plantillaViewhtml.generate('view-' + wp.entityName.firstToLowerCase() + ".html");
+	}
+}
+
+TemplateFactory.setOutputRoot("C:/FrontEnd/pages/list");
+for (wp in WebPage.all){
+	if (wp.name.startsWith('list-')){
+		//Se generan los archivos list en typescript
+		var plantillaListts:Template:= TemplateFactory.load('List-ts.egl');
+		plantillaListts.populate("webPage", wp);
+		plantillaListts.generate('list-' + wp.entityName.firstToLowerCase() + "s.ts");
+		
+		//Se generan los archivos list en html
+		var plantillaListhtml:Template:= TemplateFactory.load('List-html.egl');
+		plantillaListhtml.populate("webPage", wp);
+		plantillaListhtml.generate('list-' + wp.entityName.firstToLowerCase() + "s.html");
+	}
+}
+
+TemplateFactory.setOutputRoot("C:/FrontEnd/pages/create");
+for (wp in WebPage.all){
+	if (wp.name.startsWith('create-')){
+		//Se generan los archivos create en typescript
+		var plantillaCreatets:Template:= TemplateFactory.load('Create-ts.egl');
+		plantillaCreatets.populate("webPage", wp);
+		plantillaCreatets.generate('create-' + wp.entityName.firstToLowerCase() + ".ts");
+		
+		//Se generan los archivos create en html
+		var plantillaCreatehtml:Template:= TemplateFactory.load('Create-html.egl');
+		plantillaCreatehtml.populate("webPage", wp);
+		plantillaCreatehtml.generate('create-' + wp.entityName.firstToLowerCase() + ".html");
+	}
+}
+
+TemplateFactory.setOutputRoot("C:/FrontEnd/pages/edit");
+for (wp in WebPage.all){
+	if (wp.name.startsWith('edit-')){
+		//Se generan los archivos edit en typescript
+		var plantillaEditts:Template:= TemplateFactory.load('Edit-ts.egl');
+		plantillaEditts.populate("webPage", wp);
+		plantillaEditts.generate('edit-' + wp.entityName.firstToLowerCase() + ".ts");
+		
+		//Se generan los archivos edit en html
+		var plantillaEdithtml:Template:= TemplateFactory.load('Edit-html.egl');
+		plantillaEdithtml.populate("webPage", wp);
+		plantillaEdithtml.generate('edit-' + wp.entityName.firstToLowerCase() + ".html");
+	}
+}
+
+TemplateFactory.setOutputRoot("C:/FrontEnd/pages");
+//Se genera el pages.ts typescript
+var plantillaPages:Template:= TemplateFactory.load('Pages.egl');
+plantillaPages.generate("pages.ts");
+
+TemplateFactory.setOutputRoot("C:/FrontEnd/pages");
+//Se genera el init-page.html typescript
+var plantillaInitPage:Template:= TemplateFactory.load('Init-Page.egl');
+plantillaInitPage.generate("init-page.html");
+
+TemplateFactory.setOutputRoot("C:/FrontEnd/server");
+//Se genera el init-page.html typescript
+var plantillaServer:Template:= TemplateFactory.load('Server.egl');
+plantillaServer.generate("server.js");
+
+%]

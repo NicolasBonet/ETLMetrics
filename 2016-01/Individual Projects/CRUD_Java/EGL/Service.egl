@@ -1,0 +1,15 @@
+/// <reference path="../../../../typings/tsd.d.ts" />
+[%
+var size = Service.all.size();
+for (service in Service.all){%]
+import {[%=service.name.firstToLowerCase()%]ServiceInjectables} from './[%=service.name%]Service';
+[%}%]
+
+export var appServicesInjectables:Array<any> = [
+[%for (service in Service.all){%]
+	[%=service.name.firstToLowerCase()%]ServiceInjectables[%if (service.name <> Service.all.get(size-1).name){%],
+[%
+}
+}%]
+
+];

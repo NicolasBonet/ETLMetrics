@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ASCII"?>
+<metamodelo:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:metamodelo="http://www.example.org/metamodelo" name="GIA Portal Empleo">
+  <businessentities name="Usuario" isAbstract="true">
+    <attributes name="id" isPK="true" isRequired="true" dataType="Long"/>
+    <attributes name="nombre" isRequired="true" dataType="String"/>
+    <attributes name="correo" isRequired="true" dataType="String"/>
+    <attributes name="tipoIdentificacion" isRequired="true" dataType="String"/>
+    <attributes name="numeroIdentificacion" isRequired="true" dataType="int"/>
+  </businessentities>
+  <businessentities name="Aspirante">
+    <attributes name="edad" isRequired="true" dataType="int"/>
+    <attributes name="profesion" isRequired="true" dataType="String"/>
+    <attributes name="otroIdioma" isRequired="true" dataType="String"/>
+    <attributes name="ciudad" isRequired="true" dataType="String"/>
+    <services name="Empleo"/>
+    <services name="Estudio"/>
+    <associations name="usuarios" source="Aspirante" target="Usuario" typeAssociation="Heritage"/>
+    <associations name="empleos" source="Aspirante" target="Empleo" typeAssociation="Composition"/>
+    <associations name="estudios" source="Aspirante" target="Estudio" typeAssociation="Composition"/>
+  </businessentities>
+  <businessentities name="Empresa">
+    <attributes name="sectorEconomico" isRequired="true" dataType="String"/>
+    <services name="Vacante"/>
+    <associations name="usuarios" source="Empresa" target="Usuario" typeAssociation="Heritage"/>
+    <associations name="vacantes" source="Empresa" target="Vacante" typeAssociation="Composition"/>
+  </businessentities>
+  <businessentities name="Empleo">
+    <attributes name="id" isPK="true" isRequired="true" dataType="Long"/>
+    <attributes name="compania" isRequired="true" dataType="String"/>
+    <attributes name="cargo" isRequired="true" dataType="String"/>
+    <attributes name="desde" isRequired="true" dataType="Date"/>
+    <attributes name="hasta" isRequired="true" dataType="Date"/>
+  </businessentities>
+  <businessentities name="Estudio">
+    <attributes name="id" isPK="true" isRequired="true" dataType="Long"/>
+    <attributes name="institucion" isRequired="true" dataType="String"/>
+    <attributes name="tituloObtenido" isRequired="true" dataType="String"/>
+    <attributes name="desde" isRequired="true" dataType="Date"/>
+    <attributes name="hasta" isRequired="true" dataType="Date"/>
+  </businessentities>
+  <businessentities name="Vacante">
+    <attributes name="id" isPK="true" isRequired="true" dataType="Long"/>
+    <attributes name="cargo" isRequired="true" dataType="String"/>
+    <attributes name="salario" isRequired="true" dataType="int"/>
+    <attributes name="fechaIngreso" isRequired="true" dataType="Date"/>
+    <attributes name="fechaPublicacion" isRequired="true" dataType="Date"/>
+    <attributes name="fechaCierre" isRequired="true" dataType="Date"/>
+    <attributes name="descripcion" isRequired="true" dataType="String"/>
+  </businessentities>
+</metamodelo:Application>

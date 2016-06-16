@@ -1,0 +1,58 @@
+{
+	"categories":[
+		[%
+		categories.renderElement();
+		%]
+	]
+}
+
+[%
+operation OrderedSet renderElement () {
+	var i : Integer = 0;
+	while(i < self.size()){
+		if (self[i].isTypeOf(Ionic!Category)) {
+			self[i].renderCategory();
+		} else if (self[i].isTypeOf(Ionic!Article)) {
+			self[i].renderArticle();
+		}
+		
+		if(i < self.size() - 1){
+		%],[%
+		}
+		i++;
+	}
+}
+
+operation Ionic!Category renderCategory () {
+	%]
+		{
+			"title":"[%=self.name%]",
+			"subtitle":"[%=self.description%]",
+			"image":"[%=self.image%]",		
+			"subcategories":[
+			[%
+			self.subcategories.renderElement();
+			%]
+			],
+			"articles":[
+			[%
+			self.articles.renderElement();
+			%]
+			]
+		}
+	[%
+}
+
+operation Ionic!Article renderArticle () {
+	%]
+		{
+			"title":"[%=self.title%]",
+			"subtitle":"[%=self.subTitle%]",
+			"summary":"[%=self.subTitle%]",
+			"content":"[%=self.content%]",
+			"image":"[%=self.image%]",
+			"portraitImage":"[%=self.portraitImage%]"
+		}
+	[%
+}
+%]

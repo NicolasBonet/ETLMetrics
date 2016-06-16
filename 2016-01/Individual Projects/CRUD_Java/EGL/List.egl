@@ -1,0 +1,47 @@
+/// <reference path="../../../../../typings/tsd.d.ts" />
+
+// Angular 2
+import {Component, View, Directive, coreDirectives} from 'angular2/angular2';
+import {Router} from 'angular2/router';
+
+import {[%=modelo.name%]Service} from '../../services/[%=modelo.name%]Service';
+
+@Component({
+    selector: 'list-[%=modelo.name.firstToLowerCase()%]s'
+})
+
+@View({
+	directives: [coreDirectives],
+    templateUrl: './app/pages/list/list-[%=modelo.name.firstToLowerCase()%]s.html'
+})
+
+export class List[%=modelo.name%]s {
+    [%=modelo.name.firstToLowerCase()%]s: Array<any>;
+
+    constructor(public router:Router, public [%=modelo.name.firstToLowerCase()%]Service:AspiranteService) {
+        this.get[%=modelo.name%]s();
+    }
+
+    get[%=modelo.name%]s() {
+        this.[%=modelo.name.firstToLowerCase()%]Service.get[%=modelo.name%]s()
+            .map(res => res.json())
+            .subscribe(res => this.[%=modelo.name.firstToLowerCase()%]s = res);
+    }
+
+    view[%=modelo.name%]([%=modelo.name.firstToLowerCase()%]) {
+        this.router.parent.navigate('/view[%=modelo.name%]/' + [%=modelo.name.firstToLowerCase()%].id);
+    }
+
+    edit[%=modelo.name%]([%=modelo.name.firstToLowerCase()%]) {
+        this.router.parent.navigate('/editAspirante/' + [%=modelo.name.firstToLowerCase()%].id);
+    }
+
+    delete[%=modelo.name%]([%=modelo.name.firstToLowerCase()%]) {
+        this.[%=modelo.name.firstToLowerCase()%]Service.delete[%=modelo.name%]([%=modelo.name.firstToLowerCase()%]); 
+		this.router.parent.navigate('/list[%=modelo.name%]');
+    }
+		
+	create[%=modelo.name%]() {
+        this.router.parent.navigate('/create[%=modelo.name%]');
+    }
+}

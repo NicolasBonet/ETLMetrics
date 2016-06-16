@@ -1,0 +1,259 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO LAS CLASES ACTIVITY
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+package app.hospital.uniandes.edu.co.hospital.[%=nombreClaseGenerar.firstToLowerCase()%];
+
+import android.content.Intent;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+
+import app.hospital.uniandes.edu.co.hospital.R;
+[%
+var nombreClaseGenerarMin=nombreClaseGenerar.firstToLowerCase();
+var package="";
+var nameMin="";
+var nameMay="";
+for (activity in AndroidApplication!Activity.all){
+nameMin=activity.name.firstToLowerCase();
+nameMay=activity.name.firstToUpperCase();
+package=package+"import app.hospital.uniandes.edu.co.hospital.rest.ConsumeRest"+activity.name+";\n";
+
+if(nombreClaseGenerar<>activity.name){
+%]
+import app.hospital.uniandes.edu.co.hospital.[%=nameMin%].[%=nameMay%]Activity;
+[%
+}
+%]
+
+import app.hospital.uniandes.edu.co.hospital.[%=nameMin%].[%=nameMay%]Create;
+import app.hospital.uniandes.edu.co.hospital.[%=nameMin%].[%=nameMay%]List;
+import app.hospital.uniandes.edu.co.hospital.dtos.[%=nameMay%]DTO;
+
+[%
+}
+
+%]
+
+[%=package%]
+[%
+for (activity in AndroidApplication!Activity.all){
+	var nomActivityActual = activity.name;
+		if(nombreClaseGenerar==nomActivityActual){
+%]
+public class [%=nombreClaseGenerar%]Activity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
+        
+[%
+/*
+Variable para armar las propiedades del intent a pasar para hacer delete
+*/
+var atributosStaticos="";
+var atributosConR="";
+var primerCampoTrue=true;
+var primerCampo="";
+
+				
+				    --verifico los componentes que hacen la activity.
+					for(atributos in activity.components){
+					--verifico el tipo de campo que viene.
+					var nameMin=atributos.name.firstToLowerCase();
+					var nameMay=atributos.name.firstToUpperCase();					
+	%]
+    [%
+						if(atributos.isTypeOf(TextField))
+						{
+						
+							if(atributos.type.isTypeOf(EEnumLiteral))
+							{
+								if(atributos.type.literal=='Number'){
+								atributosStaticos=atributosStaticos+"public static EditText editText"+nameMay+";\n";
+								atributosConR=atributosConR+"editText"+nameMay+" = (EditText) findViewById(R.id.editText"+nameMay+");\n";
+								if(primerCampoTrue){
+								primerCampo=nameMay;
+								}
+									%]
+									[%
+								}
+								if(atributos.type.literal=='Double'){
+								atributosStaticos=atributosStaticos+"public static EditText editText"+nameMay+";\n";
+								atributosConR=atributosConR+"editText"+nameMay+" = (EditText) findViewById(R.id.editText"+nameMay+");\n";
+								}
+								if(atributos.type.literal=='Text'){
+								atributosStaticos=atributosStaticos+"public static EditText editText"+nameMay+";\n";
+								atributosConR=atributosConR+"editText"+nameMay+" = (EditText) findViewById(R.id.editText"+nameMay+");\n";
+									%]
+	
+									[%
+							 	}
+							}	
+						}
+					}//Cierro for de verificar componentes de la activity
+%]
+        
+
+    private Button btnBuscar[%=nombreClaseGenerar%];
+[%
+for (activity in AndroidApplication!Activity.all){
+var activityMay=activity.name.firstToUpperCase();
+var activityMin=activity.name.firstToLowerCase();
+
+%]
+ public static ArrayList<String> nombres[%=activityMay%]s = new ArrayList<String>();
+ public static ArrayList<[%=activityMay%]DTO> full[%=activityMay%]s = new ArrayList<[%=activityMay%]DTO>();
+ [%
+
+}
+%]  
+  
+  //Atributos generados  
+   [%=atributosStaticos%]
+  
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_[%=nombreClaseGenerar.firstToLowerCase()%]);
+
+        btnBuscar[%=nombreClaseGenerar%] = (Button) findViewById(R.id.btnBuscar[%=nombreClaseGenerar%]);
+//Atributos generados
+[%=atributosConR%]
+
+        autoLoadRest();
+
+        btnBuscar[%=nombreClaseGenerar%].setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+          
+                    int numero = Integer.parseInt(editText[%=primerCampo%].getText().toString());
+                    //Consumiendo el servicio REST
+                    //String url = String.format("http://10.0.2.2:8080/hospital.api/api/persons/" + numero, numero);
+                    
+                    String url[%=nombreClaseGenerar%] = String.format("http://157.253.204.6:8080/hospital.api/api/[%=nombreClaseGenerarMin%]s/" + numero, numero);
+                    String [%=nombreClaseGenerarMin%] = "[%=nombreClaseGenerarMin%]";
+                    autoLoadRest();
+                    new ConsumeRest[%=nombreClaseGenerar%]().execute(url[%=nombreClaseGenerar%], [%=nombreClaseGenerarMin%]);
+               
+            }
+        });
+
+        //Parte de interface del menú en la activity principal
+        //Creacion del toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        //DrawerLayout que se abre con el boton izquierdo superior
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+[%
+for (activity in AndroidApplication!Activity.all){
+var activityMay=activity.name.firstToUpperCase();
+var activityMin=activity.name.firstToLowerCase();
+%]
+        //Verificacion de las opciones del menú
+        if (id == R.id.[%=activityMin%]sList) {
+            autoLoadRest();
+            Intent intent = new Intent(getApplicationContext(), [%=activityMay%]List.class);
+            startActivity(intent);
+        } else if (id == R.id.[%=activityMin%]sCreate) {
+            Intent intent = new Intent(getApplicationContext(), [%=activityMay%]Create.class);
+            startActivity(intent);
+        }
+ [%
+}
+%]
+ 		else if (id == R.id.credits) {
+            Toast.makeText(getApplicationContext(), "Diego Ruiz\nAbimelec Cuesta",
+                    Toast.LENGTH_LONG).show();
+        }
+        
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    public void autoLoadRest() {
+[%
+for (activity in AndroidApplication!Activity.all){
+var activityMay=activity.name.firstToUpperCase();
+var activityMin=activity.name.firstToLowerCase();
+%]
+        String url[%=activityMay%] = String.format("http://157.253.204.6:8080/hospital.api/api/[%=activityMin%]s/", 0);
+        String [%=activityMin%] = "[%=activityMin%]s";
+        new ConsumeRest[%=activityMay%]().execute(url[%=activityMay%], [%=activityMin%]);
+    
+ 
+ [%
+}
+%]
+}
+}
+[%
+				}
+			}
+%]

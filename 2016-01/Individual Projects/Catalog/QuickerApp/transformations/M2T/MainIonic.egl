@@ -1,0 +1,31 @@
+[%
+	var ionicApp = Ionic!IonicApp.all.get(0);
+	
+	//Render the data necesary to display the content
+	var t : Template = TemplateFactory.load("ionic/datajson.egl");
+	t.populate("categories", ionicApp.categories);
+	t.generate("../../../ionic-app/app/images/data.json");
+	
+	//Render each html view, but no the main view because is very diferent
+	for(state : Ionic!State in ionicApp.modules[0].views) {
+		var t : Template = TemplateFactory.load("ionic/viewhtml.egl");
+		t.populate("state", state);
+		t.populate("showMode", ionicApp.showMode);
+		var name = state.url.substring(1);
+		if (name <> 'main') {
+			t.generate("../../../ionic-app/app/templates/views/" + name + ".html");
+		}		
+	}
+	
+	//Render the javascript for the main module
+	var t : Template = TemplateFactory.load("ionic/module.egl");
+	t.populate("language", ionicApp.language);
+	t.populate("font", ionicApp.font);
+	t.generate("../../../ionic-app/app/src/app.js");
+	
+	//Render the script for the selected styles
+	var t : Template = TemplateFactory.load("ionic/styles.egl");
+	t.populate("fontSize", ionicApp.fontSize);
+	t.generate("../../../ionic-app/app/styles/main.scss");
+	
+%]

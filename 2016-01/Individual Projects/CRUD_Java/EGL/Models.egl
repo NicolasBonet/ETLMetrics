@@ -1,0 +1,50 @@
+[%
+if (modelo.master <> ''){%]
+import {[%=modelo.master%]} from './[%=modelo.master.firstToLowerCase()%]';
+
+[%
+}
+
+var size = modelo.attributes.size();%]
+export class [%=modelo.name %] {
+    constructor(
+[% if (modelo.master <> ''){ %]
+    	public [%=modelo.master.firstToLowerCase()%]:[%=modelo.master%] = null,
+[%}
+for (attribute in modelo.attributes){ 
+%]		public [%=attribute.name%]:string = null[%if (attribute.name <> modelo.attributes.get(size-1).name){%],
+[%
+}
+}%] ){
+	}
+
+	static fromJSON(json:any) {
+        if (json) {
+[% if (modelo.master <> ''){ %]
+    		var [%=modelo.master.firstToLowerCase()%]:[%=modelo.master%] = json.[%=modelo.master%] || null;
+[%}
+for (attribute in modelo.attributes){ 
+%]			var [%=attribute.name%]:string = json.[%=attribute.name%] || null;
+[%
+}%]
+		    return new [%=modelo.name %]([% if (modelo.master <> ''){%][%=modelo.master.firstToLowerCase()%], [%}for (attribute in modelo.attributes){%][%=attribute.name%][%if (attribute.name <> modelo.attributes.get(size-1).name){%], [%}}%]);
+		} else {
+			return new [%=modelo.name %]([% if (modelo.master <> ''){%]null, [%}for (attribute in modelo.attributes){%]null[%if (attribute.name <> modelo.attributes.get(size-1).name){%], [%}}%]);
+		}
+	}
+	
+    toJSON([% if (modelo.master <> ''){ %]id[%=modelo.master%]:string[%}%]) {
+        var json = {
+[% if (modelo.master <> ''){ %]
+        	[%=modelo.master.firstToLowerCase()%] : {id: id[%=modelo.master%]},
+[%}
+for (attribute in modelo.attributes){ 
+%]          [%=attribute.name%]: this.[%=attribute.name%][%if (attribute.name <> modelo.attributes.get(size-1).name){%],
+[%
+}
+}%] 	
+		};
+
+		return json;
+	}
+}

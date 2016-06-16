@@ -1,0 +1,137 @@
+<div id="paciente-header">
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#paciente-navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand">Paciente</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="paciente-navbar">
+				<button id="create-paciente" class="btn btn-default navbar-btn" ng-hide="ctrl.editMode" ng-click="ctrl.createRecord()"><span class="glyphicon glyphicon-plus"></span> Crear</button>
+				<button id="list-paciente" class="btn btn-default navbar-btn" ng-hide="ctrl.editMode" ng-click="ctrl.fetchRecords()"><span class="glyphicon glyphicon-list"></span> Listar</button>
+				<button id="search-paciente" class="btn btn-default navbar-btn" ng-hide="ctrl.editMode" ng-click="ctrl.searchRecord()"><span class="glyphicon glyphicon-search"></span> Buscar</button>
+				<!-- <button id="consult-paciente" class="btn btn-default navbar-btn" ng-hide="ctrl.editMode" ng-click="ctrl.consult()"><span class="glyphicon glyphicon-search"></span> Cosultar</button> -->
+
+            </div>
+        </div>
+    </nav>
+</div>
+
+<div ng-hide="ctrl.editModeList" class="col-md-12">
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+				<th>Documento</th>
+				<th>Nombres</th>
+				<th>Apellidos</th>
+				<th>Direccion</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="record in records">
+				<td id="{{$index}}-documento">{{record.documento}}</td>
+				<td id="{{$index}}-nombres">{{record.nombres}}</td>
+				<td id="{{$index}}-apellidos">{{record.apellidos}}</td>
+				<td id="{{$index}}-direccion">{{record.direccion}}</td>
+ 
+
+                <td>
+					<button id="{{$index}}-edit-btn" class="btn btn-default btn-sm" ng-click="ctrl.editRecord(record)"><span class="glyphicon glyphicon-edit"></span> Editar</button>
+					<button id="{{$index}}-delete-btn" class="btn btn-default btn-sm" ng-click="ctrl.deleteRecord(record)"><span class="glyphicon glyphicon-minus"></span> Eliminar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div ng-show="ctrl.editMode" class="col-md-12 well">
+    <form novalidate name="form" id="paciente-form" role="form" ng-submit="form.$valid && ctrl.saveRecord()">
+        <alert ng-messages="form.$error" type="danger" close="" ng-hide="!form.$error.required">
+            <div ng-message="required">
+                Por favor, complete los campos!
+            </div>
+        </alert>
+        <fieldset>
+            <input id="id" class="form-control" type="hidden" ng-model="currentRecord.id"/>
+            <div class="form-group col-md-12" ng-class="{'has-success': form.name.$valid && form.name.$dirty, 'has-error': form.name.$invalid && (form.name.$dirty || form.$submitted)}" >
+				<label for="documento" class="col-md-2 control-label">Documento</label>
+                <div class="col-md-10">
+                    <input id="documento" name="documento" class="form-control" type="text" ng-model="currentRecord.documento" required />
+                </div>
+				<label for="nombres" class="col-md-2 control-label">Nombres</label>
+                <div class="col-md-10">
+                    <input id="nombres" name="nombres" class="form-control" type="text" ng-model="currentRecord.nombres" required />
+                </div>
+				<label for="apellidos" class="col-md-2 control-label">Apellidos</label>
+                <div class="col-md-10">
+                    <input id="apellidos" name="apellidos" class="form-control" type="text" ng-model="currentRecord.apellidos" required />
+                </div>
+				<label for="direccion" class="col-md-2 control-label">Direccion</label>
+                <div class="col-md-10">
+                    <input id="direccion" name="direccion" class="form-control" type="text" ng-model="currentRecord.direccion" required />
+                </div>
+                
+            </div>
+            <div  style="text-align: center;">
+            	<button id="save-paciente" type="submit" form="paciente-form" class="btn btn-primary" ng-show="ctrl.editMode"><span class="glyphicon glyphicon-save"></span> Guardar</button>
+				<button id="cancel-paciente" type="button" form="paciente-form" class="btn btn-primary" ng-show="ctrl.editMode" ng-click="form.$setPristine(); ctrl.fetchRecords();"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+	        </div>
+        </fieldset>
+    </form>
+</div>
+<div ng-hide="ctrl.editModeSearch" class="col-md-12 well">
+    <div class="row">
+        <table class="table table-condensed">
+				<tr>
+	                <td>
+	                    <label for="documento">Documento</label>
+	                </td>
+	                <td>
+	                    <input class="form-control" placeholder="Documento...." id="documento"
+	                           ng-model="record.documento" >            
+	                </td>
+	            </tr>
+				<tr>
+	                <td>
+	                    <label for="nombres">Nombres</label>
+	                </td>
+	                <td>
+	                    <input class="form-control" placeholder="Nombres...." id="nombres"
+	                           ng-model="record.nombres" readonly>            
+	                </td>
+	            </tr>
+				<tr>
+	                <td>
+	                    <label for="apellidos">Apellidos</label>
+	                </td>
+	                <td>
+	                    <input class="form-control" placeholder="Apellidos...." id="apellidos"
+	                           ng-model="record.apellidos" readonly>            
+	                </td>
+	            </tr>
+				<tr>
+	                <td>
+	                    <label for="direccion">Direccion</label>
+	                </td>
+	                <td>
+	                    <input class="form-control" placeholder="Direccion...." id="direccion"
+	                           ng-model="record.direccion" readonly>            
+	                </td>
+	            </tr>
+ 
+            <tr>
+                <td colspan="2" align="center">
+                    <button id="btnBuscar" class="btn btn-primary" ng-click="ctrl.getRecord(record)">Consultar</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+

@@ -1,0 +1,20 @@
+﻿
+<Page
+    x:Class="TotalWar.ProtestantMissionary"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TotalWar"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+	<ScrollViewer Height="Auto">
+	 <StackPanel HorizontalAlignment="Center">
+<TextBlock TextWrapping="Wrap" Text="PROTESTANTMISSIONARY" FontFamily="Lato" FontSize="16" Margin="0,0,-0.167,0"/>
+<Image Source="https://i.ytimg.com/vi/tDEChLf-gcM/hqdefault.jpg" Height="198" Width="237"/>
+<TextBlock TextWrapping="Wrap" Text="A Protestant Missionary is a religious teacher who spreads word of Protestantism. Placing a Missionary within a region will cause a gradual conversion to Protestantism amongst the population. They will continue to convert a region until moved." FontFamily="Lato" FontSize="16" Margin="0,0,-0.167,0"/>
+</StackPanel>
+</ScrollViewer>
+    
+</Page>
+

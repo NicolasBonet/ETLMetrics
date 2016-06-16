@@ -1,0 +1,138 @@
+package GIA.PortalEmpleo.Servicios;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import java.util.List;
+import com.google.common.base.Optional;
+import GIA.PortalEmpleo.Datos.[%=bEntity.name%]DAL;
+import GIA.PortalEmpleo.Negocio.[%=bEntity.name%];
+[%for (serv in bEntity.services){%]
+import GIA.PortalEmpleo.Datos.[%=serv.name%]DAL;
+import GIA.PortalEmpleo.Negocio.[%=serv.name%];
+[%}%]
+import io.dropwizard.hibernate.UnitOfWork;
+import io.dropwizard.jersey.params.LongParam;
+
+// Clase servicio de [%=bEntity.name.firstToLowerCase()%]
+@Path("/[%=bEntity.name.firstToLowerCase()%]s")
+@Produces(MediaType.APPLICATION_JSON + "; charset=utf-8")
+@Consumes(MediaType.APPLICATION_JSON + "; charset=utf-8")
+public class [%=bEntity.name%]Resource {
+
+	private final [%=bEntity.name%]DAL [%=bEntity.name.firstToLowerCase()%]DAL;
+[%for (serv in bEntity.services){%]
+	private final [%=serv.name%]DAL [%=serv.name.firstToLowerCase()%]DAL;
+[%}%]
+
+	public [%=bEntity.name%]Resource([%=bEntity.name%]DAL [%=bEntity.name.firstToLowerCase()%]DAL[%for (serv in bEntity.services){%], [%=serv.name%]DAL [%=serv.name.firstToLowerCase()%]DAL[%}%]) {
+		this.[%=bEntity.name.firstToLowerCase()%]DAL = [%=bEntity.name.firstToLowerCase()%]DAL;
+	[%for (serv in bEntity.services){%]
+		this.[%=serv.name.firstToLowerCase()%]DAL = [%=serv.name.firstToLowerCase()%]DAL;
+	[%}%]
+	}
+
+	// Obtiene una lista de registros de [%=bEntity.name.firstToLowerCase()%]
+	@GET	
+	@UnitOfWork
+	public List<[%=bEntity.name%]> get[%=bEntity.name%]s() {
+		return [%=bEntity.name.firstToLowerCase()%]DAL.get[%=bEntity.name%]s();
+	}	
+	
+	// Obtiene un registro de [%=bEntity.name.firstToLowerCase()%] por id
+	@GET
+	@Path("/{id}")
+	@UnitOfWork
+	public [%=bEntity.name%] get[%=bEntity.name%](@PathParam("id") LongParam id) {
+		return findSafely[%=bEntity.name%](id.get());
+	}
+
+	// Crea un registro de [%=bEntity.name.firstToLowerCase()%]
+	@POST
+	@UnitOfWork
+	public [%=bEntity.name%] create[%=bEntity.name%]([%=bEntity.name%] [%=bEntity.name.firstToLowerCase()%]) {
+		return [%=bEntity.name.firstToLowerCase()%]DAL.create[%=bEntity.name%]([%=bEntity.name.firstToLowerCase()%]);
+	}
+
+	// Modifica un registro de [%=bEntity.name.firstToLowerCase()%]
+	@PUT	
+	@UnitOfWork
+	public [%=bEntity.name%] update[%=bEntity.name%]([%=bEntity.name%] [%=bEntity.name.firstToLowerCase()%]) {		
+		return [%=bEntity.name.firstToLowerCase()%]DAL.update[%=bEntity.name%]([%=bEntity.name.firstToLowerCase()%]);
+	}
+
+	// Elimina un registro de [%=bEntity.name.firstToLowerCase()%]
+	@DELETE
+	@UnitOfWork
+	public void delete[%=bEntity.name%]([%=bEntity.name%] [%=bEntity.name.firstToLowerCase()%]) {
+		[%=bEntity.name.firstToLowerCase()%]DAL.delete[%=bEntity.name%]([%=bEntity.name.firstToLowerCase()%]);
+	}
+	
+	// Busca un registro de [%=bEntity.name.firstToLowerCase()%]
+	private [%=bEntity.name%] findSafely[%=bEntity.name%](Long id) {
+		final Optional<[%=bEntity.name%]> [%=bEntity.name.firstToLowerCase()%] = [%=bEntity.name.firstToLowerCase()%]DAL.getById(id);
+		if (![%=bEntity.name.firstToLowerCase()%].isPresent()) {
+			throw new NotFoundException("No existe el registro de [%=bEntity.name.firstToLowerCase()%]");
+		}
+		return [%=bEntity.name.firstToLowerCase()%].get();
+	}
+	
+[%for (serv in bEntity.services){%]
+	// Obtiene una lista de [%=serv.name.firstToLowerCase()%]s de [%=bEntity.name.firstToLowerCase()%]
+	@GET
+	@Path("{id}/[%=serv.name.firstToLowerCase()%]s")
+	@UnitOfWork
+	public List<[%=serv.name%]> get[%=serv.name%]s(@PathParam("id") LongParam id) {
+		return [%=serv.name.firstToLowerCase()%]DAL.get[%=serv.name%]sBy[%=bEntity.name%](id.get());
+	}
+	
+	// Obtiene un registro de [%=serv.name.firstToLowerCase()%] de [%=bEntity.name.firstToLowerCase()%] por id
+	@GET
+	@Path("{id}/[%=serv.name.firstToLowerCase()%]s/{id[%=serv.name%]}")
+	@UnitOfWork
+	public [%=serv.name%] get[%=serv.name%](@PathParam("id[%=serv.name%]") LongParam id[%=serv.name%]) {
+		return findSafely[%=serv.name%](id[%=serv.name%].get());
+	}
+
+	// Crea un [%=serv.name.firstToLowerCase()%] de [%=bEntity.name.firstToLowerCase()%]
+	@POST
+	@Path("{id}/[%=serv.name.firstToLowerCase()%]s")
+	@UnitOfWork
+	public [%=serv.name%] create[%=serv.name%]([%=serv.name%] [%=serv.name.firstToLowerCase()%]) {		
+		return [%=serv.name.firstToLowerCase()%]DAL.create[%=serv.name%]([%=serv.name.firstToLowerCase()%]);
+	}
+	
+	// Elimina un [%=serv.name.firstToLowerCase()%] de [%=bEntity.name.firstToLowerCase()%]
+	@DELETE
+	@Path("{id}/[%=serv.name.firstToLowerCase()%]s")
+	@UnitOfWork
+	public void delete[%=serv.name%]([%=serv.name%] [%=serv.name.firstToLowerCase()%]) {
+		[%=serv.name.firstToLowerCase()%]DAL.delete[%=serv.name%]([%=serv.name.firstToLowerCase()%]);
+	}
+
+	// Modifica una [%=serv.name.firstToLowerCase()%] de [%=bEntity.name.firstToLowerCase()%]
+	@PUT
+	@Path("{id}/[%=serv.name.firstToLowerCase()%]s")
+	@UnitOfWork
+	public [%=serv.name%] update[%=serv.name%]([%=serv.name%] [%=serv.name.firstToLowerCase()%]) {		
+		return [%=serv.name.firstToLowerCase()%]DAL.update[%=serv.name%]([%=serv.name.firstToLowerCase()%]);
+	}
+
+	// Busca un registro de [%=serv.name.firstToLowerCase()%]
+	private [%=serv.name%] findSafely[%=serv.name%](Long id[%=serv.name%]) {
+		final Optional<[%=serv.name%]> [%=serv.name.firstToLowerCase()%] = [%=serv.name.firstToLowerCase()%]DAL.getById(id[%=serv.name%]);
+		if (![%=serv.name.firstToLowerCase()%].isPresent()) {
+			throw new NotFoundException("No existe el registro de [%=serv.name.firstToLowerCase()%]");
+		}
+		return [%=serv.name.firstToLowerCase()%].get();
+	}
+
+[%}%]
+}

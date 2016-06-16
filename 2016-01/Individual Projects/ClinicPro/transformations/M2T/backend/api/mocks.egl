@@ -1,0 +1,201 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO LAS CLASES MOCK DE PRUEBAS - PUEDEN SER UTILES
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+package co.edu.uniandes.rest.hospital.mocks;
+
+/**
+ * Mock del recurso [%=nameEntityMayGenerando%] (Mock del servicio REST)
+ * @author Diego F.
+ */
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
+
+
+import co.edu.uniandes.rest.hospital.dtos.[%=nameEntityMayGenerando%]DTO;
+import co.edu.uniandes.rest.hospital.exceptions.[%=nameEntityMayGenerando%]LogicException;
+
+/**
+ * Mock del recurso [%=nameEntityMayGenerando%] (Mock del servicio REST)
+ */
+@Named
+@ApplicationScoped
+public class [%=nameEntityMayGenerando%]LogicMock {
+	
+	// objeto para presentar logs de las operaciones
+	private final static Logger logger = Logger.getLogger([%=nameEntityMayGenerando%]LogicMock.class.getName());
+	
+	// listado de [%=nameEntityGenerando%]as
+    private static ArrayList<[%=nameEntityMayGenerando%]DTO> [%=nameEntityGenerando%]s;
+
+    /**
+     * Constructor. Crea los datos de ejemplo.
+     */
+    public [%=nameEntityMayGenerando%]LogicMock() {
+
+    	if ([%=nameEntityGenerando%]s == null) {
+            [%=nameEntityGenerando%]s = new ArrayList<>();
+        }
+        
+    	// indica que se muestren todos los mensajes
+    	logger.setLevel(Level.INFO);
+    	
+    	// muestra información 
+    	logger.info("Inicializa la lista de [%=nameEntityGenerando%]as");
+    	logger.info("[%=nameEntityGenerando%]as" + [%=nameEntityGenerando%]s );
+    }    
+    
+	/**
+	 * Obtiene el listado de [%=nameEntityMayGenerando%]s. 
+	 * @return lista de [%=nameEntityMayGenerando%]s
+	 * @throws [%=nameEntityMayGenerando%]LogicException cuando no existe la lista en memoria  
+	 */    
+    public List<[%=nameEntityMayGenerando%]DTO> get[%=nameEntityMayGenerando%]s() throws [%=nameEntityMayGenerando%]LogicException {
+    	if ([%=nameEntityGenerando%]s == null) {
+    		logger.severe("Error interno: lista de [%=nameEntityGenerando%]as no existe.");
+    		throw new [%=nameEntityMayGenerando%]LogicException("Error interno: lista de [%=nameEntityGenerando%]as no existe.");    		
+    	}
+    	
+    	logger.info("retornando todas las [%=nameEntityGenerando%]as");
+    	return [%=nameEntityGenerando%]s;
+    }
+
+    /**
+     * Obtiene una [%=nameEntityGenerando%]a
+     * @param id identificador de la [%=nameEntityGenerando%]a
+     * @return [%=nameEntityGenerando%]a encontrada
+     * @throws [%=nameEntityMayGenerando%]LogicException cuando la [%=nameEntityGenerando%]a no existe
+     */
+    public [%=nameEntityMayGenerando%]DTO get[%=nameEntityMayGenerando%](Long id) throws [%=nameEntityMayGenerando%]LogicException {
+    	logger.info("recibiendo solicitud de [%=nameEntityGenerando%]a con id " + id);
+    	
+    	// busca la [%=nameEntityGenerando%]a con el id suministrado - en realidad la cedula
+       /* for ([%=nameEntityMayGenerando%]DTO [%=nameEntityGenerando%] : [%=nameEntityGenerando%]s) {
+            if (Objects.equals([%=nameEntityGenerando%].getCedula(), id)){
+            	logger.info("retornando [%=nameEntityGenerando%]a " + [%=nameEntityGenerando%]);
+                return [%=nameEntityGenerando%];
+            }
+        }*/
+        
+        // si no encuentra la [%=nameEntityGenerando%]
+        logger.severe("No existe [%=nameEntityGenerando%] con ese id");
+        throw new [%=nameEntityMayGenerando%]LogicException("No existe [%=nameEntityGenerando%] con ese id");
+    }
+
+    /**
+     * Agrega una [%=nameEntityGenerando%] a la lista.
+     * @param new[%=nameEntityMayGenerando%] [%=nameEntityGenerando%] a adicionar
+     * @throws [%=nameEntityMayGenerando%]LogicException cuando ya existe una [%=nameEntityGenerando%] con el id suministrado
+     * @return [%=nameEntityGenerando%] agregada
+     */
+    public [%=nameEntityMayGenerando%]DTO create[%=nameEntityMayGenerando%]([%=nameEntityMayGenerando%]DTO new[%=nameEntityMayGenerando%]) throws [%=nameEntityMayGenerando%]LogicException {
+    	logger.info("recibiendo solicitud de agregar [%=nameEntityGenerando%] " + new[%=nameEntityMayGenerando%]);
+    	
+    	// la nueva [%=nameEntityGenerando%] tiene id ?
+    	if ( new[%=nameEntityMayGenerando%].getId() != null ) {
+	    	// busca la [%=nameEntityGenerando%]a con el id suministrado
+	        for ([%=nameEntityMayGenerando%]DTO [%=nameEntityGenerando%] : [%=nameEntityGenerando%]s) {
+	        	// si existe una [%=nameEntityGenerando%]a con ese id
+	            if (Objects.equals([%=nameEntityGenerando%].getId(), new[%=nameEntityMayGenerando%].getId())){
+	            	logger.severe("Ya existe una [%=nameEntityGenerando%]a con ese id");
+	                throw new [%=nameEntityMayGenerando%]LogicException("Ya existe una [%=nameEntityGenerando%]a con ese id");
+	            }
+	        }
+	        
+	    // la nueva [%=nameEntityGenerando%]a no tiene id ? 
+    	} else {
+
+    		// genera un id para la [%=nameEntityGenerando%]a
+    		logger.info("Generando id paa la nueva [%=nameEntityGenerando%]a");
+    		long newId = 1;
+	        for ([%=nameEntityMayGenerando%]DTO [%=nameEntityGenerando%] : [%=nameEntityGenerando%]s) {
+	            if (newId <= [%=nameEntityGenerando%].getId()){
+	                newId =  [%=nameEntityGenerando%].getId() + 1;
+	            }
+	        }
+	        new[%=nameEntityMayGenerando%].setId(newId);
+    	}
+    	
+        // agrega la [%=nameEntityGenerando%]a
+    	logger.info("agregando [%=nameEntityGenerando%]a " + new[%=nameEntityMayGenerando%]);
+        [%=nameEntityGenerando%]s.add(new[%=nameEntityMayGenerando%]);
+        return new[%=nameEntityMayGenerando%];
+    }
+
+    /**
+     * Actualiza los datos de una [%=nameEntityGenerando%]a
+     * @param id identificador de la [%=nameEntityGenerando%]a a modificar
+     * @param update[%=nameEntityMayGenerando%] [%=nameEntityGenerando%]a a modificar
+     * @return datos de la [%=nameEntityGenerando%]a modificada 
+     * @throws [%=nameEntityMayGenerando%]LogicException cuando no existe una [%=nameEntityGenerando%]a con el id suministrado
+     */
+    public [%=nameEntityMayGenerando%]DTO update[%=nameEntityMayGenerando%](Long id, [%=nameEntityMayGenerando%]DTO updated[%=nameEntityMayGenerando%]) throws [%=nameEntityMayGenerando%]LogicException {
+    	logger.info("recibiendo solictud de modificar [%=nameEntityGenerando%]a " + updated[%=nameEntityMayGenerando%]);
+    	
+    	// busca la [%=nameEntityGenerando%]a con el id suministrado
+        for ([%=nameEntityMayGenerando%]DTO [%=nameEntityGenerando%] : [%=nameEntityGenerando%]s) {
+            if (Objects.equals([%=nameEntityGenerando%].getId(), id)) {
+            	
+            	// modifica la [%=nameEntityGenerando%]a
+            	[%=nameEntityGenerando%].setId(updated[%=nameEntityMayGenerando%].getId());
+[%
+var nomParam = "";
+var nomParamMay = "";
+
+		for(parametros in vecAtributos){
+			for(param in parametros){
+				nomParam = param.name.toLowerCase();
+				nomParamMay = nomParam.firstToUpperCase();
+%]
+    			[%=nameEntityGenerando%].set[%=nomParamMay%](updated[%=nameEntityGenerando%].get[%=nomParamMay%]());
+[%
+	}
+}
+%]
+                
+                // retorna la [%=nameEntityGenerando%]a modificada
+            	logger.info("Modificando [%=nameEntityGenerando%]a " + [%=nameEntityGenerando%]);
+                return [%=nameEntityGenerando%];
+            }
+        }
+        
+        // no encontró la [%=nameEntityGenerando%]a con ese id ?
+        logger.severe("No existe una [%=nameEntityGenerando%]a con ese id");
+        throw new [%=nameEntityMayGenerando%]LogicException("No existe una [%=nameEntityGenerando%]a con ese id");
+    }
+
+    /**
+     * Elimina los datos de una [%=nameEntityGenerando%]a
+     * @param id identificador de la [%=nameEntityGenerando%]a a eliminar
+     * @throws [%=nameEntityMayGenerando%]LogicException cuando no existe una [%=nameEntityGenerando%]a con el id suministrado
+     */
+    public void delete[%=nameEntityMayGenerando%](Long id) throws [%=nameEntityMayGenerando%]LogicException {
+    	logger.info("recibiendo solictud de eliminar [%=nameEntityGenerando%]a con id " + id);
+    	
+    	// busca la [%=nameEntityGenerando%]a con el id suministrado
+      /*  for ([%=nameEntityMayGenerando%]DTO [%=nameEntityGenerando%] : [%=nameEntityGenerando%]s) {
+            if (Objects.equals([%=nameEntityGenerando%].getCedula(), id)) {
+            	
+            	// elimina la [%=nameEntityGenerando%]a
+            	logger.info("eliminando [%=nameEntityGenerando%]a " + [%=nameEntityGenerando%]);
+                [%=nameEntityGenerando%]s.remove([%=nameEntityGenerando%]);
+                return;
+            }
+        }*/
+
+        // no encontró la [%=nameEntityGenerando%]a con ese id ?
+        logger.severe("No existe una [%=nameEntityGenerando%]a con ese id");
+        throw new [%=nameEntityMayGenerando%]LogicException("No existe una [%=nameEntityGenerando%]a con ese id");
+    }
+}

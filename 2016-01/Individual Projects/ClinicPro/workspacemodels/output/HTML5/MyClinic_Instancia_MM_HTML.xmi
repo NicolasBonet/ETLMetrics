@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ASCII"?>
+<webplatform:WebApplication xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:webplatform="http://co.edu.uniandes.webplatform">
+  <html name="Hospital ABC">
+    <body>
+      <form value="tabla" name="Paciente">
+        <input value="primary" name="Documento"/>
+        <input name="Nombres"/>
+        <input name="Apellidos"/>
+        <input name="Direccion"/>
+      </form>
+      <form value="tabla" name="Servicio">
+        <input value="primary" name="Codigo"/>
+        <input name="Nombre"/>
+        <input name="Precio"/>
+      </form>
+      <form value="tabla" name="Doctor">
+        <input value="primary" name="Cedula"/>
+        <input name="Doctor"/>
+      </form>
+    </body>
+    <head/>
+  </html>
+</webplatform:WebApplication>

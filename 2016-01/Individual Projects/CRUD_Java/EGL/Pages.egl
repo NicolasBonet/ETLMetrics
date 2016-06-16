@@ -1,0 +1,54 @@
+/// <reference path="../../../../typings/tsd.d.ts" />
+
+// Angular 2
+import {Component, View, coreDirectives} from 'angular2/angular2';
+import {RouteConfig, RouterOutlet, RouterLink, Router} from 'angular2/router';
+import {BrowserLocation} from 'angular2/src/router/browser_location';
+
+[%for (modelo in Modelo.all){%]
+
+import {Create[%=modelo.name%]} from './create/create-[%=modelo.name.firstToLowerCase()%]';
+import {Edit[%=modelo.name%]} from './edit/edit-[%=modelo.name.firstToLowerCase()%]';
+import {List[%=modelo.name%]s} from './list/list-[%=modelo.name.firstToLowerCase()%]s';
+import {View[%=modelo.name%]} from './view/view-[%=modelo.name.firstToLowerCase()%]';
+[%}%]
+
+
+@Component({
+    selector: 'app',
+})
+
+@View({
+    directives: [ RouterOutlet, RouterLink, coreDirectives],
+    templateUrl:'./app/pages/init-page.html'
+})
+
+@RouteConfig([
+[%var size = Modelo.all.size(); 
+for (modelo in Modelo.all){
+	if (modelo.master = ''){%]
+	
+	{ path: '/list[%=modelo.name%]',      as: 'list[%=modelo.name%]',      component: List[%=modelo.name%]s },
+    { path: '/create[%=modelo.name%]',    as: 'create[%=modelo.name%]',    component: Create[%=modelo.name%] },
+    { path: '/edit[%=modelo.name%]/:id',  as: 'edit[%=modelo.name%]',      component: Edit[%=modelo.name%] },
+    { path: '/view[%=modelo.name%]/:id',  as: 'view[%=modelo.name%]',      component: View[%=modelo.name%] }[%if (modelo.name <> Modelo.all.get(size-1).name){%],[%}%]
+    
+	[%}else{%]
+	
+	{ path: '/list[%=modelo.name%]/:id',      as: 'list[%=modelo.name%]',      component: List[%=modelo.name%]s },
+	{ path: '/create[%=modelo.name%]/:id',    as: 'create[%=modelo.name%]',    component: Create[%=modelo.name%] },
+	{ path: '/:idMaster/edit[%=modelo.name%]/:id',  as: 'edit[%=modelo.name%]',      component: Edit[%=modelo.name%] },
+	{ path: '/:idMaster/view[%=modelo.name%]/:id',  as: 'view[%=modelo.name%]',      component: View[%=modelo.name%] }[%if (modelo.name <> Modelo.all.get(size-1).name){%],[%}%]
+
+[%}}%]
+])
+
+export class App {
+    title: string;
+    constructor(private router: Router, browserLocation: BrowserLocation) {
+        this.title = 'GIA Portal Empleo';
+        
+        let uri = browserLocation.path();
+        router.navigate(uri);
+    }
+}

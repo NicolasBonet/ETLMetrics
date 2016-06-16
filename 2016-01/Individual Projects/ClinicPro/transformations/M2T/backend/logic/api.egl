@@ -1,0 +1,33 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO LAS INTERFACES ASOCIADAS A CADA ENTIDAD
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+package co.edu.uniandes.hospital.api;
+
+import co.edu.uniandes.hospital.entities.[%=nameEntityMayGenerando%]Entity;
+import co.edu.uniandes.hospital.exceptions.BusinessLogicException;
+import java.util.List;
+
+public interface I[%=nameEntityMayGenerando%]Logic {
+
+    public List<[%=nameEntityMayGenerando%]Entity> get[%=nameEntityMayGenerando%]s();
+
+    public [%=nameEntityMayGenerando%]Entity get[%=nameEntityMayGenerando%](Long id) ;
+[%
+if (primary <> ""){
+%]   
+    public [%=nameEntityMayGenerando%]Entity get[%=nameEntityMayGenerando%]ByPK([%=typePrimary.firstToUpperCase()%] [%=primary%]) ;
+[%
+}
+%] 
+    public [%=nameEntityMayGenerando%]Entity create[%=nameEntityMayGenerando%]([%=nameEntityMayGenerando%]Entity entity);
+
+    public [%=nameEntityMayGenerando%]Entity update[%=nameEntityMayGenerando%]([%=nameEntityMayGenerando%]Entity entity);
+
+    public void delete[%=nameEntityMayGenerando%](Long id);
+}

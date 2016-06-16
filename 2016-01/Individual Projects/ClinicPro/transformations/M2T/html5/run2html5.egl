@@ -1,0 +1,78 @@
+[% 
+/*
+DESCRIPCION:
+Esta es la transformación general que toma todos los archivos egl de las carpetas src para generar 
+cada uno de los artefactos usados por la aplicación WEB HTML5/ANGULAR.
+
+SE REALIZA UN CICLO GENERAL PARA LA IDENTIFICACION DE LAS ENTIDADES Y ASOCIARLAS A SUS 
+ 	--MODULES
+	--SERVICES
+	--CTRLS
+	--INDEX
+	--TEMPLATES DE CADA UNA DE LAS ENTIDADES DEL MODELO
+	--APPS
+*/
+%]
+[% 
+var urlServicioRest = "http://localhost:8080/hospital.api/api/";
+//Para generar el pom.xml de hospital.web
+var t:Template:= TemplateFactory.load('pom.egl');
+t.generate("../../../gen/front/html5/hospital.web/pom.xml");
+//Para generar el index.html de hospital.web/src/main/webapp
+t:= TemplateFactory.load('index.egl');
+t.generate("../../../gen/front/html5/hospital.web/src/main/webapp/index.html");
+//Para generar el app.js de hospital.web/src/main/webapp/src
+t:= TemplateFactory.load('app.egl');
+t.generate("../../../gen/front/html5/hospital.web/src/main/webapp/src/app.js");
+//Se generan el cofdigo de angular para cada una de las entidades.
+var nameModule = "";
+var nameModuleMin = "";	
+var nameModuleMay = "";	
+var vecParametros = "";
+var vecBotones = "";
+var paramPK = "";
+for (modulos in html!Form.all){
+	nameModule = modulos.name;
+	nameModuleMin = nameModule.toLowerCase();
+	nameModuleMay = nameModule.toUpperCase();
+	
+	vecParametros = html!Form.all.select(a|a.name=nameModule).input;
+	vecBotones = html!Form.all.select(a|a.name=nameModule).button;
+	
+	for(parametros in vecParametros){
+		for(param in parametros){
+			if(param.value.toLowerCase() == "primary"){
+				paramPK = param.name.toLowerCase(); 
+				break;
+			}
+	 	}
+	}
+	
+	//Para generar el los *.mod.js.js de Angular para cada una de las entidades
+	t:= TemplateFactory.load('angular_MOD.egl');
+	t.populate("nameModuleGenerando",nameModule);
+	t.populate("nameModuleGenerandoMin",nameModuleMin);
+	t.populate("urlServicioRest",urlServicioRest+nameModuleMin+"s");
+	t.generate("../../../gen/front/html5/hospital.web/src/main/webapp/src/modules/"+nameModuleMin+"/"+nameModuleMin+".mod.js");
+	
+	//Para generar el los *.svc.js.js de Angular para cada una de las entidades
+	t:= TemplateFactory.load('angular_SVC.egl');
+	t.populate("nameModuleGenerando",nameModule);
+	t.populate("nameModuleGenerandoMin",nameModuleMin);
+	t.generate("../../../gen/front/html5/hospital.web/src/main/webapp/src/modules/"+nameModuleMin+"/"+nameModuleMin+".svc.js");
+	
+	//Para generar el los *.ctrl.js.js de Angular para cada una de las entidades
+	t:= TemplateFactory.load('angular_CTRL.egl');
+	t.populate("nameModuleGenerando",nameModule);
+	t.populate("nameModuleGenerandoMin",nameModuleMin);
+	t.populate("paramPK",paramPK);
+	t.generate("../../../gen/front/html5/hospital.web/src/main/webapp/src/modules/"+nameModuleMin+"/"+nameModuleMin+".ctrl.js");
+	
+	t:= TemplateFactory.load('angular_TPL.egl');
+	t.populate("nameModuleGenerando",nameModule);
+	t.populate("nameModuleGenerandoMin",nameModuleMin);
+	t.populate("vecParametros",vecParametros);
+	t.generate("../../../gen/front/html5/hospital.web/src/main/webapp/src/modules/"+nameModuleMin+"/"+nameModuleMin+".tpl.html");
+}
+
+%]

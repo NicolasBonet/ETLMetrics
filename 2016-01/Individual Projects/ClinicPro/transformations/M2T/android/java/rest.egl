@@ -1,0 +1,233 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO LAS CLASES QUE CONSUME EL SERVICIO REST DEL BACKEND ASOCIADAS A LA ENTIDAD DE MODELO PARA EL CRUD
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+package app.hospital.uniandes.edu.co.hospital.rest;
+
+import android.os.AsyncTask;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
+[%
+var namePackage=nombreClaseGenerar.firstToLowerCase();
+%]
+
+import app.hospital.uniandes.edu.co.hospital.[%=namePackage%].[%=nombreClaseGenerar%]List;
+import app.hospital.uniandes.edu.co.hospital.[%=namePackage%].[%=nombreClaseGenerar%]Activity;
+import app.hospital.uniandes.edu.co.hospital.dtos.[%=nombreClaseGenerar%]DTO;
+import app.hospital.uniandes.edu.co.hospital.http.HttpRequest;
+
+
+/**
+ * Created by Diego on 17/04/2016.
+ */
+  
+[% 
+/*
+Se definen los atributos para trabajar - dependiendo de los que posea el modelo
+Se utilizan los metodos get y delete para hacer las peticiones al backend.
+*/
+			var atributos="";
+			/*
+			Esta variable permite armar el cotnenido de las variables estaticas que 
+			deben ser consumidas desde otras activity
+			*/
+			var sentenciasVariables="";
+			/*
+			Esta variable permite armar el cotnenido de las variables estaticas que 
+			deben ser consumidas desde otras activity con los gets
+			*/
+			var sentenciasVariablesGets="";
+			/*
+			Esta variable permite armar el cotnenido de las variables que llenaran el spinner en
+			android para el servicio o clase que venga.
+			*/
+			var sentenciasArraysNombres="";
+			/*
+			Esta variable permite armar el cotnenido de las variables que llenaran el spinner en
+			android para el servicio o clase que venga.
+			*/
+			var sentenciasArraysFull="";
+			
+			var primera=true;
+			var nameVariable="";
+			 
+			for (activity in AndroidApplication!Activity.all){
+		
+				var nombreClaseGenerarMin=nombreClaseGenerar.firstToLowerCase();
+				var nomActivityActual = activity.name;
+				
+				if(nombreClaseGenerar==nomActivityActual){
+%]
+public class ConsumeRest[%=nombreClaseGenerar%] extends AsyncTask<String, Long, String> {
+[%
+				    --verifico los componentes que hacen la activity.
+					for(atributos in activity.components){
+					--verifico el tipo de campo que viene.
+					var nameMin=atributos.name.firstToLowerCase();
+					var nameMay=atributos.name.firstToUpperCase();	
+						if(atributos.isTypeOf(TextField))
+						{
+							if(atributos.type.isTypeOf(EEnumLiteral))
+							{
+								if(atributos.type.literal=='Number'){
+							       sentenciasVariables=sentenciasVariables+"new "+nombreClaseGenerar+"Activity().editText"+nameMay+".setText("+'""'+");\n";
+							       sentenciasVariablesGets=sentenciasVariablesGets+"new "+nombreClaseGenerar+"Activity().editText"+nameMay+".setText("+nombreClaseGenerarMin+".get"+nameMay+"().toString());\n";					       
+							        if(primera){
+									nameVariable=nameMay;
+									primera=false;
+									}
+									%]
+						        	
+									[%
+
+								}
+								if(atributos.type.literal=='Double'){								    
+								    sentenciasVariables=sentenciasVariables+"new "+nombreClaseGenerar+"Activity().editText"+nameMay+".setText("+'""'+");\n";		
+									sentenciasVariablesGets=sentenciasVariablesGets+"new "+nombreClaseGenerar+"Activity().editText"+nameMay+".setText("+nombreClaseGenerarMin+".get"+nameMay+"().toString());\n";
+									if(primera){
+									nameVariable=nameMay;
+									primera=false;
+									}
+									%]
+
+									[%
+
+								}
+								if(atributos.type.literal=='Text'){
+									sentenciasVariables=sentenciasVariables+"new "+nombreClaseGenerar+"Activity().editText"+nameMay+".setText("+'""'+");\n";
+									sentenciasVariablesGets=sentenciasVariablesGets+"new "+nombreClaseGenerar+"Activity().editText"+nameMay+".setText("+nombreClaseGenerarMin+".get"+nameMay+"());\n";
+									if(primera){
+									nameVariable=nameMay;
+									primera=false;
+									}										
+									%]
+
+									[%
+							 	}
+							}									
+						}
+					}
+%]
+    public int bandera = 0;
+    public int code = 0;
+
+    protected String doInBackground(String... urls) {
+        try {
+
+            if (urls[1].equals("[%=nombreClaseGenerarMin%]")) {
+                bandera = 1;
+                code = HttpRequest.get(urls[0]).accept("application/json").code();
+                return HttpRequest.get(urls[0]).accept("application/json").body();
+            } else if (urls[1].equals("[%=nombreClaseGenerarMin%]s")) {
+                bandera = 2;
+                code = HttpRequest.get(urls[0]).accept("application/json").code();
+                return HttpRequest.get(urls[0]).accept("application/json").body();
+            } else if (urls[1].equals("[%=nombreClaseGenerarMin%]Delete")) {
+                bandera = 3;
+                code = HttpRequest.delete(urls[0]).accept("application/json").code();
+                HttpRequest.delete(urls[0]).accept("application/json");
+                return null;
+            } else {
+                code = 0;
+                bandera = 0;
+                return null;
+            }
+
+        } catch (HttpRequest.HttpRequestException exception) {
+            return null;
+        }
+    }
+
+    protected void onPostExecute(String response) {
+
+        if (bandera == 1) {
+            if (code == 500) {
+                System.out.println("Error en el servidor");
+                
+                [%=sentenciasVariables%]
+                
+            } else if (code == 200) {
+                [%=nombreClaseGenerar%]DTO [%=nombreClaseGenerarMin%] = get[%=nombreClaseGenerar%](response);
+                //Envio los datos del objeto
+                if ([%=nombreClaseGenerarMin%] != null) {
+                
+                [%=sentenciasVariablesGets%]
+                
+                }
+            }
+        } 
+       
+        else if (bandera == 2) {
+            if (code == 500) {
+                System.out.println("Error en el servidor");
+            } else if (code == 200) {
+                clearAll();
+                List<[%=nombreClaseGenerar%]DTO> [%=nombreClaseGenerarMin%]s = get[%=nombreClaseGenerar%]s(response);
+                int i = 0;
+                if ([%=nombreClaseGenerarMin%]s != null) {
+
+                    for ([%=nombreClaseGenerar%]DTO [%=nombreClaseGenerarMin%] : [%=nombreClaseGenerarMin%]s) {
+						[%
+						/*
+						En el momento de armar la información para el Spinner se debe observar que 
+						el nombre del servicio puede ser getName o getNombre o getNombres en n 
+						*/
+						%]
+						 
+					    
+		           		new [%=nombreClaseGenerar%]Activity().full[%=nombreClaseGenerar%]s.add([%=nombreClaseGenerarMin%]);
+						new [%=nombreClaseGenerar%]List().full[%=nombreClaseGenerar%]s.add([%=nombreClaseGenerarMin%]);
+                       i++;
+                    }
+                }
+            }
+        } else if (bandera == 3) {
+            if (code == 204) {
+                clearAll();
+                System.out.println("[%=nombreClaseGenerar%] borrado...");
+                System.out.println(response);
+            } else {
+                System.out.println("Error borrando el [%=nombreClaseGenerar%]...");
+            }
+        }
+    }
+
+    private [%=nombreClaseGenerar%]DTO get[%=nombreClaseGenerar%](String json) {
+        Gson gson = new Gson();
+        Type type = new TypeToken<[%=nombreClaseGenerar%]DTO>() {
+        }.getType();
+        return gson.fromJson(json, type);
+    }
+
+    private List<[%=nombreClaseGenerar%]DTO> get[%=nombreClaseGenerar%]s(String json) {
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<[%=nombreClaseGenerar%]DTO>>() {
+        }.getType();
+        return gson.fromJson(json, type);
+    }
+
+
+// Permite hacer la limpieza de cada uno de los arrays que son cargados en los listviews
+public void clearAll() {
+		
+        new [%=nombreClaseGenerar%]Activity().full[%=nombreClaseGenerar%]s.clear();
+        new [%=nombreClaseGenerar%]List().full[%=nombreClaseGenerar%]s.clear();
+ }
+
+}
+[%
+				}
+			}
+%]
+

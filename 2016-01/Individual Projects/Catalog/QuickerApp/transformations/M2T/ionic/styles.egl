@@ -1,0 +1,62 @@
+/************************************
+ *
+ *  Main Styles to compile. Here only @imports!
+ *
+ ************************************/
+@import "_variables";
+@import "_fonts";
+/**
+ * LAYOUT
+ */
+@import "layout/layout";
+/**
+ * MENU
+ */
+@import "menu/menu";
+/**
+ * VIEWS
+ */
+@import "views/home";
+
+body {
+  h1 {
+    font-size: [%=fontSize%] !important;
+  }
+  h2 {
+    font-size: [%=fontSize%] !important;
+  }
+  h3 {
+    font-size: [%=fontSize%] !important;
+  }
+  h4 {
+    font-size: [%=fontSize%] !important;
+  }
+  h5 {
+    font-size: [%=fontSize%] !important;
+  }
+  h6 {
+    font-size: [%=fontSize%] !important;
+  }
+  p {
+    font-size: [%=fontSize%] !important;
+  }
+  li {
+    font-size: [%=fontSize%] !important;
+  }
+  a {
+    font-size: [%=fontSize%] !important;
+  }
+}
+
+.grid {
+  .item {
+    img {
+      top: 10px;
+      left: 10px;
+      max-height: 80px;
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+

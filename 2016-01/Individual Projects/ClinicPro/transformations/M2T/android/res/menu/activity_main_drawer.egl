@@ -1,0 +1,49 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+CONFIG MENU - DEPENDIENDO DE LAS ACTIVITIES SE CREA UNO
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+    
+[%    for (activity in AndroidApplication!Activity.all){
+	   var nomActivityActual = activity.name;
+	   var activityMin=nomActivityActual.firstToLowerCase();
+				 				
+	%]
+        <item android:title="[%=nomActivityActual%]s">
+            <menu>
+                <item
+                    android:id="@+id/[%=activityMin%]sCreate"
+                    android:icon="@android:drawable/ic_input_add"
+                    android:title="Crear" />
+                <item
+                    android:id="@+id/[%=activityMin%]sList"
+                    android:icon="@drawable/list"
+                    android:title="Listar" />
+            </menu>
+        </item>
+
+
+[%
+				
+			}
+%]
+    </group>
+
+    <item android:title="Otras opciones">
+        <menu>
+            <item
+                android:id="@+id/credits"
+                android:icon="@drawable/close"
+                android:title="Créditos" />
+        </menu>
+    </item>
+
+</menu>

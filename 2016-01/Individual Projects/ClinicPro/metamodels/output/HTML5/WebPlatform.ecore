@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="webplatform" nsURI="http://co.edu.uniandes.webplatform" nsPrefix="webplatform">
+  <eClassifiers xsi:type="ecore:EClass" name="WebApplication">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="html" upperBound="-1" eType="#//HTML"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="HTML" eSuperTypes="#//HtmlElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="body" eType="#//Body" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="head" eType="#//Head" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="HtmlElement" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Body">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="form" upperBound="-1" eType="#//Form"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="div" upperBound="-1" eType="#//Div"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Head" eSuperTypes="#//HtmlElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Input" eSuperTypes="#//HtmlElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Span" eSuperTypes="#//HtmlElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Button" eSuperTypes="#//HtmlElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="SelectOption" eSuperTypes="#//HtmlElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Form" eSuperTypes="#//HtmlElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="button" upperBound="-1"
+        eType="#//Button" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="input" upperBound="-1"
+        eType="#//Input" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="span" upperBound="-1" eType="#//Span"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="selectoption" upperBound="-1"
+        eType="#//SelectOption" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="table" upperBound="-1"
+        eType="#//Table" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Div" eSuperTypes="#//HtmlElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="button" upperBound="-1"
+        eType="#//Button" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="selectoption" upperBound="-1"
+        eType="#//SelectOption" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="span" upperBound="-1" eType="#//Span"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="input" upperBound="-1"
+        eType="#//Input" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="div" upperBound="-1" eType="#//Div"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="table" upperBound="-1"
+        eType="#//Table" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Table" eSuperTypes="#//HtmlElement"/>
+</ecore:EPackage>

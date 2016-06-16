@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ASCII"?>
+<businessplataform:Business xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:businessplataform="http://co.edu.uniandes.businessplataform" name="Hospital ABC">
+  <businessentity name="Paciente">
+    <attributes name="Documento" unique="true" type="long"/>
+    <attributes name="Nombres"/>
+    <attributes name="Apellidos"/>
+    <attributes name="Direccion"/>
+  </businessentity>
+  <businessentity name="Servicio">
+    <attributes name="Codigo" unique="true"/>
+    <attributes name="Nombre"/>
+    <attributes name="Precio" type="long"/>
+  </businessentity>
+  <businessentity name="Doctor">
+    <attributes name="Cedula" unique="true" type="long"/>
+    <attributes name="Doctor"/>
+  </businessentity>
+</businessplataform:Business>

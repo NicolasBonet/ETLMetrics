@@ -1,0 +1,26 @@
+
+<Page
+    x:Class="TotalWar.Medieval2TotalWar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TotalWar"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+	<Grid>
+<Pivot Title="Medieval2TotalWar" FontFamily="Lato" FontSize="16">
+	<PivotItem>
+	<ScrollViewer Height="Auto">
+	 <StackPanel HorizontalAlignment="Center">
+<Image Source="http://wiki.totalwar.com/images/5/50/Med2cover.jpg" Height="198" Width="237"/>
+<Button Content="England" HorizontalAlignment="Stretch" FontFamily="Lato" FontSize="16" Click="England_Click"/>
+<Button Content="Aztecs" HorizontalAlignment="Stretch" FontFamily="Lato" FontSize="16" Click="Aztecs_Click"/>
+<Button Content="P" HorizontalAlignment="Stretch" FontFamily="Lato" FontSize="16" Click="P_Click"/>
+</StackPanel>
+</ScrollViewer>
+</PivotItem>
+</Pivot>
+</Grid>
+    
+</Page>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+    
+        <item android:title="Pacientes">
+            <menu>
+                <item
+                    android:id="@+id/pacientesCreate"
+                    android:icon="@android:drawable/ic_input_add"
+                    android:title="Crear" />
+                <item
+                    android:id="@+id/pacientesList"
+                    android:icon="@drawable/list"
+                    android:title="Listar" />
+            </menu>
+        </item>
+
+
+        <item android:title="Servicios">
+            <menu>
+                <item
+                    android:id="@+id/serviciosCreate"
+                    android:icon="@android:drawable/ic_input_add"
+                    android:title="Crear" />
+                <item
+                    android:id="@+id/serviciosList"
+                    android:icon="@drawable/list"
+                    android:title="Listar" />
+            </menu>
+        </item>
+
+
+        <item android:title="Doctors">
+            <menu>
+                <item
+                    android:id="@+id/doctorsCreate"
+                    android:icon="@android:drawable/ic_input_add"
+                    android:title="Crear" />
+                <item
+                    android:id="@+id/doctorsList"
+                    android:icon="@drawable/list"
+                    android:title="Listar" />
+            </menu>
+        </item>
+
+
+    </group>
+
+    <item android:title="Otras opciones">
+        <menu>
+            <item
+                android:id="@+id/credits"
+                android:icon="@drawable/close"
+                android:title="Créditos" />
+        </menu>
+    </item>
+
+</menu>

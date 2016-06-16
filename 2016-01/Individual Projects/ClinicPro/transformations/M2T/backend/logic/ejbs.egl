@@ -1,0 +1,91 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO LOS EJBS CORRESPONDIENTES PARA EL @INJECT
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+package co.edu.uniandes.hospital.ejbs;
+
+import co.edu.uniandes.hospital.api.I[%=nameEntityMayGenerando%]Logic;
+import co.edu.uniandes.hospital.entities.[%=nameEntityMayGenerando%]Entity;
+import co.edu.uniandes.hospital.exceptions.BusinessLogicException;
+import co.edu.uniandes.hospital.persistence.[%=nameEntityMayGenerando%]Persistence;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+
+@Stateless
+public class [%=nameEntityMayGenerando%]Logic implements I[%=nameEntityMayGenerando%]Logic {
+
+    private static final Logger logger = Logger.getLogger([%=nameEntityMayGenerando%]Logic.class.getName());
+
+    @Inject
+    private [%=nameEntityMayGenerando%]Persistence persistence;
+
+    /*@Inject
+    IBookLogic bookLogic;*/
+    @Override
+    public List<[%=nameEntityMayGenerando%]Entity> get[%=nameEntityMayGenerando%]s() {
+        logger.info("Inicia proceso de consultar todos los [%=nameEntityMayGenerando%]s");
+        List<[%=nameEntityMayGenerando%]Entity> [%=nameEntityMayGenerando%]s = persistence.findAll();
+        logger.info("Termina proceso de consultar todos los [%=nameEntityMayGenerando%]");
+        return [%=nameEntityMayGenerando%]s;
+    }
+
+    @Override
+    public [%=nameEntityMayGenerando%]Entity get[%=nameEntityMayGenerando%](Long id) {
+        logger.log(Level.INFO, "Inicia proceso de consultar [%=nameEntityMayGenerando%] con id={0}", id);
+        [%=nameEntityMayGenerando%]Entity service = persistence.find(id);
+        if (service == null) {
+            logger.log(Level.SEVERE, "El [%=nameEntityMayGenerando%] con el id {0} no existe", id);
+            throw new IllegalArgumentException("El [%=nameEntityMayGenerando%] solicitado no existe");
+        }
+        logger.log(Level.INFO, "Termina proceso de consultar [%=nameEntityMayGenerando%] con id={0}", id);
+        return service;
+    }
+
+    @Override
+    public [%=nameEntityMayGenerando%]Entity create[%=nameEntityMayGenerando%]([%=nameEntityMayGenerando%]Entity entity) {
+        logger.info("Inicia proceso de creación de [%=nameEntityMayGenerando%]");
+        persistence.create(entity);
+        logger.info("Termina proceso de creación de [%=nameEntityMayGenerando%]");
+        return entity;
+    }
+
+    @Override
+    public [%=nameEntityMayGenerando%]Entity update[%=nameEntityMayGenerando%]([%=nameEntityMayGenerando%]Entity entity) {
+        logger.log(Level.INFO, "Inicia proceso de actualizar [%=nameEntityMayGenerando%] con id={0}", entity.getId());
+        [%=nameEntityMayGenerando%]Entity newEntity = persistence.update(entity);
+        logger.log(Level.INFO, "Termina proceso de actualizar [%=nameEntityMayGenerando%] con id={0}", entity.getId());
+        return newEntity;
+    }
+
+    @Override
+    public void delete[%=nameEntityMayGenerando%](Long id) {
+        logger.log(Level.INFO, "Inicia proceso de borrar [%=nameEntityMayGenerando%] con id={0}", id);
+        persistence.delete(id);
+        logger.log(Level.INFO, "Termina proceso de borrar [%=nameEntityMayGenerando%] con id={0}", id);
+    }
+[%
+if (primary<>""){
+%]
+    @Override
+    public [%=nameEntityMayGenerando%]Entity get[%=nameEntityMayGenerando%]ByPK([%=typePrimary.firstToUpperCase()%] [%=primary%]){
+        logger.log(Level.INFO, "Inicia proceso de consultar [%=nameEntityMayGenerando%] con [%=primary%]={0}", [%=primary%]);
+        [%=nameEntityMayGenerando%]Entity [%=nameEntityMayGenerando%] = persistence.findByPK([%=primary%]);
+        if ([%=nameEntityMayGenerando%] == null) {
+            logger.log(Level.SEVERE, "El [%=nameEntityMayGenerando%] con el [%=primary%] {0} no existe", [%=primary%]);
+            throw new IllegalArgumentException("El [%=nameEntityMayGenerando%] solicitado no existe");
+        }
+        logger.log(Level.INFO, "Termina proceso de consultar [%=nameEntityMayGenerando%] con [%=primary%]={0}", [%=primary%]);
+        return [%=nameEntityMayGenerando%];
+    }
+ [%
+ }
+ %]   
+}

@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="ASCII"?>
+<metamodeloFront:WebApp xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:metamodeloFront="http://www.example.org/metamodeloFront">
+  <webPages name="list-Aspirantes" master="" entityName="Aspirante">
+    <buttons name="Crear"/>
+    <grid>
+      <buttons name="Ver"/>
+      <buttons name="Editar"/>
+      <buttons name="Eliminar"/>
+      <columns name="nombre" label="Nombre"/>
+      <columns name="numeroIdentificacion" label="Identificacion"/>
+      <columns name="tipoIdentificacion" label="Tipo Ident"/>
+    </grid>
+  </webPages>
+  <webPages name="create-Aspirante" master="" entityName="Aspirante">
+    <buttons name="Guardar"/>
+    <inputs name="correo" type="EString" isRequired="true" label="Correo"/>
+    <inputs name="profesion" type="EString" isRequired="true" label="Profesion"/>
+    <inputs name="edad" type="EInt" isRequired="true" label="Edad"/>
+    <inputs name="otroIdioma" type="EString" isRequired="true" label="Otro Idioma"/>
+    <inputs name="numeroIdentificacion" type="EInt" isRequired="true" label="Identificacion"/>
+    <inputs name="ciudad" type="EString" isRequired="true" label="Ciudad"/>
+    <inputs name="nombre" type="EString" isRequired="true" label="Nombre"/>
+    <selects name="tipoIdentificacion" isRequired="true" label="Tipo Ident">
+      <items name="CEDULA"/>
+      <items name="NIT"/>
+      <items name="PASAPORTE"/>
+    </selects>
+  </webPages>
+  <webPages name="edit-Aspirante" master="" entityName="Aspirante">
+    <buttons name="Guardar"/>
+    <inputs name="edad" type="EInt" isRequired="true" label="Edad"/>
+    <inputs name="otroIdioma" type="EString" isRequired="true" label="Otro Idioma"/>
+    <inputs name="numeroIdentificacion" type="EInt" isRequired="true" label="Identificacion"/>
+    <inputs name="correo" type="EString" isRequired="true" label="Correo"/>
+    <inputs name="nombre" type="EString" isRequired="true" label="Nombre"/>
+    <inputs name="ciudad" type="EString" isRequired="true" label="Ciudad"/>
+    <inputs name="profesion" type="EString" isRequired="true" label="Profesion"/>
+    <selects name="tipoIdentificacion" isRequired="true" label="Tipo Ident">
+      <items name="CEDULA"/>
+      <items name="NIT"/>
+      <items name="PASAPORTE"/>
+    </selects>
+  </webPages>
+  <webPages name="view-Aspirante" master="" entityName="Aspirante">
+    <buttons name="Empleo"/>
+    <buttons name="Estudio"/>
+    <inputs name="profesion" type="EString" isRequired="true" label="Profesion"/>
+    <inputs name="otroIdioma" type="EString" isRequired="true" label="Otro Idioma"/>
+    <inputs name="tipoIdentificacion" type="TipoIdentificacion" isRequired="true" label="Tipo Ident"/>
+    <inputs name="correo" type="EString" isRequired="true" label="Correo"/>
+    <inputs name="nombre" type="EString" isRequired="true" label="Nombre"/>
+    <inputs name="edad" type="EInt" isRequired="true" label="Edad"/>
+    <inputs name="numeroIdentificacion" type="EInt" isRequired="true" label="Identificacion"/>
+    <inputs name="ciudad" type="EString" isRequired="true" label="Ciudad"/>
+  </webPages>
+  <webPages name="list-Empresas" master="" entityName="Empresa">
+    <buttons name="Crear"/>
+    <grid>
+      <buttons name="Ver"/>
+      <buttons name="Editar"/>
+      <buttons name="Eliminar"/>
+      <columns name="numeroIdentificacion" label="Identificacion"/>
+      <columns name="nombre" label="Nombre"/>
+      <columns name="tipoIdentificacion" label="Tipo Ident"/>
+    </grid>
+  </webPages>
+  <webPages name="create-Empresa" master="" entityName="Empresa">
+    <buttons name="Guardar"/>
+    <inputs name="sectorEconomico" type="EString" isRequired="true" label="Sector economico"/>
+    <inputs name="correo" type="EString" isRequired="true" label="Correo"/>
+    <inputs name="nombre" type="EString" isRequired="true" label="Nombre"/>
+    <inputs name="numeroIdentificacion" type="EInt" isRequired="true" label="Identificacion"/>
+    <selects name="tipoIdentificacion" isRequired="true" label="Tipo Ident">
+      <items name="CEDULA"/>
+      <items name="NIT"/>
+      <items name="PASAPORTE"/>
+    </selects>
+  </webPages>
+  <webPages name="edit-Empresa" master="" entityName="Empresa">
+    <buttons name="Guardar"/>
+    <inputs name="numeroIdentificacion" type="EInt" isRequired="true" label="Identificacion"/>
+    <inputs name="correo" type="EString" isRequired="true" label="Correo"/>
+    <inputs name="sectorEconomico" type="EString" isRequired="true" label="Sector economico"/>
+    <inputs name="nombre" type="EString" isRequired="true" label="Nombre"/>
+    <selects name="tipoIdentificacion" isRequired="true" label="Tipo Ident">
+      <items name="CEDULA"/>
+      <items name="NIT"/>
+      <items name="PASAPORTE"/>
+    </selects>
+  </webPages>
+  <webPages name="view-Empresa" master="" entityName="Empresa">
+    <buttons name="Vacante"/>
+    <inputs name="nombre" type="EString" isRequired="true" label="Nombre"/>
+    <inputs name="sectorEconomico" type="EString" isRequired="true" label="Sector economico"/>
+    <inputs name="correo" type="EString" isRequired="true" label="Correo"/>
+    <inputs name="numeroIdentificacion" type="EInt" isRequired="true" label="Identificacion"/>
+    <inputs name="tipoIdentificacion" type="TipoIdentificacion" isRequired="true" label="Tipo Ident"/>
+  </webPages>
+  <webPages name="list-Empleos" master="Aspirante" entityName="Empleo">
+    <buttons name="Crear"/>
+    <grid>
+      <buttons name="Ver"/>
+      <buttons name="Editar"/>
+      <buttons name="Eliminar"/>
+      <columns name="compania" label="Empresa"/>
+      <columns name="cargo" label="Cargo"/>
+    </grid>
+  </webPages>
+  <webPages name="create-Empleo" master="Aspirante" entityName="Empleo">
+    <buttons name="Guardar"/>
+    <inputs name="desde" type="EDate" isRequired="true" label="Desde"/>
+    <inputs name="hasta" type="EDate" isRequired="true" label="Hasta"/>
+    <inputs name="compania" type="EString" isRequired="true" label="Empresa"/>
+    <inputs name="cargo" type="EString" isRequired="true" label="Cargo"/>
+  </webPages>
+  <webPages name="edit-Empleo" master="Aspirante" entityName="Empleo">
+    <buttons name="Guardar"/>
+    <inputs name="cargo" type="EString" isRequired="true" label="Cargo"/>
+    <inputs name="hasta" type="EDate" isRequired="true" label="Hasta"/>
+    <inputs name="desde" type="EDate" isRequired="true" label="Desde"/>
+    <inputs name="compania" type="EString" isRequired="true" label="Empresa"/>
+  </webPages>
+  <webPages name="view-Empleo" master="Aspirante" entityName="Empleo">
+    <buttons name="Volver"/>
+    <inputs name="compania" type="EString" isRequired="true" label="Empresa"/>
+    <inputs name="hasta" type="EDate" isRequired="true" label="Hasta"/>
+    <inputs name="desde" type="EDate" isRequired="true" label="Desde"/>
+    <inputs name="cargo" type="EString" isRequired="true" label="Cargo"/>
+  </webPages>
+  <webPages name="list-Estudios" master="Aspirante" entityName="Estudio">
+    <buttons name="Crear"/>
+    <grid>
+      <buttons name="Ver"/>
+      <buttons name="Editar"/>
+      <buttons name="Eliminar"/>
+      <columns name="tituloObtenido" label="Titulo obtenido"/>
+      <columns name="institucion" label="Institucion"/>
+    </grid>
+  </webPages>
+  <webPages name="create-Estudio" master="Aspirante" entityName="Estudio">
+    <buttons name="Guardar"/>
+    <inputs name="tituloObtenido" type="EString" isRequired="true" label="Titulo obtenido"/>
+    <inputs name="hasta" type="EDate" isRequired="true" label="Hasta"/>
+    <inputs name="desde" type="EDate" isRequired="true" label="Desde"/>
+    <inputs name="institucion" type="EString" isRequired="true" label="Institucion"/>
+  </webPages>
+  <webPages name="edit-Estudio" master="Aspirante" entityName="Estudio">
+    <buttons name="Guardar"/>
+    <inputs name="tituloObtenido" type="EString" isRequired="true" label="Titulo obtenido"/>
+    <inputs name="institucion" type="EString" isRequired="true" label="Institucion"/>
+    <inputs name="desde" type="EDate" isRequired="true" label="Desde"/>
+    <inputs name="hasta" type="EDate" isRequired="true" label="Hasta"/>
+  </webPages>
+  <webPages name="view-Estudio" master="Aspirante" entityName="Estudio">
+    <buttons name="Volver"/>
+    <inputs name="desde" type="EDate" isRequired="true" label="Desde"/>
+    <inputs name="tituloObtenido" type="EString" isRequired="true" label="Titulo obtenido"/>
+    <inputs name="hasta" type="EDate" isRequired="true" label="Hasta"/>
+    <inputs name="institucion" type="EString" isRequired="true" label="Institucion"/>
+  </webPages>
+  <webPages name="list-Vacantes" master="Empresa" entityName="Vacante">
+    <buttons name="Crear"/>
+    <grid>
+      <buttons name="Ver"/>
+      <buttons name="Editar"/>
+      <buttons name="Eliminar"/>
+      <columns name="cargo" label="Cargo"/>
+      <columns name="fechaCierre" label="Fecha de cierre"/>
+    </grid>
+  </webPages>
+  <webPages name="create-Vacante" master="Empresa" entityName="Vacante">
+    <buttons name="Guardar"/>
+    <inputs name="fechaPublicacion" type="EDate" isRequired="true" label="Fecha de publicacion"/>
+    <inputs name="salario" type="EDouble" isRequired="true" label="Salario"/>
+    <inputs name="cargo" type="EString" isRequired="true" label="Cargo"/>
+    <inputs name="fechaIngreso" type="EDate" isRequired="true" label="Fecha de ingreso"/>
+    <inputs name="fechaCierre" type="EDate" isRequired="true" label="Fecha de cierre"/>
+    <inputs name="descripcion" type="EString" isRequired="true" label="Descripcion"/>
+  </webPages>
+  <webPages name="edit-Vacante" master="Empresa" entityName="Vacante">
+    <buttons name="Guardar"/>
+    <inputs name="fechaIngreso" type="EDate" isRequired="true" label="Fecha de ingreso"/>
+    <inputs name="fechaPublicacion" type="EDate" isRequired="true" label="Fecha de publicacion"/>
+    <inputs name="salario" type="EDouble" isRequired="true" label="Salario"/>
+    <inputs name="cargo" type="EString" isRequired="true" label="Cargo"/>
+    <inputs name="descripcion" type="EString" isRequired="true" label="Descripcion"/>
+    <inputs name="fechaCierre" type="EDate" isRequired="true" label="Fecha de cierre"/>
+  </webPages>
+  <webPages name="view-Vacante" master="Empresa" entityName="Vacante">
+    <buttons name="Volver"/>
+    <inputs name="fechaPublicacion" type="EDate" isRequired="true" label="Fecha de publicacion"/>
+    <inputs name="fechaCierre" type="EDate" isRequired="true" label="Fecha de cierre"/>
+    <inputs name="salario" type="EDouble" isRequired="true" label="Salario"/>
+    <inputs name="cargo" type="EString" isRequired="true" label="Cargo"/>
+    <inputs name="fechaIngreso" type="EDate" isRequired="true" label="Fecha de ingreso"/>
+    <inputs name="descripcion" type="EString" isRequired="true" label="Descripcion"/>
+  </webPages>
+  <models name="Aspirante" master="">
+    <attributes name="id" type="EBigInteger" isRequired="true" isPK="true"/>
+    <attributes name="nombre" type="EString" isRequired="true" label="Nombre" showInGrid="true"/>
+    <attributes name="correo" type="EString" isRequired="true" label="Correo"/>
+    <attributes name="edad" type="EInt" isRequired="true" label="Edad"/>
+    <attributes name="numeroIdentificacion" type="EInt" isRequired="true" label="Identificacion" showInGrid="true"/>
+    <attributes name="profesion" type="EString" isRequired="true" label="Profesion"/>
+    <attributes name="otroIdioma" type="EString" isRequired="true" label="Otro Idioma"/>
+    <attributes name="tipoIdentificacion" type="TipoIdentificacion" isRequired="true" label="Tipo Ident" showInGrid="true"/>
+    <attributes name="ciudad" type="EString" isRequired="true" label="Ciudad"/>
+  </models>
+  <models name="Empresa" master="">
+    <attributes name="correo" type="EString" isRequired="true" label="Correo"/>
+    <attributes name="sectorEconomico" type="EString" isRequired="true" label="Sector economico"/>
+    <attributes name="id" type="EBigInteger" isRequired="true" isPK="true"/>
+    <attributes name="numeroIdentificacion" type="EInt" isRequired="true" label="Identificacion" showInGrid="true"/>
+    <attributes name="nombre" type="EString" isRequired="true" label="Nombre" showInGrid="true"/>
+    <attributes name="tipoIdentificacion" type="TipoIdentificacion" isRequired="true" label="Tipo Ident" showInGrid="true"/>
+  </models>
+  <models name="Empleo" master="Aspirante">
+    <attributes name="compania" type="EString" isRequired="true" label="Empresa" showInGrid="true"/>
+    <attributes name="desde" type="EDate" isRequired="true" label="Desde"/>
+    <attributes name="id" type="EBigInteger" isRequired="true" isPK="true"/>
+    <attributes name="cargo" type="EString" isRequired="true" label="Cargo" showInGrid="true"/>
+    <attributes name="hasta" type="EDate" isRequired="true" label="Hasta"/>
+  </models>
+  <models name="Estudio" master="Aspirante">
+    <attributes name="desde" type="EDate" isRequired="true" label="Desde"/>
+    <attributes name="id" type="EBigInteger" isRequired="true" isPK="true"/>
+    <attributes name="tituloObtenido" type="EString" isRequired="true" label="Titulo obtenido" showInGrid="true"/>
+    <attributes name="hasta" type="EDate" isRequired="true" label="Hasta"/>
+    <attributes name="institucion" type="EString" isRequired="true" label="Institucion" showInGrid="true"/>
+  </models>
+  <models name="Vacante" master="Empresa">
+    <attributes name="salario" type="EDouble" isRequired="true" label="Salario"/>
+    <attributes name="fechaIngreso" type="EDate" isRequired="true" label="Fecha de ingreso"/>
+    <attributes name="cargo" type="EString" isRequired="true" label="Cargo" showInGrid="true"/>
+    <attributes name="id" type="EBigInteger" isRequired="true" isPK="true"/>
+    <attributes name="descripcion" type="EString" isRequired="true" label="Descripcion"/>
+    <attributes name="fechaPublicacion" type="EDate" isRequired="true" label="Fecha de publicacion"/>
+    <attributes name="fechaCierre" type="EDate" isRequired="true" label="Fecha de cierre" showInGrid="true"/>
+  </models>
+  <services name="Aspirante" master=""/>
+  <services name="Empresa" master=""/>
+  <services name="Empleo" master="Aspirante"/>
+  <services name="Estudio" master="Aspirante"/>
+  <services name="Vacante" master="Empresa"/>
+</metamodeloFront:WebApp>

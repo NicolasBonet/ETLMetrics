@@ -1,0 +1,34 @@
+[%
+TemplateFactory.setOutputRoot("C:/BackEnd/Datos");
+for(cl in BusinessEntity.all){
+	//Se generan los archivos para la capa de datos
+	if (cl.isAbstract = false){ 
+		var plantillaDatos:Template:= TemplateFactory.load('Datos.egl');
+		plantillaDatos.populate("bEntity", cl);
+		plantillaDatos.generate(cl.name + "DAL.java");
+	}
+}
+
+TemplateFactory.setOutputRoot("C:/BackEnd/Negocio");
+for(cl in BusinessEntity.all){
+	//Se generan los archivos para la capa de negocio 
+	var plantillaNegocio:Template:= TemplateFactory.load('Negocio.egl');
+	plantillaNegocio.populate("bEntity", cl);
+	plantillaNegocio.generate(cl.name + ".java");
+}
+
+TemplateFactory.setOutputRoot("C:/BackEnd/Servicios");
+for(cl in BusinessEntity.all){
+	//Se generan los archivos para la capa de servicio
+	if (cl.services.size() > 0){
+		var plantillaServicio:Template:= TemplateFactory.load('Servicio.egl');
+		plantillaServicio.populate("bEntity", cl);
+		plantillaServicio.generate(cl.name + "Resource.java");
+	}
+}
+
+TemplateFactory.setOutputRoot("C:/BackEnd/PortalEmpleo");
+//Se generan los archivos para la capa de servicio
+var plantillaPortal:Template:= TemplateFactory.load('PortalEmpleo.egl');
+plantillaPortal.generate("PortalEmpleoApplication.java");
+%]

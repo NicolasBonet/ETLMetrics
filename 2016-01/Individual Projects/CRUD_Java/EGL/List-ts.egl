@@ -1,0 +1,107 @@
+
+/// <reference path="../../../../../typings/tsd.d.ts" />
+
+// Angular 2
+import {Component, View, Directive, coreDirectives} from 'angular2/angular2';
+[%if (webPage.master <> ''){%]
+import {RouteParams, Router} from 'angular2/router';
+import {Inject} from 'angular2/di';
+
+import {[%=webPage.entityName%]Service} from '../../services/[%=webPage.entityName%]Service';
+
+//servicio maestro
+import {[%=webPage.master%]Service} from '../../services/[%=webPage.master%]Service';
+import {[%=webPage.master%]} from '../../models/[%=webPage.master%]';
+
+[%}
+else {%]
+import {Router} from 'angular2/router';
+
+import {[%=webPage.entityName%]Service} from '../../services/[%=webPage.entityName%]Service';
+[%}%]
+
+
+@Component({
+    selector: 'list-[%=webPage.entityName.firstToLowerCase()%]s'
+})
+
+@View({
+	directives: [coreDirectives],
+    templateUrl: './app/pages/list/list-[%=webPage.entityName.firstToLowerCase()%]s.html'
+})
+
+export class List[%=webPage.entityName%]s {
+    [%=webPage.entityName.firstToLowerCase()%]s: Array<any>;
+[%if (webPage.master <> ""){%]
+	id:string;
+	[%=webPage.master.firstToLowerCase()%]: [%=webPage.master%] = new [%=webPage.master%]();
+
+    constructor(@Inject(RouteParams) params, public router:Router, public [%=webPage.entityName.firstToLowerCase()%]Service:[%=webPage.entityName%]Service, public [%=webPage.master.firstToLowerCase()%]Service:[%=webPage.master%]Service) {
+		this.id = params.get('id');
+        this.get[%=webPage.entityName%]s(params.get('id'));
+		this.get[%=webPage.master%](params.get('id'));
+    }
+
+    get[%=webPage.entityName%]s(id:string) {
+        this.[%=webPage.entityName.firstToLowerCase()%]Service.get[%=webPage.entityName%]s(id)
+            .map(res => res.json())
+            .subscribe(res => this.[%=webPage.entityName.firstToLowerCase()%]s = res);
+    }
+
+    view[%=webPage.entityName%]([%=webPage.entityName.firstToLowerCase()%]) {
+        this.router.parent.navigate('/' + this.id + '/view[%=webPage.entityName%]/' + [%=webPage.entityName.firstToLowerCase()%].id);
+    }
+
+    edit[%=webPage.entityName%]([%=webPage.entityName.firstToLowerCase()%]) {
+        this.router.parent.navigate('/' + this.id + '/edit[%=webPage.entityName%]/' + [%=webPage.entityName.firstToLowerCase()%].id);
+    }
+
+    delete[%=webPage.entityName%]([%=webPage.entityName.firstToLowerCase()%]) {
+        this.[%=webPage.entityName.firstToLowerCase()%]Service.delete[%=webPage.entityName%]([%=webPage.entityName.firstToLowerCase()%], this.id);
+		this.router.parent.navigate('/list[%=webPage.entityName%]/' + this.id);
+    }
+		
+	create[%=webPage.entityName%]() {
+        this.router.parent.navigate('/create[%=webPage.entityName%]/' + this.id);
+    }
+	
+	volver() {
+		this.router.parent.navigate('/view[%=webPage.master%]/' + this.id);
+	}
+	
+	get[%=webPage.master%](id:string) {
+        this.[%=webPage.master.firstToLowerCase()%]Service.get[%=webPage.master%](id)
+            .map(res => res.json())
+            .subscribe(res => this.[%=webPage.master.firstToLowerCase()%] = [%=webPage.master%].fromJSON(res));
+    }
+[%}
+else{%]
+
+	constructor(public router:Router, public [%=webPage.entityName.firstToLowerCase()%]Service:[%=webPage.entityName%]Service) {
+        this.get[%=webPage.entityName%]s();
+    }
+
+    get[%=webPage.entityName%]s() {
+        this.[%=webPage.entityName.firstToLowerCase()%]Service.get[%=webPage.entityName%]s()
+            .map(res => res.json())
+            .subscribe(res => this.[%=webPage.entityName.firstToLowerCase()%]s = res);
+    }
+
+    view[%=webPage.entityName%]([%=webPage.entityName.firstToLowerCase()%]) {
+        this.router.parent.navigate('/view[%=webPage.entityName%]/' + [%=webPage.entityName.firstToLowerCase()%].id);
+    }
+	
+    edit[%=webPage.entityName%]([%=webPage.entityName.firstToLowerCase()%]) {
+        this.router.parent.navigate('/edit[%=webPage.entityName%]/' + [%=webPage.entityName.firstToLowerCase()%].id);
+    }
+
+    delete[%=webPage.entityName%]([%=webPage.entityName.firstToLowerCase()%]) {
+        this.[%=webPage.entityName.firstToLowerCase()%]Service.delete[%=webPage.entityName%]([%=webPage.entityName.firstToLowerCase()%]); 
+		this.router.parent.navigate('/list[%=webPage.entityName%]');
+    }
+		
+	create[%=webPage.entityName%]() {
+        this.router.parent.navigate('/create[%=webPage.entityName%]');
+    }
+[%}%]
+}

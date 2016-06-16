@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ASCII"?>
+<androidplatform:AndroidApplication xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:androidplatform="http://co.edu.uniandes.androidplatform" name="Hospital ABC">
+  <activities name="Paciente">
+    <components xsi:type="androidplatform:TextField" name="documento"/>
+    <components xsi:type="androidplatform:TextField" name="nombres" type="Text"/>
+    <components xsi:type="androidplatform:TextField" name="apellidos" type="Text"/>
+    <components xsi:type="androidplatform:TextField" name="direccion" type="Text"/>
+  </activities>
+  <activities name="Servicio">
+    <components xsi:type="androidplatform:TextField" name="codigo" type="Text"/>
+    <components xsi:type="androidplatform:TextField" name="nombre" type="Text"/>
+    <components xsi:type="androidplatform:TextField" name="precio"/>
+  </activities>
+  <activities name="Doctor">
+    <components xsi:type="androidplatform:TextField" name="cedula"/>
+    <components xsi:type="androidplatform:TextField" name="doctor" type="Text"/>
+  </activities>
+</androidplatform:AndroidApplication>

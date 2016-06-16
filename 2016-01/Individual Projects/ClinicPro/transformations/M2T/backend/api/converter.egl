@@ -1,0 +1,209 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO LAS CLASES CONVERTES QUE VAN DE DTO A ENTITY Y DE ENTITY A DTO
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+package co.edu.uniandes.rest.hospital.converters;
+
+import co.edu.uniandes.rest.hospital.dtos.[%=nameEntityMayGenerando%]DTO;
+import co.edu.uniandes.hospital.entities.[%=nameEntityMayGenerando%]Entity;
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class [%=nameEntityMayGenerando%]Converter {
+
+    /**
+     * Constructor privado para evitar la creación del constructor implícito de Java
+     * @generated
+     */
+    private [%=nameEntityMayGenerando%]Converter() {
+    }
+
+    /**
+     * Realiza la conversión de [%=nameEntityMayGenerando%]Entity a [%=nameEntityMayGenerando%]DTO.
+     * Se invoca cuando otra entidad tiene una referencia a [%=nameEntityMayGenerando%]Entity.
+     * Entrega únicamente los atributos proprios de la entidad.
+     *
+     * @param entity instancia de [%=nameEntityMayGenerando%]Entity a convertir
+     * @return instancia de [%=nameEntityMayGenerando%]DTO con los datos recibidos por parámetro
+     * @generated
+     */
+    public static [%=nameEntityMayGenerando%]DTO refEntity2DTO([%=nameEntityMayGenerando%]Entity entity) {
+        if (entity != null) {
+            [%=nameEntityMayGenerando%]DTO dto = new [%=nameEntityMayGenerando%]DTO();
+            dto.setId(entity.getId());
+[%
+var nomParam = "";
+var nomParamMay = "";
+
+	for(parametros in vecAtributos){
+		for(param in parametros){
+			nomParam = param.name.toLowerCase();
+			nomParamMay = nomParam.firstToUpperCase();
+			--typeParam = param.type;
+%]
+            dto.set[%=nomParamMay%](entity.get[%=nomParamMay%]());
+[%
+		}
+	}
+%]
+            return dto;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Realiza la conversión de [%=nameEntityMayGenerando%]DTO a [%=nameEntityMayGenerando%]Entity Se invoca cuando otro DTO
+     * tiene una referencia a [%=nameEntityMayGenerando%]DTO Convierte únicamente el ID ya que es el
+     * único atributo necesario para guardar la relación en la base de datos
+     *
+     * @param dto instancia de [%=nameEntityMayGenerando%]DTO a convertir
+     * @return instancia de [%=nameEntityMayGenerando%]Entity con los datos recibidos por parámetro
+     * @generated
+     */
+    public static [%=nameEntityMayGenerando%]Entity refDTO2Entity([%=nameEntityMayGenerando%]DTO dto) {
+        if (dto != null) {
+            [%=nameEntityMayGenerando%]Entity entity = new [%=nameEntityMayGenerando%]Entity();
+            entity.setId(dto.getId());
+
+            return entity;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Convierte una instancia de [%=nameEntityMayGenerando%]Entity a [%=nameEntityMayGenerando%]DTO Se invoca cuando se desea
+     * consultar la entidad y sus relaciones muchos a uno o uno a uno
+     *
+     * @param entity instancia de [%=nameEntityMayGenerando%]Entity a convertir
+     * @return Instancia de [%=nameEntityMayGenerando%]DTO con los datos recibidos por parámetro
+     * @generated
+     */
+    private static [%=nameEntityMayGenerando%]DTO basicEntity2DTO([%=nameEntityMayGenerando%]Entity entity) {
+        if (entity != null) {
+            [%=nameEntityMayGenerando%]DTO dto = new [%=nameEntityMayGenerando%]DTO();
+            dto.setId(entity.getId());
+[%
+	for(parametros in vecAtributos){
+		for(param in parametros){
+			nomParam = param.name.toLowerCase();
+			nomParamMay = nomParam.firstToUpperCase();
+%]
+            dto.set[%=nomParamMay%](entity.get[%=nomParamMay%]());
+[%
+		}
+	}
+%]
+            return dto;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Convierte una instancia de [%=nameEntityMayGenerando%]DTO a [%=nameEntityMayGenerando%]Entity Se invoca cuando se
+     * necesita convertir una instancia de [%=nameEntityMayGenerando%]DTO con los atributos propios de
+     * la entidad y con las relaciones uno a uno o muchos a uno
+     *
+     * @param dto instancia de [%=nameEntityMayGenerando%]DTO a convertir
+     * @return Instancia de [%=nameEntityMayGenerando%]Entity creada a partir de los datos de dto
+     * @generated
+     */
+    private static [%=nameEntityMayGenerando%]Entity basicDTO2Entity([%=nameEntityMayGenerando%]DTO dto) {
+        if (dto != null) {
+            [%=nameEntityMayGenerando%]Entity entity = new [%=nameEntityMayGenerando%]Entity();
+           // entity.setId(dto.getId());
+[%
+	for(parametros in vecAtributos){
+		for(param in parametros){
+			nomParam = param.name.toLowerCase();
+			nomParamMay = nomParam.firstToUpperCase();
+%]
+            entity.set[%=nomParamMay%](dto.get[%=nomParamMay%]());
+[%
+		}
+	}
+%]    
+            return entity;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Convierte instancias de [%=nameEntityMayGenerando%]Entity a [%=nameEntityMayGenerando%]DTO incluyendo sus relaciones
+     * Uno a muchos y Muchos a muchos
+     *
+     * @param entity Instancia de [%=nameEntityMayGenerando%]Entity a convertir
+     * @return Instancia de [%=nameEntityMayGenerando%]DTO con los datos recibidos por parámetro
+     * @generated
+     */
+    public static [%=nameEntityMayGenerando%]DTO fullEntity2DTO([%=nameEntityMayGenerando%]Entity entity) {
+        if (entity != null) {
+            [%=nameEntityMayGenerando%]DTO dto = basicEntity2DTO(entity);
+            return dto;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Convierte una instancia de [%=nameEntityMayGenerando%]DTO a [%=nameEntityMayGenerando%]Entity.
+     * Incluye todos los atributos de [%=nameEntityMayGenerando%]Entity.
+     *
+     * @param dto Instancia de [%=nameEntityMayGenerando%]DTO a convertir
+     * @return Instancia de [%=nameEntityMayGenerando%]Entity con los datos recibidos por parámetro
+     * @generated
+     */
+    public static [%=nameEntityMayGenerando%]Entity fullDTO2Entity([%=nameEntityMayGenerando%]DTO dto) {
+        if (dto != null) {
+            [%=nameEntityMayGenerando%]Entity entity = basicDTO2Entity(dto);
+            return entity;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Convierte una colección de instancias de [%=nameEntityMayGenerando%]Entity a [%=nameEntityMayGenerando%]DTO. Para cada
+     * instancia de [%=nameEntityMayGenerando%]Entity en la lista, invoca basicEntity2DTO y añade el
+     * nuevo [%=nameEntityMayGenerando%]DTO a una nueva lista
+     *
+     * @param entities Colección de entidades a convertir
+     * @return Collección de instancias de [%=nameEntityMayGenerando%]DTO
+     * @generated
+     */
+    public static List<[%=nameEntityMayGenerando%]DTO> listEntity2DTO(List<[%=nameEntityMayGenerando%]Entity> entities) {
+        List<[%=nameEntityMayGenerando%]DTO> dtos = new ArrayList<[%=nameEntityMayGenerando%]DTO>();
+        if (entities != null) {
+            for ([%=nameEntityMayGenerando%]Entity entity : entities) {
+                dtos.add(basicEntity2DTO(entity));
+            }
+        }
+        return dtos;
+    }
+
+    /**
+     * Convierte una colección de instancias de [%=nameEntityMayGenerando%]DTO a instancias de
+     * [%=nameEntityMayGenerando%]Entity Para cada instancia se invoca el método basicDTO2Entity
+     *
+     * @param dtos entities Colección de [%=nameEntityMayGenerando%]DTO a convertir
+     * @return Collección de instancias de [%=nameEntityMayGenerando%]Entity
+     * @generated
+     */
+    public static List<[%=nameEntityMayGenerando%]Entity> listDTO2Entity(List<[%=nameEntityMayGenerando%]DTO> dtos) {
+        List<[%=nameEntityMayGenerando%]Entity> entities = new ArrayList<[%=nameEntityMayGenerando%]Entity>();
+        if (dtos != null) {
+            for ([%=nameEntityMayGenerando%]DTO dto : dtos) {
+                entities.add(basicDTO2Entity(dto));
+            }
+        }
+        return entities;
+    }
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ASCII"?>
+<myclinicpro:GUI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:myclinicpro="http://www.example.org/myclinicpro">
+  <forms name="Hospital ABC">
+    <layouts name="Paciente">
+      <graphicalcomponent xsi:type="myclinicpro:Field" name="Documento" value="primary" text="long"/>
+      <graphicalcomponent xsi:type="myclinicpro:Field" name="Nombres" text="String"/>
+      <graphicalcomponent xsi:type="myclinicpro:Field" name="Apellidos" text="String"/>
+      <graphicalcomponent xsi:type="myclinicpro:Field" name="Direccion" text="String"/>
+    </layouts>
+    <layouts name="Servicio">
+      <graphicalcomponent xsi:type="myclinicpro:Field" name="Codigo" value="primary" text="String"/>
+      <graphicalcomponent xsi:type="myclinicpro:Field" name="Nombre" text="String"/>
+      <graphicalcomponent xsi:type="myclinicpro:Field" name="Precio" text="long"/>
+    </layouts>
+    <layouts name="Doctor">
+      <graphicalcomponent xsi:type="myclinicpro:Field" name="Cedula" value="primary" text="long"/>
+      <graphicalcomponent xsi:type="myclinicpro:Field" name="Doctor" text="String"/>
+    </layouts>
+  </forms>
+</myclinicpro:GUI>

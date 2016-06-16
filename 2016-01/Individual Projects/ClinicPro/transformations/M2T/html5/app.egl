@@ -1,0 +1,62 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO EL APP.JS QUE UTILIZA ANGULAR
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+(function (ng) {
+
+    var mod = ng.module("mainApp", [
+        "ui.router"
+[%
+var nameModule = "";
+for (modulos in html!Form.all){
+	nameModule =  modulos.name.toLowerCase();
+%]
+        ,"[%=nameModule%]Module"
+[%
+}
+%]  
+    ]);
+
+    mod.config(['$logProvider', function ($logProvider) {
+            $logProvider.debugEnabled(true);
+        }]);
+
+    mod.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
+            $urlRouterProvider.otherwise("/person");
+            $stateProvider
+
+                    .state('person', {
+                        url: '/person',
+                        views: {
+[%
+					var i = 0;
+					for (modulos in html!Form.all){
+						nameModule =  modulos.name.toLowerCase();
+						if (i < modulos.size()){
+%]
+							"[%=nameModule%]": {controller: "[%=nameModule%]Ctrl",
+                            controllerAs: "ctrl",
+                            templateUrl: "src/modules/[%=nameModule%]/[%=nameModule%].tpl.html"}
+															     
+[%							
+						}else{
+%]
+							,"[%=nameModule%]": {controller: "[%=nameModule%]Ctrl",
+                            controllerAs: "ctrl",
+                            templateUrl: "src/modules/[%=nameModule%]/[%=nameModule%].tpl.html"}
+[%
+						}
+						
+						i = i+1;
+					}						
+%]                         
+                        }
+                    });
+
+        }]);
+})(window.angular);

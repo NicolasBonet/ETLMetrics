@@ -1,0 +1,238 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+GENERANDO LOS TPLS DE LA VISTA
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+<div id="[%=nameModuleGenerandoMin%]-header">
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#[%=nameModuleGenerandoMin%]-navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand">[%=nameModuleGenerando.firstToUpperCase()%]</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="[%=nameModuleGenerandoMin%]-navbar">
+[%			//Se generan los botones para el CRUD%]
+				<button id="create-[%=nameModuleGenerandoMin%]" class="btn btn-default navbar-btn" ng-hide="ctrl.editMode" ng-click="ctrl.createRecord()"><span class="glyphicon glyphicon-plus"></span> Crear</button>
+				<button id="list-[%=nameModuleGenerandoMin%]" class="btn btn-default navbar-btn" ng-hide="ctrl.editMode" ng-click="ctrl.fetchRecords()"><span class="glyphicon glyphicon-list"></span> Listar</button>
+				<button id="search-[%=nameModuleGenerandoMin%]" class="btn btn-default navbar-btn" ng-hide="ctrl.editMode" ng-click="ctrl.searchRecord()"><span class="glyphicon glyphicon-search"></span> Buscar</button>
+				<!-- <button id="consult-[%=nameModuleGenerandoMin%]" class="btn btn-default navbar-btn" ng-hide="ctrl.editMode" ng-click="ctrl.consult()"><span class="glyphicon glyphicon-search"></span> Cosultar</button> -->
+
+            </div>
+        </div>
+    </nav>
+</div>
+
+<div ng-hide="ctrl.editModeList" class="col-md-12">
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+[%
+var nomParametro = "";
+var nomParamMin = "";
+var nomParamMay = "";
+var permiteEdit = "";
+var esPK = "";
+
+		for(parametros in vecParametros){
+			for(param in parametros){
+				nomParametro = param.name.firstToUpperCase();
+%]
+				<th>[%=nomParametro%]</th>
+[%
+			}
+		}
+%]
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="record in records">
+[%
+		for(parametros in vecParametros){
+			for(param in parametros){
+				nomParamMin = param.name.firstToLowerCase();
+%]
+				<td id="{{$index}}-[%=nomParamMin%]">{{record.[%=nomParamMin%]}}</td>
+[%
+			}
+		}
+%] 
+
+                <td>
+					<button id="{{$index}}-edit-btn" class="btn btn-default btn-sm" ng-click="ctrl.editRecord(record)"><span class="glyphicon glyphicon-edit"></span> Editar</button>
+					<button id="{{$index}}-delete-btn" class="btn btn-default btn-sm" ng-click="ctrl.deleteRecord(record)"><span class="glyphicon glyphicon-minus"></span> Eliminar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div ng-show="ctrl.editMode" class="col-md-12 well">
+    <form novalidate name="form" id="[%=nameModuleGenerandoMin%]-form" role="form" ng-submit="form.$valid && ctrl.saveRecord()">
+        <alert ng-messages="form.$error" type="danger" close="" ng-hide="!form.$error.required">
+            <div ng-message="required">
+                Por favor, complete los campos!
+            </div>
+        </alert>
+        <fieldset>
+            <input id="id" class="form-control" type="hidden" ng-model="currentRecord.id"/>
+            <div class="form-group col-md-12" ng-class="{'has-success': form.name.$valid && form.name.$dirty, 'has-error': form.name.$invalid && (form.name.$dirty || form.$submitted)}" >
+[%
+		for(parametros in vecParametros){
+			for(param in parametros){
+				nomParamMay = param.name.firstToUpperCase();
+				nomParamMin = param.name.firstToLowerCase();
+%]
+				<label for="[%=nomParamMin%]" class="col-md-2 control-label">[%=nomParamMay%]</label>
+                <div class="col-md-10">
+                    <input id="[%=nomParamMin%]" name="[%=nomParamMin%]" class="form-control" type="text" ng-model="currentRecord.[%=nomParamMin%]" required />
+                </div>
+[%
+			}
+		}
+%]                
+            </div>
+            <div  style="text-align: center;">
+            	<button id="save-[%=nameModuleGenerandoMin%]" type="submit" form="[%=nameModuleGenerandoMin%]-form" class="btn btn-primary" ng-show="ctrl.editMode"><span class="glyphicon glyphicon-save"></span> Guardar</button>
+				<button id="cancel-[%=nameModuleGenerandoMin%]" type="button" form="[%=nameModuleGenerandoMin%]-form" class="btn btn-primary" ng-show="ctrl.editMode" ng-click="form.$setPristine(); ctrl.fetchRecords();"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+	        </div>
+        </fieldset>
+    </form>
+</div>
+<div ng-hide="ctrl.editModeSearch" class="col-md-12 well">
+    <div class="row">
+        <table class="table table-condensed">
+[%		
+		for(parametros in vecParametros){
+			for(param in parametros){
+				nomParamMay = param.name.firstToUpperCase();
+				nomParamMin = param.name.firstToLowerCase();
+				esPK = param.value;
+				permiteEdit = "readonly";
+				if(esPK == "primary") permiteEdit = "";
+%]
+				<tr>
+	                <td>
+	                    <label for="[%=nomParamMin%]">[%=nomParamMay%]</label>
+	                </td>
+	                <td>
+	                    <input class="form-control" placeholder="[%=nomParamMay%]...." id="[%=nomParamMin%]"
+	                           ng-model="record.[%=nomParamMin%]" [%=permiteEdit%]>            
+	                </td>
+	            </tr>
+[%
+			}
+		}
+%] 
+            <tr>
+                <td colspan="2" align="center">
+                    <button id="btnBuscar" class="btn btn-primary" ng-click="ctrl.getRecord(record)">Consultar</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+[%
+//Se REVISA si la entidad tiene el buscar mediante DDL's'
+for(boton in html!Form.all.select(a|a.name=nameModuleGenerando).button.get(0).select(a|a.value="consult")){
+%] 
+<div ng-hide="ctrl.editModeConsult"  class="col-md-12 well">
+    <div class="row">
+        <table class="table table-condensed">
+
+            <tr>
+                <td align="center">
+                    <label for="tipoDe[%=nameModuleGenerandoMin%]">Seleccionar</label>
+                </td>
+                <td align="center">
+                    <select class="selectpicker" ng-model="currentRecord.[%=nameModuleGenerandoMin%]">
+                        <option ng-selected="{{currentRecord.[%=nameModuleGenerandoMin%] === operator.id}}"
+                                ng-repeat="operator in records" 
+                                value="{{operator.id}}">
+                            {{operator.name}}
+                        </option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+
+                <td align="center">
+                    <label>${{[%=nameModuleGenerandoMin%].price}}</label>
+                </td>
+
+                <td align="center">
+                    <span class="glyphicon glyphicon-print"></span>
+                </td>
+            
+            </tr>
+           
+            <tr>
+
+                <td align="center">
+                    <button id="btnCalcular" class="btn btn-primary" ng-click="ctrl.getCost(currentRecord)">Calcular Costo</button>
+                </td>
+
+                <td align="center">
+                    <button id="btnGenerar" class="btn btn-primary" ng-click="ctrl.print('print-area-1')">Generar Recibo</button>
+                </td>          
+            </tr>
+        </table>
+    </div>
+    <div id="print-area-1" class="print-area" ng-show="false">
+        <table class="table table-bordered" border="1">
+[%
+	for(parametros in html!Form.all.select(a|a.name="Paciente").input){
+		for(param in parametros){
+			nomParametro = param.name.firstToUpperCase();
+%]
+			<tr>
+                <td>
+                    <label>[%=nomParametro%]</label>
+                </td>
+                <td>
+                    <label>{{paciente.[%=nomParametro%]}}</label>     
+                </td>
+            </tr>
+[%
+		}
+	}
+%]        
+            <tr>
+                <td>
+                    <label>Nombre del [%=nameModuleGenerandoMin%] a pagar</label>
+                </td>
+                <td>
+                    <label>{{[%=nameModuleGenerandoMin%].name}}</label>     
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Total a pagar</label>
+                </td>
+                <td>
+                    <label>{{[%=nameModuleGenerandoMin%].price}}</label>     
+                </td>
+            </tr>
+        </table>
+    </div>
+    <textarea id="printing-css" style="display:none;">html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}table{border-collapse:collapse;border-spacing:0}body{font:normal normal .8125em/1.4 Arial,Sans-Serif;background-color:white;color:#333}strong,b{font-weight:bold}cite,em,i{font-style:italic}a{text-decoration:none}a:hover{text-decoration:underline}a img{border:none}abbr,acronym{border-bottom:1px dotted;cursor:help}sup,sub{vertical-align:baseline;position:relative;top:-.4em;font-size:86%}sub{top:.4em}small{font-size:86%}kbd{font-size:80%;border:1px solid #999;padding:2px 5px;border-bottom-width:2px;border-radius:3px}mark{background-color:#ffce00;color:black}p,blockquote,pre,table,figure,hr,form,ol,ul,dl{margin:1.5em 0}hr{height:1px;border:none;background-color:#666}h1,h2,h3,h4,h5,h6{font-weight:bold;line-height:normal;margin:1.5em 0 0}h1{font-size:200%}h2{font-size:180%}h3{font-size:160%}h4{font-size:140%}h5{font-size:120%}h6{font-size:100%}ol,ul,dl{margin-left:3em}ol{list-style:decimal outside}ul{list-style:disc outside}li{margin:.5em 0}dt{font-weight:bold}dd{margin:0 0 .5em 2em}input,button,select,textarea{font:inherit;font-size:100%;line-height:normal;vertical-align:baseline}textarea{display:block;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}pre,code{font-family:"Courier New",Courier,Monospace;color:inherit}pre{white-space:pre;word-wrap:normal;overflow:auto}blockquote{margin-left:2em;margin-right:2em;border-left:4px solid #ccc;padding-left:1em;font-style:italic}table[border="1"] th,table[border="1"] td,table[border="1"] caption{border:1px solid;padding:.5em 1em;text-align:left;vertical-align:top}th{font-weight:bold}table[border="1"] caption{border:none;font-style:italic}.no-print{display:none}</textarea>
+    <iframe id="printing-frame" name="print_frame" src="about:blank" style="display:none;"></iframe>
+</div>
+
+            
+[%
+}
+%]
+

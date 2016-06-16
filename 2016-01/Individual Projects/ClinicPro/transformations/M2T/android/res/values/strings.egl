@@ -1,0 +1,69 @@
+[%
+/*
+***********************************************************************************************
+***********************************************************************************************
+CONFIG MENU Y ACTIVITIES CON LOS STRING S CORRESPONDIENTES PARA LA APP
+***********************************************************************************************
+***********************************************************************************************
+*/
+%]
+<resources>
+    <string name="app_name">APP</string>
+
+[%
+for (activity in AndroidApplication!Activity.all){
+	   var nomActivityActual = activity.name;
+	   var nomActivityMin=nomActivityActual.firstToLowerCase();			
+	   	 				
+%]
+	<string name="labelBuscar[%=nomActivityActual%]">Buscar un [%=nomActivityMin%]</string>    
+    <string name="btnBuscar[%=nomActivityActual%]">Buscar</string>
+    <string name="[%=nomActivityMin%]s">Lista de [%=nomActivityActual%]</string>
+    <string name="btnGuardar[%=nomActivityActual%]">Guardar</string>
+    <string name="crear[%=nomActivityActual%]">Crear [%=nomActivityMin%]</string>
+    <string name="btnGuardar[%=nomActivityActual%]Editar">Guardar</string>
+    <string name="editar[%=nomActivityActual%]">Editar [%=nomActivityMin%]</string>		
+[%
+
+				for(atributos in activity.components){
+					--verifico el tipo de campo que viene.
+					var nameMin=atributos.name.firstToLowerCase();
+					var nameMay=atributos.name.firstToUpperCase();					
+	%]
+    [%
+						if(atributos.isTypeOf(TextField))
+						{
+						
+							if(atributos.type.isTypeOf(EEnumLiteral))
+							{
+								if(atributos.type.literal=='Number'){
+								
+%]
+    <string name="label[%=nameMay%]">[%=nameMin%]</string>
+[%						
+								}
+								if(atributos.type.literal=='Double'){
+								
+%]
+    <string name="label[%=nameMay%]">[%=nameMin%]</string>
+[%										
+								
+								}
+								if(atributos.type.literal=='Text'){
+								
+%]
+    <string name="label[%=nameMay%]">[%=nameMin%]</string>
+[%										
+								
+							 	}
+							}	
+						}
+					}//Cierro for de verificar componentes de la activity
+
+}
+%]
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="info">info</string>
+</resources>

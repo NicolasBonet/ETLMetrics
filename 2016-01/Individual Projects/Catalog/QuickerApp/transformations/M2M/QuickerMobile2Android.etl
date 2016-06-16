@@ -1,0 +1,71 @@
+//Tranformacion de la clase raiz del metamodelo a la clase raiz de Android
+rule QuickerApp2AndroidApp
+	transform
+	   q:Quicker!QuickerApp
+	to 
+	   a:Android!AndroidApp
+	   {
+	   		//Crea la lista de cadenas de string y asigna la equivalencia entre sus items y 
+	   		//las areas de interes
+	   		a.categories = new Android!StringArray();
+	   		a.categories.name = q.name;
+	   		a.categories.items = q.interestAreas.equivalent();
+	   		
+	   		//Para Fuentes, lenguajes y tamaños se crean directamente las listas de cadenas de String
+	   		//con un item cada una que es el valor de cada propiedad
+	   		a.fonts = new Android!StringArray();
+	   		a.fonts.name = "Fuentes";
+	   		
+	   		a.fonts.items = new Collection();
+	   		a.fonts.items.add(new Android!Item());
+	   		a.fonts.items[0].value = q.fonts.literal;
+	   		
+	   		a.languages = new Android!StringArray();
+	   		a.languages.name = "Idiomas";
+	   		
+	   		a.languages.items = new Collection();
+	   		a.languages.items.add(new Android!Item());
+	   		a.languages.items[0].value = q.languages.literal;
+	   		
+	   		a.sizes = new Android!StringArray();
+	   		a.sizes.name = "Tamanos";
+	   		
+	   		a.sizes.items = new Collection();
+	   		a.sizes.items.add(new Android!Item());
+	   		a.sizes.items[0].value = q.fontSizes.literal;
+	   }
+
+//Tranformacion de las areas de interes a items de la lista de strings o a items de los articulos
+@lazy
+rule InterestArea2Items
+	transform
+	   q:Quicker!InterestArea
+	to 
+	   a:Android!Item
+	   {
+	   	   	a.value = q.name;
+	   		//Identifica si el contenido es una nueva lista de temas o un articulo y sus atributos
+	   		if(q.subInterestAreas <> null and q.subInterestAreas->notEmpty())
+	   		{
+	   			a.subcategories = new Android!StringArray();
+	   			a.subcategories.name = q.name;
+	   			a.subcategories.items = q.subInterestAreas.equivalent();
+	   		}
+			
+			if(q.articles <> null and q.articles->notEmpty())
+	   		{
+	   			//Asigna valor a los atributos del articulo
+	   			a.articulo = new Android!StringArray();
+	   			a.articulo.items = new Collection();
+	   			a.articulo.items.add(new Android!Item());
+				a.articulo.items[0].value = q.articles.first().title;
+				a.articulo.items.add(new Android!Item());
+				a.articulo.items[1].value = q.articles.first().content;
+				a.articulo.items.add(new Android!Item());
+				a.articulo.items[2].value = q.articles.first().imagePortrait;
+	   		}
+
+	   }	
+	   
+
+	   	       

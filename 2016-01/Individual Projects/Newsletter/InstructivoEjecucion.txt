@@ -1,0 +1,74 @@
+-----------------------------------------------------------------------
+Instructivo de ejecución del generador y del código generado.
+-----------------------------------------------------------------------
+
+Requerimientos
+1. Eclipse Mars con plugins de EMF y Sirius instalados
+2. NewsleterProject con la siguiente estrutura de proyecto:
+	2.1 /DownloaderImages
+	2.2 /Examples
+	2.3 /Metamodels
+	2.3 /Newsletter.design
+	2.4 /NewsletterGenerator
+	2.5 /NewsletterModel 
+	
+
+-----------------------------------------------------------------------
+Correr el generador
+-----------------------------------------------------------------------
+
+Para correr el generador es necesario realizar los siguientes pasos:
+
+1. Abrir en una primera insatncia de eclipse el contenido de la carpeta /Metamodels 
+y registrar los metamodelos	de Newsletter.ecore y Android.ecore y HTML.ecore
+	/Metamodels/MetamodeloAndroid
+	/Metamodels/MetamodeloHTML
+	/Metamodels/MetamodeloNewsletter
+	/MetamodelNewsletter.edit		
+	/MetamodelNewsletter.editor
+
+2. 	Tambien importar el DownloaderImages si quiere ver su contenido (igual Ant lo empaquetara y ejecutara)
+
+3. Abrir en una segunda instanticia de eclipse los proyectos:
+	/NewsleterGenerator		(Generador con las transformaciones, build.xml ANT, y demas archivos intermedios usados en la cadena de transformacion)
+	/Newsletter.design 		(Proyecto sirius con el editor gráfico definido)
+	/NewsletterModel 		(modelo generado por sirius que se usara como entrada de la cadena de 	transformacion)
+
+4. Crear xmi de entrada en el proyecto /NewsletterModel editando un diagrama en sirius. 
+	Almacenarlo con el nombre de /NewsletterModel/example/Newsletter.xmi y/o puede editar 
+	el archivo build.xmi para cambiar el nombre del modelo de entrada. 
+
+5. Debe poner las urls de las imagenes (utilzadas en el editor) en el archivo /data/urlsImagenes.txt. Url por linea.  
+
+6. Ejecutar build.xmi y esperar a que termine. 
+	Este archivo prepara folders de NewsletterGenerator/generated, compila y ejecuta el jar que descarga las imagenes necesarias para el proyecto android
+	(Para eso el bulid.xmi llama el build_jar.xml que limpia, compila, empaquta y ejecuta un jar usando el proyecto  "DownloaderImages"). 
+	Luego este mismo build.xml ejecuta las transformaciones m2m y m2t de forma cordinada. 
+	
+	
+7. El contenido del newsletter aparecera en el folder de de /NewsleterGenerator/generated
+	(**Nota, aveces el ant guarda un cache del primer modelo que ejecuta. Si corriendo el ant(build.xml) no se actualiza el contenido de la carpeta generated, se sugiere correr las transfomaaiciones manualmente tras ejecutar el ant. Usandolo asi, almenos, para prepara el contenido de las imagenes.)
+
+-----------------------------------------------------------------------	
+Correr codigo generado (aplicaciones)
+-----------------------------------------------------------------------
+
+Probar el newsletter en HTML
+--------------------------------------
+
+1. Para probar este aplicativo, basta con abrir el archivo /NewsleterGenerator/generated/newsletter.html
+utilizando el browser de su preferencia. 
+
+Probar el newsletter en  Android
+--------------------------------------
+
+1. Para probar este aplicativo, basta con abrir el folder /NewsleterGenerator/generated/NewsletterAndroid
+utilizando android estudio y hacer clean and bulild del proyecto. Con ello, podra ejecutarlo usando el AVD
+(android virtal device) o generar el apk par aprobarlo en un dispositivo. 
+
+
+
+
+
+
+

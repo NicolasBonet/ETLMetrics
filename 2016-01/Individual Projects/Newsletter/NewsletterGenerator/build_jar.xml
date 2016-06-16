@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project default="build">
+
+	<property name="downloaderimages.location" location="../DownloaderImages" />
+	<target name="build">
+			<echo>Llamando targets para preparar correr Image Downloader</echo>
+			<antcall target="clean" />
+			<antcall target="compile" />
+			<antcall target="jar" />
+			<antcall target="run" />
+	</target>
+	<!-- Create jar from Image Downloader -->
+	
+	<target name="clean">
+	        <delete dir="${downloaderimages.location}/build"/>
+	</target>
+
+    <target name="compile">
+        <mkdir dir="${downloaderimages.location}/build/classes"/>
+        <javac includeantruntime="false" srcdir="${downloaderimages.location}/src" destdir="${downloaderimages.location}/build/classes"/>
+    </target>
+
+    <target name="jar">
+        <mkdir dir="build/jar"/>
+        <jar destfile="${downloaderimages.location}/dist/ImageDownloader.jar" basedir="${downloaderimages.location}/build/classes">
+            <manifest>
+                <attribute name="Main-Class" value="co.edu.uniandes.ImageDownloader" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run">
+        <java jar="${downloaderimages.location}/dist/ImageDownloader.jar" fork="true">
+    		<arg line="../NewsletterGenerator/data/urlsImagenes.txt"/>
+        </java>
+    </target>
+</project>

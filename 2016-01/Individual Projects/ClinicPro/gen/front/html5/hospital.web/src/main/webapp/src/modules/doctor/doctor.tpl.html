@@ -1,0 +1,107 @@
+<div id="doctor-header">
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#doctor-navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand">Doctor</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="doctor-navbar">
+				<button id="create-doctor" class="btn btn-default navbar-btn" ng-hide="ctrl.editMode" ng-click="ctrl.createRecord()"><span class="glyphicon glyphicon-plus"></span> Crear</button>
+				<button id="list-doctor" class="btn btn-default navbar-btn" ng-hide="ctrl.editMode" ng-click="ctrl.fetchRecords()"><span class="glyphicon glyphicon-list"></span> Listar</button>
+				<button id="search-doctor" class="btn btn-default navbar-btn" ng-hide="ctrl.editMode" ng-click="ctrl.searchRecord()"><span class="glyphicon glyphicon-search"></span> Buscar</button>
+				<!-- <button id="consult-doctor" class="btn btn-default navbar-btn" ng-hide="ctrl.editMode" ng-click="ctrl.consult()"><span class="glyphicon glyphicon-search"></span> Cosultar</button> -->
+
+            </div>
+        </div>
+    </nav>
+</div>
+
+<div ng-hide="ctrl.editModeList" class="col-md-12">
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+				<th>Cedula</th>
+				<th>Doctor</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="record in records">
+				<td id="{{$index}}-cedula">{{record.cedula}}</td>
+				<td id="{{$index}}-doctor">{{record.doctor}}</td>
+ 
+
+                <td>
+					<button id="{{$index}}-edit-btn" class="btn btn-default btn-sm" ng-click="ctrl.editRecord(record)"><span class="glyphicon glyphicon-edit"></span> Editar</button>
+					<button id="{{$index}}-delete-btn" class="btn btn-default btn-sm" ng-click="ctrl.deleteRecord(record)"><span class="glyphicon glyphicon-minus"></span> Eliminar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div ng-show="ctrl.editMode" class="col-md-12 well">
+    <form novalidate name="form" id="doctor-form" role="form" ng-submit="form.$valid && ctrl.saveRecord()">
+        <alert ng-messages="form.$error" type="danger" close="" ng-hide="!form.$error.required">
+            <div ng-message="required">
+                Por favor, complete los campos!
+            </div>
+        </alert>
+        <fieldset>
+            <input id="id" class="form-control" type="hidden" ng-model="currentRecord.id"/>
+            <div class="form-group col-md-12" ng-class="{'has-success': form.name.$valid && form.name.$dirty, 'has-error': form.name.$invalid && (form.name.$dirty || form.$submitted)}" >
+				<label for="cedula" class="col-md-2 control-label">Cedula</label>
+                <div class="col-md-10">
+                    <input id="cedula" name="cedula" class="form-control" type="text" ng-model="currentRecord.cedula" required />
+                </div>
+				<label for="doctor" class="col-md-2 control-label">Doctor</label>
+                <div class="col-md-10">
+                    <input id="doctor" name="doctor" class="form-control" type="text" ng-model="currentRecord.doctor" required />
+                </div>
+                
+            </div>
+            <div  style="text-align: center;">
+            	<button id="save-doctor" type="submit" form="doctor-form" class="btn btn-primary" ng-show="ctrl.editMode"><span class="glyphicon glyphicon-save"></span> Guardar</button>
+				<button id="cancel-doctor" type="button" form="doctor-form" class="btn btn-primary" ng-show="ctrl.editMode" ng-click="form.$setPristine(); ctrl.fetchRecords();"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>
+	        </div>
+        </fieldset>
+    </form>
+</div>
+<div ng-hide="ctrl.editModeSearch" class="col-md-12 well">
+    <div class="row">
+        <table class="table table-condensed">
+				<tr>
+	                <td>
+	                    <label for="cedula">Cedula</label>
+	                </td>
+	                <td>
+	                    <input class="form-control" placeholder="Cedula...." id="cedula"
+	                           ng-model="record.cedula" >            
+	                </td>
+	            </tr>
+				<tr>
+	                <td>
+	                    <label for="doctor">Doctor</label>
+	                </td>
+	                <td>
+	                    <input class="form-control" placeholder="Doctor...." id="doctor"
+	                           ng-model="record.doctor" readonly>            
+	                </td>
+	            </tr>
+ 
+            <tr>
+                <td colspan="2" align="center">
+                    <button id="btnBuscar" class="btn btn-primary" ng-click="ctrl.getRecord(record)">Consultar</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+

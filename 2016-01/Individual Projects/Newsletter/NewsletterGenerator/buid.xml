@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project default="build">
+	<!-- Generated Files Locations-->
+	<property name="generated.location" location="${basedir}/generated" />
+	<property name="generated.location.android.images" location="${generated.location}/NewsletterAndroid/app/src/main/res/drawable-hdpi" />
+	
+	<!-- Other Data Locations -->
+	<property name="staticfiles.location.images" location="${basedir}/staticFiles/Images" />
+	<property name="data.urlsimagenes" location="${basedir}/data/urlsImagenes.txt" />
+	<property name="downloaderimages.location" location="../DownloaderImages" />
+	
+	<!-- Models -->
+	<property name="newsletter.model.location" location="../NewsletterModel/test/NewsletterTest.xmi" />
+	<property name="html.model.location" location="${basedir}/models/HTML.xmi" />
+	<property name="android.model.location" location="${basedir}/models/Android.xmi" />
+
+	<!-- Metamodels -->
+	<property name="newsletter.metamodel.location" location="${basedir}/metamodels/Newsletter.ecore" />
+	<property name="newsletter.metamodel.uri" value="http://www.example.org/metamodeloNewsletter" />
+	<property name="html.metamodel.location" location="${basedir}/metamodels/HTML.ecore" />
+	<property name="html.metamodel.uri" value="HTML" />
+	<property name="android.metamodel.location" location="${basedir}/metamodels/Android.ecore" />
+    <property name="android.metamodel.uri" value="android" />
+	
+	<!-- Build -->
+	<target name="build">
+		<echo>Llamando targets para preparar el contenido</echo>
+		<antcall target="prepare-images" />
+		<echo>Llamando targets para realizar las transformaciones</echo>
+		<antcall target="m2m-newsletter2html" />
+		<antcall target="m2m-newsletter2android" />
+	</target>
+	
+	<!-- Preparation Tasks -->
+	<target name="prepare-images">
+		<echo>Borrando contenidos de imagenes de la carpeta correspondiente en generated</echo>
+		<!-- Delete ONLY contents in generated images folder, not the folder-->
+		<delete>
+		   <fileset dir="${generated.location.android.images}">
+		   		<include name="*"/>
+		   </fileset>
+		</delete>
+		
+		<!-- Delete ONLY contents in staticFiles images folder, not the folder-->
+		<delete>
+		   <fileset dir="${staticfiles.location.images}">
+		   		<include name="*"/>
+		   </fileset>
+		</delete>
+		
+		<!-- Descarga imagenes y las agrega a folder de images-->
+		<antcall target="execute-image-downloader" />
+		
+		<!-- Copy New contents (images) to the folder generated -->
+		<echo>Copiando nuevo conjunto de imagenes a carpeta correspondiente en generated</echo>
+		<copy todir="${generated.location.android.images}" >  
+			<fileset dir="${staticfiles.location.images}">
+				<include name="**"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<!-- Executes another antfile to build and run jar ImageDownloader -->
+	
+	<target name="execute-image-downloader">
+	     <ant antfile="${basedir}/build_jar.xml" target="build" />
+	</target>	
+	
+	<!-- M2M -->
+	<target name="m2m-newsletter2html">
+		<echo>Realizar transformación ETL - Newsletter2HTML</echo>
+		<epsilon.emf.register file="${newsletter.metamodel.location}" />
+		<epsilon.emf.register file="${html.metamodel.location}" />
+		<epsilon.emf.loadModel name="newsletter" modelfile="${newsletter.model.location}" metamodeluri="${newsletter.metamodel.uri}" read="true" store="false" />
+		<epsilon.emf.loadModel name="html" modelfile="${html.model.location}" metamodeluri="${html.metamodel.uri}" read="false" store="true" />
+		<epsilon.etl src="${basedir}/M2M/Newsletter2HTML.etl">
+			<model ref="newsletter" />
+			<model ref="html" />
+		</epsilon.etl>
+		<antcall target="m2t-html" />
+	</target>
+	<target name="m2m-newsletter2android">
+		<echo>Realizar transformación ETL - Newsletter2Android</echo>
+		<epsilon.emf.register file="${newsletter.metamodel.location}" />
+		<epsilon.emf.register file="${android.metamodel.location}" />
+		<epsilon.emf.loadModel name="newsletter" modelfile="${newsletter.model.location}" metamodeluri="${newsletter.metamodel.uri}" read="true" store="false" />
+		<epsilon.emf.loadModel name="android" modelfile="${android.model.location}" metamodeluri="${android.metamodel.uri}" read="false" store="true" />
+		<epsilon.etl src="${basedir}/M2M/Newsletter2Android.etl">
+			<model ref="newsletter" />
+			<model ref="android" />
+		</epsilon.etl>
+		<antcall target="m2t-android" />
+		</target>
+	
+	<!-- M2T -->
+	<target name="m2t-html">
+		<echo>Corriendo Template EGL - generateHTML </echo>
+		<epsilon.emf.register file="${html.metamodel.location}" />
+		<epsilon.emf.loadModel name="html" modelfile="${html.model.location}" metamodeluri="${html.metamodel.uri}" read="true" store="false" />
+		<epsilon.egl src="${basedir}/M2T/html/generateHTML.egl">
+			<model ref="html" />
+		</epsilon.egl>
+	</target>
+	<target name="m2t-android">
+			<echo>Corriendo Template EGL - generateANDROID</echo>
+			<epsilon.emf.register file="${android.metamodel.location}" />
+			<epsilon.emf.loadModel name="android" modelfile="${android.model.location}" metamodeluri="${android.metamodel.uri}" read="true" store="false" />
+			<epsilon.egl src="${basedir}/M2T/android/generateANDROID.egl">
+				<model ref="android" />
+			</epsilon.egl>
+		</target>
+</project>

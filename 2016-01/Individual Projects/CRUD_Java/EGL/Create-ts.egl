@@ -1,0 +1,94 @@
+/// <reference path="../../../../../typings/tsd.d.ts" />
+
+// Angular 2
+import {Component, View, Directive, coreDirectives} from 'angular2/angular2';
+import {formDirectives, FormBuilder, Control, ControlGroup, Validators} from 'angular2/forms';
+[%if (webPage.master <> ''){%]
+import {RouteParams, Router} from 'angular2/router';
+import {Inject} from 'angular2/di';
+[%}
+else{%]
+import {Router} from 'angular2/router';
+[%}%]
+import {[%=webPage.entityName%]Service} from '../../services/[%=webPage.entityName%]Service';
+import {[%=webPage.entityName%]} from '../../models/[%=webPage.entityName.firstToLowerCase()%]';
+
+// Simple component
+@Component({
+    selector: 'create-[%=webPage.entityName.firstToLowerCase()%]'
+})
+
+@View({
+    templateUrl: './app/pages/create/create-[%=webPage.entityName.firstToLowerCase()%].html',
+    directives: [coreDirectives, formDirectives]
+})
+
+export class Create[%=webPage.entityName%] {
+    create[%=webPage.entityName%]Form: ControlGroup;
+[%for (input in Modelo.allInstances().select(m | m.name = webPage.entityName).first().attributes){%]
+	[%=input.name%]Input: Control;
+[%}%]
+
+    [%=webPage.entityName.firstToLowerCase()%]: [%=webPage.entityName%];
+
+    canShowCreateFailedMsg: boolean;
+    createFailedMsg: string;
+
+[%if (webPage.master <> ""){%]	id:string; 
+
+    constructor(@Inject(RouteParams) params, public router:Router, public [%=webPage.entityName.firstToLowerCase()%]Service:[%=webPage.entityName%]Service, public formBuilder: FormBuilder) {
+		this.id = params.get('id');
+        this.[%=webPage.entityName.firstToLowerCase()%] = new [%=webPage.entityName%]();
+        this.createFailedMsg = null;
+        this.canShowCreateFailedMsg = false;
+[%}
+else{%]
+	constructor(public router:Router, public [%=webPage.entityName.firstToLowerCase()%]Service:[%=webPage.entityName%]Service, public formBuilder: FormBuilder) {
+        this.[%=webPage.entityName.firstToLowerCase()%] = new [%=webPage.entityName%]();
+        this.createFailedMsg = null;
+        this.canShowCreateFailedMsg = false;
+[%}%]
+
+        this.create[%=webPage.entityName%]Form = formBuilder.group({
+[%
+var size = Modelo.allInstances().select(m | m.name = webPage.entityName).first().attributes.size();
+for (input in Modelo.allInstances().select(m | m.name = webPage.entityName).first().attributes){%]
+			'[%=input.name%]': [%if (input.isPK = true or input.isRequired = false){%][''][%}else{%]['', Validators.required][%}if (input.name <> Modelo.allInstances().select(m | m.name = webPage.entityName).first().attributes.get(size-1).name){%],
+[%}
+}%]
+
+        });
+
+[%for (input in Modelo.allInstances().select(m | m.name = webPage.entityName).first().attributes){%]
+		this.[%=input.name%]Input = this.create[%=webPage.entityName%]Form.controls.[%=input.name%];
+[%}%]
+		
+    }
+
+    create[%=webPage.entityName%]_successHandler(response) {
+        if (response.status !== 200) {
+            response.json().then(data => {
+                this.canShowCreateFailedMsg = true;
+                this.createFailedMsg = data.errorMessage || 'Ha ocurrido un error';
+            });
+        } else {
+            this.list[%=webPage.entityName%]s();
+        }
+    }
+
+    create[%=webPage.entityName%]_errorHandler(error) {
+        this.createFailedMsg = error;
+    }
+
+    create[%=webPage.entityName%]() {
+        this.canShowCreateFailedMsg = false;
+
+        this.[%=webPage.entityName.firstToLowerCase()%]Service.create[%=webPage.entityName%](this.[%=webPage.entityName.firstToLowerCase()%].toJSON([%if (webPage.master <> ""){%]this.id), this.id[%}else{%])[%}%])
+            .then(response => this.create[%=webPage.entityName%]_successHandler(response))
+            .catch(error => this.create[%=webPage.entityName%]_errorHandler(error));
+    }
+	
+    list[%=webPage.entityName%]s() {
+        this.router.parent.navigate('/list[%=webPage.entityName%][%if (webPage.master <> ""){%]/' + this.id[%}else{%]'[%}%]);
+    }
+}

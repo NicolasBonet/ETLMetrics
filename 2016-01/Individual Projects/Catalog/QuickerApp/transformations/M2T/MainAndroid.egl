@@ -1,0 +1,6 @@
+[% 
+	//Cargo el template y exporto el archivo a ser cargado por la app Android
+	var t:Template:= TemplateFactory.load('android/AndroidModel2XML.egl');
+	t.generate('../../generated/arrays.xml');
+	
+%]
