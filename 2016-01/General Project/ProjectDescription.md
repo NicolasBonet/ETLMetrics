@@ -7,8 +7,9 @@ Students had to build a grammar to parse SQL queries that represented an schema 
 # Grades
 To get an idea of the quality of each implementation we've provided the grades obtained from each group:
 
+
 |Group    |Grade|
------------------
+|---------|-----|
 |Group 1  | 2.8 |
 |Group 2  | 4.4 |
 |Group 3  | 0.7 |
