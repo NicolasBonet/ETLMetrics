@@ -20,8 +20,12 @@ Cobiw code is parsed using Java code to create a model representation of it whic
 ## JSON2SQL
 This group designed a grammar which is able to parse JSON files into a XMI model using XText, this model can then be transformed using ETL into a SQL model which can generate Java code that creates the SQL database.
 
-# Swing2AngularJS
+## Swing2AngularJS
 Swing projects are analyzed using Modisco which generates a XMI model used by the transformation as an input to generated a HTML model used as a resource for the EGL scripts in order to generate AngularJS/HTML code which should operate similary to the Swing app.
+
+# Grades
+
+Here are the grades of each project in order to give an idea about the quality of their work:
 
 |Group                                       |Grade|
 |--------------------------------------------|-----|
