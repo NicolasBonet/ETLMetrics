@@ -1,0 +1,35 @@
+[% var sql = SQL!Table.all;%]
+package co.com.ap.model;
+
+public class GenericJSon {
+	[%
+	for(table in sql){%]
+	private [%=(table.name.removerComillas()).firstToUpperCase()%] [%=table.name.removerComillas()%];
+
+	public [%=(table.name.removerComillas()).firstToUpperCase()%] get[%=(table.name.removerComillas()).firstToUpperCase()%]() {
+		return [%=table.name.removerComillas()%];
+	}
+
+	public void set[%=(table.name.removerComillas()).firstToUpperCase()%]([%=(table.name.removerComillas()).firstToUpperCase()%] [%=table.name.removerComillas()%]) {
+		this.[%=table.name.removerComillas()%] = [%=table.name.removerComillas()%];
+	}
+	[%}%]
+	public String getSQLInsert(){
+		[% var contador = 0; for(table in sql){
+		if(contador == 0){%]
+		if([%=table.name.removerComillas()%]!=null){
+			return [%=table.name.removerComillas()%].toSQLInsert();
+		}
+		[%}else{%]
+		else if([%=table.name.removerComillas()%]!=null){
+			return [%=table.name.removerComillas()%].toSQLInsert();
+		}
+		[%}}%]
+		return null;
+	}	
+}
+[%
+	operation String removerComillas(){
+		return self.replace("\"","");	
+	}
+%]

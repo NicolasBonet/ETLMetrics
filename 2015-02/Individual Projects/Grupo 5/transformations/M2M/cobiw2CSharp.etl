@@ -1,0 +1,113 @@
+pre {
+	var fillers = 1;
+}
+
+rule PrgCobiw2CSharp 
+	transform c : CobiwMM!Programa
+	to s : CSharpMM!Programa {
+		s.nombre = c.nombre;
+		s.tipoPrograma = c.getTipoPrograma();
+		s.controlador = new CSharpMM!Controlador();
+		s.controlador.nombre = c.getControladorNombre();
+		s.controlador.vistas = c.contiene.equivalent();
+		s.controlador.modelos = s.controlador.vistas.collect(v|v.modelo);
+	}
+	
+rule Copy2Vista 
+	transform c : CobiwMM!Copy
+	to s : CSharpMM!Vista {
+		s.esEntrada = c.esEntrada;
+		s.nombre = c.nombreArchivo;
+		s.modelo = new CSharpMM!Modelo();
+		s.modelo.nombre = c.nombreArchivo;
+		s.modelo.esEntrada = c.esEntrada;
+		s.modelo.propiedades = c.compuesto.getPropiedades();
+		s.elementos = s.modelo.propiedades.select(p|not p.esRelleno).equivalent();		
+	}
+	
+operation OrderedSet getPropiedades(): Sequence
+{
+	var selfProps = self.select(c|c.conformada.size() = 0).equivalent("Variable2Propiedad");
+
+	for (pr in self.select(c|c.conformada.size() > 0))
+	{
+		var childProps = pr.conformada.getPropiedades();
+		selfProps = selfProps.includingAll(childProps);
+	}
+
+	return selfProps;
+}	
+	
+@lazy	
+rule Variable2Propiedad 
+	transform c : CobiwMM!Variable
+	to s : CSharpMM!Propiedad {
+	
+		s.nombre = c.nombre;
+		s.longitud = c.longitud;
+		s.precision = c.precision;
+		s.esRelleno = c.nombre = "FILLER";
+		
+		if (s.esRelleno) {
+			s.nombre = s.nombre + fillers;
+			fillers = fillers + 1;
+		}
+		
+		s.tipo = c.getTipoVariable();
+	}	
+
+rule Propiedad2Widget
+	transform c : CSharpMM!Propiedad
+	to s : CSharpMM!Widget {
+		s.propiedad = c;
+		s.tipoWidget = c.getTipoWidget();
+	}
+
+operation CSharpMM!Propiedad getTipoWidget()
+{
+	if (self.modelo.esEntrada)
+	{
+		return CSharpMM!TipoWidget#Input;
+	}
+
+	return CSharpMM!TipoWidget#Label;
+}
+
+operation CobiwMM!Programa getTipoPrograma()
+{
+	switch (self.tipo) {
+		case CobiwMM!TipoPrograma#linea : return CSharpMM!TipoPrograma#reporte;
+		case CobiwMM!TipoPrograma#lineaConsulta : return CSharpMM!TipoPrograma#consulta;
+		default : return CSharpMM!TipoPrograma#cobol;
+	}
+}
+
+
+operation CobiwMM!Programa getControladorNombre()
+{
+	switch (self.tipo) {
+		case CobiwMM!TipoPrograma#linea : return "Reports";
+		case CobiwMM!TipoPrograma#lineaConsulta : return "Entities";
+		default : return "Cobol";
+	}
+}
+
+
+operation CobiwMM!Variable getTipoVariable()
+{
+	if (self.tipo = CobiwMM!TipoVariable#caracter) {
+		return CSharpMM!TipoDato#string;
+	}
+
+	if (self.tipo = CobiwMM!TipoVariable#numerica) {
+		
+		if (self.precision > 0) {
+			return CSharpMM!TipoDato#decimal;
+		}
+
+		return CSharpMM!TipoDato#int;
+	}
+	
+	return CSharpMM!TipoDato#string;
+}
+

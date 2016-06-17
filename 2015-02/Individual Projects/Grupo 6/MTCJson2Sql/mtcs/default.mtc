@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.mtcflow.model:MTC xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:com.mtcflow.model="http://com.mtcflow.mtc/1.1">
+  <files name="NoSql" URI="${inputJson}"/>
+  <files name="ConfigApp" URI="${configFile}"/>
+  <files name="SQL"/>
+  <files name="JavaApp"/>
+  <metamodels name="JSON" URI="Json.ecore" technology="" alias="JSON" autoregister="false" metamodelURI="http://www.uniandes.com/jsontosql/xtext/Json"/>
+  <metamodels name="CONFIG" URI="Config.ecore" alias="CONFIG" autoregister="false" metamodelURI="http://www.uniandes.com/config2sql/xtext/Config"/>
+  <metamodels name="DB" URI="SqlModel.ecore" alias="DB"/>
+  <models name="JsonModel" URI="workspace/json.xmi" metamodels="//@metamodels.0" format=""/>
+  <models name="ConfigModel" URI="workspace/config.xmi" metamodels="//@metamodels.1"/>
+  <models name="SqlModel" URI="DB.xmi" metamodels="//@metamodels.2"/>
+  <inputModels model="//@models.0" modelAlias="JSON" transformation="//@transformations.2"/>
+  <inputModels model="//@models.1" modelAlias="CONFIG" transformation="//@transformations.2"/>
+  <inputModels model="//@models.2" modelAlias="DB" transformation="//@transformations.3"/>
+  <inputModels model="//@models.1" modelAlias="CO" transformation="//@transformations.4" metamodelAlias="CO"/>
+  <inputModels model="//@models.2" modelAlias="SQL" transformation="//@transformations.4" metamodelAlias="SQL"/>
+  <transformations xsi:type="com.mtcflow.model:T2MTransformation" name="JSonT2M" URI="transformations/T2M/Json.xtext"/>
+  <transformations xsi:type="com.mtcflow.model:T2MTransformation" name="ConfigT2M" URI="transformations/T2M/Config.xtext"/>
+  <transformations xsi:type="com.mtcflow.model:M2MTransformation" name="JsonConfig2Sql" URI="json2sql.etl"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="SQLSchema" URI="master.egl" target="${output}"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="JavaApp" URI="masterApp.egl" target="${output}"/>
+  <outputModels modelAlias="JSON" model="//@models.0" transformation="//@transformations.0" metamodelAlias="JSON"/>
+  <outputModels modelAlias="CONFIG" model="//@models.1" transformation="//@transformations.1" metamodelAlias="CONFIG"/>
+  <outputModels model="//@models.2" transformation="//@transformations.2"/>
+  <configurations>
+    <variables name="configFile" defaultValue="models/sads.config"/>
+    <variables name="inputJson" defaultValue="models/input.json"/>
+    <variables name="output"/>
+  </configurations>
+  <inputFiles file="//@files.0" transformation="//@transformations.0"/>
+  <inputFiles file="//@files.1" transformation="//@transformations.1"/>
+  <outputFiles transformation="//@transformations.3" file="//@files.2"/>
+  <outputFiles transformation="//@transformations.4" file="//@files.3"/>
+</com.mtcflow.model:MTC>

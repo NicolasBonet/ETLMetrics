@@ -1,0 +1,125 @@
+Config-file
+[% "ConfigFiles".println() ;%]
+[%// TemplateFactory.load('./ui/.travis.yml.egl').generate('../build/ui/.travis.yml'); %]
+[% TemplateFactory.load('./ui/package.json.egl').generate('../build/ui/package.json'); %]
+[% TemplateFactory.load('./ui/bower.json.egl').generate('../build/ui/bower.json'); %]
+[% TemplateFactory.load('./ui/.yo-rc.json.egl').generate('../build/ui/.yo-rc.json'); %]
+
+Test-files
+[% "Test files".println() ;%]
+[% TemplateFactory.load('./ui/test/.jshintrc.egl').generate('../build/ui/test/.jshintrc'); %]
+[% TemplateFactory.load('./ui/test/karma.conf.coffee.egl').generate('../build/ui/test/karma.conf.coffee'); %]
+[% TemplateFactory.load('./ui/test/spec/controllers/main.coffee.egl').generate('../build/ui/test/spec/controllers/main.coffee'); %]
+
+
+Static-files
+[% TemplateFactory.load('./ui/.editorconfig.egl').generate('../build/ui/.editorconfig'); %]
+[% TemplateFactory.load('./ui/README.md.egl').generate('../build/ui/README.md'); %]
+[% TemplateFactory.load('./ui/.jshintrc.egl').generate('../build/ui/.jshintrc'); %]
+[% TemplateFactory.load('./ui/app/.htaccess.egl').generate('../build/ui/app/.htaccess'); %]
+[% TemplateFactory.load('./ui/app/404.html.egl').generate('../build/ui/app/404.html'); %]
+[% TemplateFactory.load('./ui/app/styles/main.scss.egl').generate('../build/ui/app/styles/main.scss'); %]
+[% TemplateFactory.load('./ui/app/.buildignore.egl').generate('../build/ui/app/.buildignore'); %]
+
+Services-files
+
+[%
+ 	for(service in angularModel!Application.getAllInstances().get(0).services){
+ 	 var template = TemplateFactory.load('./ui/app/scripts/services/services.egl');
+ 	 template.populate('service', service);
+ 	 template.generate('../build/ui/app/scripts/services/'+service.name.toLowerCase()+'.coffee'); 
+ 	
+ 	}
+%]
+
+
+Controllers-files
+[% TemplateFactory.load('./ui/app/scripts/controllers/main.coffee.egl').generate('../build/ui/app/scripts/controllers/main.coffee'); %]
+
+[%
+ 	for(crud in angularModel!Application.getAllInstances().get(0).cruds){
+ 		if(crud.allowCreate){
+ 			var template = TemplateFactory.load('./ui/app/scripts/controllers/controller_new.egl'); 
+ 			template.populate('ctl', crud);
+ 			template.generate('../build/ui/app/scripts/controllers/'+crud.service.name.toLowerCase()+'s_new.coffee');
+ 		}
+ 		if(crud.allowRead or crud.allowDelete){
+ 			var template = TemplateFactory.load('./ui/app/scripts/controllers/controller.egl'); 
+ 			template.populate('ctl', crud);
+ 			template.generate('../build/ui/app/scripts/controllers/'+crud.service.name.toLowerCase()+'s.coffee');
+ 		}
+ 		if(crud.allowUpdate){
+ 			var template = TemplateFactory.load('./ui/app/scripts/controllers/controller_edit.egl'); 
+ 			template.populate('ctl', crud);
+ 			template.generate('../build/ui/app/scripts/controllers/'+crud.service.name.toLowerCase()+'s_edit.coffee');
+ 		}
+ 	}
+ %]
+
+AppJs-file
+[% TemplateFactory.load('./ui/app/scripts/app.coffee.egl').generate('../build/ui/app/scripts/app.coffee'); %]
+
+
+Views-files
+[% TemplateFactory.load('./ui/app/views/main.html.egl').generate('../build/ui/app/views/main.html'); %]
+
+[%
+ 	for(crud in angularModel!Crud.getAllInstances()){
+ 		
+ 		if(crud.allowCreate){
+	 		var template = TemplateFactory.load('./ui/app/views/view_new.egl');
+	 		template.populate('crud', crud);
+	 		template.generate('../build/ui/app/views/'+crud.service.name.toLowerCase()+'s_new.html');
+ 		}
+ 		
+ 		if(crud.allowRead or crud.allowDelete){
+	 		var template = TemplateFactory.load('./ui/app/views/view.html.egl');
+	 		template.populate('crud', crud);
+	 		template.generate('../build/ui/app/views/'+crud.service.name.toLowerCase()+'s.html');
+ 		}
+ 		
+ 		if(crud.allowUpdate){
+ 			var template = TemplateFactory.load('./ui/app/views/view_new.egl');
+	 		template.populate('crud', crud);
+	 		template.generate('../build/ui/app/views/'+crud.service.name.toLowerCase()+'s_edit.html');
+ 		}
+ 	}
+%]
+
+BasicIndex-files
+[% TemplateFactory.load('./ui/app/robots.txt.egl').generate('../build/ui/app/robots.txt'); %]
+[% TemplateFactory.load('./ui/app/index.html.egl').generate('../build/ui/app/index.html'); %]
+[% TemplateFactory.load('./ui/app/favicon.ico.egl').generate('../build/ui/app/favicon.ico'); %]
+
+Angular-files
+[% TemplateFactory.load('./ui/Gruntfile.js.egl').generate('../build/ui/Gruntfile.js'); %]
+[% TemplateFactory.load('./ui/.bowerrc.egl').generate('../build/ui/.bowerrc'); %]
+[% TemplateFactory.load('./ui/web.js.egl').generate('../build/ui/web.js'); %]
+[% TemplateFactory.load('./ui/dist/.htaccess.egl').generate('../build/ui/dist/.htaccess'); %]
+[% TemplateFactory.load('./ui/Procfile.egl').generate('../build/ui/Procfile'); %]
+
+[% "Crud test".println() ;%]
+[%
+ 	for(test in angularModel!Application.getAllInstances().get(0).cruds){
+ 		if(test.allowCreate){
+ 			var template = TemplateFactory.load('./ui/test/spec/controllers/tests_new.egl'); 
+ 			template.populate('test', test);
+ 			template.generate('../build/ui/test/spec/controllers/'+test.service.name.toLowerCase()+'s_new.coffee');
+ 		}
+ 		
+ 		if(test.allowRead or test.allowDelete){
+ 			var template = TemplateFactory.load('./ui/test/spec/controllers/tests.egl'); 
+ 			template.populate('test', test);
+ 			template.generate('../build/ui/test/spec/controllers/'+test.service.name.toLowerCase()+'s.coffee');
+ 		}
+ 		
+ 		if(test.allowUpdate){
+ 			var template = TemplateFactory.load('./ui/test/spec/controllers/tests_edit.egl'); 
+ 			template.populate('test', test);
+ 			template.generate('../build/ui/test/spec/controllers/'+test.service.name.toLowerCase()+'s_edit.coffee');
+ 		}
+ 	}
+%]
+
+[% TemplateFactory.load('./ui/Gemfile.egl').generate('../build/ui/Gemfile'); %]
+[% TemplateFactory.load('./ui/setup.sh.egl').generate('../build/ui/setup.sh'); %]

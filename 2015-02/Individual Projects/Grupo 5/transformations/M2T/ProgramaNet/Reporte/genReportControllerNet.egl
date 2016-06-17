@@ -1,0 +1,86 @@
+[% import '../netUtil.egl'; %]
+using System;
+using System.Collections.Generic;
+using System.Web.Mvc;
+using cobiwsite.Models;
+
+namespace cobiwsite.Controllers
+{
+    using System.Configuration;
+
+    using cobiwsite.EntireX;
+
+    public class ReportsController : Controller
+    {
+
+        // GET: Reports/Create
+        public ActionResult Query()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Query(ReportEntrada report)
+        {
+            var usuarioCookie = this.Request.Cookies["usuario"];
+            var passwordCookie = this.Request.Cookies["clave"];
+
+            var strUsr = usuarioCookie != null ? usuarioCookie.Value : string.Empty;
+            var strPsw = passwordCookie != null ? passwordCookie.Value : string.Empty;
+            var strCnfCics = ConfigurationManager.AppSettings["ConfigCICS"];
+
+            var objEntirex = new clsEntireX("GE30", strUsr, strPsw, "GE", "075600");
+
+            // Definición Campos Entrada
+[%
+var modeloEntrada = CS!Modelo.all.select(m|m.esEntrada).first();
+
+for(pr in modeloEntrada.propiedades) {
+	if (pr.tipo = CS!TipoDato#string) {%]
+            objEntirex.AddCampoTexto("[%=pr.nombre%]", [%=pr.longitud%], ebxIO.EntradaSalida);	
+    [%}
+    else {%]
+            objEntirex.AddCampoNumero("[%=pr.nombre%]", [%=pr.longitud%], 0, false, ebxIO.EntradaSalida);
+    [%}%]
+            objEntirex.Campo["[%=pr.nombre%]"].Valor = report.[%=pr.getCSName()%];
+[%}%]
+
+            // Definición Campos Salida
+[%
+var modeloSalida = CS!Modelo.all.select(m|not m.esEntrada).first();
+for(pr in modeloSalida.propiedades) {
+	if (pr.tipo = CS!TipoDato#string) {%]
+            objEntirex.AddCampoTexto("[%=pr.nombre%]", [%=pr.longitud%], ebxIO.SoloSalida);	
+    [%}
+    else {%]
+            objEntirex.AddCampoNumero("[%=pr.nombre%]", [%=pr.longitud%], 0, false, ebxIO.SoloSalida);
+    [%}%]
+[%}%]
+            var reporte = new List<ReportSalida>();
+
+            try
+            {
+                do
+                {
+                    objEntirex.consultaEntireX(strCnfCics);
+
+                    var returnEntry = new ReportSalida();
+[%
+for(pr in modeloSalida.propiedades) {%]
+                    returnEntry.[%=pr.getCSName()%] = ([%=pr.getDataType()%])objEntirex.Campo["[%=pr.nombre%]"].Valor;
+[%}%]                    
+                    reporte.Add(returnEntry);
+                }
+                while (objEntirex.MoreRecords);
+
+            }
+            catch (Exception)
+            {
+                return View("Error");
+            }
+
+            return View("Index", reporte);
+        }
+    }
+}

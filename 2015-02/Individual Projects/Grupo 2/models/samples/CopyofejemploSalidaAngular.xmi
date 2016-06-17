@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Application
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.example.org/crudAngularGenerator"
+    xsi:schemaLocation="http://www.example.org/crudAngularGenerator crudAngularGenerator.ecore"
+    name="ejemplo">
+  <services
+      name="Estudiante"
+      url="/admin/estudiantes"/>
+  <services
+      name="PeriodoAcademico"
+      url="/admin/periodo_academicos"/>
+  <services
+      name="Curso"
+      url="/admin/cursos"/>
+  <cruds service="//@services.0">
+    <fields
+        key="nombre"
+        component="primitive"
+        isRequired="true"
+        dataType="string"/>
+    <fields
+        key="apellido"
+        component="primitive"
+        isRequired="true"
+        dataType="string"/>
+    <fields
+        key="fecha_nacimiento"
+        component="primitive"
+        dataType="date"/>
+    <fields
+        key="curso_ids"
+        isMultiple="true"
+        relatedService="//@services.2"/>
+  </cruds>
+  <cruds service="//@services.2">
+    <fields
+        key="nombre"
+        component="primitive"
+        isRequired="true"
+        dataType="string"/>
+    <fields
+        key="codigo"
+        component="primitive"
+        dataType="string"/>
+    <fields
+        key="descripcion"
+        component="primitive"
+        dataType="text"/>
+    <fields
+        key="periodo_academico_id"
+        isRequired="true"
+        relatedService="//@services.1"/>
+    <fields
+        key="estudiante_ids"
+        isMultiple="true"
+        component="autocompleteMultiple"
+        relatedService="//@services.0"/>
+  </cruds>
+  <cruds service="//@services.1">
+    <fields
+        key="nombre"
+        component="primitive"
+        isRequired="true"
+        dataType="string"/>
+    <fields
+        key="fecha_inicio"
+        component="primitive"
+        dataType="date"/>
+    <fields
+        key="fecha_fin"
+        component="primitive"
+        dataType="date"/>
+  </cruds>
+</Application>

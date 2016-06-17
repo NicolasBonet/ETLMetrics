@@ -1,0 +1,312 @@
+package edu.uniandes.co.jee.ejb;
+
+public class VentaVehiculosEJB 
+{
+
+	public void VentaVehiculos (){
+	
+		vehiculos = new ArrayList( );
+	}
+	
+	
+	public ArrayList<E> darVehiculos (){
+	
+		ArrayList copiaLista = new ArrayList( vehiculos );
+		return copiaLista;
+	}
+	
+	
+	public void ordenarPorMarca (){
+	
+		int inicial;
+		
+		for( inicial = 0; inicial < vehiculos.size( ); inicial++ )
+		{
+			for( int i = vehiculos.size( ) - 1; i > inicial; i-- )
+			{
+				Vehiculo p2 = ( Vehiculo )vehiculos.get( i );
+				Vehiculo p1 = ( Vehiculo )vehiculos.get( i - 1 );
+				
+				if( p1.compararPorMarca( p2 ) > 0 )
+				{
+					vehiculos.set( i, p1 );
+					vehiculos.set( i - 1, p2 );
+				}
+			}
+		}
+		verificarInvariante( );
+	}
+	
+	
+	public void ordenarPorCilindrada (){
+	
+		int inicial;
+		
+		// En cada paso se sabe que:
+		// 1. Las posiciones antes de veh�culos[inicial] est�n ordenadas
+		// En cada paso lo que se hace es encontrar en qu� posici�n entre veh�culos[0] y veh�culos[inicial] deber�a
+		// estar el veh�culo que en este momento se encuentra en veh�culos[inicial]
+		
+		for( inicial = 1; inicial < vehiculos.size( ); inicial++ )
+		{
+			Vehiculo insertado = ( Vehiculo )vehiculos.get( inicial );
+			
+			boolean termine = false;
+			int i = inicial - 1;
+			
+			while( !termine )
+			{
+				// Si encuentra una cilindrada mayor, entonces hay que intercambiarlos
+				Vehiculo veh�culoPosicion = ( Vehiculo )vehiculos.get( i );
+				
+				if( veh�culoPosicion.compararPorCilindrada( insertado ) > 0 )
+				{
+					vehiculos.set( i, insertado );
+					vehiculos.set( i + 1, veh�culoPosicion );
+					i--;
+				}
+				// Si se encuentra un cilindrada igual o menor entonces ya se encontr� la posici�n
+				else
+				{
+					termine = true;
+				}
+				
+				// Si ya se lleg� al principio de la lista no hay nada m�s que hacer
+				if( i < 0 )
+				{
+					termine = true;
+				}
+			}
+		}
+		verificarInvariante( );
+	}
+	
+	
+	public void ordenarPorAnio (){
+	
+		int inicial;
+		
+		// En cada paso se sabe que:
+		// 1. Todos los valores antes de veh�culos[inicial] est�n ordenados
+		// 2. No hay ning�n valor despu�s de veh�culos[inicial-1] que sea menor que veh�culos[inicial-1]
+		// En cada paso se busca el menor entre veh�culos[inicial] y veh�culos[final] y se ubica en veh�culos[inicial]
+		
+		for( inicial = 0; inicial < vehiculos.size( ); inicial++ )
+		{
+			int posicionMenor = inicial;
+			Vehiculo veh�culoMenor = ( Vehiculo )vehiculos.get( inicial );
+			
+			for( int i = inicial + 1; i < vehiculos.size( ); i++ )
+			{
+				Vehiculo veh�culoPosicion = ( Vehiculo )vehiculos.get( i );
+				
+				// El veh�culo de la posici�n actual es menor que el menor encontrado hasta el momento
+				if( veh�culoPosicion.compararPorAnio( veh�culoMenor ) < 0 )
+				{
+					veh�culoMenor = veh�culoPosicion;
+					posicionMenor = i;
+				}
+			}
+			
+			if( posicionMenor != inicial )
+			{
+				Vehiculo temp = ( Vehiculo )vehiculos.get( inicial );
+				vehiculos.set( inicial, veh�culoMenor );
+				vehiculos.set( posicionMenor, temp );
+			}
+			
+		}
+		verificarInvariante( );
+	}
+	
+	
+	public int buscarVehiculo (String modelo,int anio){
+	
+		int posicion = -1;
+		boolean termine = false;
+		
+		for( int i = 0; i < vehiculos.size( ) && !termine; i++ )
+		{
+			Vehiculo vehiculoPosicion = ( Vehiculo )vehiculos.get( i );
+			String modeloVehiculo = vehiculoPosicion.darModelo( );
+			
+			// Los modelos son iguales
+			if( modeloVehiculo.equals( modelo ) && vehiculoPosicion.darAnio( ) == anio )
+			{
+				posicion = i;
+				termine = true;
+			}
+		}
+		
+		return posicion;
+	}
+	
+	
+	public boolean agregarVehiculo (String modeloV,String marcaV,String imagenP,String tipoV,int anioV,int cilindradaV,int ejesV,int valor){
+	
+		boolean agregado = false;
+		int veh�culoBuscado = buscarVehiculo( modeloV, anioV );
+		if( veh�culoBuscado == -1 )
+		{
+			Vehiculo nuevoveh�culo = new Vehiculo( modeloV, marcaV, imagenP, tipoV, anioV, cilindradaV, ejesV, valor );
+			vehiculos.add( nuevoveh�culo );
+			agregado = true;
+			verificarInvariante( );
+		}
+		
+		return agregado;
+	}
+	
+	
+	public boolean comprarVehiculo (String modelo,int anio){
+	
+		boolean comprado = false;
+		
+		for( int cont = 0; cont < vehiculos.size( ) && !comprado; cont++ )
+		{
+			Vehiculo v = ( Vehiculo )vehiculos.get( cont );
+			
+			if( v.darAnio( ) == anio && v.darModelo( ).equalsIgnoreCase( modelo ) )
+			{
+				vehiculos.remove( cont );
+				comprado = true;
+			}
+		}
+		
+		return comprado;
+	}
+	
+	
+	public int buscarVehiculoMasAntiguo (){
+	
+		int posicion = -1;
+		
+		if( vehiculos.size( ) > 0 )
+		{
+			Vehiculo vMasAntiguo = ( Vehiculo )vehiculos.get( 0 );
+			posicion = 0;
+			for( int i = 1; i < vehiculos.size( ); i++ )
+			{
+				Vehiculo vPosicion = ( Vehiculo )vehiculos.get( i );
+				
+				if( vMasAntiguo.compararPorAnio( vPosicion ) == 1 )
+				{
+					posicion = i;
+					vMasAntiguo = vPosicion;
+				}
+			}
+		}
+		return posicion;
+	}
+	
+	
+	public int buscarVehiculoMasEconomico (){
+	
+		int posicion = -1;
+		
+		if( vehiculos.size( ) > 0 )
+		{
+			Vehiculo vMasEconomico = ( Vehiculo )vehiculos.get( 0 );
+			posicion = 0;
+			for( int i = 1; i < vehiculos.size( ); i++ )
+			{
+				Vehiculo vPosicion = ( Vehiculo )vehiculos.get( i );
+				
+				if( vMasEconomico.compararPorValor( vPosicion ) == 1 )
+				{
+					posicion = i;
+					vMasEconomico = vPosicion;
+				}
+			}
+		}
+		return posicion;
+	}
+	
+	
+	public int buscarVehiculoMasPotente (){
+	
+		int posicion = -1;
+		
+		if( vehiculos.size( ) > 0 )
+		{
+			Vehiculo vMasPotente = ( Vehiculo )vehiculos.get( 0 );
+			posicion = 0;
+			for( int i = 1; i < vehiculos.size( ); i++ )
+			{
+				Vehiculo vPosicion = ( Vehiculo )vehiculos.get( i );
+				
+				if( vMasPotente.compararPorCilindrada( vPosicion ) == -1 )
+				{
+					posicion = i;
+					vMasPotente = vPosicion;
+				}
+			}
+		}
+		return posicion;
+	}
+	
+	
+	public int disminuirPrecio (int valor){
+	
+		int disminuidos = 0;
+		
+		for( int cont = 0; cont < vehiculos.size( ); cont++ )
+		{
+			Vehiculo v = ( Vehiculo )vehiculos.get( cont );
+			
+			if( v.darValor( ) > valor )
+			{
+				int nValor = ( int ) ( v.darValor( ) * 0.9 );
+				
+				if( nValor > 0 )
+				{
+					v.cambiarValor( nValor );
+					disminuidos++;
+				}
+			}
+		}
+		return disminuidos;
+	}
+	
+	
+	public void verificarInvariante (){
+	
+		assert ( vehiculos != null ) : "La lista de veh�culos no debe ser null";
+		assert ( !buscarVehiculosModeloYAnioRepetido( ) ) : "Hay dos veh�culos del mismo modelo y a�o";
+	}
+	
+	
+	public boolean buscarVehiculosModeloYAnioRepetido (){
+	
+		for( int i = 0; i < vehiculos.size( ); i++ )
+		{
+			Vehiculo pi = ( Vehiculo )vehiculos.get( i );
+			for( int j = 0; j < vehiculos.size( ); j++ )
+			{
+				if( i != j )
+				{
+					Vehiculo pj = ( Vehiculo )vehiculos.get( j );
+					if( pj.darModelo( ).equals( pi.darModelo( ) ) && pj.darAnio( ) == pi.darAnio( ) )
+					{
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	
+	public String metodo1 (){
+	
+		return "respuesta1";
+	}
+	
+	
+	public String metodo2 (){
+	
+		return "respuesta2";
+	}
+	
+	
+}	

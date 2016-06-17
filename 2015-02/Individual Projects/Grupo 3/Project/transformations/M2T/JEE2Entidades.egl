@@ -1,0 +1,169 @@
+[%
+	var aplicacion = jee!Aplicacion.all().at(0);
+	var capa = aplicacion.capas.select(c|c.nombre.endsWith("Entidad")).at(0);
+	var entidades = capa.clases;
+	for (entidad in entidades){
+		if (className = entidad.nombre){
+
+		"Procesando la entidad".println();
+		entidad.nombre.println();
+	
+%]
+package co.edu.uniandes.[%=capa.nombre.toLowerCase().split("entidad")[0].concat(".entidad")%];
+
+import javax.persistence.*;
+import java.io.*;
+import java.util.*;
+import javax.validation.constraints.*;
+
+/**
+ * Entidad [%=entidad.nombre%].
+ * 
+ * @author Grupo 3
+ * 
+ */
+[%
+			for (anotacion in entidad.anotaciones){
+				var sAnotacion = "@"+anotacion.nombre;
+				if (anotacion.argumentos.size()>0){
+					var cont : Integer = 0;
+					sAnotacion = sAnotacion + "(";
+					for (argumento in anotacion.argumentos){
+						if (argumento.valor.contains("InheritanceType")){
+							sAnotacion = sAnotacion + argumento.nombre + "="+argumento.valor;
+						}else{
+							sAnotacion = sAnotacion + argumento.nombre + "=\""+argumento.valor+"\"";
+						}
+						
+						if (cont<anotacion.argumentos.size()-1){
+							sAnotacion = sAnotacion + ",";	
+						} 	
+						cont = cont +1;	
+					}
+					sAnotacion = sAnotacion + ")";
+				}
+				%]
+[%=sAnotacion%]
+				[% 
+			}
+%]
+public class [%=entidad.nombre%] [%=entidad.extension%] implements Serializable{
+	
+	/** Constante serialVersionUID. */
+	private static final long serialVersionUID = 1L;
+	
+	[%
+		var cont: Integer = 0;
+		var parametros : String;
+		var comentariosParametros : String = "";
+		var asignaciones : String;
+		for(atributo in entidad.atributos){
+
+		    atributo.nombre.println();
+
+			var sVisibilidad : String = null;
+			var tipoAtributo : String;
+			if (atributo.tipo <> null and atributo.tipo.isTypeOf(jee!Primitivo)){
+				tipoAtributo = atributo.tipo.tipoPrimitivo.toString().toLowerCase().firstToUpperCase(); 
+			}else if (atributo.tipo <> null and atributo.tipo.isTypeOf(jee!Complejo)){
+				tipoAtributo = atributo.tipo.nombre;
+			}
+				
+			if (atributo.visibilidad <> jee!Visibilidad#DEFAULT){
+				sVisibilidad = atributo.visibilidad.toString().toLowerCase(); 
+			}else{
+				sVisibilidad = "";
+			}
+			
+	%]
+	/** Atributo [%=atributo.nombre.firstToLowerCase()%]. */
+	[%		
+			parametros=parametros.concat(tipoAtributo.concat(" ").concat(atributo.nombre.firstToLowerCase()));
+			comentariosParametros = comentariosParametros+"\t* @param "+atributo.nombre.firstToLowerCase()+", parametro enviado al metodo con tipo de dato: "+tipoAtributo;
+			asignaciones=asignaciones.concat("\t\tthis.").concat(atributo.nombre.firstToLowerCase()).concat(" = ").concat(atributo.nombre.firstToLowerCase()).concat(";\n");
+			if (cont<=entidad.atributos.size()-2){
+				parametros=parametros.concat(", ");
+				comentariosParametros = comentariosParametros + "\n";
+			}
+			for (anotacion in atributo.anotaciones){
+				var sAnotacionA = "@"+anotacion.nombre;
+				if (anotacion.argumentos.size()>0){
+					var cont : Integer = 0;
+					sAnotacionA = sAnotacionA + "(";
+					for (argumento in anotacion.argumentos){
+						if (argumento.valor.contains("GenerationType") or argumento.valor.contains("JoinColumn") or
+						    argumento.valor.contains("UniqueConstraint") or argumento.nombre.contains("min") or
+						    argumento.nombre.contains("max") or anotacion.nombre.contains("Min") or anotacion.nombre.contains("Max")){
+							sAnotacionA = sAnotacionA + argumento.nombre + "="+argumento.valor;
+						}else{
+							sAnotacionA = sAnotacionA + argumento.nombre + "=\""+argumento.valor+"\"";
+						}
+						
+						if (cont<anotacion.argumentos.size()-1){
+							sAnotacionA = sAnotacionA + ",";	
+						} 	
+						cont = cont +1;	
+					}
+					sAnotacionA = sAnotacionA + ")";
+				}
+				%]
+	[%=sAnotacionA%]
+				[% 
+			}
+			cont=cont+1;
+		%]
+	[%=sVisibilidad%] [%=tipoAtributo%] [%=atributo.nombre.firstToLowerCase()%];
+	
+		[%
+			
+		}
+	%]
+	
+	/**
+	 * Constructor por defecto de la clase.
+	 */
+	public [%=entidad.nombre%](){}
+
+	/**
+	 * Constructor con parametros.
+	 *
+[%=comentariosParametros%]
+	 */
+	public [%=entidad.nombre%] ([%=parametros%]){
+[%=asignaciones%]
+	}
+	
+[%
+			for(atributo in entidad.atributos){
+				var tipoAtributo : String;
+				if (atributo.tipo <> null and atributo.tipo.isTypeOf(jee!Primitivo)){
+					tipoAtributo = atributo.tipo.tipoPrimitivo.toString().toLowerCase().firstToUpperCase(); 
+				}else if (atributo.tipo <> null and atributo.tipo.isTypeOf(jee!Complejo)){
+					tipoAtributo = atributo.tipo.nombre;
+				}
+				%]
+	/**
+	 * Obtiene el atributo [%=atributo.nombre.firstToLowerCase()%].
+	 *
+	 * @return atributo [%=atributo.nombre.firstToLowerCase()%]
+	 */
+	public [%=tipoAtributo%] get[%=atributo.nombre.firstToUpperCase()%](){
+		return [%=atributo.nombre.firstToLowerCase()%];
+	}
+	
+	/**
+	 * Modifica el atributo [%=atributo.nombre.firstToLowerCase()%].
+	 *
+	 * @param [%=atributo.nombre.firstToLowerCase()%], es el nuevo valor para el atributo [%=atributo.nombre.firstToLowerCase()%]
+	 */
+	public void set[%=atributo.nombre.firstToUpperCase()%]([%=tipoAtributo%] [%=atributo.nombre.firstToLowerCase()%]){
+		this.[%=atributo.nombre.firstToLowerCase()%] = [%=atributo.nombre.firstToLowerCase()%];
+	}
+[%
+			}
+%]
+}
+[%
+		}
+	}
+%]

@@ -1,0 +1,229 @@
+package edu.uniandes.co.jee.entity;
+
+public class Vehiculo 
+{
+
+	private String modelo;	
+	private String marca;	
+	private String imagen;	
+	private String tipo;	
+	private int anio;	
+	private int cilindrada;	
+	private int ejes;	
+	private int valor;	
+	
+	
+	public Vehiculo ()
+	{
+	
+	}
+	
+	
+	public String getModelo()
+	{
+		return this.modelo;
+	}
+	
+	public void setModelo(String modelo)
+	{
+		this.modelo=modelo;
+	}
+	
+	
+	public String getMarca()
+	{
+		return this.marca;
+	}
+	
+	public void setMarca(String marca)
+	{
+		this.marca=marca;
+	}
+	
+	
+	public String getImagen()
+	{
+		return this.imagen;
+	}
+	
+	public void setImagen(String imagen)
+	{
+		this.imagen=imagen;
+	}
+	
+	
+	public String getTipo()
+	{
+		return this.tipo;
+	}
+	
+	public void setTipo(String tipo)
+	{
+		this.tipo=tipo;
+	}
+	
+	
+	public int getAnio()
+	{
+		return this.anio;
+	}
+	
+	public void setAnio(int anio)
+	{
+		this.anio=anio;
+	}
+	
+	
+	public int getCilindrada()
+	{
+		return this.cilindrada;
+	}
+	
+	public void setCilindrada(int cilindrada)
+	{
+		this.cilindrada=cilindrada;
+	}
+	
+	
+	public int getEjes()
+	{
+		return this.ejes;
+	}
+	
+	public void setEjes(int ejes)
+	{
+		this.ejes=ejes;
+	}
+	
+	
+	public int getValor()
+	{
+		return this.valor;
+	}
+	
+	public void setValor(int valor)
+	{
+		this.valor=valor;
+	}
+	
+	
+	
+	
+	public  Vehiculo (String modeloV,String marcaV,String imagenV,String tipoV,int anioV,int cilindradaV,int ejesV,int valorV){
+	
+		modelo = modeloV;
+		marca = marcaV;
+		imagen = imagenV;
+		tipo = tipoV;
+		anio = anioV;
+		cilindrada = cilindradaV;
+		ejes = ejesV;
+		valor = valorV;
+		
+		verificarInvariante( );
+	}
+	
+	
+	public String darModelo (){
+	
+		return modelo;
+	}
+	
+	
+	public String darMarca (){
+	
+		return marca;
+	}
+	
+	
+	public String darImagen (){
+	
+		return imagen;
+	}
+	
+	
+	public String darTipo (){
+	
+		return tipo;
+	}
+	
+	
+	public int darAnio (){
+	
+		return anio;
+	}
+	
+	
+	public int darCilindrada (){
+	
+		return cilindrada;
+	}
+	
+	
+	public int darEjes (){
+	
+		return ejes;
+	}
+	
+	
+	public int darValor (){
+	
+		return valor;
+	}
+	
+	
+	public int compararPorCilindrada (Vehiculo v){
+	
+		int resultado = ( cilindrada == v.darCilindrada( ) ) ? 0 : ( ( cilindrada > v.darCilindrada( ) ) ? 1 : -1 );
+		return resultado;
+	}
+	
+	
+	public int compararPorMarca (Vehiculo v){
+	
+		return marca.toLowerCase( ).compareTo( v.darMarca( ).toLowerCase( ) );
+	}
+	
+	
+	public int compararPorAnio (Vehiculo v){
+	
+		int resultado = ( anio == v.darAnio( ) ) ? 0 : ( ( anio > v.darAnio( ) ) ? 1 : -1 );
+		return resultado;
+	}
+	
+	
+	public int compararPorValor (Vehiculo v){
+	
+		int resultado = ( valor == v.darValor( ) ) ? 0 : ( ( valor > v.darValor( ) ) ? 1 : -1 );
+		return resultado;
+	}
+	
+	
+	public void cambiarValor (int nValor){
+	
+		valor = nValor;
+	}
+	
+	
+	public String toString (){
+	
+		return marca + " " + modelo + " (" + anio + ")";
+	}
+	
+	
+	public void verificarInvariante (){
+	
+		assert ( tipo.equals( BUS ) || tipo.equals( AUTOMOVIL ) || tipo.equals( MOTOCICLETA ) || tipo.equals( CAMION )  ) : "El tipo debe ser uno de los valores v�lidos";
+		assert ( anio > 0 ) : "El a�o no puede ser 0";
+		assert ( imagen != null ) : "La imagen no puede ser null";
+		assert ( modelo != null ) : "El modelo no puede ser null";
+		assert ( marca != null ) : "La marca no puede ser null";
+		assert ( cilindrada > 0 ) : "La cilindrada no puede ser 0";
+		assert ( ejes > 1 ) : "El n�mero de ejes debe ser mayor a 1";
+		assert ( valor > 0 ) : "El veh�culo debe tener un valor mayor a 0";
+	}
+	
+	
+	
+	
+}	

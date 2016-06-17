@@ -1,0 +1,452 @@
+[%
+var programa = PC!Programa.all[0];
+var join = programa.joins[0];
+var Copy1 = programa.contiene[0];
+var Copy2 = programa.contiene[1];
+var nombreCopy1 = ((Copy1.nombreArchivo.substring(0,2)+Copy1.nombreArchivo.substring(3,6))+'SE');
+var nombreCopy2 = ((Copy2.nombreArchivo.substring(0,2)+Copy2.nombreArchivo.substring(3,6))+'SE');
+var nombreArchivoSalida = ((join.nomArchivoSalida.substring(0,2)+join.nomArchivoSalida.substring(3,6))+'SS');
+var nombrePrograma = programa.nombre.split('\\.')[0];
+	if (SalidaJoin == nombrePrograma)
+	{
+%]
+      *==============================================================*
+      * AUTHOR    : [%=programa.autor%].                         *
+      * TEMA      : [%=programa.team%].                          *
+      * OBJETIVO  : [%=programa.objetivo%].                      *
+      *           :									                 *
+      * FECHA     : 30 DE NOVIEMBRE DE 2015                          *
+      * NRO REQ   : [%=programa.numeroRequerimiento%].                     *
+      *==============================================================*
+
+      *==============================================================*
+      * REMARKS           LOG DE MODIFICACIONES                      *
+      *==============================================================*
+      * NRO REQ:                                                     *
+      * FECHA  :                                                     *
+      * AUTOR  :                                                     *
+      * DESCRIP:                                                     *
+      *==============================================================*
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.   [%=nombrePrograma%].
+       AUTHOR.       [%=programa.autor%]
+       DATE-WRITTEN.  30 DE NOVIEMBRE DE 2015           
+      *---------------------------------------------------------------*
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+
+           SELECT  [%=nombreCopy1%]     ASSIGN TO SYS001-[%=nombreCopy1%]
+                               FILE STATUS ES-[%=nombreCopy1%].
+
+           SELECT  [%=nombreCopy2%]     ASSIGN TO SYS002-[%=nombreCopy2%]
+                               FILE STATUS ES-[%=nombreCopy2%].
+
+           SELECT  [%=nombreArchivoSalida%]     ASSIGN TO SYS003-[%=nombreArchivoSalida%]
+                               FILE STATUS ES-[%=nombreArchivoSalida%].
+
+       DATA DIVISION.
+       FILE SECTION.
+
+       FD  [%=nombreCopy1%].
+       01  REG-[%=nombreCopy1%].
+       	   [% for (variable in Copy1.compuesto[0].conformada) {%]
+		   [%=(variable.ObtenerVariables(3,nombreCopy1))%]
+		   [%}%]
+   
+       FD  [%=nombreCopy2%].
+       01  REG-[%=nombreCopy2%].
+           [% for (variable in Copy2.compuesto[0].conformada) {%]
+       	   [%=(variable.ObtenerVariables(3,nombreCopy2))%]
+		   [%}%]
+
+       FD  [%=nombreArchivoSalida%].
+       [% } if (SalidaJoin == nombrePrograma or SalidaJoin == 'otro')
+       {
+       		if (SalidaJoin == 'otro')
+       		{
+       %]
+      *----------------------------------------------------------------*
+      * COPY    : [%=nombreArchivoSalida.replace('SS','')%]                                               *
+      * ARCHIVO : [%=programa.team%]                     *
+      * LONGITUD: [%=PC!Variable.all.longitudVariablesSalidad()%]                                                 *
+      * CREACION: 30 DE NOVIEMBRE DE 2015                              *
+      * AUTOR   : [%=programa.autor%]                                 *
+      *----------------------------------------------------------------*
+      		[%
+      		}
+      		%]
+       01  REG-[%=nombreArchivoSalida%].
+           [% for (variable in Copy1.compuesto) {%]
+		   [%=variable.ObtenerVariablesSalida(3,nombreArchivoSalida).trim()%]
+		   [%}%]
+		   [% for (variable in Copy2.compuesto) {%]
+		   [%=variable.ObtenerVariablesSalida(3,nombreArchivoSalida).trim()%]
+		   [%}%]
+		[%
+		}
+		%]
+		[%
+			if (SalidaJoin == nombrePrograma)
+		{
+		%]
+	   
+	   WORKING-STORAGE SECTION.
+
+       01  WK-VARIABLES.
+           03  ES-[%=nombreCopy1%]                   PIC   X(02).
+           03  ES-[%=nombreCopy2%]                   PIC   X(02).
+           03  ES-[%=nombreArchivoSalida%]                   PIC   X(02).
+           03  SW-FINAL                     PIC   9(01).
+           03  SW-FIN                       PIC   9(01).
+           03  ST-PROGRAMA                  PIC   9(01).
+           03  WK-LEIDOS                    PIC   9(10).
+           03  WK-LEIDOS-CIFIN              PIC   9(10).
+           03  WK-GRABADOS                  PIC   9(10).
+           03  WK-LLAVE1.
+           	[% for (variable in Copy1.compuesto[0].conformada) {
+		   		 var texto = variable.ObtenerVariablesLlave(3,'WK');
+		   		     if(texto <> null and texto.trim() <> ''){%]
+		   		[%=texto.trim()%]
+		   	[%}}%]
+		   03  WK-LLAVE2.
+           	[% for (variable in Copy2.compuesto[0].conformada) {
+		   		 var texto = variable.ObtenerVariablesLlave(3,'WK');
+		   		     if(texto <> null and texto.trim() <> ''){%]
+		   		[%=texto.trim()%]
+		   	[%}}%]
+
+       01  WK-FECHA                         PIC       9(8).
+       01  WK-HORA                          PIC       9(8).
+       01  WK-FECHA-SISTEMA                 PIC       9(8).
+       01  WK-FECHA-SISTEMA-R               REDEFINES WK-FECHA-SISTEMA.
+           05  WK-SISTEMA-ANO               PIC       9(4).
+           05  WK-SISTEMA-MES               PIC       9(2).
+           05  WK-SISTEMA-DIA               PIC       9(2).
+
+      *------------------*
+       PROCEDURE DIVISION.
+      *------------------*
+
+           PERFORM 100-INICIALIZAR THRU 100-FIN.
+           PERFORM 200-PROCESO     THRU 200-FIN
+                   UNTIL SW-FINAL = 1 OR SW-FIN = 1.
+           MOVE 1                  TO   ST-PROGRAMA.
+           PERFORM 990-FINALIZAR   THRU 990-FIN.
+
+       100-INICIALIZAR.
+
+           CALL    'GEC002'    USING     WK-FECHA
+           MOVE    WK-FECHA    TO        WK-FECHA-SISTEMA
+           ACCEPT  WK-HORA     FROM      TIME
+           DISPLAY 'FECHA  : ' WK-FECHA
+           DISPLAY 'HORA   : ' WK-HORA
+
+           OPEN INPUT  [%=nombreCopy1%].
+           IF   ES-[%=nombreCopy1%] = '97'
+                MOVE '00'  TO ES-[%=nombreCopy1%].
+           IF   ES-[%=nombreCopy1%] NOT = '00'
+                DISPLAY 'ERROR AL ABRIR ARCHIVO [%=nombreCopy1%] ' ES-[%=nombreCopy1%]
+                MOVE    999  TO RETURN-CODE
+                PERFORM  990-FINALIZAR THRU 990-FIN.
+
+           OPEN INPUT  [%=nombreCopy2%].
+           IF   ES-[%=nombreCopy2%] = '97'
+                MOVE '00'  TO ES-[%=nombreCopy2%].
+           IF   ES-[%=nombreCopy2%] NOT = '00'
+                DISPLAY 'ERROR AL ABRIR ARCHIVO [%=nombreCopy2%] ' ES-[%=nombreCopy2%]
+                MOVE     999  TO RETURN-CODE
+                PERFORM  990-FINALIZAR THRU 990-FIN.
+
+           OPEN OUTPUT [%=nombreArchivoSalida%].
+           IF  ES-[%=nombreArchivoSalida%] NOT = '00' AND '97'
+               DISPLAY 'ERROR AL ABRIR ARCHIVO [%=nombreArchivoSalida%] ' ES-[%=nombreArchivoSalida%]
+               MOVE     999           TO   RETURN-CODE
+               PERFORM  990-FINALIZAR THRU 990-FIN.
+
+           INITIALIZE  WK-VARIABLES.
+           PERFORM 210-LEER-[%=nombreCopy1%]   THRU 210-FIN.
+           PERFORM 220-LEER-[%=nombreCopy2%]   THRU 220-FIN.
+
+       100-FIN.
+           EXIT.
+
+       200-PROCESO.
+
+           IF WK-LLAVE1 = WK-LLAVE2 
+              [% for (variable in Copy1.compuesto[0].conformada) {
+              var  text = variable.VariablesSalida('MOVE '+nombreCopy1+'-' ,'TO '+nombreArchivoSalida); 
+               if (text <> null  and text.trim() <> ''){%]
+		   		[%=text.trim()%]
+		   	[%}}%]
+		   	[% for (variable in Copy2.compuesto[0].conformada) {
+              var  text1= variable.VariablesSalida('MOVE '+nombreCopy2+'-' ,'TO '+nombreArchivoSalida); 
+               if (text1 <> null and text1.trim() <> ''){%]
+		   		[%=text1.trim()%]
+		   	[%}}%]
+             
+              PERFORM 300-GRABAR-[%=nombreArchivoSalida%]      THRU 300-FIN
+              PERFORM 210-LEER-[%=nombreCopy1%]                THRU 210-FIN
+              PERFORM 220-LEER-[%=nombreCopy2%]                THRU 220-FIN
+           ELSE
+              IF WK-LLAVE1 < WK-LLAVE2
+                 PERFORM 210-LEER-[%=nombreCopy1%]     THRU 210-FIN
+              ELSE
+                IF WK-LLAVE1 > WK-LLAVE2
+                   PERFORM 220-LEER-[%=nombreCopy2%]   THRU 220-FIN
+                END-IF
+              END-IF
+           END-IF.
+
+       200-FIN.
+           EXIT.
+
+       210-LEER-[%=nombreCopy1%].
+
+           READ [%=nombreCopy1%]
+
+           IF ES-[%=nombreCopy1%] = '00'
+           	     [% for (variable in Copy1.compuesto[0].conformada) {
+              	var text1 = variable.VariablesLlave('MOVE '+nombreCopy1+'-' ,'TO '); 
+              	 if (text1 <> null and text1.trim() <> ''){%]
+		   		[%=text1.trim()%]
+		   	[%}}%]
+              ADD 1 TO WK-LEIDOS-CIFIN
+           ELSE
+            IF ES-[%=nombreCopy1%] = '10' OR '46'
+              MOVE 1 TO SW-FINAL
+            ELSE
+               DISPLAY 'ERROR AL LEER ARCHIVO [%=nombreCopy1%] ' ES-[%=nombreCopy1%]
+               MOVE     999           TO   RETURN-CODE
+               PERFORM  990-FINALIZAR THRU 990-FIN.
+
+       210-FIN.
+           EXIT.
+
+       220-LEER-[%=nombreCopy2%].
+
+           READ [%=nombreCopy2%]
+
+           IF ES-[%=nombreCopy2%] = '00'
+           	  [% for (variable in Copy2.compuesto[0].conformada) {
+              	var  text2 = variable.VariablesLlave('MOVE '+nombreCopy2+'-' ,'TO '); 
+              	 if (text2 <> null and text2.trim() <> ''){%]
+		   		[%=text2.trim()%]
+		   		[%}}%]
+              ADD 1 TO WK-LEIDOS
+           ELSE
+            IF ES-[%=nombreCopy2%] = '10'
+              MOVE 1   TO SW-FIN
+            ELSE
+               DISPLAY 'ERROR AL LEER ARCHIVO [%=nombreCopy2%] ' ES-[%=nombreCopy2%]
+               MOVE     999           TO   RETURN-CODE
+               PERFORM  990-FINALIZAR THRU 990-FIN.
+
+       220-FIN.
+           EXIT.
+
+       300-GRABAR-[%=nombreArchivoSalida%].
+
+           WRITE REG-[%=nombreArchivoSalida%].
+
+           IF ES-[%=nombreArchivoSalida%] = '00'
+              ADD  1 TO WK-GRABADOS
+           ELSE
+              DISPLAY 'ERROR AL GRABAR [%=nombreArchivoSalida%] ' ES-[%=nombreArchivoSalida%]
+              MOVE     999            TO   RETURN-CODE
+              PERFORM  990-FINALIZAR  THRU 990-FIN.
+
+       300-FIN.
+           EXIT.
+
+       990-FINALIZAR.
+
+              DISPLAY '--------------------------------------'
+              DISPLAY '     PROG. [%=nombrePrograma%] TERMINO NORMAL      '                     
+              DISPLAY '--------------------------------------'
+              DISPLAY 'REGS. LEIDOS EN [%=nombreCopy1%]    : ' WK-LEIDOS-CIFIN
+              DISPLAY 'REGS. LEIDOS EN [%=nombreCopy2%]    : ' WK-LEIDOS
+              DISPLAY 'REGS. ACTUALIZADOS [%=nombreArchivoSalida%] : ' WK-GRABADOS
+              DISPLAY '--------------------------------------'.
+
+           CLOSE [%=nombreCopy1%].
+           CLOSE [%=nombreCopy2%].
+           CLOSE [%=nombreArchivoSalida%].
+           STOP      RUN.
+
+       990-FIN.
+           EXIT.
+[%
+}
+
+//
+operation Variable ObtenerTipo () : String
+{
+switch(self.tipo){
+ 	case PC!TipoVariable#numerica : return 'PIC 9'+'('+self.longitud+').'; 
+ 	case PC!TipoVariable#caracter : return 'PIC X'+'('+self.longitud+').'; 
+ 	default : return '';
+ 	}
+}
+//se realiza la imprecion de las variables
+operation Variable ObtenerVariablesSalida(nivel : Integer, nombreCopy : String) : String {
+var oux;
+// var tabulacion = nivel.ObtenerTabulacion(); 
+if(self.nombre <> 'FILLER'){
+	
+	if(self.esSalida <> null and self.esSalida)
+		{
+	 	if(self.conformada.size() > 0)
+		{
+	  		oux ='\t'+'0' + nivel.asString() +' '+ self.nombre.SplitVariable()+'\n';
+		}
+		else
+	 	{
+	 		oux = '\t\t   '+'0' + nivel.asString() +' '+nombreCopy+'-'+ self.nombre.SplitVariable()+'\t'+self.ObtenerTipo()+'\n';
+	 	}
+	}
+	else 
+	nivel = nivel - 2;
+		for(variable in self.conformada){
+	     oux = oux + variable.ObtenerVariablesSalida(nivel+2,nombreCopy);
+	   }
+     }
+return oux; 
+}
+
+operation Sequence longitudVariablesSalidad() : Integer  {
+ var oux : Integer;
+		for(variable in self){
+			if(variable.nombre <> 'FILLER'){
+				if(variable.esSalida <> null and variable.esSalida){
+						oux = oux + variable.longitud;
+					}
+				}
+			}
+return oux; 
+}
+
+//se realiza la impresión de las variables
+operation Variable ObtenerVariables(nivel : Integer, nombreCopy : String) : String {
+var oux;
+
+if(self.nombre <> 'FILLER'){
+	 	if(self.conformada.size() > 0)
+		{
+	  		oux = '0' + nivel.asString() +' '+ self.nombre.SplitVariable();
+		}
+		else
+	 	{
+	 		oux = '0' + nivel.asString() +' '+nombreCopy+'-'+ self.nombre.SplitVariable()+'\t\t'+self.ObtenerTipo();
+	 	}
+	
+		for(variable in self.conformada){
+	      oux = oux +'\n\t\t\t  '+variable.ObtenerVariables(nivel+2,nombreCopy);
+	    }
+     }
+return oux; 
+}
+
+//se realiza la impresión de las variables llave
+operation Variable ObtenerVariablesLlave(nivel : Integer, nombreCopy : String) : String {
+var oux;
+// var tabulacion = nivel.ObtenerTabulacion(); 
+	if(self.nombre <> 'FILLER'){
+		if(self.esLlave <> null and self.esLlave)
+		{
+			if(self.conformada.size() > 0)
+		{
+	  //oux = '0' + nivel.asString() +' '+ self.nombre;
+		}
+		else
+	 	{
+	 		oux = '0' + nivel.asString() +' '+nombreCopy+'-'+ self.nombre+'\t\t'+self.ObtenerTipo()+'\n\t\t\t\t';
+	 	}
+	 }
+		for(variable in self.conformada){
+		//	if(variable.esLlave <> null and variable.esLlave)
+		//	 {
+			 oux = oux + variable.ObtenerVariablesLlave(nivel+2,nombreCopy);
+		//	 }
+	 }
+     }
+          
+return  oux; 
+}
+//se realiza la impresión de las variables llave
+operation Variable VariablesLlave(prefijo : String, sufijo : String) : String {
+var oux = '';
+// var tabulacion = nivel.ObtenerTabulacion(); 
+if(self.nombre <> 'FILLER'){
+
+if(self.esLlave <> null and self.esLlave)
+{
+	if(self.conformada.size() > 0)
+	{
+	  //oux = '0' + nivel.asString() +' '+ self.nombre;
+	}
+	else
+	{
+		 oux = prefijo+self.nombre.substring(5)+'\t\t '+sufijo + 'WK-'+self.nombre+'\n\t\t\t\t';
+	 }
+	 }
+		for(variable in self.conformada){
+			 oux = oux + variable.VariablesLlave(prefijo,sufijo);
+	 }
+     }
+return oux; 
+}
+//se realiza la impresión de las variables salida
+operation Variable VariablesSalida(prefijo : String, sufijo : String) : String {
+var oux;
+// var tabulacion = nivel.ObtenerTabulacion(); 
+if(self.nombre <> 'FILLER'){
+if(self.esSalida <> null and self.esSalida)
+			 {
+	if(self.conformada.size() > 0)
+	{
+	  //oux = '0' + nivel.asString() +' '+ self.nombre;
+	}
+	else
+	{
+		 oux = prefijo+self.nombre.SplitVariable()+'\t\t '+sufijo + self.nombre.substring(4)+'\n\t\t\t\t';
+	 }
+	 }
+		for(variable in self.conformada){
+			//if(variable.esSalida <> null and variable.esSalida)
+			// {
+			 oux = oux + variable.VariablesSalida(prefijo,sufijo);
+			// }
+	 }
+     }
+return oux; 
+}
+// splid por '-'
+operation String SplitVariable() : String {
+var parts = self.split("-");
+          var returnValue;
+          
+          if (parts.size() > 1) {
+          
+              var index = 0;
+              var parsedValue = "";
+              var delim = "";
+              
+                for (p in parts) {
+                  if (index > 0) {
+                      parsedValue = parsedValue + delim + p;
+                      delim = "-";
+                  }
+                  
+                  index = index + 1;
+              }
+              
+              returnValue = parsedValue;
+          }
+          else {
+              returnValue = self;
+          }
+          return returnValue;
+}
+%]

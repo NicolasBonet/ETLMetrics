@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ASCII"?>
+<angular:Aplicacion xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:angular="http://www.example.org/angular" nombre="SistemaGestionUniversitario">
+  <vistas nombre="UniversidadLista" entidad="universidad">
+    <navegaciones nombre="Detalle Universidad" destino="UniversidadDetalle"/>
+    <controlador nombre="UniversidadListaCtrl">
+      <servicios nombre="UniversidadListar" entidad="Universidad"/>
+    </controlador>
+    <secciones nombre="Lista">
+      <elementos nombre="Universidad Tabla" valor="universidad">
+        <hijos nombre="Nombre" tipoElemento="COLUMNA" valor="nombre"/>
+        <hijos nombre="NIT" tipoElemento="COLUMNA" valor="nit"/>
+      </elementos>
+    </secciones>
+  </vistas>
+  <vistas nombre="UniversidadDetalle" tipo="FORMULARIO" entidad="universidad">
+    <navegaciones nombre="Lista Universidad" destino="UniversidadLista"/>
+    <controlador nombre="UniversidadDetalleCtrl">
+      <servicios nombre="UniversidadDetalle" tipoServicio="CONSULTAR" entidad="Universidad"/>
+      <servicios nombre="UniversidadAgregar" tipoServicio="AGREGAR" entidad="Universidad"/>
+      <servicios nombre="UniversidadModificar" tipoServicio="MODIFICAR" entidad="Universidad"/>
+      <servicios nombre="UniversidadEliminar" tipoServicio="ELIMINAR" entidad="Universidad"/>
+    </controlador>
+    <secciones nombre="Detalle" tipoSeccion="FORMULARIO">
+      <elementos nombre="Nombre" tipoElemento="TEXTOENTRADA" valor="Nombre"/>
+      <elementos nombre="NIT" tipoElemento="TEXTOENTRADA" valor="NIT"/>
+      <acciones nombre="Guardar"/>
+      <acciones nombre="Eliminar" tipoAccion="ELIMINAR"/>
+    </secciones>
+  </vistas>
+  <vistas nombre="ProfesorLista" entidad="profesor">
+    <navegaciones nombre="Detalle Profesor" destino="ProfesorDetalle"/>
+    <controlador nombre="ProfesorListaCtrl">
+      <servicios nombre="ProfesorListar" entidad="Profesor"/>
+    </controlador>
+    <secciones nombre="Lista">
+      <elementos nombre="Profesor Tabla" valor="profesor">
+        <hijos nombre="Nombre" tipoElemento="COLUMNA" valor="nombre"/>
+      </elementos>
+    </secciones>
+  </vistas>
+  <vistas nombre="ProfesorDetalle" tipo="FORMULARIO" entidad="profesor">
+    <navegaciones nombre="Lista Profesor" destino="ProfesorLista"/>
+    <controlador nombre="ProfesorDetalleCtrl">
+      <servicios nombre="ProfesorDetalle" tipoServicio="CONSULTAR" entidad="Profesor"/>
+      <servicios nombre="ProfesorAgregar" tipoServicio="AGREGAR" entidad="Profesor"/>
+      <servicios nombre="ProfesorModificar" tipoServicio="MODIFICAR" entidad="Profesor"/>
+      <servicios nombre="ProfesorEliminar" tipoServicio="ELIMINAR" entidad="Profesor"/>
+    </controlador>
+    <secciones nombre="Detalle" tipoSeccion="FORMULARIO">
+      <elementos nombre="Nombre" tipoElemento="TEXTOENTRADA" valor="Nombre"/>
+      <acciones nombre="Guardar"/>
+      <acciones nombre="Eliminar" tipoAccion="ELIMINAR"/>
+    </secciones>
+  </vistas>
+</angular:Aplicacion>

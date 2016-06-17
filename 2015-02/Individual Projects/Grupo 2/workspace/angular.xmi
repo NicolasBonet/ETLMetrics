@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ASCII"?>
+<crudAngularGenerator:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:crudAngularGenerator="http://www.example.org/crudAngularGenerator" name="Ejemplo completo 2">
+  <services name="Estudiante" url="admin/estudiantes" filters="//@cruds.0/@fields.0 //@cruds.0/@fields.1"/>
+  <services name="Curso" url="admin/cursos" filters="//@cruds.1/@fields.0"/>
+  <services name="Periodoacademico" url="admin/periodoacademicos" filters="//@cruds.2/@fields.0"/>
+  <services name="Profesor" url="admin/profesors" filters="//@cruds.3/@fields.0 //@cruds.3/@fields.1"/>
+  <services name="Salon" url="admin/salons" filters="//@cruds.4/@fields.0"/>
+  <services name="Horario" url="admin/horarios" filters="//@cruds.5/@fields.0"/>
+  <cruds service="//@services.0">
+    <fields key="nombre" component="primitive" isRequired="true" dataType="string" relatedService="//@services.0"/>
+    <fields key="apellido" component="primitive" isRequired="true" dataType="string" relatedService="//@services.0"/>
+    <fields key="fechanacimiento" component="primitive" dataType="date"/>
+    <fields key="Curso_ids" isMultiple="true" component="selectListMultiple" dataType="relation" relatedService="//@services.1"/>
+  </cruds>
+  <cruds service="//@services.1">
+    <fields key="nombre" component="primitive" isRequired="true" dataType="string" relatedService="//@services.1"/>
+    <fields key="codigo" component="primitive" isRequired="true" dataType="string"/>
+    <fields key="descripcion" component="primitive" dataType="text"/>
+    <fields key="PeriodoAcademico_id" dataType="relation" relatedService="//@services.2"/>
+    <fields key="Horario_ids" isMultiple="true" component="checkbox" dataType="relation" relatedService="//@services.5"/>
+    <fields key="Estudiante_ids" isMultiple="true" component="autocompleteMultiple" dataType="relation" relatedService="//@services.0"/>
+    <fields key="Profesor_id" component="autocomplete" dataType="relation" relatedService="//@services.3"/>
+  </cruds>
+  <cruds service="//@services.2">
+    <fields key="nombre" component="primitive" isRequired="true" dataType="string" relatedService="//@services.2"/>
+    <fields key="fechainicio" component="primitive" isRequired="true" dataType="date"/>
+    <fields key="fechafin" component="primitive" isRequired="true" dataType="date"/>
+  </cruds>
+  <cruds service="//@services.3">
+    <fields key="nombre" component="primitive" isRequired="true" dataType="string" relatedService="//@services.3"/>
+    <fields key="apellido" component="primitive" isRequired="true" dataType="string" relatedService="//@services.3"/>
+    <fields key="formacion" component="primitive" dataType="text"/>
+  </cruds>
+  <cruds allowDelete="false" service="//@services.4">
+    <fields key="bloque" component="primitive" isRequired="true" dataType="string" relatedService="//@services.4"/>
+    <fields key="capacidad" component="primitive"/>
+  </cruds>
+  <cruds service="//@services.5">
+    <fields key="nombre" component="primitive" isRequired="true" dataType="string" relatedService="//@services.5"/>
+    <fields key="Salon_id" component="selectList" dataType="relation" relatedService="//@services.4"/>
+    <fields key="Curso_id" component="radioButton" dataType="relation" relatedService="//@services.1"/>
+  </cruds>
+</crudAngularGenerator:Application>

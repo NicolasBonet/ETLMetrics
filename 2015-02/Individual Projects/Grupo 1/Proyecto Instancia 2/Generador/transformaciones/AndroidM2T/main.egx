@@ -1,0 +1,162 @@
+
+//Archivos necesarios para las promos
+
+rule PromoFragment2Java
+  transform fragm : android!PromoFragment {
+
+  template : 'promoFragment2class.egl'
+
+  target : '../../generado/androidApplication/app/src/main/java/co/edu/uniandes/proyectoautomatizacion/widget/' + fragm.name + '.java'
+  
+}
+
+rule PromoFragment2Xml
+  transform fragm : android!PromoFragment { 
+  
+  template: 'promoFragment2xml.egl'
+  
+  target : '../../generado/androidApplication/app/src/main/res/layout/' + fragm.name.toLowerCase() + '.xml'
+  
+}
+
+rule PromoFragment2adapterJava
+  transform fragm : android!PromoFragment { 
+  
+  template: 'promoFragment2adapterJava.egl'
+  
+  target : '../../generado/androidApplication/app/src/main/java/co/edu/uniandes/proyectoautomatizacion/staggeredgrid/' + fragm.name + 'Adapter.java'
+  
+}
+
+rule PromoFragment2adapterXml
+  transform fragm : android!PromoFragment { 
+  
+  template: 'promoFragment2adapterXml.egl'
+  
+  target : '../../generado/androidApplication/app/src/main/res/layout/' + fragm.name.toLowerCase() + 'adapter.xml'
+  
+}
+
+//Archivos necesarios para el catalogo
+
+rule CatalogFragment2Java
+  transform fragm : android!CatalogFragment {
+
+  template : 'catalogFragment2class.egl'
+
+  target : '../../generado/androidApplication/app/src/main/java/co/edu/uniandes/proyectoautomatizacion/widget/' + fragm.name + '.java'
+  
+}
+
+rule CatalogFragment2Xml
+  transform fragm : android!CatalogFragment { 
+  
+  template: 'catalogFragment2xml.egl'
+  
+  target : '../../generado/androidApplication/app/src/main/res/layout/' + fragm.name.toLowerCase() + '.xml'
+  
+}
+
+rule CatalogFragment2adapterJava
+  transform fragm : android!CatalogFragment { 
+  
+  template: 'catalogFragment2adapterJava.egl'
+  
+  target : '../../generado/androidApplication/app/src/main/java/co/edu/uniandes/proyectoautomatizacion/staggeredgrid/' + fragm.name + 'Adapter.java'
+  
+}
+
+rule CatalogFragment2adapterXml
+  transform fragm : android!CatalogFragment { 
+  
+  template: 'catalogFragment2adapterXml.egl'
+  
+  target : '../../generado/androidApplication/app/src/main/res/layout/' + fragm.name.toLowerCase() + 'adapter.xml'
+  
+}
+
+//Archivos necesarios para el mapa
+
+rule MapFragment2Java
+  transform fragm : android!MapFragment {
+
+  template : 'mapFragment2class.egl'
+
+  target : '../../generado/androidApplication/app/src/main/java/co/edu/uniandes/proyectoautomatizacion/widget/' + fragm.name + '.java'
+  
+}
+
+rule MapFragment2Xml
+  transform fragm : android!MapFragment { 
+  
+  template: 'mapFragment2xml.egl'
+  
+  target : '../../generado/androidApplication/app/src/main/res/layout/' + fragm.name.toLowerCase() + '.xml'
+  
+}
+
+//Archivos necesarios para el contacto
+
+rule ContactoFragment2Java
+  transform fragm : android!ContactoFragment {
+
+  template : 'contactoFragment2class.egl'
+
+  target : '../../generado/androidApplication/app/src/main/java/co/edu/uniandes/proyectoautomatizacion/widget/' + fragm.name + '.java'
+  
+}
+
+rule ContactoFragment2Xml
+  transform fragm : android!ContactoFragment { 
+  
+  template: 'contactoFragment2xml.egl'
+  
+  target : '../../generado/androidApplication/app/src/main/res/layout/' + fragm.name.toLowerCase() + '.xml'
+  
+}
+
+//Actividad principal de la App
+
+rule Activity2Java
+	transform act : android!Activity {
+	
+	template : 'activity2class.egl'	
+	
+	target : '../../generado/androidApplication/app/src/main/java/co/edu/uniandes/proyectoautomatizacion/' + act.name + '.java'
+}
+
+rule Activity2Xml
+	transform act : android!Activity {
+	
+	template : 'activity2xml.egl'	
+	
+	target : '../../generado/androidApplication/app/src/main/res/layout/' + act.name.toLowerCase() + '.xml'
+}
+
+//Singleton
+
+rule Application2Java
+	transform act : android!Application {
+	
+	template : 'application2class.egl'	
+	
+	target : '../../generado/androidApplication/app/src/main/java/co/edu/uniandes/proyectoautomatizacion/ApplicationClass.java'
+}
+
+//Splash Screen
+
+rule Application2SplashClass
+	transform act : android!Application {
+	
+	template : 'application2splashClass.egl'	
+	
+	target : '../../generado/androidApplication/app/src/main/java/co/edu/uniandes/proyectoautomatizacion/SplashActivity.java'
+}
+
+rule Application2SplashXml
+	transform act : android!Application {
+	
+	template : 'application2splashXml.egl'	
+	
+	target : '../../generado/androidApplication/app/src/main/res/layout/splash_screen.xml'
+}

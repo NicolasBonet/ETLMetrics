@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:arquitectura="http://www.example.org/arquitectura">
+  <arquitectura:Sistema nombre="SistemaGestionUniversitario" dominio="SistemaGestionUniversitario">
+    <proyecto_negocio nombre="SistemaGestionUniversitarioNegocio">
+      <capas xsi:type="arquitectura:CapaEntidad" nombre="SistemaGestionUniversitarioEntidad">
+        <clases nombre="Usuario">
+          <atributos nombre="Nombre"/>
+        </clases>
+      </capas>
+      <capas xsi:type="arquitectura:CapaNegocio" nombre="SistemaGestionUniversitarioNegocio">
+        <clases nombre="Usuario">
+          <atributos nombre="Nombre"/>
+        </clases>
+      </capas>
+      <capas xsi:type="arquitectura:CapaServicio" nombre="SistemaGestionUniversitarioServicio">
+        <clases nombre="Usuario">
+          <atributos nombre="Nombre"/>
+        </clases>
+      </capas>
+    </proyecto_negocio>
+    <proyecto_web nombre="SistemaGestionUniversitarioWEB">
+      <capa_presentacion nombre="SistemaGestionUniversitarioWEB">
+        <vistas nombre="UsuarioLista" entidad="/0/@entidades.0"/>
+        <vistas nombre="UsuarioDetalle" tipo="DETALLE" entidad="/0/@entidades.0"/>
+      </capa_presentacion>
+    </proyecto_web>
+    <entidades nombre="Usuario">
+      <atributos nombre="Nombre"/>
+    </entidades>
+  </arquitectura:Sistema>
+  <arquitectura:Sistema nombre="SistemaGestionUniversitario" dominio="SistemaGestionUniversitario">
+    <proyecto_negocio nombre="SistemaGestionUniversitarioNegocio">
+      <capas xsi:type="arquitectura:CapaEntidad" nombre="SistemaGestionUniversitarioEntidad">
+        <clases nombre="Usuario">
+          <atributos nombre="Nombre"/>
+        </clases>
+      </capas>
+      <capas xsi:type="arquitectura:CapaNegocio" nombre="SistemaGestionUniversitarioNegocio">
+        <clases nombre="Usuario">
+          <atributos nombre="Nombre"/>
+        </clases>
+      </capas>
+      <capas xsi:type="arquitectura:CapaServicio" nombre="SistemaGestionUniversitarioServicio">
+        <clases nombre="Usuario">
+          <atributos nombre="Nombre"/>
+        </clases>
+      </capas>
+    </proyecto_negocio>
+    <proyecto_web nombre="SistemaGestionUniversitarioWEB">
+      <capa_presentacion nombre="SistemaGestionUniversitarioWEB">
+        <vistas nombre="UsuarioLista" entidad="/1/@entidades.0"/>
+        <vistas nombre="UsuarioDetalle" tipo="DETALLE" entidad="/1/@entidades.0"/>
+      </capa_presentacion>
+    </proyecto_web>
+    <entidades nombre="Usuario">
+      <atributos nombre="Nombre"/>
+    </entidades>
+  </arquitectura:Sistema>
+  <arquitectura:Sistema nombre="SistemaGestionUniversitario" dominio="SistemaGestionUniversitario">
+    <proyecto_negocio nombre="SistemaGestionUniversitarioNegocio">
+      <capas xsi:type="arquitectura:CapaEntidad" nombre="SistemaGestionUniversitarioEntidad">
+        <clases nombre="Usuario">
+          <atributos nombre="Nombre"/>
+        </clases>
+      </capas>
+      <capas xsi:type="arquitectura:CapaNegocio" nombre="SistemaGestionUniversitarioNegocio">
+        <clases nombre="Usuario">
+          <atributos nombre="Nombre"/>
+        </clases>
+      </capas>
+      <capas xsi:type="arquitectura:CapaServicio" nombre="SistemaGestionUniversitarioServicio">
+        <clases nombre="Usuario">
+          <atributos nombre="Nombre"/>
+        </clases>
+      </capas>
+    </proyecto_negocio>
+    <proyecto_web nombre="SistemaGestionUniversitarioWEB">
+      <capa_presentacion nombre="SistemaGestionUniversitarioWEB">
+        <vistas nombre="UsuarioLista" entidad="/2/@entidades.0"/>
+        <vistas nombre="UsuarioDetalle" tipo="DETALLE" entidad="/2/@entidades.0"/>
+      </capa_presentacion>
+    </proyecto_web>
+    <entidades nombre="Usuario">
+      <atributos nombre="Nombre"/>
+    </entidades>
+  </arquitectura:Sistema>
+  <arquitectura:Sistema nombre="SistemaGestionUniversitario" dominio="SistemaGestionUniversitario">
+    <proyecto_negocio nombre="SistemaGestionUniversitarioNegocio">
+      <capas xsi:type="arquitectura:CapaEntidad" nombre="SistemaGestionUniversitarioEntidad">
+        <clases nombre="Usuario">
+          <atributos nombre="Nombre"/>
+        </clases>
+      </capas>
+      <capas xsi:type="arquitectura:CapaNegocio" nombre="SistemaGestionUniversitarioNegocio">
+        <clases nombre="Usuario">
+          <atributos nombre="Nombre"/>
+        </clases>
+      </capas>
+      <capas xsi:type="arquitectura:CapaServicio" nombre="SistemaGestionUniversitarioServicio">
+        <clases nombre="Usuario">
+          <atributos nombre="Nombre"/>
+        </clases>
+      </capas>
+    </proyecto_negocio>
+    <proyecto_web nombre="SistemaGestionUniversitarioWEB">
+      <capa_presentacion nombre="SistemaGestionUniversitarioWEB">
+        <vistas nombre="UsuarioLista" entidad="/3/@entidades.0"/>
+        <vistas nombre="UsuarioDetalle" tipo="DETALLE" entidad="/3/@entidades.0"/>
+      </capa_presentacion>
+    </proyecto_web>
+    <entidades nombre="Usuario">
+      <atributos nombre="Nombre"/>
+    </entidades>
+  </arquitectura:Sistema>
+  <arquitectura:Sistema nombre="SistemaGestionUniversitario" dominio="SistemaGestionUniversitario">
+    <proyecto_negocio nombre="SistemaGestionUniversitarioNegocio">
+      <capas xsi:type="arquitectura:CapaEntidad" nombre="SistemaGestionUniversitarioEntidad">
+        <clases nombre="Usuario">
+          <atributos nombre="Nombre"/>
+        </clases>
+      </capas>
+      <capas xsi:type="arquitectura:CapaNegocio" nombre="SistemaGestionUniversitarioNegocio">
+        <clases nombre="Usuario">
+          <atributos nombre="Nombre"/>
+        </clases>
+      </capas>
+      <capas xsi:type="arquitectura:CapaServicio" nombre="SistemaGestionUniversitarioServicio">
+        <clases nombre="Usuario">
+          <atributos nombre="Nombre"/>
+        </clases>
+      </capas>
+    </proyecto_negocio>
+    <proyecto_web nombre="SistemaGestionUniversitarioWEB">
+      <capa_presentacion nombre="SistemaGestionUniversitarioWEB">
+        <vistas nombre="UsuarioLista" entidad="/4/@entidades.0"/>
+        <vistas nombre="UsuarioDetalle" tipo="DETALLE" entidad="/4/@entidades.0"/>
+      </capa_presentacion>
+    </proyecto_web>
+    <entidades nombre="Usuario">
+      <atributos nombre="Nombre"/>
+    </entidades>
+  </arquitectura:Sistema>
+</xmi:XMI>

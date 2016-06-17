@@ -1,0 +1,19 @@
+[%
+var programa = PC!Programa.all[0];
+	if(programa.tipo == PC!TipoPrograma#lineaBalance)
+	{
+		var lineaBalance = programa.joins[0];
+
+		var t:Template:= TemplateFactory.load('GeneracionLineaBalance.egl'); 
+		t.populate('SalidaLineaBalance', programa.nombre.split('\\.')[0]); 
+		t.generate('./CobolApplication/LineaBalance/' + programa.nombre.replace('"', '')); 
+
+		var t:Template:= TemplateFactory.load('GeneracionLineaBalance.egl');
+		t.populate('SalidaLineaBalance', 'Copy-LB1'); 
+		t.generate('./CobolApplication/LineaBalance/' + lineaBalance.nomArchivoSalida.replace('"', '')); 
+		
+		var t:Template:= TemplateFactory.load('GeneracionLineaBalance.egl');
+		t.populate('SalidaLineaBalance', 'Copy-LB2'); 
+		t.generate('./CobolApplication/LineaBalance/' + lineaBalance.nomArchivoSalida.replace('"', '').subString(0,5)+'1.CPY' );
+	}
+%]

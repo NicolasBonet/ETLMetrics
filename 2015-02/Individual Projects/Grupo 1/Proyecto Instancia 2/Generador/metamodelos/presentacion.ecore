@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="presentacion" nsURI="http://www.example.org/presentacion" nsPrefix="presentacion">
+  <eClassifiers xsi:type="ecore:EClass" name="Design">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="views" lowerBound="1" upperBound="-1"
+        eType="#//View" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="View" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="page" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="background" eType="#//Color"
+        defaultValueLiteral="gray"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="image" eType="#//ImgSize"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="font" eType="#//Color"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipo" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="objects" upperBound="-1"
+        eType="#//PageObject" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipoPagina" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ImgSize">
+    <eLiterals name="small"/>
+    <eLiterals name="large"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Color">
+    <eLiterals name="gray"/>
+    <eLiterals name="black"/>
+    <eLiterals name="white"/>
+    <eLiterals name="blue"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Layout" eSuperTypes="#//View">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="filas" upperBound="-1"
+        eType="#//Row" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Column"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Row">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="columnas" upperBound="-1"
+        eType="#//Column" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PageObject">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="#//ObjectType"
+        defaultValueLiteral="none"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ObjectType">
+    <eLiterals name="banner" value="6"/>
+    <eLiterals name="currentUbication"/>
+    <eLiterals name="searchUbication"/>
+    <eLiterals name="email"/>
+    <eLiterals name="price"/>
+    <eLiterals name="description"/>
+    <eLiterals name="none"/>
+  </eClassifiers>
+</ecore:EPackage>

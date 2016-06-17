@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:scrollbars="none" android:background="#FFF" android:layout_marginBottom="110dp">
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" tools:context="co.bquest.pepe.widget.UbicacionFragment" android:background="#FFF">
+
+    <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:adjustViewBounds="true" android:id="@+id/fotoDetalleLugar"></ImageView>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="60dp" android:background="@color/secondary_dark">
+
+        <TextView android:id="@+id/ubicacion_name" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@android:style/TextAppearance.Large" android:textColor="#FFF" android:layout_gravity="center" android:gravity="center"></TextView>
+
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="#FFF" android:layout_marginTop="10dp">
+
+        <TextView android:id="@+id/ubicacion_direccion" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginEnd="10dp" android:layout_marginLeft="10dp" android:layout_marginRight="10dp" android:layout_marginStart="10dp" android:textAppearance="@android:style/TextAppearance.Medium" android:layout_gravity="center" android:gravity="center"></TextView>
+
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="10dp">
+
+        <Button android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Ir a Tienda" android:id="@+id/irATiendaButton" android:layout_gravity="center" android:gravity="center" android:background="@drawable/selector_boton_1" android:textColor="@color/secondary" android:layout_marginTop="10dp" android:layout_marginBottom="10dp"></Button>
+
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="#FFF" android:layout_marginBottom="10dp">
+
+        <TextView android:id="@+id/ubicacion_descripcion" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginEnd="10dp" android:layout_marginLeft="10dp" android:layout_marginRight="10dp" android:layout_marginStart="10dp" android:textAppearance="@android:style/TextAppearance.Medium" android:layout_gravity="center" android:gravity="center"></TextView>
+
+    </LinearLayout>
+
+    <TextView android:id="@+id/ubicacion_productos" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginEnd="10dp" android:layout_marginLeft="10dp" android:layout_marginRight="10dp" android:layout_marginStart="10dp" android:textAppearance="@android:style/TextAppearance.Medium"></TextView>
+
+</LinearLayout>
+
+    </ScrollView>

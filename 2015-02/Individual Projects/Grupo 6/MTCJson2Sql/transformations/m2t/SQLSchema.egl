@@ -1,0 +1,99 @@
+[% 
+/*
+CREATE TABLE student (
+'_id' int PRIMARY KEY,
+'name' varchar(200));
+
+CREATE TABLE scores (
+_id varchar(200) PRIMARY KEY
+varchar(80) references student(_id),
+'type' varchar(200),
+'score' real);INSERT INTO student  (  '_id','name')
+ VALUES (0, 'aimee Zank');
+*/ var databases = DB!Database.all(); 
+ for (database in databases){
+  if(not (database.name  == "helper")){
+%]   
+CREATE DATABASE [%=database.name%];
+ 
+ 
+[%
+   for(table in database.tables){
+    var primaryKey = table.primary_key.getPK();
+    
+%]
+CREATE TABLE [%=table.name.removeQuotes()%] (
+  [%=primaryKey%]PRIMARY KEY AUTO_INCREMENT
+    ,
+[%
+    var columnsLenght = table.columns.size() - 2;
+    for(column in table.columns){
+     var columnFormation = column.name.removeQuotes()+" "+column.type.getType();
+     if(not (columnFormation+" " == primaryKey)){
+     
+%]
+  [%=columnFormation%] 
+[%     //(not (columnsLenght==0)).println();
+     if(not (columnsLenght==0)){
+%]
+   ,
+[%      
+     }
+     //columnsLenght.println();
+     columnsLenght = columnsLenght - 1;
+    
+     }
+    }
+%] 
+);
+
+
+[%    
+   }
+   
+   for(table in database.tables){
+    var foreignKeyBool = table.foreignkeys.size()>0; 
+    System.out.println("foreignKeyBool: "+ foreignKeyBool);
+    if(foreignKeyBool){
+    %]
+ALTER TABLE [%=table.name.removeQuotes()%]
+ ADD CONSTRAINT `fk_[%=table.name.removeQuotes()%]_[%=table.foreignkeys.referencedKey.eContainer.name.first().removeQuotes()%]`
+  FOREIGN KEY ([%=table.foreignkeys.foreign_column.name.first().removeQuotes()%])
+    REFERENCES [%=table.foreignkeys.referencedKey.eContainer.name.first().removeQuotes()%]([%=table.foreignkeys.referencedKey.name.first().removeQuotes()%])
+      ON DELETE CASCADE;
+    [% 
+    }
+   }
+   
+  }
+ 
+%]
+[%
+ }
+operation OrderedSet getPK(){
+ var pk = self.first().key_column.first();
+ //pk.println();
+ return pk.name.removeQuotes()+" "+pk.type.getType()+" ";
+}
+
+operation String removeQuotes(){
+ //self.split('"').second().println();
+ return self.split('"').second();
+}
+operation EEnumLiteral getType(){
+ var type = self;
+ if(type == DB!DataType#varchar){
+    type = "varchar(1000)";
+  }else if(type == DB!DataType#int){
+    type = "int";
+  }else if(type == DB!DataType#text){
+    type = "text";
+  }else if(type == DB!DataType#bool){
+    type = "decimal(18,4)";
+  }else if(type == DB!DataType#decimal){
+    type = "tinyint(1)";
+  }else type = "text";
+  //type.println();
+return type;
+}
+%]

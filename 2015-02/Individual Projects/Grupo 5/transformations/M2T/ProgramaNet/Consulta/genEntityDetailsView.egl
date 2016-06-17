@@ -1,0 +1,21 @@
+[% import '../netUtil.egl'; %]
+@model cobiwsite.Models.EntityEntrada
+
+    <div>
+        <h4>Registro [%=CS!Programa.all.first().nombre%]</h4>
+        <hr />
+        <dl class="dl-horizontal">
+[%
+var vista = CS!Vista.all.select(m|m.esEntrada).first();
+for(e in vista.elementos) {
+%]   
+            <dt>
+                @Html.DisplayNameFor(model => model.[%=e.propiedad.getCSName()%])
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.[%=e.propiedad.getCSName()%])
+            </dd>
+[%}%]   
+        </dl>
+    </div>

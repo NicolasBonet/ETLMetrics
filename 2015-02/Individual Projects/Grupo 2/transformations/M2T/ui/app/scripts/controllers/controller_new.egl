@@ -1,0 +1,72 @@
+'use strict'
+
+###*
+ # @ngdoc function
+ # @name uiApp.controller:[%=ctl.service.name.firstToUpperCase()%]sNewCtrl
+ # @description
+ # # [%=ctl.service.name.firstToUpperCase()%]sNewCtrl
+ # Controller of the uiApp
+###
+[% var services_list= ctl.fields.select(f|not (f.relatedService==null)).collect(f|f.relatedService.name).asSet().toString().replace('\\[','').replace('\\]','');
+%] 
+angular.module 'uiApp'
+  .controller '[%=ctl.service.name.firstToUpperCase()%]sNewCtrl', ($window,[%=services_list%]) ->
+    scope=@
+    [% for(externalField in ctl.fields.select(f|not (f.relatedService==null) and 
+    	not (f.component = angularModel!UIComponent#autocomplete or  f.component = angularModel!UIComponent#autocompleteMultiple)   and 
+    	not (f.relatedService == ctl.service)  )){ 
+    %]
+    @[%=externalField.relatedService.name.toLowerCase().replace(' ','_') %]s=[%=externalField.relatedService.name %].query()
+    [%}%]
+    @save = (form) ->
+      new_object = new [%=ctl.service.name.firstToUpperCase()%](@object);
+      new_object.$save().then(->
+        scope.alert={type: "info", msg: "Guardado"}
+        $window.location.href = '#/[%=ctl.service.name.toLowerCase()%]s';
+      , ->
+        scope.alert={type: 'danger', msg: "No guardado"}
+      )
+    [% for(field in ctl.fields.select(f|not (f.relatedService==null) and (f.component = angularModel!UIComponent#checkbox))){ 
+      var field_name = field.key.toLowerCase().replace(' ','_');
+    %]
+    @toggleSelectionCheckbox[%= field_name%]=(item) -> 
+      if _.isUndefined(scope.object.[%= field_name%])
+        scope.object.[%= field_name%]=[]
+      idx = scope.object.[%= field_name%].indexOf(item.id)
+      if idx > -1
+        scope.object.[%= field_name%].splice idx, 1
+      else
+        scope.object.[%= field_name%].push item.id
+    [%}%]
+    [% for(field in ctl.fields.select(f|not (f.relatedService==null) and (f.component = angularModel!UIComponent#autocompleteMultiple))){ 
+      var field_name = field.key.toLowerCase().replace(' ','_');
+    %]
+    @get_[%= field.relatedService.name.toLowerCase()%]s=(query)->
+      [%=field.relatedService.name%].query({'q[[%=field.relatedService.filters.collect(a| a.key.trim()).toString().replace('\\[','').replace('\\]','').replace(' ','').replace(',',"_or_")%]_cont]': query}).
+      $promise.then((response) ->
+        return response;
+      )
+    @add_[%=field.relatedService.name.toLowerCase()%]=($item, $model, $label)->
+      if _.isUndefined(scope.object.estudiantes)
+        scope.object.[%=field.relatedService.name.toLowerCase()%]s = []
+      unless _.contains(scope.object.[%=field_name%],$item.id)
+        scope.object.[%=field.relatedService.name.toLowerCase()%]s.push($item)
+        scope.object.[%=field_name%]=_.map(scope.object.[%=field.relatedService.name.toLowerCase()%]s, (e)->
+          e.id)
+      scope.object.selected_[%=field.relatedService.name.toLowerCase()%] = null
+    @delete_[%=field.relatedService.name.toLowerCase()%]=(item)->
+      scope.object.[%=field.relatedService.name.toLowerCase()%]s=_.without(scope.object.[%=field.relatedService.name.toLowerCase()%]s, item)
+      scope.object.[%=field_name%]=_.map(scope.object.[%=field.relatedService.name.toLowerCase()%], (e)->
+          e.id) 
+    [%}%]
+    [% for(field in ctl.fields.select(f|not (f.relatedService==null) and (f.component = angularModel!UIComponent#autocomplete))){ 
+      var field_name = field.key.toLowerCase().replace(' ','_');
+    %]
+    @get_[%= field.relatedService.name.toLowerCase()%]=(query)->
+      [%=field.relatedService.name%].query({'q[[%=field.relatedService.filters.collect(a| a.key.trim()).toString().replace('\\[','').replace('\\]','').replace(' ','').replace(',',"_or_")%]_cont]': query}).
+      $promise.then((response) ->
+        return response;
+      ) 
+    [%}%]
+    return
+

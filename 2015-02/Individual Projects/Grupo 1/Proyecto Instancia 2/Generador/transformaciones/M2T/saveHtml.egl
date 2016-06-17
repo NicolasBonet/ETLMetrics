@@ -1,0 +1,38 @@
+[% 
+	TemplateFactory.setOutputRoot('../../generado/webApplication/');
+		
+		var promocion:Template:=TemplateFactory.load('GeneratePromocionHtml.egl');
+		var catalogo:Template:=TemplateFactory.load('GenerateCatalogoHtml.egl');
+		var contacto:Template:=TemplateFactory.load('GenerateContactoHtml.egl');
+		var mapa:Template:=TemplateFactory.load('GenerateMapaHtml.egl');
+		var index:Template:=TemplateFactory.load('GenerateIndex.egl');
+			
+		
+		for(vista in view!View.all){
+
+			for(pg  in vista.select(x|x.tipoPagina='Catalogo')){
+               
+				catalogo.populate('pg',pg.name);
+				catalogo.generate('catalogo/Catalogo_'+pg.name+'.html');
+			}
+			
+			for(pg  in vista.select(x|x.tipoPagina='Promocion')){
+
+				promocion.populate('pg',pg.name);
+				promocion.generate('promocion/Promocion_'+pg.name+'.html');
+			}
+			
+			for(pg  in vista.select(x|x.tipoPagina='Mapa')){
+
+				mapa.populate('pg',pg.name);
+				mapa.generate('mapa/Mapa_'+pg.name+'.html');
+			}
+			for(pg  in vista.select(x|x.tipoPagina='Contacto')){
+
+				contacto.populate('pg',pg.name);
+				contacto.generate('contacto/Contacto_'+pg.name+'.html');
+			}
+		}
+		 
+		 index.generate('index/index.html');
+%]

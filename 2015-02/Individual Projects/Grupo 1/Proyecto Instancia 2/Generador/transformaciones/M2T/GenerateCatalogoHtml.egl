@@ -1,0 +1,671 @@
+[%
+	var imgH:String:='400px';
+	var imgW:String:='600px';
+	var banner:String;
+	var background:String;
+	var color:String;
+	
+for(vista in view!View.all){
+	
+	for(pagina in vista.select(x|x.tipoPagina='Catalogo')){
+		
+		if(pagina.image.name=='small')
+		{
+		
+		imgH='300px';  imgW='400px';
+		
+		}
+
+		if(pagina.tipo=='basico')
+		{
+		
+		banner='none';
+		
+		}
+		
+		if(pagina.background.name=='blue')
+		{ 
+		
+		background ='rgb(49,153,251)';
+		
+		}
+		
+		if(pagina.background.name=='gray')
+		{
+		
+		 background ='rgb(139,146,138)';
+		 
+		 }
+		 
+		if(pagina.font.name=='blue')
+		{
+		
+		color='rgb(49,153,251)';
+		
+		}
+		if(pagina.font.name=='gray')
+		{
+		
+		color='rgb(139,146,138)';
+		
+		}
+
+		if(pagina.font.name=='white' or pagina.font.name=='black')
+		{
+		
+		color=pagina.font.name;
+		
+		}
+		
+		if(pagina.background.name=='white' or pagina.background.name=='black')
+		{
+		
+		background=pagina.background.name;
+		
+		}
+%]
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <script src="../js/jquery.js"></script>
+    <script>
+	$.getJSON("https://api.myjson.com/bins/29qr1", function( data ) {
+		var productos = data.productos;
+		var imagenes = [];
+		var descripciones =[];
+		var detalles=[];
+		var nombres =[];
+		var detallesurl=[];
+		var precios=[];
+		
+		$.each( productos, function( key, val ) {
+			var imagen = val.imagen;
+			var nombre = val.nombre;
+			var precio = val.precio;
+			var descripcion = val.descripcion;
+			var detalle = val.detalle;
+			var detalleUrl = val.detalleurl;
+			console.log(val);
+			imagenes.push(imagen);
+			descripciones.push(descripcion);
+			detalles.push(detalle);
+			nombres.push(nombre);
+			detallesurl.push(detalleUrl);
+			precios.push(precio);
+		});
+		$(".popup").each(function(indice,elemento){
+	$(elemento).attr('src',imagenes[indice]);
+	
+	$(this).click(function(){
+			var pSrc=$(this).attr('src');
+			
+				$('#show').css('visibility','visible');
+				$('#show').find('img').attr('src',pSrc);
+				$('#boton').attr('src','../images/pse.png');
+				$('#name').text(nombres[indice]);
+				$('#precio').text(precios[indice]);
+				$('#descripcion').text(descripciones[indice]);
+				$('#detalle').text(detalles[indice]);
+				$('#detalleu').text(detallesurl[indice]);
+				});
+				
+			$('#show').click(function(){
+			
+				$('#show').css('visibility','hidden');
+				
+				});
+	
+	 
+	
+	
+	   });
+	  
+	  $(".empLayout").each(function(indice,elemento){
+	$(elemento).attr('src',imagenes[indice]);
+	});
+	$(".cname").each(function(indice,elemento){
+	$(elemento).text(nombres[indice]);
+	});
+	$(".cdes").each(function(indice,elemento){
+	$(elemento).text(descripciones[indice]);
+	});
+	$(".cdet").each(function(indice,elemento){
+	$(elemento).text(detalles[indice]);
+	});
+	$(".cdetu").each(function(indice,elemento){
+	$(elemento).text(detallesurl[indice]);
+	});
+	$(".cpre").each(function(indice,elemento){
+	$(elemento).text(precios[indice]);
+	});
+	
+	
+	});
+	$.getJSON("https://api.myjson.com/bins/4bo0l",function( data ){
+	var publicidad=data.publicidad;
+    var cadena='';
+	$.each(publicidad,function( key, val ){
+	 cadena=cadena+'<p><h3>'+val.nombre+'</3></p><img src="'+val.imagen+'"/><p><a><small>'+val.visitenos+'</small></a><hr></p>';
+	});
+	$('#lateralDer').html('<h2>Publicidad</h2><div>'+cadena+'</div>');
+	});	
+	$.getJSON("https://api.myjson.com/bins/4ztdt",function( data ){
+		var purl=data.clientes;
+		var ucadena='';
+	$.each(purl,function( key, val ){
+    
+	ucadena=ucadena+'<img src="'+val.url+'"/>';
+	console.log(ucadena);
+	});
+	ucadena='<p><h4>Nuestros Clientes</h4></p>'+ucadena;
+	$('#pieCliente').html(ucadena);
+	});
+		</script>
+    <style>
+      	img{
+      
+		  height:[%=imgH%];
+		  width:[%=imgW%];
+		  
+ 		}  
+ 		
+ 		#container1{
+      
+		  height: 1000px;
+		  width: 100%;
+		  background:[%=background%];
+		  color:[%=color%];  
+		  z-index:1;
+         
+       }
+      
+      #cabecera{
+      
+         position:relative;
+          [% if(banner=='none'){
+     %] height:5%;
+     [%}else{%]   height:20%; [%}%]
+		   background:[%=background%];
+		   color:[%=color%];  
+		   z-index:4;
+         
+        }
+        
+      #campoContenido{
+      
+          position: relative;
+          height: 55%;
+          width: 100%;
+      	  z-index:2;
+      	  padding-bottom:3%;
+      }
+     
+      #campoCentral{
+      
+         position: relative;
+         padding-bottom:3%;
+         overflow-x:scroll;
+         float: left;
+         
+[%
+		if(vista.page=='profesional')
+		{
+		
+%]		 padding-top:10%;
+
+[%		}
+
+    	if(vista.page=='empresarial' or vista.page=='moderno')
+    	{if(pagina.tipo=='gold'){
+%]
+		padding-left:5%;
+[%
+		}else
+		{
+%]
+		padding-left:30%;
+[%
+		
+		}
+		}
+		else{
+%]
+		padding-left=1%;
+[%
+		} 
+         
+     	if(pagina.tipo=='gold'){ 
+%]  
+		width: 80%;
+[%		
+		}
+		else{
+%]
+		width: 100%;
+[%
+		}
+%]
+        height: 100%;
+        z-index:3;
+      
+      	}
+      
+      	table,tr,td{
+      
+      	z-index:3;
+      	
+      	}
+      	
+      	#lateralDer{
+      	
+	       
+	        position:relative;
+	        float: left;
+	        padding-left: 5%;
+	        width: 20%;
+	        height: 100%;
+	        background:[%=background%];
+	     	color:[%=color%];  
+	        z-index:3;
+            padding-bottom:3%;
+        }
+      
+      #lateralDer div{
+      	
+	        
+	        position:relative;
+	        overflow-y: scroll;
+	        width: 100%;
+	        height: 100%;
+	        background:[%=background%];
+	     	color:[%=color%];  
+	        z-index:3;
+            padding-bottom:3%;
+        }
+      
+      
+      	#pieDePag{
+        
+	        position:relative;
+	        width:100%;
+	        height:15%;
+	        color:rgb(210,210,210); 
+	        background-color: rgb(26,26,26);
+	        z-index:2;
+        
+      	}
+      
+  		#lateralDer  img{
+        
+         	 padding-left:5%; 
+        	 height: 70%;
+        	 width: 70%;
+      
+      	}
+      
+      	#cabecera img{
+          
+        	height: 100%;
+         	width: 100%;  
+      	}
+          
+      	#pieCliente{
+          	padding:1.9%;
+          	position: relative;
+          	float: left;
+          	width: 33%;
+          	padding: 2.8%;
+          	height: 100%;
+           	border-left-style: solid;
+           	border-left-width: thin;
+           	border-left-color: [%=color%]; 
+           	border-right-style: solid;
+           	border-right-width: thin;
+           	border-right-color: [%=color%]; 
+            background:[%=background%];
+     		color:[%=color%]; 
+     		z-index:3;
+      	}
+      
+      	#pieEnlace{
+            padding:2%;
+	        float: left;
+	        width: 33%;
+	        padding: 2%;
+	        height: 100%;
+         	border-right-style: solid;
+           	border-right-width: thin;
+           	border-right-color: [%=color%];     
+           	background:[%=background%];
+     		color:[%=color%];
+     		z-index:3;
+      }
+      
+      #pieEnlace a{
+         
+         	color:[%=color%];
+      
+      }
+      
+      #pieCredito{
+          padding:2%;
+          	float: left;
+           	width: 34%;
+          	padding: 2%;
+          	height: 100%;
+          	font: small;
+   			border-right-style: solid;
+           	border-right-width: thin;
+           	border-right-color: [%=color%]; 
+           	background:[%=background%];
+     		color:[%=color%];
+         	z-index:3;   
+      
+      }
+      
+      #pieCliente img{
+      
+	        height: 50%;
+	        width: 20%;
+	        float:left;
+	        padding-left: 5%;
+	        background:[%=background%];
+     	    color:[%=color%];
+            
+      }
+   
+   		.popup{
+   		
+   			cursor:pointer;
+   		}
+ 
+ 		#show{
+		
+			 visibility:hidden;
+			 position:absolute;
+			 width:100%;
+			 height:200%;
+			 z-index:5;
+			 background:rgba(0,0,0,0.7);
+	    }
+	    
+ 		#show div{
+			 
+			 position:relative;
+			 top:220px;
+			 left:300px;
+			 height:400px;
+			 width:720px;
+			 padding:20px;
+			 background:rgba(0,0,0,0.6);
+	    
+	    }
+ 
+ 		#show img{
+ 
+			 height: [%=imgH%];
+			 width:[%=imgW%];
+	    }
+	    
+ 		#empresa{
+ 
+			 position:relative;
+			 padding-bottom:20px;
+             padding-left:10px;
+ 		}
+ 
+ 
+    </style>
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../css/2-col-portfolio.css" rel="stylesheet">
+<body>
+	<div id='show'>	
+		<div>
+			<table>
+				<tr>
+					<td><img  /></td>
+					<td style="color:rgb(200,200,200);padding-left:20px"">
+					<h4>Descripcion:</h4>
+					<p id='name'></p>
+					<p id='descripcion'></p>
+					<p id='detalle'></p>
+					<p id='detalleu'></p>
+        			
+[%
+					if(pagina.tipo=='premium' or pagina.tipo=='gold')
+					{
+					
+%]						<h4>Precio:</h4><p id='precio'></p>
+
+[%					}
+					
+					if(pagina.tipo=='gold')
+					{
+%]
+						<p><img id="boton"  style="cursor:pointer; height:150px; width:150px;"/>
+[%
+					}
+%]					
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+ <div id="container1">
+ 	<div id="cabecera">
+       <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        	<div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            	<div class="navbar-header">
+                	<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                	</button>
+                	<a class="navbar-brand" href="../index/index.html">Inicio</a>
+            	</div>
+            	<!-- Collect the nav links, forms, and other content for toggling -->
+            		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                		<ul class="nav navbar-nav">
+                    		<li>
+                        		<a href="#">Mapa</a>
+                    		</li>
+                    		<li>
+                        		<a href="#">Promocion</a>
+                    		</li>
+                    		<li>
+                        		<a href="#">Contacto</a>
+                    		</li>
+                		</ul>
+            		</div>
+            <!-- /.navbar-collapse -->
+        		</div>
+        <!-- /.container -->
+    		</nav>
+    
+[%  
+		if(banner<>'none')
+		{
+		
+%]			<img id="banner" src="../images/banner.jpg"/>
+
+[%		}
+%]
+
+
+     
+    </div>
+    <div id='empresa' style=" width:100%;">
+     	<hr><h2>Catalogo de productos [%=vista.eContainer().name%] 2015</h2>
+     	<hr>
+     	  </div>
+    <div id="campoContenido">
+     	[%		if(pagina.tipo=='gold')
+		{
+		
+%] 		<div id="lateralDer">
+	 		
+ 		</div>
+  [%
+ 		 }
+  %]
+			<div id="campoCentral">
+				<table>
+[%
+
+	switch(vista.page){
+
+		case 'empresarial':
+
+			for(row in vista.filas){
+%]
+       			<tr>        
+[%
+        		for(col in row.columnas){
+%]
+        			<td style="padding-top:30px;"><img class='empLayout'/></td> 
+        			 <td style="padding-left:30px;" >
+        			 <h4>Descripcion:</h4>
+        			<p class="cname"></p>
+        			<p class="cdes"></p>
+        			<p class="cdet"></p>
+        			<p class="cdetu"></p>
+[%
+					if(pagina.tipo=='premium' or pagina.tipo=='gold')
+					{
+%]		
+					<h4>Precio:</h4>
+					<p class='cpre'></p>
+					
+[%					}
+
+					if(pagina.tipo=='gold')
+					{
+%]
+					<p><img src='../images/pse.png' style="cursor:pointer; height:150px; width:150px;"/></td>
+[%
+					}
+                }
+%]
+           
+			</tr>
+[%
+}
+
+		case 'moderno':
+
+			for(row in vista.filas){
+%]
+  				<tr>
+[%
+        		for(col in row.columnas){
+%]
+        			<td style="padding-top:30px;"><img class='empLayout'/></td> 
+        			 <td style="padding-left:30px;" >
+        			 <h4>Descripcion:</h4>
+        			<p class="cname"></p>
+        			<p class="cdes"></p>
+        			<p class="cdet"></p>
+        			<p class="cdetu"></p>
+[%
+					if(pagina.tipo=='premium' or pagina.tipo=='gold')
+					{
+%]
+					<h4>Precio:</h4>
+					<p class='cpre'></p>
+[%
+					}
+					
+					if(pagina.tipo=='gold')
+					{
+%]
+						<p><img src='../images/pse.png' style="cursor:pointer; height:150px; width:150px;"/></td>
+[%
+					}
+
+               }
+%]
+     			</tr>
+[%
+		}
+
+		case 'clasico':
+
+			for(row in vista.filas){
+%]
+       			<tr class="row" >
+[%
+	        	for(col in row.columnas){
+%]
+           			<td class="col-md-3 portfolio-item" style="padding-top:30px;"><img class='popup' /></td>
+[%
+                }
+%]
+  				</tr>
+ 
+[%
+			}
+
+		case 'profesional':
+
+			for(row in vista.filas){
+%]
+       			<tr>
+[%
+        		for(col in row.columnas){
+%]
+         			<td class="col-md-3 portfolio-item" style="padding-top:30px;"><img class='popup' /></td>
+[%
+                }
+%]
+				</tr>
+[%
+			}
+		}
+
+%]
+		</table>
+
+ 	</div>
+ 
+
+ 	</div>
+ <hr>
+ <div id="pieDPag">
+ 	
+ 	<div id='pieCliente'>
+ 		
+ 	</div>
+
+ 	<div id='pieEnlace'>
+ 		<strong>Enlaces de interes</strong><p>
+               <a href="http://www.uniandes.edu.co/">recursos y capacitaciones</a><br>
+               <a href="https://moodleinstitucional.uniandes.edu.co/login/index.php">consultas interactivas y foros</a><br>
+               <a href="sicuaplus.uniandes.edu.co">talleres y evaluaciones</a><br>
+               <a href="labsis.uniandes.edu.co">laboratorios de calidad y desarrolo de productos</a>
+ 	</div>
+ 
+ 	<div id='pieCredito'>
+ 		<strong>Creditos</strong><p>
+             Alejandro Quintero<br>Juan David Poveda<br>Ernesto Nobmann<br>Copyright 2015 
+ 	</div>
+ </div>
+</div>  
+    
+    <!-- jQuery -->
+    
+
+</body>
+
+</html>
+
+[%
+}
+}
+%]

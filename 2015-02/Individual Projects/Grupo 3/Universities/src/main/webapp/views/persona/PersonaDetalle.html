@@ -1,0 +1,42 @@
+<div>
+<ul class="nav navbar-nav">
+	<li><a ng-href="#/personalista">Lista Persona</a></li>
+</ul>
+<div>
+
+		<form ng-controller="PersonaDetalleCtrl"
+			ng-submit="save(data)"
+			class="jumbotron"
+			role="form">
+			<fieldset class="form-group">
+				<p>Nombre</p>
+				<input ng-model="data.nombre" type="text" class="form-control"/>
+			</fieldset>
+			<fieldset class="form-group">
+				<p>Apellido</p>
+				<input ng-model="data.apellido" type="text" class="form-control"/>
+			</fieldset>
+			<fieldset class="form-group">
+				<p>Documento</p>
+				<input ng-model="data.documento" type="text" class="form-control"/>
+			</fieldset>
+			<fieldset class="form-group">
+				<p>Direccion</p>
+				<input ng-model="data.direccion" type="text" class="form-control"/>
+			</fieldset>
+			<fieldset class="form-group">
+				<p>Edad</p>
+				<input ng-model="data.edad" type="number" class="form-control"/>
+			</fieldset>
+			<fieldset class="form-group">
+				<p>ViveBogota</p>
+			</fieldset>
+				<input type="button"
+				ng-click="save(data)" 
+				class="btn btn-default" 
+				value="Guardar"/>
+				<input type="button" ng-click="eliminar(data)"
+				ng-hide="data.id"
+				class="btn btn-primary" value="Eliminar"/>
+		<form>
+

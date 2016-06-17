@@ -1,0 +1,827 @@
+<?xml version="1.0" encoding="ASCII"?>
+<proyecto:Aplicacion xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:proyecto="http://www.example.org/proyecto" nombre="SistemaGestionUniversitarioNegocio">
+  <capas nombre="SistemaGestionUniversitarioEntidad">
+    <clases xsi:type="proyecto:Entidad" nombre="Persona">
+      <atributos nombre="personaId">
+        <tipo xsi:type="proyecto:Primitivo" tipoPrimitivo="INTEGER"/>
+        <anotaciones nombre="Id"/>
+        <anotaciones nombre="GeneratedValue">
+          <argumentos nombre="strategy" valor="GenerationType.IDENTITY"/>
+        </anotaciones>
+        <anotaciones nombre="Column">
+          <argumentos nombre="name" valor="PERSONA_ID"/>
+        </anotaciones>
+      </atributos>
+      <atributos nombre="Nombre">
+        <tipo xsi:type="proyecto:Primitivo"/>
+        <anotaciones nombre="Column">
+          <argumentos nombre="name" valor="NOMBRE"/>
+        </anotaciones>
+      </atributos>
+      <atributos nombre="Apellido">
+        <tipo xsi:type="proyecto:Primitivo"/>
+        <anotaciones nombre="Column">
+          <argumentos nombre="name" valor="APELLIDO"/>
+        </anotaciones>
+      </atributos>
+      <atributos nombre="Documento">
+        <tipo xsi:type="proyecto:Primitivo"/>
+        <anotaciones nombre="Column">
+          <argumentos nombre="name" valor="DOCUMENTO"/>
+        </anotaciones>
+      </atributos>
+      <atributos nombre="Direccion">
+        <tipo xsi:type="proyecto:Primitivo"/>
+        <anotaciones nombre="Column">
+          <argumentos nombre="name" valor="DIRECCION"/>
+        </anotaciones>
+      </atributos>
+      <atributos nombre="Edad">
+        <tipo xsi:type="proyecto:Primitivo" tipoPrimitivo="INTEGER"/>
+        <anotaciones nombre="Column">
+          <argumentos nombre="name" valor="EDAD"/>
+        </anotaciones>
+        <anotaciones nombre="Min">
+          <argumentos nombre="value" valor="18"/>
+        </anotaciones>
+      </atributos>
+      <atributos nombre="ViveBogota">
+        <tipo xsi:type="proyecto:Primitivo" tipoPrimitivo="BOOLEAN"/>
+        <anotaciones nombre="Column">
+          <argumentos nombre="name" valor="VIVEBOGOTA"/>
+        </anotaciones>
+      </atributos>
+      <anotaciones nombre="Entity">
+        <argumentos nombre="name" valor="persona"/>
+      </anotaciones>
+      <anotaciones nombre="Table">
+        <argumentos nombre="name" valor="PERSONA"/>
+      </anotaciones>
+      <anotaciones nombre="Inheritance">
+        <argumentos nombre="strategy" valor="InheritanceType.JOINED"/>
+      </anotaciones>
+    </clases>
+    <clases xsi:type="proyecto:Entidad" nombre="Curso">
+      <atributos nombre="cursoId">
+        <tipo xsi:type="proyecto:Primitivo" tipoPrimitivo="INTEGER"/>
+        <anotaciones nombre="Id"/>
+        <anotaciones nombre="GeneratedValue">
+          <argumentos nombre="strategy" valor="GenerationType.IDENTITY"/>
+        </anotaciones>
+        <anotaciones nombre="Column">
+          <argumentos nombre="name" valor="CURSO_ID"/>
+        </anotaciones>
+      </atributos>
+      <atributos nombre="Nombre">
+        <tipo xsi:type="proyecto:Primitivo"/>
+        <anotaciones nombre="Column">
+          <argumentos nombre="name" valor="NOMBRE"/>
+        </anotaciones>
+      </atributos>
+      <atributos nombre="profesor">
+        <tipo xsi:type="proyecto:Complejo" nombre="Profesor"/>
+        <anotaciones nombre="ManyToOne"/>
+        <anotaciones nombre="JoinColumn">
+          <argumentos nombre="name" valor="PROFESOR_ID"/>
+        </anotaciones>
+      </atributos>
+      <anotaciones nombre="Entity">
+        <argumentos nombre="name" valor="curso"/>
+      </anotaciones>
+      <anotaciones nombre="Table">
+        <argumentos nombre="name" valor="CURSO"/>
+      </anotaciones>
+    </clases>
+    <clases xsi:type="proyecto:Entidad" nombre="Profesor" extension="extends Persona">
+      <atributos nombre="Codigo">
+        <tipo xsi:type="proyecto:Primitivo"/>
+        <anotaciones nombre="Column">
+          <argumentos nombre="name" valor="CODIGO"/>
+        </anotaciones>
+      </atributos>
+      <anotaciones nombre="Entity">
+        <argumentos nombre="name" valor="profesor"/>
+      </anotaciones>
+      <anotaciones nombre="Table">
+        <argumentos nombre="name" valor="PROFESOR"/>
+      </anotaciones>
+    </clases>
+  </capas>
+  <capas nombre="SistemaGestionUniversitarioNegocio">
+    <clases xsi:type="proyecto:EJB" nombre="PersonaEJB">
+      <atributos nombre="entityManager">
+        <tipo xsi:type="proyecto:Complejo" nombre="EntityManager"/>
+        <anotaciones nombre="PersistenceContext">
+          <argumentos nombre="unitName" valor="puProyecto"/>
+        </anotaciones>
+      </atributos>
+      <anotaciones nombre="Stateless"/>
+      <anotaciones nombre="Local">
+        <argumentos nombre="value" valor="PersonaEJBLocal"/>
+      </anotaciones>
+      <servicios nombre="insertar" visibilidad="PUBLIC">
+        <parametros nombre="persona">
+          <tipo xsi:type="proyecto:Complejo" nombre="Persona"/>
+        </parametros>
+        <instrucciones valor="entityManager.persist(persona);"/>
+      </servicios>
+      <servicios nombre="actualizar" visibilidad="PUBLIC">
+        <parametros nombre="persona">
+          <tipo xsi:type="proyecto:Complejo" nombre="Persona"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="Persona"/>
+        </retorno>
+        <instrucciones valor="return entityManager.merge(persona);"/>
+      </servicios>
+      <servicios nombre="encontrarTodos" visibilidad="PUBLIC">
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="List&lt;Persona>"/>
+        </retorno>
+        <instrucciones valor="List&lt;Persona> lista = null;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;TypedQuery&lt;Persona> typedQuery = entityManager.createQuery(&quot;SELECT t FROM persona t &quot;, Persona.class);"/>
+        <instrucciones valor="&#x9;lista = typedQuery.getResultList();"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return lista;"/>
+      </servicios>
+      <servicios nombre="encontrarPorId" visibilidad="PUBLIC">
+        <parametros nombre="id">
+          <tipo xsi:type="proyecto:Complejo" nombre="Object"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="Persona"/>
+        </retorno>
+        <instrucciones valor="Persona persona = null;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;persona = entityManager.find(Persona.class, id);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return persona;"/>
+      </servicios>
+      <servicios nombre="remover" visibilidad="PUBLIC">
+        <parametros nombre="id">
+          <tipo xsi:type="proyecto:Complejo" nombre="Object"/>
+        </parametros>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;Persona persona = entityManager.find(Persona.class, id);"/>
+        <instrucciones valor="&#x9;entityManager.remove(persona);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+      </servicios>
+      <servicios nombre="totalRegistros" visibilidad="PUBLIC">
+        <retorno>
+          <tipo xsi:type="proyecto:Primitivo" tipoPrimitivo="INTEGER"/>
+        </retorno>
+        <instrucciones valor="Number cantidadRegistros = new Integer(0);"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;cantidadRegistros = (Number)entityManager.createQuery(&quot;SELECT COUNT(t) FROM persona t &quot;).getSingleResult();"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return cantidadRegistros.intValue();"/>
+      </servicios>
+    </clases>
+    <clases xsi:type="proyecto:EJB" nombre="CursoEJB">
+      <atributos nombre="entityManager">
+        <tipo xsi:type="proyecto:Complejo" nombre="EntityManager"/>
+        <anotaciones nombre="PersistenceContext">
+          <argumentos nombre="unitName" valor="puProyecto"/>
+        </anotaciones>
+      </atributos>
+      <anotaciones nombre="Stateless"/>
+      <anotaciones nombre="Local">
+        <argumentos nombre="value" valor="CursoEJBLocal"/>
+      </anotaciones>
+      <servicios nombre="insertar" visibilidad="PUBLIC">
+        <parametros nombre="curso">
+          <tipo xsi:type="proyecto:Complejo" nombre="Curso"/>
+        </parametros>
+        <instrucciones valor="entityManager.persist(curso);"/>
+      </servicios>
+      <servicios nombre="actualizar" visibilidad="PUBLIC">
+        <parametros nombre="curso">
+          <tipo xsi:type="proyecto:Complejo" nombre="Curso"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="Curso"/>
+        </retorno>
+        <instrucciones valor="return entityManager.merge(curso);"/>
+      </servicios>
+      <servicios nombre="encontrarTodos" visibilidad="PUBLIC">
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="List&lt;Curso>"/>
+        </retorno>
+        <instrucciones valor="List&lt;Curso> lista = null;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;TypedQuery&lt;Curso> typedQuery = entityManager.createQuery(&quot;SELECT t FROM curso t &quot;, Curso.class);"/>
+        <instrucciones valor="&#x9;lista = typedQuery.getResultList();"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return lista;"/>
+      </servicios>
+      <servicios nombre="encontrarPorId" visibilidad="PUBLIC">
+        <parametros nombre="id">
+          <tipo xsi:type="proyecto:Complejo" nombre="Object"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="Curso"/>
+        </retorno>
+        <instrucciones valor="Curso curso = null;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;curso = entityManager.find(Curso.class, id);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return curso;"/>
+      </servicios>
+      <servicios nombre="remover" visibilidad="PUBLIC">
+        <parametros nombre="id">
+          <tipo xsi:type="proyecto:Complejo" nombre="Object"/>
+        </parametros>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;Curso curso = entityManager.find(Curso.class, id);"/>
+        <instrucciones valor="&#x9;entityManager.remove(curso);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+      </servicios>
+      <servicios nombre="totalRegistros" visibilidad="PUBLIC">
+        <retorno>
+          <tipo xsi:type="proyecto:Primitivo" tipoPrimitivo="INTEGER"/>
+        </retorno>
+        <instrucciones valor="Number cantidadRegistros = new Integer(0);"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;cantidadRegistros = (Number)entityManager.createQuery(&quot;SELECT COUNT(t) FROM curso t &quot;).getSingleResult();"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return cantidadRegistros.intValue();"/>
+      </servicios>
+    </clases>
+    <clases xsi:type="proyecto:EJB" nombre="ProfesorEJB">
+      <atributos nombre="entityManager">
+        <tipo xsi:type="proyecto:Complejo" nombre="EntityManager"/>
+        <anotaciones nombre="PersistenceContext">
+          <argumentos nombre="unitName" valor="puProyecto"/>
+        </anotaciones>
+      </atributos>
+      <anotaciones nombre="Stateless"/>
+      <anotaciones nombre="Local">
+        <argumentos nombre="value" valor="ProfesorEJBLocal"/>
+      </anotaciones>
+      <servicios nombre="insertar" visibilidad="PUBLIC">
+        <parametros nombre="profesor">
+          <tipo xsi:type="proyecto:Complejo" nombre="Profesor"/>
+        </parametros>
+        <instrucciones valor="entityManager.persist(profesor);"/>
+      </servicios>
+      <servicios nombre="actualizar" visibilidad="PUBLIC">
+        <parametros nombre="profesor">
+          <tipo xsi:type="proyecto:Complejo" nombre="Profesor"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="Profesor"/>
+        </retorno>
+        <instrucciones valor="return entityManager.merge(profesor);"/>
+      </servicios>
+      <servicios nombre="encontrarTodos" visibilidad="PUBLIC">
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="List&lt;Profesor>"/>
+        </retorno>
+        <instrucciones valor="List&lt;Profesor> lista = null;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;TypedQuery&lt;Profesor> typedQuery = entityManager.createQuery(&quot;SELECT t FROM profesor t &quot;, Profesor.class);"/>
+        <instrucciones valor="&#x9;lista = typedQuery.getResultList();"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return lista;"/>
+      </servicios>
+      <servicios nombre="encontrarPorId" visibilidad="PUBLIC">
+        <parametros nombre="id">
+          <tipo xsi:type="proyecto:Complejo" nombre="Object"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="Profesor"/>
+        </retorno>
+        <instrucciones valor="Profesor profesor = null;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;profesor = entityManager.find(Profesor.class, id);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return profesor;"/>
+      </servicios>
+      <servicios nombre="remover" visibilidad="PUBLIC">
+        <parametros nombre="id">
+          <tipo xsi:type="proyecto:Complejo" nombre="Object"/>
+        </parametros>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;Profesor profesor = entityManager.find(Profesor.class, id);"/>
+        <instrucciones valor="&#x9;entityManager.remove(profesor);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+      </servicios>
+      <servicios nombre="totalRegistros" visibilidad="PUBLIC">
+        <retorno>
+          <tipo xsi:type="proyecto:Primitivo" tipoPrimitivo="INTEGER"/>
+        </retorno>
+        <instrucciones valor="Number cantidadRegistros = new Integer(0);"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;cantidadRegistros = (Number)entityManager.createQuery(&quot;SELECT COUNT(t) FROM profesor t &quot;).getSingleResult();"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return cantidadRegistros.intValue();"/>
+      </servicios>
+    </clases>
+  </capas>
+  <capas nombre="SistemaGestionUniversitarioServicio">
+    <clases xsi:type="proyecto:Service" nombre="RestApp">
+      <anotaciones nombre="ApplicationPath">
+        <argumentos nombre="value" valor="rest"/>
+      </anotaciones>
+    </clases>
+    <clases xsi:type="proyecto:Service" nombre="PersonaService">
+      <atributos nombre="personaEJBLocal">
+        <tipo xsi:type="proyecto:Complejo" nombre="PersonaEJBLocal"/>
+        <anotaciones nombre="EJB"/>
+      </atributos>
+      <anotaciones nombre="Path">
+        <argumentos nombre="value" valor="Persona"/>
+      </anotaciones>
+      <servicios nombre="encontrarTodos" visibilidad="PUBLIC" recurso="Persona">
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="List&lt;Persona>"/>
+        </retorno>
+        <anotaciones nombre="GET"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="Personas"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <instrucciones valor="List&lt;Persona> lista = null;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;lista = personaEJBLocal.encontrarTodos();"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return lista;"/>
+      </servicios>
+      <servicios nombre="encontrarPorId" visibilidad="PUBLIC" recurso="Persona">
+        <parametros nombre="id">
+          <tipo xsi:type="proyecto:Primitivo" tipoPrimitivo="INTEGER"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="Persona"/>
+        </retorno>
+        <anotaciones nombre="GET"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="Persona/{id}"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <instrucciones valor="Persona persona = null;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;persona = personaEJBLocal.encontrarPorId(id);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return persona;"/>
+      </servicios>
+      <servicios nombre="insertar" visibilidad="PUBLIC" recurso="Persona" peticion="POST" produce="TEXT">
+        <parametros nombre="persona">
+          <tipo xsi:type="proyecto:Complejo" nombre="Persona"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Primitivo"/>
+        </retorno>
+        <anotaciones nombre="POST"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="Persona"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="text/plain"/>
+        </anotaciones>
+        <anotaciones nombre="Consumes">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <instrucciones valor="String mensaje=&quot;OK&quot;;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;personaEJBLocal.insertar(persona);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;mensaje = &quot;BAD&quot;;"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return mensaje;"/>
+      </servicios>
+      <servicios nombre="actualizar" visibilidad="PUBLIC" recurso="Persona" peticion="PUT">
+        <parametros nombre="persona">
+          <tipo xsi:type="proyecto:Complejo" nombre="Persona"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="Persona"/>
+        </retorno>
+        <anotaciones nombre="PUT"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="Persona"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <anotaciones nombre="Consumes">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;persona = personaEJBLocal.actualizar(persona);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return persona;"/>
+      </servicios>
+      <servicios nombre="remover" visibilidad="PUBLIC" recurso="Persona" peticion="DELETE" produce="TEXT">
+        <parametros nombre="id">
+          <tipo xsi:type="proyecto:Primitivo" tipoPrimitivo="INTEGER"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Primitivo"/>
+        </retorno>
+        <anotaciones nombre="DELETE"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="Persona/{id}"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="text/plain"/>
+        </anotaciones>
+        <instrucciones valor="String mensaje=&quot;OK&quot;;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;personaEJBLocal.remover(id);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;mensaje = &quot;BAD&quot;;"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return mensaje;"/>
+      </servicios>
+      <servicios nombre="totalRegistros" visibilidad="PUBLIC" recurso="Persona">
+        <retorno>
+          <tipo xsi:type="proyecto:Primitivo" tipoPrimitivo="INTEGER"/>
+        </retorno>
+        <anotaciones nombre="GET"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="CantidadPersonas"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <instrucciones valor="Integer cantidad = 0;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;cantidad = personaEJBLocal.totalRegistros();"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return cantidad;"/>
+      </servicios>
+    </clases>
+    <clases xsi:type="proyecto:Service" nombre="CursoService">
+      <atributos nombre="cursoEJBLocal">
+        <tipo xsi:type="proyecto:Complejo" nombre="CursoEJBLocal"/>
+        <anotaciones nombre="EJB"/>
+      </atributos>
+      <anotaciones nombre="Path">
+        <argumentos nombre="value" valor="Curso"/>
+      </anotaciones>
+      <servicios nombre="encontrarTodos" visibilidad="PUBLIC" recurso="Curso">
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="List&lt;Curso>"/>
+        </retorno>
+        <anotaciones nombre="GET"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="Cursos"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <instrucciones valor="List&lt;Curso> lista = null;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;lista = cursoEJBLocal.encontrarTodos();"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return lista;"/>
+      </servicios>
+      <servicios nombre="encontrarPorId" visibilidad="PUBLIC" recurso="Curso">
+        <parametros nombre="id">
+          <tipo xsi:type="proyecto:Primitivo" tipoPrimitivo="INTEGER"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="Curso"/>
+        </retorno>
+        <anotaciones nombre="GET"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="Curso/{id}"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <instrucciones valor="Curso curso = null;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;curso = cursoEJBLocal.encontrarPorId(id);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return curso;"/>
+      </servicios>
+      <servicios nombre="insertar" visibilidad="PUBLIC" recurso="Curso" peticion="POST" produce="TEXT">
+        <parametros nombre="curso">
+          <tipo xsi:type="proyecto:Complejo" nombre="Curso"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Primitivo"/>
+        </retorno>
+        <anotaciones nombre="POST"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="Curso"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="text/plain"/>
+        </anotaciones>
+        <anotaciones nombre="Consumes">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <instrucciones valor="String mensaje=&quot;OK&quot;;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;cursoEJBLocal.insertar(curso);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;mensaje = &quot;BAD&quot;;"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return mensaje;"/>
+      </servicios>
+      <servicios nombre="actualizar" visibilidad="PUBLIC" recurso="Curso" peticion="PUT">
+        <parametros nombre="curso">
+          <tipo xsi:type="proyecto:Complejo" nombre="Curso"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="Curso"/>
+        </retorno>
+        <anotaciones nombre="PUT"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="Curso"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <anotaciones nombre="Consumes">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;curso = cursoEJBLocal.actualizar(curso);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return curso;"/>
+      </servicios>
+      <servicios nombre="remover" visibilidad="PUBLIC" recurso="Curso" peticion="DELETE" produce="TEXT">
+        <parametros nombre="id">
+          <tipo xsi:type="proyecto:Primitivo" tipoPrimitivo="INTEGER"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Primitivo"/>
+        </retorno>
+        <anotaciones nombre="DELETE"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="Curso/{id}"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="text/plain"/>
+        </anotaciones>
+        <instrucciones valor="String mensaje=&quot;OK&quot;;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;cursoEJBLocal.remover(id);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;mensaje = &quot;BAD&quot;;"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return mensaje;"/>
+      </servicios>
+      <servicios nombre="totalRegistros" visibilidad="PUBLIC" recurso="Curso">
+        <retorno>
+          <tipo xsi:type="proyecto:Primitivo" tipoPrimitivo="INTEGER"/>
+        </retorno>
+        <anotaciones nombre="GET"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="CantidadCursos"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <instrucciones valor="Integer cantidad = 0;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;cantidad = cursoEJBLocal.totalRegistros();"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return cantidad;"/>
+      </servicios>
+    </clases>
+    <clases xsi:type="proyecto:Service" nombre="ProfesorService">
+      <atributos nombre="profesorEJBLocal">
+        <tipo xsi:type="proyecto:Complejo" nombre="ProfesorEJBLocal"/>
+        <anotaciones nombre="EJB"/>
+      </atributos>
+      <anotaciones nombre="Path">
+        <argumentos nombre="value" valor="Profesor"/>
+      </anotaciones>
+      <servicios nombre="encontrarTodos" visibilidad="PUBLIC" recurso="Profesor">
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="List&lt;Profesor>"/>
+        </retorno>
+        <anotaciones nombre="GET"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="Profesors"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <instrucciones valor="List&lt;Profesor> lista = null;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;lista = profesorEJBLocal.encontrarTodos();"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return lista;"/>
+      </servicios>
+      <servicios nombre="encontrarPorId" visibilidad="PUBLIC" recurso="Profesor">
+        <parametros nombre="id">
+          <tipo xsi:type="proyecto:Primitivo" tipoPrimitivo="INTEGER"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="Profesor"/>
+        </retorno>
+        <anotaciones nombre="GET"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="Profesor/{id}"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <instrucciones valor="Profesor profesor = null;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;profesor = profesorEJBLocal.encontrarPorId(id);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return profesor;"/>
+      </servicios>
+      <servicios nombre="insertar" visibilidad="PUBLIC" recurso="Profesor" peticion="POST" produce="TEXT">
+        <parametros nombre="profesor">
+          <tipo xsi:type="proyecto:Complejo" nombre="Profesor"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Primitivo"/>
+        </retorno>
+        <anotaciones nombre="POST"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="Profesor"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="text/plain"/>
+        </anotaciones>
+        <anotaciones nombre="Consumes">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <instrucciones valor="String mensaje=&quot;OK&quot;;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;profesorEJBLocal.insertar(profesor);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;mensaje = &quot;BAD&quot;;"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return mensaje;"/>
+      </servicios>
+      <servicios nombre="actualizar" visibilidad="PUBLIC" recurso="Profesor" peticion="PUT">
+        <parametros nombre="profesor">
+          <tipo xsi:type="proyecto:Complejo" nombre="Profesor"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Complejo" nombre="Profesor"/>
+        </retorno>
+        <anotaciones nombre="PUT"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="Profesor"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <anotaciones nombre="Consumes">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;profesor = profesorEJBLocal.actualizar(profesor);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return profesor;"/>
+      </servicios>
+      <servicios nombre="remover" visibilidad="PUBLIC" recurso="Profesor" peticion="DELETE" produce="TEXT">
+        <parametros nombre="id">
+          <tipo xsi:type="proyecto:Primitivo" tipoPrimitivo="INTEGER"/>
+        </parametros>
+        <retorno>
+          <tipo xsi:type="proyecto:Primitivo"/>
+        </retorno>
+        <anotaciones nombre="DELETE"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="Profesor/{id}"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="text/plain"/>
+        </anotaciones>
+        <instrucciones valor="String mensaje=&quot;OK&quot;;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;profesorEJBLocal.remover(id);"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;mensaje = &quot;BAD&quot;;"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return mensaje;"/>
+      </servicios>
+      <servicios nombre="totalRegistros" visibilidad="PUBLIC" recurso="Profesor">
+        <retorno>
+          <tipo xsi:type="proyecto:Primitivo" tipoPrimitivo="INTEGER"/>
+        </retorno>
+        <anotaciones nombre="GET"/>
+        <anotaciones nombre="Path">
+          <argumentos nombre="value" valor="CantidadProfesors"/>
+        </anotaciones>
+        <anotaciones nombre="Produces">
+          <argumentos nombre="value" valor="application/json"/>
+        </anotaciones>
+        <instrucciones valor="Integer cantidad = 0;"/>
+        <instrucciones valor="try{"/>
+        <instrucciones valor="&#x9;cantidad = profesorEJBLocal.totalRegistros();"/>
+        <instrucciones valor="} catch(Exception e){"/>
+        <instrucciones valor="&#x9;e.printStackTrace();"/>
+        <instrucciones valor="&#x9;throw new Exception(&quot;BAD&quot;);"/>
+        <instrucciones valor="} finally{&#xA;"/>
+        <instrucciones valor="}"/>
+        <instrucciones valor="return cantidad;"/>
+      </servicios>
+    </clases>
+  </capas>
+</proyecto:Aplicacion>

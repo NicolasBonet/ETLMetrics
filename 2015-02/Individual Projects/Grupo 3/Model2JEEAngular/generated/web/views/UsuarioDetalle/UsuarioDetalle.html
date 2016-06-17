@@ -1,0 +1,23 @@
+<div>
+<ul class="nav navbar-nav">
+	<li><a href="/#/UsuarioLista">Agregar Usuario</a></li>
+</ul>
+<div>
+
+		<form ng-controller="UsuarioDetalleCtrl"
+			ng-submit="save(data)"
+			class="jumbotron"
+			role="form">
+			<fieldset class="form-group">
+				<p>Nombre</p>
+				<input ng-model="data.nombre" type="text" class="form-control"/>
+			</fieldset>
+				<input type="button"
+				ng-click="save(data)" 
+				class="btn btn-default" 
+				value="Guardar"/>
+				<input type="button" ng-click="eliminar(data)"
+				class="btn btn-primary"
+				>Eliminar</input>
+		<form>
+

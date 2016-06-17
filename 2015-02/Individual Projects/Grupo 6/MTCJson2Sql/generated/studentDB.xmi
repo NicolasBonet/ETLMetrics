@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:DB="DB">
+  <DB:Database name="helper"/>
+  <DB:Database name="databaseTest">
+    <tables name="&quot;puntajes&quot;" database="/1">
+      <foreignkeys referencedKey="/1/@tables.1/@primary_key.0" foreign_column="/1/@tables.0/@columns.3"/>
+      <primary_key name="&quot;_id&quot;" key_column="/1/@tables.0/@columns.2"/>
+      <columns table="/1/@tables.0" type="varchar" name="&quot;type&quot;"/>
+      <columns table="/1/@tables.0" type="decimal" name="&quot;puntaje&quot;"/>
+      <columns table="/1/@tables.0" name="&quot;_id&quot;"/>
+      <columns table="/1/@tables.0" notNull="true" name="&quot;student_id&quot;"/>
+    </tables>
+    <tables name="&quot;student&quot;" database="/1">
+      <primary_key name="&quot;_id&quot;" key_column="/1/@tables.1/@columns.0"/>
+      <columns table="/1/@tables.1" name="&quot;_id&quot;"/>
+      <columns table="/1/@tables.1" type="varchar" name="&quot;nombre&quot;"/>
+    </tables>
+  </DB:Database>
+  <DB:Column name="&quot;puntajes&quot;"/>
+</xmi:XMI>

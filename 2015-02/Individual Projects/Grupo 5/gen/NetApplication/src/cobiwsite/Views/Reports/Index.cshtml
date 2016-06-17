@@ -1,0 +1,165 @@
+@model IEnumerable<cobiwsite.Models.ReportSalida>
+
+<table class="table">
+    <tr>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.COD_RESP)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.DES_RESP)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.PRI_APELLIDO)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.SEG_APELLIDO)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.PRI_NOMBRE)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.SEG_NOMBRE)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.FEC_NAC)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.IND_SEX)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.COD_CIIU)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.CIU_RES)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.NOM_CIU_RES)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.COD_DPT)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.NOM_COD_DPT)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.DIR_RES)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.TEL_RES)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.OFI_FUN)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.NOM_OFI)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.NUM_TC)
+        </th>
+    
+        <th>
+            @Html.DisplayNameFor(model => model.TIP_TC)
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.COD_RESP)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.DES_RESP)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.PRI_APELLIDO)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.SEG_APELLIDO)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.PRI_NOMBRE)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.SEG_NOMBRE)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.FEC_NAC)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.IND_SEX)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.COD_CIIU)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.CIU_RES)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.NOM_CIU_RES)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.COD_DPT)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.NOM_COD_DPT)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.DIR_RES)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.TEL_RES)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.OFI_FUN)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.NOM_OFI)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.NUM_TC)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.TIP_TC)
+            </td>
+        </tr>
+    }
+
+</table>

@@ -1,0 +1,210 @@
+pre{
+var csharp =new CSharp!CSharp;
+var  androidCore =new  AndroidOut!AndroidCore;
+ 
+}
+ 
+rule Clase2DTO
+ transform clase: CSharp!Clase
+ to dto: AndroidOut!DTO
+ {
+  guard: (clase.name.endsWith("DTO"))
+   
+   dto.nombre=clase.name;
+   androidCore.activities.add(dto);
+   for(prop in clase.propiedades){
+    var propiedad= new AndroidOut!Propiedad;
+    propiedad.nombre= prop.name;
+    propiedad.label= prop.name;
+    if(prop.tipo <> null){
+     var nFormElement= new AndroidOut!Radiobutton;
+     if(prop.tipo.isTypeOf(CSharp!Enum)){
+     
+     if(prop.atributos.propiedades.size()>0){
+     for(aa in prop.atributos.propiedades){
+      if(aa.name.equals("Placeholder")){
+      formElementc.placeholder = aa.valor;
+      }
+         
+        }  
+        }  
+     
+     for(pp in prop.tipo.valores){
+      var opc = new AndroidOut!Opcion;
+      opc.nombre = pp.name;
+      nFormElement.opciones.add(opc);
+     }
+     }
+           
+     
+     propiedad.formElement = nFormElement; 
+    }
+    if(prop.tipoPrimitivo <> null){
+     if(prop.tipoPrimitivo.equals("bool")){
+     var nFormElement= new AndroidOut!CheckBox;
+     
+          if(prop.atributos.propiedades.size()>0){
+     for(aa in prop.atributos.propiedades){
+      if(aa.name.equals("Placeholder")){
+     
+      formElementc.placeholder = aa.valor;
+      }
+         
+        }  
+        } 
+     propiedad.formElement = nFormElement;
+    }
+    }
+    
+    if(prop.atributos.size==0 and prop.tipoPrimitivo<>null)
+    {
+    if (prop.tipoPrimitivo.equals("string")){
+          var nFormElement= new AndroidOut!EditText;
+     
+          if(prop.atributos.propiedades.size()>0){
+     for(aa in prop.atributos.propiedades){
+      if(aa.name.equals("Placeholder")){
+     
+      formElementc.placeholder = aa.valor;
+      }
+         
+        }  
+        } 
+     propiedad.formElement = nFormElement;
+    
+    }
+    }
+    
+    
+    for(atributo in prop.atributos){
+     if(atributo.name.equals("Hide")){
+      propiedad.esOculto = true;
+     }else{
+      propiedad.esOculto = false;
+     }
+    
+     var formElementc;
+     switch (atributo.name){
+     case  "Textbox":
+       formElementc= new AndroidOut!EditText;
+       
+                    if(atributo.propiedades.size()>0){
+     for(aa in atributo.propiedades){
+      if(aa.name.equals("Placeholder")){
+      formElementc.placeholder = aa.valor;
+      }
+         
+        }  
+        } 
+       propiedad.formElement = formElementc;
+     case "Textarea":
+           formElementc= new AndroidOut!EditText;
+           
+                        if(atributo.propiedades.size()>0){
+     for(aa in atributo.propiedades){
+      if(aa.name.equals("Placeholder")){
+      formElementc.placeholder = aa.valor;
+      }
+         
+        }  
+        } 
+           propiedad.formElement = formElementc;
+     case "Combobox":
+        formElementc= new AndroidOut!Spinner; 
+      
+             if(atributo.propiedades.size()>0){
+     for(aa in atributo.propiedades){
+      if(aa.name.equals("Placeholder")){
+      formElementc.placeholder = aa.valor;
+      }
+         
+        }  
+        } 
+        propiedad.formElement = formElementc;
+     case "Display":
+        for(aa in atributo.propiedades){
+         propiedad.label = aa.valor;
+        }           
+    } 
+     
+    }
+     dto.propiedades.add(propiedad); 
+   }
+   
+ }
+ 
+ rule Clase2Controlador
+ transform clase: CSharp!Clase
+ to controlador: AndroidOut!Controlador
+ {
+  guard: (clase.name.endsWith("Controller"))
+  //asigno el name al controlador
+   controlador.nombre=clase.name;
+   //para llenar los atributos del controlador
+   for(atrib in clase.atributos){
+    switch (atrib.name){
+    case  "Domain":
+     controlador.domain=atrib.valor;
+    case "RoutePrefix":
+     controlador.RoutePrefix= atrib.valor;
+    case "Main":
+     controlador.main=true;
+    } 
+   }
+   //para llenar los metodos
+   for (metod in clase.metodos){
+    
+    var metodo= new AndroidOut!Metodo;
+    //asigno el name al metodo
+    metodo.nombre=metod.name;
+    //asigno los atributos del metodo
+    for (atribInMetod in metod.atributos){
+     switch(atribInMetod.name){
+     case "Route":
+      metodo.ruta=atribInMetod.valor;
+     case "ViewType":
+      metodo.viewType=atribInMetod.valor;
+     case "Title":
+      metodo.titulo=atribInMetod.valor;
+     case "GetId":
+      metodo.getID=atribInMetod.valor;
+     case "HttpGet":
+      metodo.verbo=AndroidOut!VerboEnum#HttpGet;
+     case "HttpPost":
+      metodo.verbo=AndroidOut!VerboEnum#HttpPost;
+     case "HttpPut":
+      metodo.verbo=AndroidOut!VerboEnum#HttpPut;
+     case "HttpDelete":
+      metodo.verbo=AndroidOut!VerboEnum#HttpDelete; 
+     }
+
+    }
+    
+    //para llenar los parametros al metodo
+    for (paramInMetod in metod.parametros){
+    var parametro = new AndroidOut!Parametro;
+     parametro.nombre=paramInMetod.name; 
+     //parametro.tipo= paramInMetod.tipo.name;
+     parametro.tipo= paramInMetod.name;  
+     for(dtos in androidCore.activities){
+      //dtos.println();
+      var inDto = metod.tipo;
+      var outDto = dtos;
+      if(inDto <> null){
+       if(inDto.name.equals(outDto.nombre)){
+       parametro.valor = outDto;
+       }
+      }
+     }
+     //parametro.valor = metod.clase;
+     metodo.parametros=parametro; 
+    }
+    controlador.metodos.add(metodo);
+   }
+   
+   
+   
+   //agrego el controlador completo al androidCore
+   androidCore.controllers.add(controlador);
+   
+ }

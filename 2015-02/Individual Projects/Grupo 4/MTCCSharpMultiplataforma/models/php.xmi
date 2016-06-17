@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ASCII"?>
+<webApiPHP:PHPCore xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:webApiPHP="http://www.example.org/webApiPHP">
+  <clases name="CiudadesController" routePrefix="api/Ciudades" domain="http://192.168.0.6:51792/">
+    <metodos name="ObtenerTodos" route="ObtenerTodos"/>
+  </clases>
+  <clases name="EstudiantesController" routePrefix="api/Estudiantes" domain="http://192.168.0.6:51792/" isMain="true">
+    <metodos name="ObtenerPorId" route="ObtenerPorId">
+      <parametros name="id"/>
+    </metodos>
+    <metodos name="Crear" verbo="POST" route="Crear">
+      <parametros name="estudianteDTO" valores="//@dtos.1"/>
+    </metodos>
+    <metodos name="Actualizar" verbo="PUT" route="Actualizar">
+      <parametros name="estudianteDTO" valores="//@dtos.1"/>
+    </metodos>
+  </clases>
+  <dtos name="CiudadDTO">
+    <atributos name="Id" title="Id"/>
+    <atributos name="Nombre" title="Nombre">
+      <elementos xsi:type="webApiPHP:Input" placeholder="Nombre"/>
+    </atributos>
+  </dtos>
+  <dtos name="EstudianteDTO">
+    <atributos name="Id" title="Id" isHide="true"/>
+    <atributos name="Nombre" title="Nombre">
+      <elementos xsi:type="webApiPHP:Input" placeholder="Nombre"/>
+    </atributos>
+    <atributos name="Apellido" title="Apellido">
+      <elementos xsi:type="webApiPHP:Input" isRequired="false" placeholder="Apellido"/>
+    </atributos>
+    <atributos name="Sexo" title="Sexo">
+      <elementos xsi:type="webApiPHP:Input" placeholder="Sexo" tipo="radio">
+        <opciones value="Mujer"/>
+        <opciones value="Hombre"/>
+      </elementos>
+    </atributos>
+    <atributos name="Ciudad" title="Ciudad">
+      <elementos xsi:type="webApiPHP:DropDown" placeholder="Ciudad"/>
+    </atributos>
+    <atributos name="Correo" title="Correo">
+      <elementos xsi:type="webApiPHP:Input" isRequired="false" placeholder="Correo" tipo="email"/>
+    </atributos>
+    <atributos name="Usuario" title="Usuario">
+      <elementos xsi:type="webApiPHP:Input" placeholder="Usuario"/>
+    </atributos>
+    <atributos name="Contrasenia" title="Contrasenia">
+      <elementos xsi:type="webApiPHP:Input" placeholder="Contrasenia" tipo="password"/>
+    </atributos>
+    <atributos name="AcercaDeMi" title="Acerca de mi">
+      <elementos xsi:type="webApiPHP:TextArea" placeholder="Acerca de mi"/>
+    </atributos>
+    <atributos name="Razon" title="&#xfffd;Por qu&#xfffd; estudiar en los Andes?">
+      <elementos xsi:type="webApiPHP:TextArea" isRequired="false" placeholder="&#xfffd;Por qu&#xfffd; estudiar en los Andes?"/>
+    </atributos>
+    <atributos name="RecibirCorreo" title="&#xfffd;Desea recibir correo elecr&#xfffd;nico?">
+      <elementos xsi:type="webApiPHP:Input" placeholder="&#xfffd;Desea recibir correo elecr&#xfffd;nico?" tipo="checkbox"/>
+    </atributos>
+  </dtos>
+</webApiPHP:PHPCore>

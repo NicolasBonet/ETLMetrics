@@ -1,0 +1,247 @@
+package co.edu.uniandes.proyectoautomatizacion;
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.location.Location;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTabHost;
+import android.support.v4.app.FragmentTransaction;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+[%for(frag in act.fragments){%]import co.edu.uniandes.proyectoautomatizacion.widget.[%=frag.name%];
+[%
+%]
+[%}%]
+[%
+if(act.fragments.select(f|f.isKindOf(android!PromoFragment)).size() > 0){
+%]
+import co.edu.uniandes.proyectoautomatizacion.adapter.PromoListAdapter;
+import co.edu.uniandes.proyectoautomatizacion.database.PromocionDb;
+import co.edu.uniandes.proyectoautomatizacion.widget.PromoDetallesFragment;
+[%
+}
+%]
+[%
+if(act.fragments.select(f|f.isKindOf(android!MapFragment)).size() > 0){
+%]
+import co.edu.uniandes.proyectoautomatizacion.widget.UbicacionFragment;
+import co.edu.uniandes.proyectoautomatizacion.database.UbicacionDb;
+[%
+}
+%]
+[%
+if(act.fragments.select(f|f.isKindOf(android!CatalogFragment)).size() > 0){
+%]
+import co.edu.uniandes.proyectoautomatizacion.database.CategoriaDb;
+import co.edu.uniandes.proyectoautomatizacion.database.ProductoDb;
+import co.edu.uniandes.proyectoautomatizacion.widget.CatalogoDetallesFragment;
+[%
+}
+%]
+import co.edu.uniandes.proyectoautomatizacion.widget.WebFragment;
+
+
+public class [%=act.name%] extends FragmentActivity [%if(act.fragments.select(f|f.isKindOf(android!Fragment)).size()>0){%]implements [%}%] 
+[%if(act.fragments.select(f|f.isKindOf(android!CatalogFragment)).size()>0){%] CatalogoDetallesFragment.CatalogoDetallesClickListener,[%}%]
+[%if(act.fragments.select(f|f.isKindOf(android!PromoFragment)).size()>0){%] PromoListAdapter.PromoViewHolder.PromoClickListener, PromoDetallesFragment.DetallePromoClickListener, 
+[%}%]
+[%for(frag in act.fragments){
+	if(frag.isKindOf(android!CatalogFragment)){%][%=frag.name%].CategoriaClickListener[%if(frag = act.fragments.last()){}else{%], [%}%] [%}
+	if(frag.isKindOf(android!PromoFragment)){%][%=frag.name%].PromoListClickListener[%if(frag = act.fragments.last()){}else{%], [%}%] [%}
+	if(frag.isKindOf(android!MapFragment)){%][%=frag.name%].OnMapMarkerClickedListener[%if(frag = act.fragments.last()){}else{%], [%}%] [%}
+	if(frag.isKindOf(android!ContactoFragment)){%][%=frag.name%].ContactoClickListener[%if(frag = act.fragments.last()){}else{%], [%}%] [%}
+%]
+[%}%] {
+
+    private static String TAG = [%=act.name%].class.getSimpleName();
+    private FragmentTabHost mTabHost;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+    
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.[%=act.name.toLowerCase()%]);
+
+        mTabHost = (FragmentTabHost)findViewById(android.R.id.tabhost);
+        mTabHost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
+
+[%for(frag in act.fragments){
+	if(frag.isKindOf(android!CatalogFragment)){
+	%]
+		mTabHost.addTab(mTabHost.newTabSpec("[%=frag.name.toLowerCase()%]").setIndicator(getTabIndicator(mTabHost.getContext(), "Catalogo", R.drawable.menu2)),
+                [%=frag.name%].class, null);
+                
+	[%}
+	if(frag.isKindOf(android!PromoFragment)){
+	%]
+		mTabHost.addTab(mTabHost.newTabSpec("[%=frag.name.toLowerCase()%]").setIndicator(getTabIndicator(mTabHost.getContext(), "Promos", R.drawable.menu3)),
+                [%=frag.name%].class, null);
+                
+	[%}
+	if(frag.isKindOf(android!MapFragment)){
+	%]
+		mTabHost.addTab(mTabHost.newTabSpec("[%=frag.name.toLowerCase()%]").setIndicator(getTabIndicator(mTabHost.getContext(), "Mapa", R.drawable.menu5)),
+                [%=frag.name%].class, null);
+                
+	[%}
+	if(frag.isKindOf(android!ContactoFragment)){
+	%]
+		mTabHost.addTab(mTabHost.newTabSpec("[%=frag.name.toLowerCase()%]").setIndicator(getTabIndicator(mTabHost.getContext(), "Contacto", R.drawable.menu6)),
+                [%=frag.name%].class, null);
+                
+	[%}
+%]
+[%}%]
+
+    }
+
+    private View getTabIndicator(Context context, String title, int icon) {
+        View view = LayoutInflater.from(context).inflate(R.layout.tab_layout, null);
+        ImageView iv = (ImageView) view.findViewById(R.id.imageView);
+        iv.setImageResource(icon);
+        TextView tv = (TextView) view.findViewById(R.id.textView);
+        tv.setText(title);
+        return view;
+    }
+    
+[%
+if(act.fragments.select(f|f.isKindOf(android!CatalogFragment)).size() > 0){
+%]
+    @Override
+    public void onCategoriaClick(CategoriaDb cat) {
+
+        Bundle args = new Bundle();
+        args.putSerializable(CatalogoDetallesFragment.CATEGORIAS, cat);
+
+        CatalogoDetallesFragment f = new CatalogoDetallesFragment();
+        f.setArguments(args);
+
+        getSupportFragmentManager().beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .add(R.id.catalogoFrameLayout, f)
+                .addToBackStack(null)
+                .commit();
+    }
+    
+    @Override
+    public void onComprarProductoClick(ProductoDb p) {
+        Bundle args = new Bundle();
+        args.putSerializable(WebFragment.URL_ARG, p.getUrl());
+
+        WebFragment webFragment = new WebFragment();
+        webFragment.setArguments(args);
+
+        getSupportFragmentManager().beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .add(R.id.catalogoDetallesFrame, webFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+    
+    @Override
+    public void onImagenSlideCatalogoDetallesClick(ProductoDb img) {
+
+    }
+    
+[%}%]
+[%
+if(act.fragments.select(f|f.isKindOf(android!PromoFragment)).size() > 0){
+%]
+    @Override
+    public void onPromoClick(View v, int position, boolean isLongClick) {
+
+    }
+
+    @Override
+    public void onPromoListClick(PromocionDb prom) {
+
+    }
+    
+    @Override
+    public void onIrTiendaDetallePromoClick(String url) {
+
+    }
+
+[%}%]
+[%
+if(act.fragments.select(f|f.isKindOf(android!MapFragment)).size() > 0){
+%]
+    @Override
+    public void omMapMarkerClick(UbicacionDb seleccionada, Location ubicacionActual) {
+
+        double[] latLongActuales = new double[2];
+
+        if(ubicacionActual != null) {
+            latLongActuales[0] = ubicacionActual.getLatitude();
+            latLongActuales[1] = ubicacionActual.getLongitude();
+        }
+
+
+        Bundle args = new Bundle();
+        args.putSerializable(UbicacionFragment.UBICACION_ARG, seleccionada);
+        args.putDoubleArray(UbicacionFragment.UBICACION_ACTUAL_ARG, latLongActuales);
+
+        UbicacionFragment f = new UbicacionFragment();
+        f.setArguments(args);
+
+        getSupportFragmentManager().beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .add(R.id.mapFrame, f)
+                .addToBackStack(null)
+                .commit();
+
+    }
+
+[%}%]
+[%
+if(act.fragments.select(f|f.isKindOf(android!ContactoFragment)).size() > 0){
+%]    
+    @Override
+    public void onIrTiendaContactoClick() {
+        Bundle args = new Bundle();
+        args.putSerializable(WebFragment.URL_ARG, getString(R.string.url_pagina));
+
+        WebFragment webFragment = new WebFragment();
+        webFragment.setArguments(args);
+
+        getSupportFragmentManager().beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .add(R.id.contactoFrame, webFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+[%}%]   
+    @Override
+    public void onBackPressed() {
+
+        System.out.println("back pressed main!");
+        FragmentManager fm = getSupportFragmentManager();
+
+        System.out.println("BackStack count: " + fm.getBackStackEntryCount());
+
+        if (fm.getBackStackEntryCount() > 0) {
+            super.onBackPressed();
+        } else {
+            new AlertDialog.Builder(this)
+                    .setTitle("Confirmacion")
+                    .setMessage("Deseas salir de la app?")
+                    .setNegativeButton("No", null)
+                    .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            System.exit(0);
+                        }
+                    }).create().show();
+        }
+
+    }
+
+}

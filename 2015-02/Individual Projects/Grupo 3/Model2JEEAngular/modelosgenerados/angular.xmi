@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="ASCII"?>
+<angular:Aplicacion xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:angular="http://www.example.org/angular" nombre="SistemaGestionUniversitario">
+  <vistas nombre="PersonaLista" entidad="persona">
+    <navegaciones nombre="Detalle Persona" destino="PersonaDetalle"/>
+    <controlador nombre="PersonaListaCtrl">
+      <servicios nombre="PersonaListar" entidad="Persona"/>
+    </controlador>
+    <secciones nombre="Lista">
+      <elementos nombre="Persona Tabla" valor="persona">
+        <hijos nombre="Nombre" tipoElemento="COLUMNA" valor="nombre"/>
+        <hijos nombre="Apellido" tipoElemento="COLUMNA" valor="apellido"/>
+        <hijos nombre="Documento" tipoElemento="COLUMNA" valor="documento"/>
+        <hijos nombre="Direccion" tipoElemento="COLUMNA" valor="direccion"/>
+        <hijos nombre="Edad" tipoElemento="COLUMNA" valor="edad"/>
+        <hijos nombre="ViveBogota" tipoElemento="COLUMNA" valor="vivebogota"/>
+      </elementos>
+    </secciones>
+  </vistas>
+  <vistas nombre="PersonaDetalle" tipo="FORMULARIO" entidad="persona">
+    <navegaciones nombre="Lista Persona" destino="PersonaLista"/>
+    <controlador nombre="PersonaDetalleCtrl">
+      <servicios nombre="PersonaDetalle" tipoServicio="CONSULTAR" entidad="Persona"/>
+      <servicios nombre="PersonaAgregar" tipoServicio="AGREGAR" entidad="Persona"/>
+      <servicios nombre="PersonaModificar" tipoServicio="MODIFICAR" entidad="Persona"/>
+      <servicios nombre="PersonaEliminar" tipoServicio="ELIMINAR" entidad="Persona"/>
+    </controlador>
+    <secciones nombre="Detalle" tipoSeccion="FORMULARIO">
+      <elementos nombre="Nombre" tipoElemento="TEXTOENTRADA" valor="Nombre"/>
+      <elementos nombre="Apellido" tipoElemento="TEXTOENTRADA" valor="Apellido"/>
+      <elementos nombre="Documento" tipoElemento="TEXTOENTRADA" valor="Documento"/>
+      <elementos nombre="Direccion" tipoElemento="TEXTOENTRADA" valor="Direccion"/>
+      <elementos nombre="Edad" tipoElemento="NUMERO" valor="Edad"/>
+      <elementos nombre="ViveBogota" tipoElemento="SELECCIONUNICA" valor="ViveBogota"/>
+      <acciones nombre="Guardar"/>
+      <acciones nombre="Eliminar" tipoAccion="ELIMINAR"/>
+    </secciones>
+  </vistas>
+  <vistas nombre="CursoLista" entidad="curso">
+    <navegaciones nombre="Detalle Curso" destino="CursoDetalle"/>
+    <controlador nombre="CursoListaCtrl">
+      <servicios nombre="CursoListar" entidad="Curso"/>
+    </controlador>
+    <secciones nombre="Lista">
+      <elementos nombre="Curso Tabla" valor="curso">
+        <hijos nombre="Nombre" tipoElemento="COLUMNA" valor="nombre"/>
+        <hijos nombre="Profesor" tipoElemento="COLUMNA" valor="profesor">
+          <hijos nombre="Codigo" tipoElemento="TEXTOENTRADA" valor="Codigo"/>
+        </hijos>
+      </elementos>
+    </secciones>
+  </vistas>
+  <vistas nombre="CursoDetalle" tipo="FORMULARIO" entidad="curso">
+    <navegaciones nombre="Lista Curso" destino="CursoLista"/>
+    <controlador nombre="CursoDetalleCtrl">
+      <servicios nombre="CursoDetalle" tipoServicio="CONSULTAR" entidad="Curso"/>
+      <servicios nombre="CursoAgregar" tipoServicio="AGREGAR" entidad="Curso"/>
+      <servicios nombre="CursoModificar" tipoServicio="MODIFICAR" entidad="Curso"/>
+      <servicios nombre="CursoEliminar" tipoServicio="ELIMINAR" entidad="Curso"/>
+      <servicios nombre="Profesor" entidad="Profesor"/>
+    </controlador>
+    <secciones nombre="Detalle" tipoSeccion="FORMULARIO">
+      <elementos nombre="Nombre" tipoElemento="TEXTOENTRADA" valor="Nombre"/>
+      <elementos nombre="Profesor" tipoElemento="COMBO" servicio="//@vistas.3/@controlador/@servicios.4" valor="Profesor">
+        <hijos nombre="Codigo" tipoElemento="TEXTOENTRADA"/>
+      </elementos>
+      <acciones nombre="Guardar"/>
+      <acciones nombre="Eliminar" tipoAccion="ELIMINAR"/>
+    </secciones>
+  </vistas>
+  <vistas nombre="ProfesorLista" entidad="profesor">
+    <navegaciones nombre="Detalle Profesor" destino="ProfesorDetalle"/>
+    <controlador nombre="ProfesorListaCtrl">
+      <servicios nombre="ProfesorListar" entidad="Profesor"/>
+    </controlador>
+    <secciones nombre="Lista">
+      <elementos nombre="Profesor Tabla" valor="profesor">
+        <hijos nombre="Codigo" tipoElemento="COLUMNA" valor="codigo"/>
+        <hijos nombre="Persona" tipoElemento="COLUMNA" valor="persona">
+          <hijos nombre="Nombre" tipoElemento="TEXTOENTRADA" valor="Nombre"/>
+        </hijos>
+      </elementos>
+    </secciones>
+  </vistas>
+  <vistas nombre="ProfesorDetalle" tipo="FORMULARIO" entidad="profesor">
+    <navegaciones nombre="Lista Profesor" destino="ProfesorLista"/>
+    <controlador nombre="ProfesorDetalleCtrl">
+      <servicios nombre="ProfesorDetalle" tipoServicio="CONSULTAR" entidad="Profesor"/>
+      <servicios nombre="ProfesorAgregar" tipoServicio="AGREGAR" entidad="Profesor"/>
+      <servicios nombre="ProfesorModificar" tipoServicio="MODIFICAR" entidad="Profesor"/>
+      <servicios nombre="ProfesorEliminar" tipoServicio="ELIMINAR" entidad="Profesor"/>
+    </controlador>
+    <secciones nombre="Detalle" tipoSeccion="FORMULARIO">
+      <elementos nombre="Codigo" tipoElemento="TEXTOENTRADA" valor="Codigo"/>
+      <elementos nombre="Nombre" tipoElemento="TEXTOENTRADA" valor="Nombre"/>
+      <elementos nombre="Apellido" tipoElemento="TEXTOENTRADA" valor="Apellido"/>
+      <elementos nombre="Documento" tipoElemento="TEXTOENTRADA" valor="Documento"/>
+      <elementos nombre="Direccion" tipoElemento="TEXTOENTRADA" valor="Direccion"/>
+      <elementos nombre="Edad" tipoElemento="NUMERO" valor="Edad"/>
+      <elementos nombre="ViveBogota" tipoElemento="SELECCIONUNICA" valor="ViveBogota"/>
+      <acciones nombre="Guardar"/>
+      <acciones nombre="Eliminar" tipoAccion="ELIMINAR"/>
+    </secciones>
+  </vistas>
+</angular:Aplicacion>

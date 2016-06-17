@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>[%=angularModel!Application.allInstances().get(0).name%]</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+  <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+  <!-- build:css(.) styles/vendor.css -->
+  <!-- bower:css -->
+  <link rel="stylesheet" href="bower_components/bootstrap-css-only/css/bootstrap.css" />
+  <!-- endbower -->
+  <!-- endbuild -->
+  <!-- build:css(.tmp) styles/main.css -->
+  <link rel="stylesheet" href="styles/main.css">
+  <!-- endbuild -->
+</head>
+<body ng-app="uiApp">
+    <!--[if lte IE 8]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+      <![endif]-->
+
+      <!-- Add your site or application content here -->
+      <div class="header">
+        <div class="navbar navbar-default" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+
+              <a class="navbar-brand" href="#/">[%=angularModel!Application.allInstances().get(0).name%]</a>
+            </div>
+
+            <div class="">
+
+              <ul class="nav navbar-nav">
+              [%for(crud in angularModel!Crud.allInstances()){%]
+                <li >
+                  <a href="#/[%= crud.service.name.toLowerCase().replace(' ','_')%]s">
+                    [%= crud.service.name%]
+                  </a>
+                 </li>
+              [%}%]
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div ng-view=""></div>
+      </div>
+
+      <div class="footer">
+        <div class="container">
+
+        </div>
+      </div>
+
+    <!-- build:js(.) scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="bower_components/angular-paginate-anything/dist/paginate-anything-tpls.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/angular-underscore-module/angular-underscore-module.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+
+     <!-- build:js({.tmp,app}) scripts/scripts.js -->
+     <script src="scripts/app.js"></script>
+     [%
+     	
+     	for (service in angularModel!Application.getAllInstances().get(0).services){
+     		var filename = service.name.toLowerCase();
+     		%]
+     <script src="scripts/services/[%=filename%].js"></script>
+     		[%
+     	}
+     %]
+     <script src="scripts/controllers/main.js"></script>
+     
+     [%
+     	for(crud in angularModel!Application.getAllInstances().get(0).cruds){
+     		if(crud.allowCreate){
+     			out.println('<script src="scripts/controllers/'+crud.service.name.toLowerCase()+'s_new.js"></script>');
+     		}
+     		if(crud.allowRead or crud.allowDelete){
+     			out.println('<script src="scripts/controllers/'+crud.service.name.toLowerCase()+'s.js"></script>');
+     		}
+     		if(crud.allowUpdate){
+     			out.println('<script src="scripts/controllers/'+crud.service.name.toLowerCase()+'s_edit.js"></script>');
+     		}
+     	}
+     %]
+     
+     <script src="/scripts/config.js" />
+
+     <!-- endbuild -->
+   </body>
+   </html>

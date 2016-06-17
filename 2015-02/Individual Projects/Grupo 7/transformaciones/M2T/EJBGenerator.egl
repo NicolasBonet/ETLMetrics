@@ -1,0 +1,28 @@
+[%
+
+	for(ejb in JEE!EJB.all){
+		if(ejbName == ejb.name)
+		{
+			
+			%]
+package edu.uniandes.co.jee.ejb;
+			
+public class [%=ejbName%] 
+{
+	[% 
+		for (method in ejb.bussinesMethods){
+	%]
+	
+	public [%=method.`return`%] [%=method.name%] ([% for (atr in method.attributes){  %][%=atr.type%] [%=atr.name%][% if(atr.name == method.attributes.last().name){}else{%],[%}} %]){
+	
+		[%=method.code%]
+	}
+	
+	[%				
+		}
+	%]	
+}	
+			[%
+		}		
+	}
+%]

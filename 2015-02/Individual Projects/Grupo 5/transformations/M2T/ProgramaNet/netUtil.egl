@@ -1,0 +1,45 @@
+[%
+  operation CS!Propiedad getDataType() : String {
+
+    	if (self.tipo = CS!TipoDato#string) {
+    		return "string";
+    	}
+    	
+    	if (self.tipo = CS!TipoDato#int) {
+    		return "int";
+    	}
+    	
+    	if (self.tipo = CS!TipoDato#decimal) {
+    		return "decimal";
+    	}
+  }
+  
+  operation CS!Propiedad getCSName() : String {
+  
+  		var parts = self.nombre.split("-");
+  		var returnValue;
+  		
+  		if (parts.size() > 1) {
+  		
+  			var index = 0;
+  			var parsedValue = "";
+  			var delim = "";
+  			
+  		  	for (p in parts) {
+  				if (index > 0) {
+  					parsedValue = parsedValue + delim + p;
+  					delim = "_";
+  				}
+  				
+  				index = index + 1;
+  			}
+  			
+  			returnValue = parsedValue;
+  		}
+  		else {
+  			returnValue = self.nombre;
+  		}
+  		
+  		return returnValue.replace("-", "_").replace("\\.", "_");
+  }
+%]

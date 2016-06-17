@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Bolsa de Empleo</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="css/main.css">
+    </head>
+	<body>
+<div  class='container' >
+<div  class='row' >
+<div  id='PanelImagen'   class='col-md-12  jumbotron' >
+<fieldset class='scheduler-border'>
+<legend class='scheduler-border'></legend>
+<img src='data/titulo.png' style='width:100%'>
+</fieldset>
+
+</div>
+
+</div>
+
+<div  class='row' >
+<div  id='PanelListaVehiculos'   class='col-md-6' >
+<fieldset class='scheduler-border'>
+<legend class='scheduler-border'>Veh�culos a la Venta</legend>
+<select SINGLE_SELECTION  size='5' ></select>
+<div  class='col-md-4' >
+</div>
+
+</fieldset>
+
+</div>
+
+<div  id='PanelDatosVehiculo'   class='col-md-6' >
+<fieldset class='scheduler-border'>
+<legend class='scheduler-border'>Datos del Veh�culo</legend>
+<label>Modelo: </label>
+<input type='text' id='' value=''><br/>
+<label>Marca: </label>
+<input type='text' id='' value=''><br/>
+<label>Tipo: </label>
+<input type='text' id='' value=''><br/>
+<label>A�o: </label>
+<input type='text' id='' value=''><br/>
+<label>Cilindrada: </label>
+<input type='text' id='' value=''><br/>
+<label>Ejes: </label>
+<input type='text' id='' value=''><br/>
+<label>Valor: </label>
+<input type='text' id='' value=''><br/>
+<table><tr><td></td>
+</tr>
+</table>
+</fieldset>
+
+</div>
+
+</div>
+
+<div  class='row' >
+<div  id='PanelConsultasOperaciones'   class='col-md-6' >
+<fieldset class='scheduler-border'>
+<legend class='scheduler-border'>Consultas y Operaciones</legend>
+<input type='button' value='Agregar Veh�culo'>
+<input type='button' value='Comprar Veh�culo'>
+<input type='button' value='Disminuir Precio'>
+<input type='button' value='M�s Antiguo'>
+<input type='button' value='M�s Econ�mico'>
+<input type='button' value='M�s Potente'>
+</fieldset>
+
+</div>
+
+<div  id='PanelBusquedaOrdenamiento'   class='col-md-6' >
+<fieldset class='scheduler-border'>
+<legend class='scheduler-border'>B�squeda y Ordenamientos</legend>
+<input type='button' value='Ordenar por Marca'>
+<input type='button' value='Ordenar por A�o'>
+<input type='button' value='Ordenar por Cilindrada'>
+<input type='button' value='Buscar Veh�culo'>
+</fieldset>
+
+</div>
+
+</div>
+
+<div  class='row' >
+<div  id='PanelExtension'   class='col-md-12' >
+<fieldset class='scheduler-border'>
+<legend class='scheduler-border'>Puntos de Extensi�n</legend>
+<input type='button' value='Opci�n 1'>
+<input type='button' value='Opci�n 2'>
+</fieldset>
+
+</div>
+
+</div>
+
+</div>
+
+	</body>
+</html>
+
+

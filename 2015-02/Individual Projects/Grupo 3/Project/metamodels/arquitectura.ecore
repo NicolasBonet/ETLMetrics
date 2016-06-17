@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="arquitectura" nsURI="http://www.example.org/arquitectura" nsPrefix="arquitectura">
+  <eClassifiers xsi:type="ecore:EClass" name="Capa">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="clases" upperBound="-1"
+        eType="#//Entidad" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Sistema">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="dominio" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="proyecto_negocio" lowerBound="1"
+        eType="#//ProyectoNegocio" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="proyecto_web" lowerBound="1"
+        eType="#//ProyectoWeb" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entidades" lowerBound="1"
+        upperBound="-1" eType="#//Entidad" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CapaPresentacion" eSuperTypes="#//Capa">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="vistas" lowerBound="1"
+        upperBound="-1" eType="#//Vista" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CapaServicio" eSuperTypes="#//Capa"/>
+  <eClassifiers xsi:type="ecore:EClass" name="CapaNegocio" eSuperTypes="#//Capa"/>
+  <eClassifiers xsi:type="ecore:EClass" name="CapaEntidad" eSuperTypes="#//Capa"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Vista">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipo" eType="#//ETipoVista"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entidad" lowerBound="1"
+        eType="#//Entidad"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ProyectoWeb">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="capa_presentacion" lowerBound="1"
+        eType="#//CapaPresentacion" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ProyectoNegocio">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="capas" lowerBound="1" upperBound="3"
+        eType="#//Capa" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="VistaEntidad">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipo" eType="#//ETipoVista"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Relacion">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="destino" lowerBound="1"
+        eType="#//Entidad"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="multiplicidadOrigen" eType="#//ETipoMultiplicidad"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="multiplicidadDestino" eType="#//ETipoMultiplicidad"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipo" eType="#//ETipoRelacion"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ETipoVista">
+    <eLiterals name="LISTA"/>
+    <eLiterals name="DETALLE" value="1"/>
+    <eLiterals name="AGREGAR" value="2"/>
+    <eLiterals name="MODIFICAR" value="3"/>
+    <eLiterals name="ELIMINAR" value="4"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Entidad">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="atributos" lowerBound="1"
+        upperBound="-1" eType="#//Atributo" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="relaciones" upperBound="-1"
+        eType="#//Relacion" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Atributo">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="validaciones" upperBound="-1"
+        eType="#//Validacion" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipoDato" eType="#//TipoDato"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Validacion">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="valor" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipoValidacion" eType="#//TipoValidacionA"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ETipoRelacion">
+    <eLiterals name="HERENCIA"/>
+    <eLiterals name="AGREGACION" value="1"/>
+    <eLiterals name="COMPOSICION" value="2"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ETipoMultiplicidad">
+    <eLiterals name="CERO"/>
+    <eLiterals name="UNO" value="1"/>
+    <eLiterals name="MUCHOS" value="-1"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TipoDato">
+    <eLiterals name="CadenaTexto"/>
+    <eLiterals name="Numerico"/>
+    <eLiterals name="Entero"/>
+    <eLiterals name="Fecha"/>
+    <eLiterals name="FechaHora"/>
+    <eLiterals name="Booleano"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TipoValidacionA">
+    <eLiterals name="IGUAL"/>
+    <eLiterals name="OBLIGATORIO"/>
+    <eLiterals name="MAYORIGUAL"/>
+    <eLiterals name="MENORIGUAL"/>
+    <eLiterals name="PATRON"/>
+  </eClassifiers>
+</ecore:EPackage>

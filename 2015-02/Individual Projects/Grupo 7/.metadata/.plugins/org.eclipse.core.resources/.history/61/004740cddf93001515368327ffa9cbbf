@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:html5="http://www.example.org/html5">
+  <html5:html>
+    <container xsi:type="html5:div" class="container">
+      <innercontainer xsi:type="html5:div" class="row">
+        <innercontainer xsi:type="html5:div" class="col-md-12  jumbotron" id="PanelImagen">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:img" src="data/titulo.png"/>
+            <legend valor=""/>
+          </innercontainer>
+        </innercontainer>
+      </innercontainer>
+      <innercontainer xsi:type="html5:div" class="row">
+        <innercontainer xsi:type="html5:div" class="col-md-6" id="PanelListaVehiculos">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:select" multiple="SINGLE_SELECTION " size="5"/>
+            <elements xsi:type="html5:div"/>
+            <legend valor="Veh&#xfffd;culos a la Venta"/>
+          </innercontainer>
+        </innercontainer>
+        <innercontainer xsi:type="html5:div" class="col-md-6" id="PanelDatosVehiculo">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:label" value="Modelo: "/>
+            <elements xsi:type="html5:input" value=""/>
+            <elements xsi:type="html5:label" value="Marca: "/>
+            <elements xsi:type="html5:input" value=""/>
+            <elements xsi:type="html5:label" value="Tipo: "/>
+            <elements xsi:type="html5:input" value=""/>
+            <elements xsi:type="html5:label" value="A&#xfffd;o: "/>
+            <elements xsi:type="html5:input" value=""/>
+            <elements xsi:type="html5:label" value="Cilindrada: "/>
+            <elements xsi:type="html5:input" value=""/>
+            <elements xsi:type="html5:label" value="Ejes: "/>
+            <elements xsi:type="html5:input" value=""/>
+            <elements xsi:type="html5:label" value="Valor: "/>
+            <elements xsi:type="html5:input" value=""/>
+            <elements xsi:type="html5:table">
+              <tr>
+                <td/>
+              </tr>
+            </elements>
+            <legend valor="Datos del Veh&#xfffd;culo"/>
+          </innercontainer>
+        </innercontainer>
+      </innercontainer>
+      <innercontainer xsi:type="html5:div" class="row">
+        <innercontainer xsi:type="html5:div" class="col-md-6" id="PanelConsultasOperaciones">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:button" value="Agregar Veh&#xfffd;culo" action="AGREGAR"/>
+            <elements xsi:type="html5:button" value="Comprar Veh&#xfffd;culo" action="COMPRAR"/>
+            <elements xsi:type="html5:button" value="Disminuir Precio" action="DISMINUIR_PRECIO"/>
+            <elements xsi:type="html5:button" value="M&#xfffd;s Antiguo" action="MAS_ANTIGUO"/>
+            <elements xsi:type="html5:button" value="M&#xfffd;s Econ&#xfffd;mico" action="MAS_ECONOMICO"/>
+            <elements xsi:type="html5:button" value="M&#xfffd;s Potente" action="MAS_POTENTE"/>
+            <legend valor="Consultas y Operaciones"/>
+          </innercontainer>
+        </innercontainer>
+        <innercontainer xsi:type="html5:div" class="col-md-6" id="PanelBusquedaOrdenamiento">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:button" value="Ordenar por Marca" action="ORDENAR_MARCA"/>
+            <elements xsi:type="html5:button" value="Ordenar por A&#xfffd;o" action="ORDENAR_ANIO"/>
+            <elements xsi:type="html5:button" value="Ordenar por Cilindrada" action="ORDENAR_CILINDRADA"/>
+            <elements xsi:type="html5:button" value="Buscar Veh&#xfffd;culo" action="BUSCAR"/>
+            <legend valor="B&#xfffd;squeda y Ordenamientos"/>
+          </innercontainer>
+        </innercontainer>
+      </innercontainer>
+      <innercontainer xsi:type="html5:div" class="row">
+        <innercontainer xsi:type="html5:div" class="col-md-12" id="PanelExtension">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:button" value="Opci&#xfffd;n 1" action="OPCION_1"/>
+            <elements xsi:type="html5:button" value="Opci&#xfffd;n 2" action="OPCION_2"/>
+            <legend valor="Puntos de Extensi&#xfffd;n"/>
+          </innercontainer>
+        </innercontainer>
+      </innercontainer>
+    </container>
+  </html5:html>
+  <html5:div id="PanelAgregarVehiculo">
+    <innercontainer xsi:type="html5:fieldset">
+      <elements xsi:type="html5:table">
+        <tr>
+          <td>
+            <elements xsi:type="html5:label" value="Modelo: "/>
+          </td>
+          <td>
+            <elements xsi:type="html5:input" value=""/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <elements xsi:type="html5:label" value="Marca: "/>
+          </td>
+          <td>
+            <elements xsi:type="html5:input" value=""/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <elements xsi:type="html5:label" value="Imagen: "/>
+          </td>
+          <td>
+            <elements xsi:type="html5:table">
+              <tr>
+                <td>
+                  <elements xsi:type="html5:input" value=""/>
+                </td>
+                <td>
+                  <elements xsi:type="html5:button" value="Examinar" action="BUSCAR"/>
+                </td>
+              </tr>
+            </elements>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <elements xsi:type="html5:label" value="Tipo: "/>
+          </td>
+          <td>
+            <elements xsi:type="html5:label" value="A&#xfffd;o: "/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <elements xsi:type="html5:input" value=""/>
+          </td>
+          <td>
+            <elements xsi:type="html5:label" value="Cilindrada: "/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <elements xsi:type="html5:input" value=""/>
+          </td>
+          <td>
+            <elements xsi:type="html5:label" value="Ejes: "/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <elements xsi:type="html5:input" value=""/>
+          </td>
+          <td>
+            <elements xsi:type="html5:label" value="Valor: "/>
+          </td>
+        </tr>
+      </elements>
+      <elements xsi:type="html5:div">
+        <elements xsi:type="html5:button" value="Agregar Veh&#xfffd;culo" action="AGREGAR"/>
+      </elements>
+      <legend valor="Agregar veh&#xfffd;culo"/>
+    </innercontainer>
+  </html5:div>
+  <html5:label value=""/>
+  <html5:tr/>
+  <html5:tr>
+    <td>
+      <elements xsi:type="html5:input" value=""/>
+    </td>
+  </html5:tr>
+</xmi:XMI>

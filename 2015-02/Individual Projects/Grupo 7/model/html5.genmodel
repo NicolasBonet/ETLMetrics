@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/Html5/src" modelPluginID="Html5" modelName="Html5"
+    rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="8.0" copyrightFields="false" operationReflection="true" importOrganizing="true">
+  <foreignModel>html5.ecore</foreignModel>
+  <genPackages prefix="Html5" disposableProviderFactory="true" ecorePackage="html5.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="html5.ecore#//types">
+      <genEnumLiterals ecoreEnumLiteral="html5.ecore#//types/text"/>
+      <genEnumLiterals ecoreEnumLiteral="html5.ecore#//types/number"/>
+      <genEnumLiterals ecoreEnumLiteral="html5.ecore#//types/button"/>
+    </genEnums>
+    <genClasses ecoreClass="html5.ecore#//div"/>
+    <genClasses ecoreClass="html5.ecore#//table">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference html5.ecore#//table/tr"/>
+    </genClasses>
+    <genClasses ecoreClass="html5.ecore#//tr">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference html5.ecore#//tr/td"/>
+    </genClasses>
+    <genClasses ecoreClass="html5.ecore#//td">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference html5.ecore#//td/elements"/>
+    </genClasses>
+    <genClasses ecoreClass="html5.ecore#//htmElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute html5.ecore#//htmElement/class"/>
+    </genClasses>
+    <genClasses ecoreClass="html5.ecore#//img"/>
+    <genClasses ecoreClass="html5.ecore#//label"/>
+    <genClasses ecoreClass="html5.ecore#//Input">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute html5.ecore#//Input/type"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute html5.ecore#//Input/value"/>
+    </genClasses>
+    <genClasses ecoreClass="html5.ecore#//button">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute html5.ecore#//button/type"/>
+    </genClasses>
+    <genClasses ecoreClass="html5.ecore#//body">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference html5.ecore#//body/container"/>
+    </genClasses>
+    <genClasses ecoreClass="html5.ecore#//select">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference html5.ecore#//select/options"/>
+    </genClasses>
+    <genClasses ecoreClass="html5.ecore#//option"/>
+    <genClasses ecoreClass="html5.ecore#//fieldset">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference html5.ecore#//fieldset/legend"/>
+    </genClasses>
+    <genClasses ecoreClass="html5.ecore#//html">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference html5.ecore#//html/body"/>
+    </genClasses>
+    <genClasses ecoreClass="html5.ecore#//dialog"/>
+    <genClasses ecoreClass="html5.ecore#//legend">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute html5.ecore#//legend/class"/>
+    </genClasses>
+    <genClasses ecoreClass="html5.ecore#//container">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute html5.ecore#//container/class"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference html5.ecore#//container/elements"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference html5.ecore#//container/innercontainer"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

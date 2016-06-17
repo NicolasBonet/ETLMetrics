@@ -1,0 +1,33 @@
+[% import '../netUtil.egl'; %]
+@model cobiwsite.Models.ReportEntrada
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/jqueryval")
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Reporte [%=CS!Programa.all.first().nombre%]</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+[%
+var vista = CS!Vista.all.select(m|m.esEntrada).first();
+for(e in vista.elementos) {
+%]
+        <div class="form-group">
+            @Html.LabelFor(model => model.[%=e.propiedad.getCSName()%], htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.[%=e.propiedad.getCSName()%], new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.[%=e.propiedad.getCSName()%], "", new { @class = "text-danger" })
+            </div>
+        </div>
+[%}%]
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Consulta" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}

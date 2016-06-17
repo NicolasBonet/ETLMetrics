@@ -1,0 +1,28 @@
+package co.com.ap.model;
+
+public class [%= (mergeField.tableName.removerComillas()).firstToUpperCase()%]MergerField {
+	
+	[%
+	for(field in mergeField.fields){%]
+	public static String get[%=(field.name.removerComillas()).firstToUpperCase()%]([%= (mergeField.tableName.removerComillas()).firstToUpperCase()%] [%= mergeField.tableName.removerComillas()%]){
+		String [%=field.name%]cadena = null;
+		[% var contador = 0;
+		for(atributeName in mergeField.attributeNames.select(c | c.finalField.name.removerComillas().equals(field.name.removerComillas()))){
+			if(contador == 0){%]
+		if([%= mergeField.tableName.removerComillas()%].get[%= (atributeName.oldField.removerComillas()).firstToUpperCase()%]()!=null && ![%= mergeField.tableName.removerComillas()%].get[%= (atributeName.oldField.removerComillas()).firstToUpperCase()%]().toString().trim().equals("")){
+			[%=field.name.removerComillas()%]cadena = "" +[%= mergeField.tableName.removerComillas()%].get[%= (atributeName.oldField.removerComillas()).firstToUpperCase()%]();			
+		}
+			[%}else{%]
+		else if([%= mergeField.tableName.removerComillas()%].get[%= (atributeName.oldField.removerComillas()).firstToUpperCase()%]()!=null && ![%= mergeField.tableName.removerComillas()%].get[%= (atributeName.oldField.removerComillas()).firstToUpperCase()%]().toString().trim().equals("")){
+			[%=field.name.removerComillas()%]cadena = "" +[%= mergeField.tableName.removerComillas()%].get[%= (atributeName.oldField.removerComillas()).firstToUpperCase()%]();			
+		}	
+		[% }contador = contador + 1;}%]
+		return [%=field.name.removerComillas()%]cadena;
+	}
+	[%}%]	
+}
+[%
+	operation String removerComillas(){
+		return self.replace("\"","");	
+	}
+%]

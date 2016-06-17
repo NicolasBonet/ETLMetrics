@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/Cobiw/src" modelPluginID="Cobiw" modelName="Cobiw"
+    rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="7.0" copyrightFields="false" operationReflection="true" importOrganizing="true">
+  <foreignModel>cobiw.ecore</foreignModel>
+  <genPackages prefix="Cobiw" disposableProviderFactory="true" ecorePackage="cobiw.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="cobiw.ecore#//TipoPrograma">
+      <genEnumLiterals ecoreEnumLiteral="cobiw.ecore#//TipoPrograma/linea"/>
+      <genEnumLiterals ecoreEnumLiteral="cobiw.ecore#//TipoPrograma/batch"/>
+      <genEnumLiterals ecoreEnumLiteral="cobiw.ecore#//TipoPrograma/join"/>
+      <genEnumLiterals ecoreEnumLiteral="cobiw.ecore#//TipoPrograma/lineaBalance"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="cobiw.ecore#//TipoVariable">
+      <genEnumLiterals ecoreEnumLiteral="cobiw.ecore#//TipoVariable/numerica"/>
+      <genEnumLiterals ecoreEnumLiteral="cobiw.ecore#//TipoVariable/caracter"/>
+    </genEnums>
+    <genClasses ecoreClass="cobiw.ecore#//Variable">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cobiw.ecore#//Variable/nombre"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cobiw.ecore#//Variable/tipo"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cobiw.ecore#//Variable/longitud"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cobiw.ecore#//Variable/precision"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cobiw.ecore#//Variable/esOccurs"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cobiw.ecore#//Variable/esLlave"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cobiw.ecore#//Variable/conformada"/>
+    </genClasses>
+    <genClasses ecoreClass="cobiw.ecore#//Join">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cobiw.ecore#//Join/nomArchivoSalida"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cobiw.ecore#//Join/referenciaDestino"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cobiw.ecore#//Join/referenciaOrigen"/>
+    </genClasses>
+    <genClasses ecoreClass="cobiw.ecore#//Programa">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cobiw.ecore#//Programa/contiene"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cobiw.ecore#//Programa/usa"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cobiw.ecore#//Programa/tipo"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cobiw.ecore#//Programa/nombre"/>
+    </genClasses>
+    <genClasses ecoreClass="cobiw.ecore#//Copy">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cobiw.ecore#//Copy/compuesto"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cobiw.ecore#//Copy/nombreArchivo"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cobiw.ecore#//Copy/esEntrada"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

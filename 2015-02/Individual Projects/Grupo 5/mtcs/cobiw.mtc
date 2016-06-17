@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.mtcflow.model:MTC xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:com.mtcflow.model="http://com.mtcflow.mtc/1.1" M2TTechnology="EGL">
+  <files name="ProgramaNet"/>
+  <files name="ProgramaCobolJoin"/>
+  <files name="ProgramaCobolLinea"/>
+  <metamodels name="Cobiw" URI="cobiw.ecore" alias="Cobiw"/>
+  <metamodels name="CSharp" URI="csharp.ecore" alias="CSharp"/>
+  <models name="ProgramaCobiw" URI="ProgramaCobiw.xmi" technology="" metamodels="//@metamodels.0"/>
+  <models name="ProgramaCSharp" URI="ProgramaCSharp.xmi" metamodels="//@metamodels.1"/>
+  <inputModels model="//@models.0" modelAlias="CobiwMM" transformation="//@transformations.0"/>
+  <inputModels model="//@models.1" modelAlias="CS" transformation="//@transformations.1" metamodelAlias="CS"/>
+  <inputModels model="//@models.0" modelAlias="PC" transformation="//@transformations.2" metamodelAlias="PC"/>
+  <inputModels model="//@models.0" modelAlias="PC" transformation="//@transformations.3" metamodelAlias="PC"/>
+  <transformations xsi:type="com.mtcflow.model:M2MTransformation" name="Cobiw2CSharp" URI="cobiw2CSharp.etl" technology=""/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="getNetApplication" URI="ProgramaNet/getNetApplication.egl" target="gen"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="CobolJoin" URI="ProgramaCobol/SaveGeneracionJoin.egl" implementationClass="" target="gen"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="CobolLinea" URI="ProgramaCobol/SaveGeneracionLineaBalance.egl" implementationClass="" target="gen"/>
+  <outputModels modelAlias="CSharpMM" model="//@models.1" transformation="//@transformations.0"/>
+  <outputFiles transformation="//@transformations.1" file="//@files.0"/>
+  <outputFiles transformation="//@transformations.2" file="//@files.1"/>
+  <outputFiles transformation="//@transformations.3" file="//@files.2"/>
+</com.mtcflow.model:MTC>

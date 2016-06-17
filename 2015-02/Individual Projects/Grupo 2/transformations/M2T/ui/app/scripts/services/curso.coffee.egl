@@ -1,0 +1,15 @@
+'use strict'
+
+###*
+ # @ngdoc service
+ # @name uiApp.Curso
+ # @description
+ # # Curso
+ # Factory in the uiApp.
+###
+angular.module 'uiApp'
+  .factory 'Curso', ($resource, ENV)->
+    $resource(ENV.api+'/admin/cursos/:id.json',
+       {id:'@id'}, {
+        update: {method:'PUT'}
+      });

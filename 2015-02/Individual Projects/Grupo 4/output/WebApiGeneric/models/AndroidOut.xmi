@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ASCII"?>
+<webApiGeneric:AndroidCore xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:webApiGeneric="http://www.example.org/webApiGeneric">
+  <activities nombre="CiudadDTO">
+    <propiedades nombre="Id" label="Id"/>
+    <propiedades nombre="Nombre" label="Nombre">
+      <formElement xsi:type="webApiGeneric:EditText"/>
+    </propiedades>
+  </activities>
+  <activities nombre="EstudianteDTO">
+    <propiedades nombre="Id" esOculto="true" label="Id"/>
+    <propiedades nombre="Nombre" label="Nombre">
+      <formElement xsi:type="webApiGeneric:EditText"/>
+    </propiedades>
+    <propiedades nombre="Apellido" label="Apellido">
+      <formElement xsi:type="webApiGeneric:EditText"/>
+    </propiedades>
+    <propiedades nombre="Sexo" label="Sexo">
+      <formElement xsi:type="webApiGeneric:Radiobutton">
+        <opciones nombre="Mujer"/>
+        <opciones nombre="Hombre"/>
+      </formElement>
+    </propiedades>
+    <propiedades nombre="Ciudad" label="Ciudad">
+      <formElement xsi:type="webApiGeneric:Spinner"/>
+    </propiedades>
+    <propiedades nombre="Correo" label="Correo">
+      <formElement xsi:type="webApiGeneric:EditText"/>
+    </propiedades>
+    <propiedades nombre="Usuario" label="Usuario">
+      <formElement xsi:type="webApiGeneric:EditText" placeholder="No debe contener espacios"/>
+    </propiedades>
+    <propiedades nombre="Contrasenia" label="Contrasenia">
+      <formElement xsi:type="webApiGeneric:EditText"/>
+    </propiedades>
+    <propiedades nombre="AcercaDeMi" label="Acerca de mi">
+      <formElement xsi:type="webApiGeneric:EditText"/>
+    </propiedades>
+    <propiedades nombre="Razon" label="&#xbf;Por qu&#xe9; estudiar en los Andes?">
+      <formElement xsi:type="webApiGeneric:EditText"/>
+    </propiedades>
+    <propiedades nombre="RecibirCorreo" label="&#xbf;Desea recibir correo elecr&#xf3;nico?">
+      <formElement xsi:type="webApiGeneric:CheckBox"/>
+    </propiedades>
+  </activities>
+  <controllers nombre="CiudadesController" domain="http://192.168.0.6:51792/" RoutePrefix="api/Ciudades">
+    <metodos nombre="ObtenerTodos" ruta="ObtenerTodos"/>
+  </controllers>
+  <controllers nombre="EstudiantesController" main="true" domain="http://192.168.0.6:51792/" RoutePrefix="api/Estudiantes">
+    <metodos nombre="ObtenerPorId" ruta="ObtenerPorId">
+      <parametros nombre="id" tipo="id" valor="//@activities.1"/>
+    </metodos>
+    <metodos nombre="Crear" verbo="HttpPost" ruta="Crear" viewType="Create" titulo="Crear estudiante">
+      <parametros nombre="estudianteDTO" tipo="estudianteDTO"/>
+    </metodos>
+    <metodos nombre="Actualizar" verbo="HttpPut" ruta="Actualizar" viewType="Update" titulo="Actualizar estudiante" getID="ObtenerPorId">
+      <parametros nombre="estudianteDTO" tipo="estudianteDTO"/>
+    </metodos>
+  </controllers>
+</webApiGeneric:AndroidCore>

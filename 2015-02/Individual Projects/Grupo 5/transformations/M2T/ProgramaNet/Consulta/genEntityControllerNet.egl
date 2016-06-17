@@ -1,0 +1,138 @@
+[% import '../netUtil.egl'; %]
+using System.Web.Mvc;
+using cobiwsite.Models;
+
+namespace cobiwsite.Controllers
+{
+    using System;
+    using System.Configuration;
+
+    using cobiwsite.EntireX;
+
+    public class EntitiesController : Controller
+    {
+        // GET: Entities
+        public ActionResult Query()
+        {
+            return this.View();
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Query(EntityEntrada entity)
+        {
+            var usuarioCookie = this.Request.Cookies["usuario"];
+            var passwordCookie = this.Request.Cookies["clave"];
+
+            var strUsr = usuarioCookie != null ? usuarioCookie.Value : string.Empty;
+            var strPsw = passwordCookie != null ? passwordCookie.Value : string.Empty;
+            var strCnfCics = ConfigurationManager.AppSettings["ConfigCICS"];
+
+            var objEntirex = new clsEntireX("GE30", strUsr, strPsw, "GE", "075600");
+
+            // Definición Campos Entrada
+[%
+var modeloEntrada = CS!Modelo.all.select(m|m.esEntrada).first();
+
+for(pr in modeloEntrada.propiedades) {
+	if (pr.tipo = CS!TipoDato#string) {%]
+            objEntirex.AddCampoTexto("[%=pr.nombre%]", [%=pr.longitud%], ebxIO.EntradaSalida);	
+    [%}
+    else {%]
+            objEntirex.AddCampoNumero("[%=pr.nombre%]", [%=pr.longitud%], 0, false, ebxIO.EntradaSalida);
+    [%}%]
+            objEntirex.Campo["[%=pr.nombre%]"].Valor = entity.[%=pr.getCSName()%];
+[%}%]
+
+            // Definición Campos Salida
+[%
+var modeloSalida = CS!Modelo.all.select(m|not m.esEntrada).first();
+for(pr in modeloSalida.propiedades) {
+	if (pr.tipo = CS!TipoDato#string) {%]
+            objEntirex.AddCampoTexto("[%=pr.nombre%]", [%=pr.longitud%], ebxIO.SoloSalida);	
+    [%}
+    else {%]
+            objEntirex.AddCampoNumero("[%=pr.nombre%]", [%=pr.longitud%], 0, false, ebxIO.SoloSalida);
+    [%}%]
+[%}%]
+
+            var returnEntry = new EntitySalida();
+
+            try
+            {
+                //ejecuta la consulta y asigna los valores obtenidos
+                objEntirex.consultaEntireX(strCnfCics);
+[%                    
+for(pr in modeloSalida.propiedades) {%]
+                    returnEntry.[%=pr.getCSName()%] = ([%=pr.getDataType()%])objEntirex.Campo["[%=pr.nombre%]"].Valor;
+[%}%]  
+                
+                this.ModelState.Clear();
+            }
+            catch (Exception)
+            {
+                return View("Error");
+            }
+            
+            return this.View("Edit", returnEntry);
+        }
+
+
+        // GET: Entities/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(EntityEntrada entity)
+        {
+            if (this.ModelState.IsValid)
+            {
+                var usuarioCookie = this.Request.Cookies["usuario"];
+                var passwordCookie = this.Request.Cookies["clave"];
+
+                var strUsr = usuarioCookie != null ? usuarioCookie.Value : string.Empty;
+                var strPsw = passwordCookie != null ? passwordCookie.Value : string.Empty;
+                var strCnfCics = ConfigurationManager.AppSettings["ConfigCICS"];
+
+                var objEntirex = new clsEntireX("GE30", strUsr, strPsw, "GE", "075600");
+
+                // Definición Campos Entrada
+[%
+var modeloEntrada = CS!Modelo.all.select(m|m.esEntrada).first();
+
+for(pr in modeloEntrada.propiedades) {
+	if (pr.tipo = CS!TipoDato#string) {%]
+            objEntirex.AddCampoTexto("[%=pr.nombre%]", [%=pr.longitud%], ebxIO.EntradaSalida);	
+    [%}
+    else {%]
+            objEntirex.AddCampoNumero("[%=pr.nombre%]", [%=pr.longitud%], 0, false, ebxIO.EntradaSalida);
+    [%}%]
+            objEntirex.Campo["[%=pr.nombre%]"].Valor = entity.[%=pr.getCSName()%];
+[%}%]
+
+                try
+                {
+                    objEntirex.consultaEntireX(strCnfCics);
+                }
+                catch (Exception)
+                {
+                    return View("Error");
+                }
+
+                return this.View("Details", entity);
+            }
+
+            return this.View(entity);
+        }
+
+        // GET: Entities/Edit/5
+        public ActionResult Edit(string id)
+        {
+            return this.View();
+        }
+    }
+}

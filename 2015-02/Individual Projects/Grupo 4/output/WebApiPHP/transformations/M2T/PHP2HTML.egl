@@ -1,0 +1,229 @@
+[%
+	var a=0;
+	for(clase in php!Clase.all)
+	{
+		if(clase.isMain==true)
+		{
+			if(metodoName=="Actualizar")
+			{
+				a=1;
+				for(metodo in clase.metodos)
+				{	
+					for(parametro in metodo.parametros)
+					{
+						if(parametro.valores == null)
+						{
+						%]
+<?php
+	if(isset($_POST))
+	{
+		$[%=parametro.name%]=$_POST['[%=parametro.name%]'];		
+		$url = file_get_contents("[%=clase.domain%][%=clase.routePrefix%][%=metodo.route%]?[%=parametro.name%]=".$[%=parametro.name%]);
+		$array = json_decode($url,true);	
+	}	
+	
+?>
+						[%
+						}
+					}
+				}
+			}
+			for(metodo in clase.metodos)
+			{
+				if(metodo.name==metodoName)
+				{
+					
+		%]
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<base href="/">
+	<title>[%=clase.name.replace("Controller","")%]</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript">
+		$(document).on('ready', function(){
+			$("#[%=metodo.name%]").click(function(){
+			[%
+					//Ingresan todos los parametros del metodo
+					for(parametro in metodo.parametros)
+					{
+						for(atributo in parametro.valores.atributos)
+						{
+						%]
+				var [%=atributo.name%]=$('#[%=atributo.name%]').val();
+						[%	
+						}
+					}
+					//Imprime el AJAX
+					%]
+				$.ajax({
+           		       url: '/prueba/[%=metodo.name%]API.php',
+			           type: '[%=metodo.verbo%]',
+			           data:{
+				    [%
+				    //Ingresan todos los parametros del metodo
+				    for(parametro in metodo.parametros)
+					{
+						var i=0;
+						var t=parametro.valores.atributos.size();
+						for(atributo in parametro.valores.atributos)
+						{
+							i=i+1;
+						%]
+						[%=atributo.name%]: [%=atributo.name%][%if(i<t){%],[%}
+						}
+					}
+					%]
+			           },
+			           success: function(resp)
+			           {
+			                console.log('enviado el objeto');
+			                console.log(resp);
+
+			           }
+         			});
+    				return false; 
+ 			});		
+ 		});
+ 	</script>  
+</head>
+<body >
+	<div class="container">
+    	<center><h1>[%=metodo.name%] Usuario</h1></center>
+    	<div class="row" >
+        <div class="col-sm-offset-4 col-sm-4">
+           	<form>
+            [%
+					//Ingresan todos los parametros del metodo
+					for(parametro in metodo.parametros)
+					{
+						for(atributo in parametro.valores.atributos)
+						{
+							var elemento=atributo.elementos;
+							//Tipos de elementos
+							//Input
+							if(elemento.isTypeOf(Input))
+							{
+							//Tipo Text/Email/Password
+								if(elemento.tipo.name=="text" or elemento.tipo.name=="email" or elemento.tipo.name=="password")
+								{
+								%]
+				<div class="form-group">
+					<label [%if(elemento.isRequired==true){%]class="required"[%}%]>[%=atributo.title%]</label>
+					<input type="[%=elemento.tipo.name%]" id="[%=atributo.name%]" class="form-control" placeholder="[%=elemento.placeholder%]" [%if(a==1){%]value='<?php print_r($array['[%=atributo.name%]']); ?>' [%}%][%if(elemento.isRequired==true){%]required [%}%] >
+				</div>
+								[%
+								}
+								//Tipo checkbox
+								if(elemento.tipo.name=="checkbox")
+								{
+								%]
+				<div class="checkbox">
+	            	<label>
+	                	<input type="checkbox" id="[%=atributo.name%]" [%if(a==1){%]<?php if($array['[%=atributo.name%]']==1){echo "checked";}?>[%}%]> [%=elemento.placeholder%]
+	                </label>
+	            </div>
+		                		[%
+								}
+								//Tipo Radio
+								if(elemento.tipo.name=="radio")
+								{
+								%]
+				<div class="form-group">
+                   	<label [%if(elemento.isRequired==true){%]class="required"[%}%]>[%=atributo.title%]</label>
+                   	<div>
+		                    		[%
+		                    		//Pinta las opciones del radio
+		                    		var vr=0;
+		                    		for(opcion in elemento.opciones)
+		                    		{
+		                    		%]
+                		<label class="radio-inline">
+                    		<input type="radio" id="[%=atributo.name%]" value="[%=vr%]" [%if(a==1){%]<?php if([%=vr%]==$array['[%=atributo.name%]']){echo 'checked="checked"';}?>[%}%]> [%=opcion.value%] 
+                		</label>
+		                        	[%
+		                        	vr=vr+1;
+		                        	}
+		                        	%]
+                    </div>
+                </div>
+									[%
+								}
+							}
+							//TextArea
+							if(elemento.isTypeOf(TextArea))
+							{
+							%]
+					<div class="form-group">
+                    	<label [%if(elemento.isRequired==true){%]class="required"[%}%]>[%=atributo.title%]</label>
+                    	<textarea id="[%=atributo.name%]" class="form-control" rows="10">[%if(a==1){%]<?php print_r($array['[%=atributo.name%]']); ?>[%}%]</textarea>
+                	</div>
+							[%
+							}
+							//DropDown
+							if(elemento.isTypeOf(DropDown))
+							{
+							%]
+					<div class="form-group">
+                    	<label [%if(elemento.isRequired==true){%]class="required"[%}%]>[%=atributo.title%]</label>
+                    	<select name="[%=atributo.name%]">
+                    	[%                   			                   			
+                    			for(clase2 in php!Clase.all)
+                    			{
+                    				if(clase2.isMain==false)
+                    				{	
+                    					for(metodo2 in clase2.metodos)
+                    					{ 
+                       						if(metodo2.parametros.size()==0)
+                    						{
+                    							for(dto in php!DTO)
+                    							{
+                    								if(dto.name.replace("DTO","")==atributo.name)
+                    								{
+                    									var n=0;
+                    									var l=dto.atributos.size();
+                    	%]
+                    	<?php		
+							$url = file_get_contents("[%=clase2.domain%][%=clase2.routePrefix%]/[%=metodo2.route%]");
+							$array = json_decode($url,true);
+							foreach ($array as $resp) 
+							{
+								echo '<option value="{ [%for(atri in dto.atributos){ n=n+1;%]"[%=atri.name%]":"'.$resp['[%=atri.name%]'].'"[%if(n<l){%], [%}else{%]}">'[%}%][%}%].$resp['Nombre'].'</option>';	
+							} 
+						?>
+						[%
+													}
+												}
+											}
+										}
+									}
+								}						
+						%]	
+		    				
+		  				</select>
+                	</div>
+							[%
+							}
+						}
+					}
+					%]
+					<br>         
+                	<button type="submit" id="[%=metodo.name%]">[%=metodo.name%]</button>
+			</form>
+		</div>
+    </div>
+</div>
+</body>
+</html>
+	[%
+				}
+			}
+		}
+	}
+	%]

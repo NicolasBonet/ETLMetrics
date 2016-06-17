@@ -1,0 +1,47 @@
+body{
+	padding-bottom: 20px;
+}
+
+label{
+	&.required{
+		&:before{
+			content: "*";
+            font-size: 14px;
+			color: #cf0000;
+            margin-right: 5px;
+		}
+	}
+}
+
+form{
+	&.ng-submitted{
+		input, select, textarea{
+			&.ng-invalid{
+				border-color: #a94442;
+				box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+
+				&:focus{
+					border-color: #843534;
+					box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483;
+				}
+			}
+		}
+	}
+}
+
+.form-control{
+	border-radius: 0px;
+	background-color: #F9F9F9;
+
+	&:focus{
+		border-color: #00AB86;
+		box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(0, 171, 134,.6);
+	}
+}
+
+.btn{
+	border-radius: 2px;
+	+ .btn {
+		margin-left: 5px;
+	}
+}

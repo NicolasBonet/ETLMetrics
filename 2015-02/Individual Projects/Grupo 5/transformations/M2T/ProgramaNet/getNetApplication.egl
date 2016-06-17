@@ -1,0 +1,66 @@
+[% 
+var programa = CS!Programa.all[0];
+
+if (programa.tipoPrograma <> CS!TipoPrograma#cobol) {
+
+	var modeloSalida = CS!Modelo.all.select(m|not m.esEntrada).size() > 0;
+	var modeloEntrada = CS!Modelo.all.select(m|m.esEntrada).size() > 0;
+	
+	if (modeloSalida and modeloEntrada) {
+	
+		if (programa.tipoPrograma = CS!TipoPrograma#reporte) {
+		   /*********************************************REPORTE*******************************************/
+		   var tc1: Template:=TemplateFactory.load('./Reporte/genReportControllerNet.egl');
+		   tc1.generate('./NetApplication/src/cobiwsite/Controllers/ReportsController.cs');
+		   
+		   var tme: Template:=TemplateFactory.load('./Reporte/genReportModelNet.egl');
+		   tme.populate("tipoModelo", "Entrada");	
+		   tme.generate('./NetApplication/src/cobiwsite/Models/ReportEntrada.cs');
+		   
+		   var tms: Template:=TemplateFactory.load('./Reporte/genReportModelNet.egl');   
+		   tms.populate("tipoModelo", "Salida");   
+		   tms.generate('./NetApplication/src/cobiwsite/Models/ReportSalida.cs');  
+		   
+		   var tmvq: Template:=TemplateFactory.load('./Reporte/genReportQueryView.egl');
+		   tmvq.generate('./NetApplication/src/cobiwsite/Views/Reports/Query.cshtml');
+		   
+		   var tmvi: Template:=TemplateFactory.load('./Reporte/genReportIndexView.egl');
+		   tmvi.generate('./NetApplication/src/cobiwsite/Views/Reports/Index.cshtml');      
+		   /***********************************************************************************************/
+	   }
+	   
+		if (programa.tipoPrograma = CS!TipoPrograma#consulta) {	   
+		   /********************************************CONSULTA*******************************************/   
+		   var tc: Template:=TemplateFactory.load('./Consulta/genEntityControllerNet.egl');
+		   tc.generate('./NetApplication/src/cobiwsite/Controllers/EntitiesController.cs');
+		   
+		   var tme1: Template:=TemplateFactory.load('./Consulta/genEntityModelNet.egl');
+		   tme1.populate("tipoModelo", "Entrada");	
+		   tme1.generate('./NetApplication/src/cobiwsite/Models/EntityEntrada.cs');
+		   
+		   var tms1: Template:=TemplateFactory.load('./Consulta/genEntityModelNet.egl');   
+		   tms1.populate("tipoModelo", "Salida");   
+		   tms1.generate('./NetApplication/src/cobiwsite/Models/EntitySalida.cs');
+		   
+		   var tmvc: Template:=TemplateFactory.load('./Consulta/genEntityCreateView.egl');
+		   tmvc.generate('./NetApplication/src/cobiwsite/Views/Entities/Create.cshtml');
+		   
+		   var tmveq: Template:=TemplateFactory.load('./Consulta/genEntityQueryView.egl');
+		   tmveq.generate('./NetApplication/src/cobiwsite/Views/Entities/Query.cshtml');   
+		   
+		   var tmvq: Template:=TemplateFactory.load('./Consulta/genEntityEditView.egl');
+		   tmvq.generate('./NetApplication/src/cobiwsite/Views/Entities/Edit.cshtml');     
+		   
+		   var tmdtv: Template:=TemplateFactory.load('./Consulta/genEntityDetailsView.egl');
+		   tmdtv.generate('./NetApplication/src/cobiwsite/Views/Entities/Details.cshtml');      
+		   /***********************************************************************************************/   
+	   }
+   
+	  	var tprj: Template:=TemplateFactory.load('./genProjectFile.egl');
+		tprj.generate('./NetApplication/src/cobiwsite/cobiwsite.csproj');
+		
+	  	var tprt: Template:=TemplateFactory.load('./genRoutes.egl');
+		tprt.generate('./NetApplication/src/cobiwsite/App_Start/RouteConfig.cs'); 		    
+	}
+}
+%]

@@ -1,0 +1,41 @@
+[%
+
+	for(service in JEE!Service.all){
+		if(serviceName == service.name)
+		{
+			
+			%]
+package edu.uniandes.co.jee.service;
+			
+public class [%=serviceName%] 
+{
+	[% 
+		for (method in service.serviceMethods){
+	%]
+	
+	[%
+		for(anotation in method.anotations){
+	    
+	    %]
+	    @[%=anotation.name%]
+	    [% if(anotation.parameter <> null){ %]("[%=anotation.parameter.name%]")
+	    [%}
+		    if(anotation.name == 'GET'){
+		    	%]@Produces({"application/json"})
+		    	[%
+		    }			
+		}
+		%]
+	public [%=method.`return`%] [%=method.name%] ([% for (atr in method.attributes){  %][%=atr.type%] [%=atr.name%][% if(atr.name == method.attributes.last().name){}else{%],[%}} %]){
+	
+		[%=method.code%]
+	}
+	
+	[%				
+		}
+	%]	
+}	
+			[%
+		}		
+	}
+%]

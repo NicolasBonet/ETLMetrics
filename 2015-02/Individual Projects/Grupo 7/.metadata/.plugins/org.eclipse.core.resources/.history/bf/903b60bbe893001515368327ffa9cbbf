@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Bolsa de Empleo</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="css/main.css">
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="jumbotron" id="panelImagen">
+                    <img src="img/titulo.png">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4" id="panelLista">
+                    <fieldset class="scheduler-border">
+                        <legend class="scheduler-border">Aspirantes Registrados en la Bolsa</legend>
+                        <select multiple>
+                            <option>Pilar Duque - Ingeniero Industrial</option>
+                            <option>Carlos Méndez - Ingeniero Industrial</option>
+                            <option>Andres Pérez - Administrador</option>    
+                            <option>Marcela Otero - Administrador</option>
+                            <option>Jorge Campos - Ingeniero Industrial</option>
+                            <option>Ana Rojas - Economista</option>
+                            <option>Juan Rodríguez - Ingeniero Industrial</option>
+                        </select>
+                    </fieldset>
+                </div>
+                <div class="col-md-8" id="panelInformacion">
+                    <fieldset class="scheduler-border">
+                        <legend class="scheduler-border">Datos del Aspirante</legend>
+                        <div class="col-md-6" id="panelImagen">
+                            <img src="img/pilar.jpg">   
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table-condensed">
+                                <tr>
+                                    <td><label for="txtNombre">Nombre:</label></td>
+                                    <td><input type="text" id="txtNombre" value="Pilar Duque" disabled></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="txtEdad">Edad:</label></td>
+                                    <td><input type="text" id="txtEdad" value="10" disabled></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="txtProfesion">Profesión:</label></td>
+                                    <td><input type="text" id="txtProfesion" value="Ingeniero Industrial" disabled></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="txtAniosExperiencia">Experiencia:</label></td>
+                                    <td><input type="text" id="txtAniosExperiencia" value="10" disabled></td>
+                                </tr>
+                                <tr>
+                                    <td><label for="txtTelefono">Teléfono:</label></td>
+                                    <td><input type="text" id="txtTelefono" value="2145500"  disabled></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4" id="panelAgregar" >
+                    <fieldset class="scheduler-border">
+                        <legend class="scheduler-border">Agregar Aspirante</legend>
+                        <table class="table-condensed">
+                            <tr>
+                                <td><label for="txtNombre">Nombre:</label></td>
+                                <td><input type="text" id="txtNombre"></td>
+                            </tr>
+                            <tr>
+                                <td><label for="txtEdad">Edad:</label></td>
+                                <td><input type="text" id="txtEdad"></td>
+                            </tr>
+                            <tr>
+                                <td><label for="txtProfesion">Profesión:</label></td>
+                                <td>
+                                    <select>
+                                        <option>Administrador</option>
+                                        <option>Contados</option>
+                                        <option>Ingeniero Industrial</option>
+                                        <option>Economista</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label for="txtAniosExperiencia">Experiencia:</label></td>
+                                <td><input type="text" id="txtAniosExperiencia"></td>
+                            </tr>
+                            <tr>
+                                <td><label for="txtImagen">Imagen:</label></td>
+                                <td><input type="file" id="txtImagen"></td>
+                            </tr>
+                            <tr>
+                                <td><label for="txtTelefono">Teléfono:</label></td>
+                                <td><input type="text" id="txtTelefono"></td>
+                            </tr>
+                        </table>
+                    </fieldset>
+                </div>
+                <div class="col-md-8" id="panelOpciones">
+                    <div class="col-md-6" id="panelBusquedaOrdenamiento" align="center">
+                        <fieldset class="scheduler-border">
+                            <legend class="scheduler-border">Búsqueda y Ordenamiento</legend>
+                            <table class="table-condensed">
+                                <tr>
+                                    <td>
+                                        <input type="button" value="Ordenar por experiencia">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="button" value="Ordenar por Edad">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="button" value="Ordenar por profesión">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="button" value="Buscar Aspirante">
+                                    </td>
+                                </tr>
+                            </table>
+                        </fieldset>
+                    </div>
+                    <div class="col-md-6" id="panelConsultas" align="center">
+                        <fieldset class="scheduler-border">
+                            <legend class="scheduler-border">Consultas</legend>
+                            <table class="table-condensed">
+                                <tr>
+                                    <td>
+                                        <input type="button" value="Más Joven">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="button" value="Mayor Edad">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="button" value="Mayor Experiencia">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="button" value="Contratar">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="button" value="Eliminar por Experiencia">
+                                    </td>
+                                </tr>
+                            </table>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12" id="panelExtension">
+                    <fieldset class="scheduler-border">
+                        <legend class="scheduler-border">Puntos de Extensión</legend>
+                        <div align="center">
+                            <input type="button" value="Opción 1">
+                            <input type="button" value="Opción 2">
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+        </div>
+    </body>
+</html>

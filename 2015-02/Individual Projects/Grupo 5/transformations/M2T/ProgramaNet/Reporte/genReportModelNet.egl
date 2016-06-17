@@ -1,0 +1,26 @@
+[% import '../netUtil.egl'; %]
+namespace cobiwsite.Models
+{
+    using System;
+    using System.Collections.Generic;
+    
+[%
+var modelo;
+
+if (tipoModelo = 'Entrada') {
+	modelo = CS!Modelo.all.select(m|m.esEntrada).first();
+}
+else {
+	modelo = CS!Modelo.all.select(m|not m.esEntrada).first();	
+}
+%]
+    public class Report[%=tipoModelo%]
+    {
+    
+[%
+for(pr in modelo.propiedades) {
+%]
+		public [%=pr.getDataType()%] [%=pr.getCSName()%] { get; set; }
+[%}%]  
+    }
+}

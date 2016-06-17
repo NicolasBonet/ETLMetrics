@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ASCII"?>
+<cobiw:Programa xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:cobiw="http://www.example.org/cobiw" tipo="lineaConsulta" nombre="RDK08301.CBL" autor="Grupo 5 COBIW " team="Generacion codigo COBIW" objetivo="Prueba generacion COBOL" numeroRequerimiento="Req00002" programaId="RDK08301.CBL">
+  <contiene nombreArchivo="Entrada" esEntrada="true">
+    <compuesto nombre="RD63-ENTRADA." esSalida="false">
+      <conformada nombre="RD63-TRN" tipo="caracter" longitud="4" esSalida="false"/>
+      <conformada nombre="RD63-USUARIO" tipo="caracter" longitud="13" esSalida="false"/>
+      <conformada nombre="RD63-CLAVE" tipo="caracter" longitud="8" esSalida="false"/>
+      <conformada nombre="RD63-MONITOR" tipo="caracter" longitud="2" esSalida="false"/>
+      <conformada nombre="RD63-TRANSACCION" tipo="numerica" longitud="6" esSalida="false"/>
+      <conformada nombre="FILLER" tipo="caracter" longitud="20" esSalida="false"/>
+      <conformada nombre="RD63-TIP-IDE" tipo="caracter" longitud="1" esSalida="false"/>
+      <conformada nombre="RD63-NUM-IDE" tipo="numerica" longitud="16" esSalida="false"/>
+      <conformada nombre="RD63-NUM-OFI" tipo="numerica" longitud="3" esSalida="false"/>
+      <conformada nombre="FILLER" tipo="caracter" longitud="4023" esSalida="false"/>
+    </compuesto>
+  </contiene>
+  <contiene nombreArchivo="Salida">
+    <compuesto nombre="RD63-SALIDA." esSalida="true">
+      <conformada nombre="RD63-COD-RESP" tipo="numerica" longitud="4" esSalida="true"/>
+      <conformada nombre="RD63-DES-RESP" tipo="caracter" longitud="60" esSalida="true"/>
+      <conformada nombre="RD63-PRI-APELLIDO" tipo="caracter" longitud="20" esSalida="true"/>
+      <conformada nombre="RD63-SEG-APELLIDO" tipo="caracter" longitud="20" esSalida="true"/>
+      <conformada nombre="RD63-PRI-NOMBRE" tipo="caracter" longitud="20" esSalida="true"/>
+      <conformada nombre="RD63-SEG-NOMBRE" tipo="caracter" longitud="20" esSalida="true"/>
+      <conformada nombre="RD63-FEC-NAC" tipo="numerica" longitud="8" esSalida="true"/>
+      <conformada nombre="RD63-IND-SEX" tipo="caracter" longitud="1" esSalida="true"/>
+      <conformada nombre="RD63-COD-CIIU" tipo="numerica" longitud="4" esSalida="true"/>
+      <conformada nombre="RD63-CIU-RES" tipo="numerica" longitud="5" esSalida="true"/>
+      <conformada nombre="RD63-NOM-CIU-RES" tipo="caracter" longitud="50" esSalida="true"/>
+      <conformada nombre="RD63-COD-DPT" tipo="numerica" longitud="5" esSalida="true"/>
+      <conformada nombre="RD63-NOM-COD-DPT" tipo="caracter" longitud="50" esSalida="true"/>
+      <conformada nombre="RD63-DIR-RES" tipo="caracter" longitud="100" esSalida="true"/>
+      <conformada nombre="RD63-TEL-RES" tipo="numerica" longitud="10" esSalida="true"/>
+      <conformada nombre="RD63-OFI-FUN" tipo="numerica" longitud="3" esSalida="true"/>
+      <conformada nombre="RD63-NOM-OFI" tipo="caracter" longitud="50" esSalida="true"/>
+      <conformada nombre="RD63-TC." esSalida="true">
+        <conformada nombre="RD63-TARJETAS" esOccurs="true" esSalida="true" valor="30">
+          <conformada nombre="RD63-NUM-TC" tipo="numerica" longitud="16" esSalida="true"/>
+          <conformada nombre="RD63-TIP-TC" tipo="caracter" longitud="50" esSalida="true"/>
+        </conformada>
+      </conformada>
+      <conformada nombre="FILLER" tipo="caracter" longitud="1686" esSalida="true"/>
+    </compuesto>
+  </contiene>
+</cobiw:Programa>

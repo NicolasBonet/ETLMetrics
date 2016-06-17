@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project default="build">
+    <taskdef resource="org/eclipse/epsilon/workflow/tasks/tasks.xml"/>
+    <taskdef resource="org/eclipse/epsilon/workflow/tasks/emf/tasks.xml"/>
+
+    <target name="build">
+        <echo>Iniciando el proceso</echo>
+        <delete dir="${basedir}/modelosgenerados/" failonerror="true" />
+        <antcall target="generate" />
+        <echo>Eliminando el archivo ${rutamodelo}</echo>
+        <delete dir="${rutamodelo}" failonerror="true" />
+    </target>
+
+    <target name="generate">
+
+        <echo>Realizar transformación Business 2 Arquitectura</echo>
+
+        <epsilon.emf.register file="${basedir}/metamodels/arquitectura.ecore" />
+        <epsilon.emf.register file="${basedir}/metamodels/business.ecore" />
+        <epsilon.emf.register file="${basedir}/metamodels/arquitectura.ecore" />
+        <epsilon.emf.register file="${basedir}/metamodels/JEE.ecore" />
+        <epsilon.emf.register file="${basedir}/metamodels/angular.ecore" />
+
+        <epsilon.emf.loadModel name="business" aliases="business" modelfile="${rutamodelo}" metamodeluri="http://www.humantech.co/business" read="true" store="false" />
+        <epsilon.emf.loadModel name="mm_arquitectura" aliases="mm_arquitectura" modelfile="${basedir}/modelosgenerados/arquitectura.xmi" metamodeluri="http://www.example.org/arquitectura" read="false" store="true" />
+
+        <epsilon.etl src="${basedir}/transformations/M2M/Negocio2Arquitectura.etl">
+            <model ref="business" />
+            <model ref="mm_arquitectura" />
+        </epsilon.etl>
+
+        <!-- la arquitectura ya cambia cuando el modulo ingresado cambia -->
+        <epsilon.disposeModel model="mm_arquitectura"/>
+
+        <epsilon.emf.loadModel name="mm_arquitectura" aliases="mm_arquitectura" modelfile="${basedir}/modelosgenerados/arquitectura.xmi" metamodeluri="http://www.example.org/arquitectura" read="true" store="false" />
+        <epsilon.emf.loadModel name="jee" aliases="jee" modelfile="${basedir}/modelosgenerados/JEE.xmi" metamodeluri="http://www.example.org/proyecto" read="false" store="true" />
+
+        <epsilon.etl src="${basedir}/transformations/M2M/Arquitectura2JEE.etl">
+            <model ref="mm_arquitectura" />
+            <model ref="jee" />
+        </epsilon.etl>
+        <!--epsilon.disposeModel model="angular" /-->
+        <epsilon.disposeModel model="jee"/>
+        <epsilon.disposeModel model="mm_arquitectura"/>
+
+
+
+        <epsilon.emf.loadModel name="jee" aliases="jee" modelfile="${basedir}/modelosgenerados/JEE.xmi" metamodeluri="http://www.example.org/proyecto" read="true" store="false" />
+        <epsilon.emf.loadModel name="mm_arquitectura" aliases="mm_arquitectura" modelfile="${basedir}/modelosgenerados/arquitectura.xmi" metamodeluri="http://www.example.org/arquitectura" read="true" store="false" />
+
+        <epsilon.egl src="${basedir}/transformations/M2T/SaveNegocio.egl">
+
+            <model ref="jee" />
+
+        </epsilon.egl>
+        <epsilon.disposeModel model="jee"/>
+        <epsilon.disposeModel model="mm_arquitectura"/>
+
+        <epsilon.emf.loadModel name="mm_arquitectura" aliases="mm_arquitectura" modelfile="${basedir}/modelosgenerados/arquitectura.xmi" metamodeluri="http://www.example.org/arquitectura" read="true" store="false" />
+        <epsilon.emf.loadModel name="angular" aliases="angular" modelfile="${basedir}/modelosgenerados/angular.xmi" metamodeluri="http://www.example.org/angular" read="false" store="true" />
+
+        <epsilon.etl src="${basedir}/transformations/M2M/Arquitectura2Angular.etl">
+            <model ref="mm_arquitectura" />
+            <model ref="angular" />
+        </epsilon.etl>
+
+        <!--epsilon.disposeModel model="angular" /-->
+        <epsilon.disposeModel model="angular"/>
+        <epsilon.disposeModel model="mm_arquitectura"/>
+
+        <epsilon.emf.loadModel name="mm_arquitectura" aliases="mm_arquitectura" modelfile="${basedir}/modelosgenerados/arquitectura.xmi" metamodeluri="http://www.example.org/arquitectura" read="true" store="false" />
+        <epsilon.emf.loadModel name="angular" aliases="angular" modelfile="${basedir}/modelosgenerados/angular.xmi" metamodeluri="http://www.example.org/angular" read="true" store="false" />
+
+        <epsilon.egl src="${basedir}/transformations/M2T/SaveWEB.egl">
+
+            <model ref="angular" />
+
+        </epsilon.egl>
+        <epsilon.disposeModel model="angular"/>
+        <epsilon.disposeModel model="mm_arquitectura"/>
+
+    </target>
+
+</project>

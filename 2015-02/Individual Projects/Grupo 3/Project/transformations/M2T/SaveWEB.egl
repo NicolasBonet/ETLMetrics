@@ -1,0 +1,29 @@
+[%
+
+	var rutaBase = "/humantech/Uniandes/ws_pry/unviersidades/src/main/webapp";
+
+	var app:angular!Aplicacion = angular!Aplicacion.all.first();
+	
+	var mainJs:Template:= TemplateFactory.load('Angular2Main.egl');
+	mainJs.populate("app",app);
+	mainJs.generate(rutaBase+'/scripts/app.js');
+	
+	var index:Template:= TemplateFactory.load('Angular2Index.egl');
+	index.populate("app",app);
+	index.generate(rutaBase+'/index.html');
+	
+	for (vista in angular!Vista.all){
+		var js:Template:= TemplateFactory.load('Angular2JavaScript.egl');
+		js.populate("app",app);
+		js.populate("vista",vista);
+		js.generate(rutaBase+'/scripts/'+vista.entidad+'/'+vista.nombre+'Ctrl.js');
+		
+		
+		var html:Template:= TemplateFactory.load('Angular2Html.egl');
+		html.populate("app",app);
+		html.populate("vista",vista);
+		html.generate(rutaBase+'/views/'+vista.entidad+'/'+vista.nombre+'.html');
+				
+	}
+	
+%]

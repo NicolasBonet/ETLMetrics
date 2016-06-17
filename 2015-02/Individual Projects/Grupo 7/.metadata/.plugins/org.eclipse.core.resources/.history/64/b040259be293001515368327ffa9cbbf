@@ -1,0 +1,241 @@
+pre {
+	var jee : new jEE!JEE;
+}
+
+rule EJBRULE
+	transform
+		c : jv!ClassUnit
+	to
+		t : jEE!EJB
+		{
+			guard:(c.verficarEJB())
+			t.name=c.name+"EJB";
+			jee.Ejbs.add(t);
+			t.bussinesMethods= new Collection;
+			for(method in c.codeElement.select(ce|ce.isTypeOf(jv!MethodUnit))){
+				t.bussinesMethods.add(method.createMethod(false,c));
+			}	
+		}
+
+
+rule ENTITYRULE
+	transform
+		c : jv!ClassUnit
+	to
+		t : jEE!Entity
+		{
+			guard:(c.verificarVO())
+			t.name=c.name;
+			jee.entities.add(t);
+			for( attribute in  c.codeElement.select(ce|ce.isTypeOf(jv!StorableUnit) and ce.kind.toString() <> 'static'))
+			{	
+				var attributeJEE=new jEE!Attribute;
+				attributeJEE.name=attribute.name;
+				attributeJEE.type=attribute.type.name;
+				t.attributes.add(attributeJEE);
+			}
+			
+			t.methods= new Collection;
+			for(method in c.codeElement.select(ce|ce.isTypeOf(jv!MethodUnit))){
+				t.methods.add(method.createMethod(false,c));
+			}
+			
+		}
+rule SERVICERULE
+	transform
+		c : jv!ClassUnit
+	to
+		t : jEE!Service
+		{
+			guard:(c.verficarEJB())
+			t.name=c.name+"Service";
+			jee.services.add(t);
+			for(method in c.codeElement.select(ce|ce.isTypeOf(jv!MethodUnit))){
+				t.serviceMethods.add(method.createMethod(true,c));
+			}	
+		}
+	
+operation jv!MethodUnit createMethod(restAnnotation:Boolean,clase :jv!ClassUnit){
+	var method:new jEE!Method;
+	method.name=self.name;
+	method.`return`=self.createReturnType();
+	if(self.codeElement.size()>0){
+		var attributes=self.codeElement.at(0).parameterUnit;
+		for(atribute in attributes){
+			if(atribute.kind.toString()<>'return'){
+				atribute.println();
+				var atributeJEE=new jEE!Attribute;
+				atributeJEE.name=atribute.name;
+				atributeJEE.type=atribute.type.name;
+				if(restAnnotation){
+					var annotation=new jEE!Anotation;
+					annotation.name='PathParam';
+					var anotationAtribute=new jEE!Attribute;
+					anotationAtribute.name=atribute.name;
+					annotation.parameter=anotationAtribute;
+					atributeJEE.anotations.add(annotation);
+					
+				}
+				method.attributes.add(atributeJEE);
+			}
+		}
+	}
+	if(restAnnotation){
+		method.anotations.add(self.createAnnotationMethod());
+		method.anotations.add(self.createAnnotationPath());
+	}
+	method.extractCodigo(clase.source.at(0).region.at(0).file.path);
+	return method;
+}
+operation jv!MethodUnit createReturnType(){
+	var returnType="void";
+	var attributes=self.codeElement.at(0).parameterUnit;
+		for(atribute in attributes){
+			if(atribute.kind.toString()='return'){
+				returnType=atribute.type.name;
+				break;
+			}
+		}
+	return returnType;
+}
+operation jv!MethodUnit createAnnotationPath(){
+	var annotation=new jEE!Anotation;
+	var attribute=new jEE!Attribute;
+	attribute.name=self.name;
+	annotation.name="Path";
+	annotation.parameter=attribute;
+	return annotation;
+}
+
+operation jv!MethodUnit createAnnotationMethod(){
+	var annotation=new jEE!Anotation;
+	if(self.name.startsWith('eliminar')){
+		annotation.name= 'DELETE';
+	}else if(self.name.startsWith('agregar')){
+		annotation.name= 'POST';
+	}else{
+		annotation.name='GET';
+	}
+	return annotation;
+}
+
+operation  jv!ClassUnit verificarVO(){
+	var tieneGetter=false;
+	/*"---------------------------------------------------".println();
+	self.name.println();
+	"---------------------------------------------------".println();*/
+	var constructor=self.codeElement.select(ce|ce.isTypeOf(jv!MethodUnit) and ce.kind.toString() ='constructor');
+	if(constructor<>null and constructor.codeElement.size()>0 ){
+		var dataConstructor=constructor.codeElement.at(0).at(0);
+		if(dataConstructor.isTypeOf(jv!Signature)){	
+			for( attribute in  self.codeElement.select(ce|ce.isTypeOf(jv!StorableUnit) and ce.kind.toString() <> 'static'))
+			{		
+				//attribute.name.println();
+				if(dataConstructor.parameterUnit.select(s|s.name.startsWith(attribute.name)).size()==1){
+					tieneGetter=true;
+				}else{
+					tieneGetter=false;
+					break;
+				}
+			}
+		}
+	}
+	//tieneGetter.println();
+	return tieneGetter;
+}
+
+operation jv!ClassUnit verficarEJB(){
+	var isEJB=false;
+	/*"---------------------------------------------------".println();
+	self.name.println();
+	"---------------------------------------------------".println();*/
+	var attributes=self.codeElement.select(ce|ce.isTypeOf(jv!StorableUnit));
+	for(element in attributes){
+		if(element.type.isTypeOf(jv!TemplateUnit)){
+			isEJB=element.type.name.toString().startsWith('ArrayList');	
+		}
+	}
+	
+	return isEJB;
+} 
+
+operation jEE!Method extractCodigo(path){
+	var file=loadFile(path);
+	//file.println();
+	var regExp="\\s*\\w+\\s+"+self.name+"\\s*\\(.*\\)\\s*\\{?\\s*";
+	var pattern=Native("java.util.regex.Pattern").compile(regExp);
+	var metodo="";
+	var llavesAbre=0;
+	var llavesCierra=0;
+	var encontroConstructor=false;
+	var encontroPrimerllave=false;
+	"------------------------".println();
+	self.name.println();
+	"------------------------".println();
+	for(line:String in file ){
+		if(not encontroConstructor){
+			var matcher=pattern.matcher(line);
+			if(matcher.find()){
+				encontroConstructor=true;
+				for(attribute in self.attributes){
+					var strAtt=".*(\\(|\\,)\\s*"+attribute.type+"\\s+"+attribute.name+"(\\,|\\))?.*";
+					if(not line.matches(strAtt)){
+						encontroConstructor=false;
+					}
+				}
+				if(line.matches(".*\\{.*")){
+					encontroPrimerllave=true;
+				}else{
+					continue;
+				}
+				
+			}
+		}else{
+			
+			llavesAbre=llavesAbre+contarCorchetesAbiertos(line);
+			llavesCierra=llavesCierra+contarCorchetesCerrados(line);
+			if( (not encontroPrimerllave ) and line.matches(".*\\{.*")){
+					encontroPrimerllave=true;
+					continue;
+			}
+			if(llavesAbre>0 and llavesAbre==llavesCierra){
+				break;
+			}
+			line.println();
+			metodo=metodo+line+"\n";
+		}
+	}
+	self.code=metodo;
+}
+
+operation contarCorchetesAbiertos(line:String){
+	var pattern=Native("java.util.regex.Pattern").compile("\\{");
+	var matcher=pattern.matcher(line);
+	var i=0;
+	while(matcher.find()){
+		i=i+1;
+	}
+	return i;
+}
+operation contarCorchetesCerrados(line:String){
+	var pattern=Native("java.util.regex.Pattern").compile("\\}");
+	var matcher=pattern.matcher(line);
+	var i=0;
+	while(matcher.find()){
+		i=i+1;
+	}
+	return i;
+}
+operation loadFile(path:String){
+	var file = new Native("java.io.File")(path);
+	var fileReader=new Native("java.io.FileReader")(file);
+	var bufferReader=new Native("java.io.BufferedReader")(fileReader);
+	var fileArray=new Native("java.util.ArrayList");
+	var line=bufferReader.readLine();
+	var fileString="";
+	while(line<>null){
+		fileArray.add(fileString+line);
+		line=bufferReader.readLine();
+	}
+	return fileArray;
+}

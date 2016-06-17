@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ASCII"?>
+<android:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:android="http://www.example.org/android" name="MarketOne">
+  <activity name="MainActivity">
+    <fragments xsi:type="android:PromoFragment" font="blanco" name="PromoFragment1" imageSize="large" layout="vertical">
+      <objects type="pieDePagina"/>
+      <objects type="descripcionPromo"/>
+    </fragments>
+    <fragments xsi:type="android:MapFragment" font="blanco" name="MapFragment1" imageSize="large" layout="vertical">
+      <objects type="pieDePagina"/>
+    </fragments>
+    <fragments xsi:type="android:ContactoFragment" font="blanco" name="ContactFragment1" imageSize="large" layout="vertical">
+      <objects type="pieDePagina"/>
+      <objects type="emailContacto"/>
+      <objects type="comentarioContacto"/>
+    </fragments>
+    <fragments xsi:type="android:CatalogFragment" font="blanco" name="CatalogFragment1" imageSize="large" layout="vertical">
+      <objects type="pieDePagina"/>
+      <objects type="descripcionProductoCatalogo"/>
+    </fragments>
+  </activity>
+</android:Application>

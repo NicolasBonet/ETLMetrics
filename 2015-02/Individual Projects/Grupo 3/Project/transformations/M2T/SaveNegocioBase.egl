@@ -1,0 +1,37 @@
+[%
+
+	var rutaBase = "<<-rutabasejee->>";
+
+	var aplicacion = jee!Aplicacion.all().at(0);
+	var capa = aplicacion.capas.select(c|c.nombre.endsWith("Entidad")).at(0);
+	var entidades = capa.clases;
+	for (entidad in entidades){
+		var t:Template:=TemplateFactory.load('JEE2Entidades.egl');
+		t.populate('className',entidad.nombre);
+
+		t.generate(rutaBase +'/co/edu/uniandes/'+capa.nombre.toLowerCase().split("entidad")[0]+'/entidad/'+entidad.nombre+'.java');
+	}
+	
+	var temp:Template:=TemplateFactory.load('JEE2Persistence.egl');
+	temp.generate(rutaBase+'/META-INF/persistence.xml');
+		
+	capa = aplicacion.capas.select(c|c.nombre.endsWith("Negocio")).at(0);
+	entidades = capa.clases;
+	for (entidad in entidades){
+		var t:Template:=TemplateFactory.load('JEE2EJbsInterfaces.egl');
+		t.populate('className',entidad.nombre);
+		t.generate(rutaBase+'/co/edu/uniandes/'+capa.nombre.toLowerCase().split("negocio")[0]+'/negocio/interfaces/'+entidad.nombre+'Local'+'.java');
+		
+		var t:Template:=TemplateFactory.load('JEE2Ejbs.egl');
+		t.populate('className',entidad.nombre);
+		t.generate(rutaBase+'/co/edu/uniandes/'+capa.nombre.toLowerCase().split("negocio")[0]+'/negocio/implementaciones/'+entidad.nombre+'.java');
+	}
+	
+	capa = aplicacion.capas.select(c|c.nombre.endsWith("Servicio")).at(0);
+	entidades = capa.clases;
+	for (entidad in entidades){
+		var t:Template:=TemplateFactory.load('JEE2WS.egl');
+		t.populate('className',entidad.nombre);
+		t.generate(rutaBase+'/co/edu/uniandes/'+capa.nombre.toLowerCase().split("servicio")[0]+'/servicio/'+entidad.nombre+'.java');
+	}
+%]

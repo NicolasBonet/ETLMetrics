@@ -1,0 +1,15 @@
+'use strict'
+
+###*
+ # @ngdoc service
+ # @name uiApp.[%=service.name.firstToUpperCase()%]
+ # @description
+ # # [%=service.name.firstToUpperCase()%]
+ # Factory in the uiApp.
+###
+angular.module 'uiApp'
+  .factory '[%=service.name.firstToUpperCase()%]', ($resource, ENV)->
+    $resource(ENV.api+'/admin/[%=service.name.toLowerCase()%]s/:id.json',
+       {id:'@id'}, {
+        update: {method:'PUT'}
+      });

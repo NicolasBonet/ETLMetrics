@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ASCII"?>
+<crudAngularGenerator:Application
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:crudAngularGenerator="http://www.example.org/crudAngularGenerator"
+    name="ejemplo">
+  <services
+      name="Estudiante"
+      url="admin/estudiantes"
+      filters="//@cruds.0/@fields.0 //@cruds.0/@fields.1"/>
+  <services
+      name="Curso"
+      url="admin/cursos"
+      filters="//@cruds.1/@fields.0"/>
+  <services
+      name="Periodoacademico"
+      url="admin/periodoacademicos"
+      filters="//@cruds.2/@fields.0"/>
+  <cruds service="//@services.0">
+    <fields
+        key="nombre"
+        dataType="string"/>
+    <fields
+        key="apellido"
+        dataType="string"/>
+    <fields
+        key="fechanacimiento"/>
+    <fields
+        key="curso"
+        isMultiple="true"
+        component="autocompleteMultiple"
+        dataType="relation"
+        relatedService="//@services.1"/>
+  </cruds>
+  <cruds service="//@services.1">
+    <fields
+        key="nombre"
+        dataType="string"/>
+    <fields
+        key="codigo"
+        dataType="string"/>
+    <fields
+        key="descripcion"
+        dataType="text"/>
+  </cruds>
+  <cruds service="//@services.2">
+    <fields
+        key="nombre"
+        dataType="string"/>
+    <fields
+        key="fechainicio"/>
+    <fields
+        key="fechafin"/>
+  </cruds>
+</crudAngularGenerator:Application>

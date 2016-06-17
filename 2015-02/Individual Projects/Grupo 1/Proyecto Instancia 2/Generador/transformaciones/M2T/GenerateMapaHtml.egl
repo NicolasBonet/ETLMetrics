@@ -1,0 +1,556 @@
+[%
+	var banner:String;
+	var background:String;
+	var color:String;
+	var imgHeight:String:='300px';
+	var imgWidth:String:='200px';
+
+	for(vista in view!View.all){
+
+		for(pagina in vista.select(x|x.tipoPagina='Mapa')){
+
+			if(pagina.tipo=='basico')
+			{
+			
+			banner='none';
+			
+			}
+			
+			if(pagina.image.name=='small')
+			{
+			
+			imgHeight='50px'; imgWidth='50px';
+			
+			}
+			
+			if(pagina.background.name=='blue')
+			{
+			
+			 background ='rgb(49,153,251)';
+			 
+			 }
+			 
+			if(pagina.background.name=='gray')
+			{ 
+			
+			background ='rgb(139,146,138)';
+			
+			}
+			
+			if(pagina.font.name=='blue')
+			{
+			
+			color='rgb(49,153,251)';
+			
+			}
+			
+			if(pagina.font.name=='gray')
+			{
+			
+			color='rgb(139,146,138)';
+			
+			}
+			
+			if(pagina.font.name=='white' or pagina.font.name=='black')
+			{
+			
+			color=pagina.font.name;
+			
+			}
+			
+			if(pagina.background.name=='white' or pagina.background.name=='black')
+			{
+			
+			background=pagina.background.name;
+			
+			}
+			
+%]
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAt_uQfUfa11Rj-gOHoCP_kNX1O2JfaBRk&signed_in=true&callback=initMap"
+        async defer>
+    </script>
+    <script src="../js/jquery.js"></script>
+
+  
+    <script src="../js/bootstrap.min.js"></script>
+       <script>
+   
+         var map;
+         var initialLocation;
+         var marker0;
+         var imagenes=[];
+         var nombres=[];
+         var horarios=[];
+         var mensajes=[];
+		function initMap() {
+ 
+  	    map = new google.maps.Map(document.getElementById('map'), {
+    	zoom: 15
+   		
+   		});
+ [%
+ 		if(pagina.tipo<>'basico')
+ 		{
+ %]
+     	if(navigator.geolocation) {
+   			
+   			navigator.geolocation.getCurrentPosition(function(position) {
+     		initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+      		map.setCenter(initialLocation);
+      		marker0 = new google.maps.Marker({
+    		position: initialLocation,
+    		map: map,
+        	icon:'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+    		
+  			
+  			}); 
+  
+    	var infowindow=new google.maps.InfoWindow;
+ 		var initialLocStr =initialLocation.toString();
+  		var initialLocArray=initialLocStr.split(',',2);
+  		initialLocArray[0]=initialLocArray[0].replace('(','');
+  		initialLocArray[1]=initialLocArray[1].replace(')','');
+ 		var geocoder = new google.maps.Geocoder;
+ 
+ 		var latlng = {
+ 		
+ 		lat: parseFloat(initialLocArray[0]), 
+ 		lng: parseFloat(initialLocArray[1])
+ 		
+ 		};
+  
+        geocoder.geocode(
+        	
+        	{'location': latlng}, 
+        	function(results, status) {
+    			if (status === google.maps.GeocoderStatus.OK) {
+      				if (results[1]) {
+        				
+        				map.setZoom(11);
+        				infowindow.setContent('<div  style="width:120px;"><h3>Usted esta aqui</h3>'+results[1].formatted_address+'</div>');
+[%						
+							if(pagina.tipo=='gold')
+							{
+%]   
+							marker0.addListener('click',function(){infowindow.open(map, this);});
+[%
+							}
+%]			
+      				  } 
+    				} 
+  				});
+  
+    		});
+  		}
+[%
+	}
+%]
+
+ $.getJSON('https://api.myjson.com/bins/1yp7x',function( data ){
+ var tiendas=data.tiendas;
+  var scadena='';
+ $.each(tiendas,function(key,val){
+ scadena=scadena+'<p><h4>'+val.nombre+'</h4></p><img src='+val.imagen+' style="height:100px; width:150px;"/></p><p><small>'+val.horario+'</small></p><p ><small>'+val.mensaje+'</small><hr></p>';
+
+  
+   	var myLatLng = {
+   	
+   	lat:parseFloat(val.latitud),
+   	lng:parseFloat(val.longitud)
+   	
+   	};
+   
+   
+   
+   	var geocoder = new google.maps.Geocoder; 
+ 
+ [%
+ 	if(pagina.tipo=='basico')
+ 	{
+ 	
+ %]  map.setCenter(myLatLng);
+ [%
+ 	}
+ %]
+     geocoder.geocode(
+     	{'location': myLatLng}, 
+     	function(results, status) {
+    		if(status === google.maps.GeocoderStatus.OK) {
+      			if (results[1]) {
+        			map.setZoom(11);
+        			var marker = new google.maps.Marker({
+    					position: myLatLng,
+    					map: map,
+    					title:val.nombre
+  					});
+  					
+       var infowindow1=new google.maps.InfoWindow;
+           infowindow1.setContent(results[1].formatted_address);
+[%
+	if(pagina.tipo=='gold')
+		{
+%] 		
+		marker.addListener('click',function(){infowindow1.open(map, this);});
+[%
+		}
+%]
+      } 
+    } 
+  });
+  });
+   $('#lateralIzq').html('<h2>Sucursales</h2><div>'+scadena+'</div>');
+ });
+} 
+
+$.getJSON("https://api.myjson.com/bins/4ztdt",function( data ){
+		var purl=data.clientes;
+		var ucadena='';
+	$.each(purl,function( key, val ){
+    
+	ucadena=ucadena+'<img src="'+val.url+'"/>';
+	
+	});
+	ucadena='<p><h4>Nuestros Clientes</h4></p>'+ucadena;
+	$('#pieCliente').html(ucadena);
+	});
+	
+	$.getJSON("https://api.myjson.com/bins/4bo0l",function( data ){
+	var publicidad=data.publicidad;
+    var cadena='';
+	$.each(publicidad,function( key, val ){
+	 cadena=cadena+'<p><h3>'+val.nombre+'</3></p><p><img src="'+val.imagen+'"/></p><p><a><small>'+val.visitenos+'</small></a><hr></p>';
+	});
+	$('#lateralDer').html('<h2>Publicidad</h2><div>'+cadena+'</div>');
+	});
+	
+    </script>
+   
+    <style>
+    
+    	img{
+    	
+    		height:[%=imgHeight%];
+    		width:[%=imgWidth%];
+    	
+    		}
+    		  
+     	#container1{
+        
+        	height: 1000px;
+          	width: 100%;
+          	background:[%=background%];
+     		color:[%=color%];  
+         
+      		}
+      		
+      	#cabecera{
+        
+        	position:relative;
+[%
+			if(banner=='none')
+			{
+%]			
+			height: 5%;
+[%			
+			}
+			else{
+%]			
+			height: 20%;
+[%
+			}
+%]
+          	background:[%=background%];
+     		color:[%=color%];  
+          
+      		}
+      		
+     	#campoContenido{
+	        
+	        position: relative;
+	        height: 55%;
+	        width: 100%;
+	        padding-bottom:3%;
+      		}
+      		
+      #lateralIzq{
+		    
+		    position: relative;
+		    float: left;
+		    padding-left: 3%;
+		    width: 20%;
+		    height: 100%;
+		    background:[%=background%];
+     		color:[%=color%]; 
+             padding-bottom:3%;
+      		}
+      		
+      		 #lateralIzq div{
+		    
+		    position: relative;
+		   
+		
+		    width: 100%;
+		    height: 100%;
+		    background:[%=background%];
+     		color:[%=color%]; 
+            overflow-y:auto;
+            padding-left:2%;
+      		}
+      		
+      		
+      #campoCentral{
+      
+         	position: relative;
+         	float: left;
+[% 
+			if(pagina.tipo=='gold')
+			{
+			
+%]  		width: 60%;
+[%
+            }
+            else{
+ %]
+ 			width: 80%;
+ [%
+ 			}
+ %]
+          	height: 100%;
+         
+          
+      		}
+      
+      	
+      #lateralDer{
+        
+        
+        position:relative;
+        float: left;
+        padding-left: 3%;
+        width: 20%;
+        height: 100%;
+        background:[%=background%];
+     	color:[%=color%];  
+      	
+        padding-bottom:3%;
+      	}
+      
+      #lateralDer div{
+        
+        overflow-y: scroll;
+        position:relative;
+       
+       
+        width: 100%;
+        height: 100%;
+        background:[%=background%];
+     	color:[%=color%];  
+      	
+       
+      	}
+      
+      
+      	#pieDePag{
+            
+        	position:relative;
+          	height:15%;
+          	
+          	width:100%;
+          	color:rgb(210,210,210); 
+          	background-color: rgb(26,26,26);
+            
+      		}
+     
+      	#map{
+       
+       		height: 100%;
+        	color:black; 
+      		
+      		}
+      
+        #lateralDer  img{
+        padding-left:5%; 
+        height: 70%;
+        width: 70%;
+       
+       	}
+      		
+      	#cabecera img{
+          
+        	height: 100%;
+         	width: 100%;  
+      		
+      		}
+          
+      	#pieCliente{
+        	
+        	position: relative;
+          	float: left;
+          	width: 33%;
+          	padding: 1%;
+          	height: 100%;
+           	border-left-style: solid;
+           	border-left-width: thin;
+           	border-left-color: rgb(100,100,100);
+           	border-right-style: solid;
+           	border-right-width: thin;
+           	border-right-color: rgb(100,100,100);
+            background:[%=background%];
+     		color:[%=color%]; 
+      		
+      		}
+      
+      	#pieEnlace{
+          
+          	float: left;
+          	width: 33%;
+          	padding: 1%;
+          	height: 100%;
+            border-right-style: solid;
+           	border-right-width: thin;
+           	border-right-color: rgb(100,100,100);
+            background:[%=background%];
+     		color:[%=color%];
+      		
+      		}
+      
+      	#pieEnlace a{
+          
+          	color:[%=color%];
+      
+      		}
+      
+      	#pieCredito{
+        
+          	float: left;
+           	width: 34%;
+          	padding: 1%;
+          	height: 100%;
+          	font: small;
+            border-right-style: solid;
+           	border-right-width: thin;
+           	border-right-color: rgb(100,100,100);
+           	background:[%=background%];
+    	 	color:[%=color%];
+            
+     	 	}
+      
+      	#pieCliente img{
+        
+          	height: 50%;
+          	width: 20%;
+          	float:left;
+          	padding-left: 5%;
+          	background:[%=background%];
+     		color:[%=color%];
+      
+      		}
+     
+    </style>
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../css/2-col-portfolio.css" rel="stylesheet">
+  </head>
+  <body>
+    
+   <div id="container1">
+       <div id="cabecera">
+           <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        		<div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            		<div class="navbar-header">
+                		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    	<span class="sr-only">Toggle navigation</span>
+                    	<span class="icon-bar"></span>
+                    	<span class="icon-bar"></span>
+                    	<span class="icon-bar"></span>
+                		</button>
+                		<a class="navbar-brand" href="../index/index.html">Inicio</a>
+            		</div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                		<ul class="nav navbar-nav">
+                    		<li>
+                        		<a href="#">Catalogo</a>
+                    		</li>
+                    		<li>
+                        		<a href="#">Promocion</a>
+                    		</li>
+                    		<li>
+                        		<a href="#">Contacto</a>
+                   			</li>
+                		</ul>
+            		</div>
+            <!-- /.navbar-collapse -->
+        		</div>
+        <!-- /.container -->
+    		</nav>
+[%
+			if(banner<>'none')
+			{
+
+%] 				<img id="banner" src="../images/banner.jpg"/>
+[%
+			}
+%]
+       </div>
+       <hr>
+       	<div id="campoContenido">
+           <div id="lateralIzq">
+               <h3><strong>Sucursales</strong></h3><hr><p>
+                <img class='sucu' />
+        		<p><h4 class="sucursal"></h4>
+            	<small class="horario" style='color:[%=color%]'>
+                </small>
+                </p>
+            	
+           </div>
+          		<div id="campoCentral">
+              		<div id="map"></div>
+           		</div>
+           		
+[%				if(pagina.tipo=='gold')
+				{
+
+%]  			<div id="lateralDer">
+             	
+       	</div>
+[%
+       		}
+%]
+           
+   </div>
+   <hr>
+       <div id="pieDePag">
+           <div id="pieCliente">
+           </div>
+      	   <div id="pieEnlace"><strong>Enlaces de interes</strong><p>
+               <a href="http://www.uniandes.edu.co/">recursos y capacitaciones</a><br>
+               <a href="https://moodleinstitucional.uniandes.edu.co/login/index.php">consultas interactivas y foros</a><br>
+               <a href="sicuaplus.uniandes.edu.co">talleres y evaluaciones</a><br>
+               <a href="labsis.uniandes.edu.co">laboratorios de calidad y desarrolo de productos</a>
+     	  </div>
+          <div id="pieCredito"><strong>Creditos</strong><p>
+               Alejandro Quintero<p>Juan David Poveda<p>Ernesto Nobmann<p>Copyright 2015 
+          </div>
+       </div>
+   </div>
+   
+ 
+  </body>
+</html> 
+
+[%
+}
+}
+%]
+
+

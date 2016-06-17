@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project default="build">
+	<echo>Iniciando proceso de construcción de Cadena</echo>
+	<property name="generated.location" location="${basedir}/generated" />
+	
+	<echo>Iniciando carga de carpetas</echo>
+	<property name="transformations.location" location="${basedir}/transformations" />
+	<property name="models.location" location="${basedir}/models" />
+	<property name="metamodels.location" location="${basedir}/metamodels" />
+	<echo>Fin carga de carpetas</echo>
+	
+	<echo>Iniciando carga de config metamodel</echo>
+	<property name="config.metamodel.uri" value="http://www.uniandes.com/config2sql/xtext/Config" />
+	<echo>Fin carga de Config metamodel ${config.metamodel.location}</echo>
+
+	<echo>Iniciando carga de Sql metamodel</echo>
+	<property name="sql.metamodel.location" location="${metamodels.location}/SqlModel.ecore" />
+	<property name="sql.metamodel.uri" value="DB" />
+	<echo>Fin carga de Sql metamodel ${sql.metamodel.location}</echo>
+
+	<echo>Iniciando carga de Json metamodel</echo>
+	<property name="json.metamodel.uri" value="http://www.uniandes.com/jsontosql/xtext/Json" />
+	<echo>Fin carga de Json metamodel ${json.metamodel.location}</echo>
+
+	<target name="build">
+
+		<echo>Borrando el contenido de la carpeta model salida</echo>
+		<delete dir="${generated.location}/sql3.xmi" failonerror="true" />
+		<echo>Borrando el contenido de la carpeta model de la app</echo>
+		<delete dir="${basedir}/DocumentalToSql/src/main/java/co/com/ap/" failonerror="true" />
+		<delete dir="${basedir}/DocumentalToSql/src/main/java/co/com/ap/" failonerror="true" />
+		<antcall target="m2m" />
+
+	</target>
+
+	<target name="m2m">
+
+		<echo>Iniciando transformación M2M</echo>
+
+		<epsilon.emf.register file="${sql.metamodel.location}" /><echo>Se registro Metamodelo SQL</echo>
+		
+		<epsilon.emf.loadModel name="CONFIG" modelfile="${models.location}/input.config" metamodeluri="${config.metamodel.uri}" read="true" store="false" />
+
+		<epsilon.emf.loadModel name="JSON" modelfile="${models.location}/input.json" metamodeluri="${json.metamodel.uri}" read="true" store="false" />
+
+		<epsilon.emf.loadModel name="DB" modelfile="${generated.location}/sql3.xmi" metamodeluri="${sql.metamodel.uri}" read="false" store="true" />
+		<echo>Archivo final ${models.location}/salida/sql3.xmi</echo>
+		<echo>Iniciando llamado json2sql.etl</echo>
+		<epsilon.etl src="${transformations.location}/m2m/json2sql.etl">
+
+			<model ref="CONFIG" />
+				
+			<model ref="JSON" />
+			
+			<model ref="DB" />
+
+		</epsilon.etl>
+		<echo>Fin llamado json2sql.etl</echo>
+		
+		<antcall target="m2t" />
+		<echo>Iniciando SQL Create</echo>
+		<antcall target="m2tCreate" />
+		<echo>Fin SQL Create</echo>
+	</target>
+
+	<target name="m2t">
+
+		<echo>Corriendo Template EGL</echo>
+		
+		<epsilon.emf.register file="${sql.metamodel.location}" />
+
+		<epsilon.emf.loadModel name="SQL" modelfile="${generated.location}/sql3.xmi" metamodeluri="${sql.metamodel.uri}" read="true" store="false" />
+		<epsilon.emf.loadModel name="CO" modelfile="${models.location}/input.config" metamodeluri="${config.metamodel.uri}" read="true" store="false" />
+
+		<epsilon.egl src="${transformations.location}/m2t/masterApp.egl">
+			<parameter name="ubicacion" value="../../DocumentalToSql/src/main/java/co/com/ap/"/>
+			<model ref="CO" />
+			<model ref="SQL" />
+		</epsilon.egl>
+
+	</target>
+	<target name="m2tCreate">
+
+		<echo>Corriendo Template EGL</echo>
+		
+		<epsilon.emf.register file="${sql.metamodel.location}" />
+
+		<epsilon.emf.loadModel name="DB" modelfile="${generated.location}/sql3.xmi" metamodeluri="${sql.metamodel.uri}" read="true" store="false" />
+
+		<epsilon.egl src="${transformations.location}/m2t/master.egl">
+			<model ref="DB" />
+		</epsilon.egl>
+
+	</target>
+
+</project>

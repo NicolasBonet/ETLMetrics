@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="ASCII"?>
+<arquitectura:Sistema xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:arquitectura="http://www.example.org/arquitectura" nombre="SistemaGestionUniversitario" dominio="SistemaGestionUniversitario">
+  <proyecto_negocio nombre="SistemaGestionUniversitarioNegocio">
+    <capas xsi:type="arquitectura:CapaEntidad" nombre="SistemaGestionUniversitarioEntidad">
+      <clases nombre="Persona">
+        <atributos nombre="Nombre"/>
+        <atributos nombre="Apellido"/>
+        <atributos nombre="Documento"/>
+        <atributos nombre="Direccion"/>
+        <atributos nombre="Edad" tipoDato="Entero">
+          <validaciones nombre="MAYOREDAD" valor="18" tipoValidacion="MAYORIGUAL"/>
+        </atributos>
+        <atributos nombre="ViveBogota" tipoDato="Booleano"/>
+      </clases>
+      <clases nombre="Curso">
+        <atributos nombre="Nombre"/>
+        <relaciones nombre="Profesor" destino="//@entidades.2" multiplicidadOrigen="MUCHOS" multiplicidadDestino="UNO" tipo="AGREGACION"/>
+      </clases>
+      <clases nombre="Profesor">
+        <atributos nombre="Codigo"/>
+        <relaciones nombre="Persona" destino="//@entidades.0"/>
+      </clases>
+    </capas>
+    <capas xsi:type="arquitectura:CapaNegocio" nombre="SistemaGestionUniversitarioNegocio">
+      <clases nombre="Persona">
+        <atributos nombre="Nombre"/>
+        <atributos nombre="Apellido"/>
+        <atributos nombre="Documento"/>
+        <atributos nombre="Direccion"/>
+        <atributos nombre="Edad" tipoDato="Entero"/>
+        <atributos nombre="ViveBogota" tipoDato="Booleano"/>
+      </clases>
+      <clases nombre="Curso">
+        <atributos nombre="Nombre"/>
+      </clases>
+      <clases nombre="Profesor">
+        <atributos nombre="Codigo"/>
+      </clases>
+    </capas>
+    <capas xsi:type="arquitectura:CapaServicio" nombre="SistemaGestionUniversitarioServicio">
+      <clases nombre="Persona">
+        <atributos nombre="Nombre"/>
+        <atributos nombre="Apellido"/>
+        <atributos nombre="Documento"/>
+        <atributos nombre="Direccion"/>
+        <atributos nombre="Edad" tipoDato="Entero"/>
+        <atributos nombre="ViveBogota" tipoDato="Booleano"/>
+      </clases>
+      <clases nombre="Curso">
+        <atributos nombre="Nombre"/>
+      </clases>
+      <clases nombre="Profesor">
+        <atributos nombre="Codigo"/>
+      </clases>
+    </capas>
+  </proyecto_negocio>
+  <proyecto_web nombre="SistemaGestionUniversitarioWEB">
+    <capa_presentacion nombre="SistemaGestionUniversitarioWEB">
+      <vistas nombre="PersonaLista" entidad="//@entidades.0"/>
+      <vistas nombre="PersonaDetalle" tipo="DETALLE" entidad="//@entidades.0"/>
+      <vistas nombre="CursoLista" entidad="//@entidades.1"/>
+      <vistas nombre="CursoDetalle" tipo="DETALLE" entidad="//@entidades.1"/>
+      <vistas nombre="ProfesorLista" entidad="//@entidades.2"/>
+      <vistas nombre="ProfesorDetalle" tipo="DETALLE" entidad="//@entidades.2"/>
+    </capa_presentacion>
+  </proyecto_web>
+  <entidades nombre="Persona">
+    <atributos nombre="Nombre"/>
+    <atributos nombre="Apellido"/>
+    <atributos nombre="Documento"/>
+    <atributos nombre="Direccion"/>
+    <atributos nombre="Edad" tipoDato="Entero"/>
+    <atributos nombre="ViveBogota" tipoDato="Booleano"/>
+  </entidades>
+  <entidades nombre="Curso">
+    <atributos nombre="Nombre"/>
+    <relaciones nombre="Profesor" destino="//@entidades.2" multiplicidadOrigen="MUCHOS" multiplicidadDestino="UNO" tipo="AGREGACION"/>
+  </entidades>
+  <entidades nombre="Profesor">
+    <atributos nombre="Codigo"/>
+    <relaciones nombre="Persona" destino="//@entidades.0"/>
+  </entidades>
+</arquitectura:Sistema>

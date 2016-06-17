@@ -1,0 +1,29 @@
+[% import '../netUtil.egl'; %]
+@model IEnumerable<cobiwsite.Models.ReportSalida>
+
+<table class="table">
+    <tr>
+[%
+var vista = CS!Vista.all.select(m|not m.esEntrada).first();
+for(e in vista.elementos) {
+%]    
+        <th>
+            @Html.DisplayNameFor(model => model.[%=e.propiedad.getCSName()%])
+        </th>
+[%}%]
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+[%
+for(e in vista.elementos) {
+%]            
+            <td>
+                @Html.DisplayFor(modelItem => item.[%=e.propiedad.getCSName()%])
+            </td>
+[%}%]
+        </tr>
+    }
+
+</table>

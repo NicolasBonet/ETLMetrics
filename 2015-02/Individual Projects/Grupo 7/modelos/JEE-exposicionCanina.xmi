@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="ASCII"?>
+<jEE:JEE xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:jEE="http://www.example.org/jEE">
+  <Ejbs name="ExposicionPerrosEJB">
+    <bussinesMethods name="ExposicionPerros" return="void" code="        perros = new ArrayList( );&#xA;"/>
+    <bussinesMethods name="darPerros" return="ArrayList&lt;E>" code="        ArrayList copiaLista = new ArrayList( perros );&#xA;        return copiaLista;&#xA;"/>
+    <bussinesMethods name="ordenarPorRaza" return="void" code="        for( int i = perros.size( ); i > 0; i-- )&#xA;        {&#xA;            for( int j = 0; j &lt; i - 1; j++ )&#xA;            {&#xA;                Perro p1 = ( Perro )perros.get( j );&#xA;                Perro p2 = ( Perro )perros.get( j + 1 );&#xA;&#xA;                // Si es necesario se deben intercambiar p1 y p2&#xA;                if( p1.compararPorRaza( p2 ) > 0 )&#xA;                {&#xA;                    perros.set( j, p2 );&#xA;                    perros.set( j + 1, p1 );&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+    <bussinesMethods name="ordenarPorNombre" return="void" code="        for( int i = perros.size( ); i > 0; i-- )&#xA;        {&#xA;            for( int j = 0; j &lt; i - 1; j++ )&#xA;            {&#xA;                Perro p1 = ( Perro )perros.get( j );&#xA;                Perro p2 = ( Perro )perros.get( j + 1 );&#xA;&#xA;                // Si es necesario se deben intercambiar p1 y p2&#xA;                if( p1.compararPorNombre( p2 ) > 0 )&#xA;                {&#xA;                    perros.set( j, p2 );&#xA;                    perros.set( j + 1, p1 );&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+    <bussinesMethods name="ordenarPorPuntos" return="void" code="        for( int i = 1; i &lt; perros.size( ); i++ )&#xA;        {&#xA;            Perro porInsertar = ( Perro )perros.get( i );&#xA;            boolean termino = false;&#xA;            for( int j = i; j > 0 &amp;&amp; !termino; j-- )&#xA;            {&#xA;                Perro actual = ( Perro )perros.get( j - 1 );&#xA;                if( actual.compararPorPuntos( porInsertar ) > 0 )&#xA;                {&#xA;                    perros.set( j, actual );&#xA;                    perros.set( j - 1, porInsertar );&#xA;                }&#xA;                else&#xA;                    termino = true;&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+    <bussinesMethods name="ordenarPorEdad" return="void" code="        int inicial;&#xA;&#xA;        // En cada iteraci&#xfffd;n se sabe que:&#xA;        // 1. Todos los valores antes de perros[inicial] est&#xfffd;n ordenados por edad&#xA;        // 2. No hay ning&#xfffd;n valor despu&#xfffd;s de perros[inicial-1] que sea menor que perros[inicial-1]&#xA;        // En cada iteraci&#xfffd;n se busca el menor entre perros[inicial] y perros[final] y se ubica en perros[inicial]&#xA;&#xA;        for( inicial = 0; inicial &lt; perros.size( ); inicial++ )&#xA;        {&#xA;            int posicionMenor = inicial;&#xA;            Perro perroMenor = ( Perro )perros.get( inicial );&#xA;&#xA;            // Buscar el perro de menor edad entre inicial y final&#xA;            for( int i = inicial + 1; i &lt; perros.size( ); i++ )&#xA;            {&#xA;                Perro perroPosicion = ( Perro )perros.get( i );&#xA;&#xA;                // El perro de la posici&#xfffd;n actual es menor que el menor encontrado hasta el momento&#xA;                if( perroPosicion.compararPorEdad( perroMenor ) &lt; 0 )&#xA;                {&#xA;                    perroMenor = perroPosicion;&#xA;                    posicionMenor = i;&#xA;                }&#xA;            }&#xA;&#xA;            if( posicionMenor != inicial )&#xA;            {&#xA;                Perro temp = ( Perro )perros.get( inicial );&#xA;                perros.set( inicial, perroMenor );&#xA;                perros.set( posicionMenor, temp );&#xA;            }&#xA;&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+    <bussinesMethods name="buscarPerro" return="int" code="        int posicion = -1;&#xA;        boolean termine = false;&#xA;&#xA;        for( int i = 0; i &lt; perros.size( ) &amp;&amp; !termine; i++ )&#xA;        {&#xA;            Perro perroPosicion = ( Perro )perros.get( i );&#xA;            String nombrePerro = perroPosicion.darNombre( );&#xA;&#xA;            // Los nombres son iguales&#xA;            if( nombrePerro.equalsIgnoreCase( nombre ) )&#xA;            {&#xA;                posicion = i;&#xA;                termine = true;&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;">
+      <attributes name="nombre" type="String"/>
+    </bussinesMethods>
+    <bussinesMethods name="buscarBinarioPorNombre" return="int" code="        int posicion = -1;&#xA;        int inicio = 0;&#xA;        int fin = perros.size( ) - 1;&#xA;        Perro aBuscar = new Perro( nombre, &quot;&quot;, &quot;&quot;, 1, 1 );&#xA;        while( inicio &lt;= fin &amp;&amp; posicion == -1 )&#xA;        {&#xA;            int medio = ( inicio + fin ) / 2;&#xA;            Perro mitad = ( Perro )perros.get( medio );&#xA;            if( mitad.compararPorNombre( aBuscar ) == 0 )&#xA;            {&#xA;                posicion = medio;&#xA;            }&#xA;            else if( mitad.compararPorNombre( aBuscar ) > 0 )&#xA;            {&#xA;                fin = medio - 1;&#xA;            }&#xA;            else&#xA;            {&#xA;                inicio = medio + 1;&#xA;            }&#xA;        }&#xA;        return posicion;&#xA;">
+      <attributes name="nombre" type="String"/>
+    </bussinesMethods>
+    <bussinesMethods name="agregarPerro" return="boolean" code="        int perroBuscado = buscarPerro( nombreP );&#xA;        boolean agregado = false;&#xA;        if( perroBuscado == -1 )&#xA;        {&#xA;            Perro nuevoPerro = new Perro( nombreP, razaP, imagenP, puntosP, edadP );&#xA;            perros.add( nuevoPerro );&#xA;            agregado = true;&#xA;        }&#xA;&#xA;        verificarInvariante( );&#xA;&#xA;        return agregado;&#xA;">
+      <attributes name="nombreP" type="String"/>
+      <attributes name="razaP" type="String"/>
+      <attributes name="imagenP" type="String"/>
+      <attributes name="puntosP" type="int"/>
+      <attributes name="edadP" type="int"/>
+    </bussinesMethods>
+    <bussinesMethods name="buscarPerroMayorPuntaje" return="int" code="        int posicion = -1;&#xA;&#xA;        if( perros.size( ) > 0 )&#xA;        {&#xA;            Perro pMayorPuntaje = ( Perro )perros.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; perros.size( ); i++ )&#xA;            {&#xA;                Perro perroPosicion = ( Perro )perros.get( i );&#xA;&#xA;                // Los nombres son iguales&#xA;                if( pMayorPuntaje.compararPorPuntos( perroPosicion ) == -1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    pMayorPuntaje = perroPosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;"/>
+    <bussinesMethods name="buscarPerroMenorPuntaje" return="int" code="        int posicion = -1;&#xA;&#xA;        if( perros.size( ) > 0 )&#xA;        {&#xA;            Perro pMenorPuntaje = ( Perro )perros.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; perros.size( ); i++ )&#xA;            {&#xA;                Perro perroPosicion = ( Perro )perros.get( i );&#xA;&#xA;                // Los nombres son iguales&#xA;                if( pMenorPuntaje.compararPorPuntos( perroPosicion ) == 1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    pMenorPuntaje = perroPosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;"/>
+    <bussinesMethods name="buscarPerroMayorEdad" return="int" code="        int posicion = -1;&#xA;&#xA;        if( perros.size( ) > 0 )&#xA;        {&#xA;            Perro pMayorEdad = ( Perro )perros.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; perros.size( ); i++ )&#xA;            {&#xA;                Perro perroPosicion = ( Perro )perros.get( i );&#xA;&#xA;                // Los nombres son iguales&#xA;                if( pMayorEdad.compararPorEdad( perroPosicion ) == -1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    pMayorEdad = perroPosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;"/>
+    <bussinesMethods name="verificarInvariante" return="void" code="        assert ( perros != null ) : &quot;La lista de perros no debe ser null&quot;;&#xA;        assert ( !buscarPerrosConNombresRepetidos( ) ) : &quot;Hay dos perros con el mismo nombre&quot;;&#xA;"/>
+    <bussinesMethods name="buscarPerrosConNombresRepetidos" return="boolean" code="        for( int i = 0; i &lt; perros.size( ); i++ )&#xA;        {&#xA;            Perro perroI = ( Perro )perros.get( i );&#xA;            for( int j = 0; j &lt; perros.size( ); j++ )&#xA;            {&#xA;                if( i != j )&#xA;                {&#xA;                    Perro perroJ = ( Perro )perros.get( j );&#xA;                    if( perroJ.darNombre( ).equals( perroI.darNombre( ) ) )&#xA;                    {&#xA;                        return true;&#xA;                    }&#xA;                }&#xA;            }&#xA;        }&#xA;        return false;&#xA;"/>
+    <bussinesMethods name="metodo1" return="String" code="        return &quot;respuesta1&quot;;&#xA;"/>
+    <bussinesMethods name="metodo2" return="String" code="        return &quot;respuesta2&quot;;&#xA;"/>
+  </Ejbs>
+  <entities name="Perro">
+    <attributes name="nombre" type="String"/>
+    <attributes name="raza" type="String"/>
+    <attributes name="imagen" type="String"/>
+    <attributes name="puntos" type="int"/>
+    <attributes name="edad" type="int"/>
+    <methods name="Perro" return="void" code="        nombre = nombreP;&#xA;        raza = razaP;&#xA;        imagen = imagenP;&#xA;        puntos = puntosP;&#xA;        edad = edadP;&#xA;&#xA;        verificarInvariante( );&#xA;">
+      <attributes name="nombreP" type="String"/>
+      <attributes name="razaP" type="String"/>
+      <attributes name="imagenP" type="String"/>
+      <attributes name="puntosP" type="int"/>
+      <attributes name="edadP" type="int"/>
+    </methods>
+    <methods name="darNombre" return="String" code="        return nombre;&#xA;"/>
+    <methods name="darRaza" return="String" code="        return raza;&#xA;"/>
+    <methods name="darImagen" return="String" code="        return imagen;&#xA;"/>
+    <methods name="darPuntos" return="int" code="        return puntos;&#xA;"/>
+    <methods name="darEdad" return="int" code="        return edad;&#xA;"/>
+    <methods name="compararPorNombre" return="int" code="    &#x9;int valorComparacion = nombre.compareToIgnoreCase( p.nombre );&#xA;    &#x9;if(valorComparacion &lt; 0){&#xA;    &#x9;&#x9;valorComparacion = -1;&#xA;    &#x9;}else if(valorComparacion == 0){&#xA;    &#x9;&#x9;valorComparacion = 0;&#xA;    &#x9;}else{&#xA;    &#x9;&#x9;valorComparacion = 1;&#xA;    &#x9;}&#xA;        return valorComparacion;&#xA;">
+      <attributes name="p" type="Perro"/>
+    </methods>
+    <methods name="compararPorRaza" return="int" code="        int valorComparacion = raza.compareToIgnoreCase( p.raza );&#xA;    &#x9;if(valorComparacion &lt; 0){&#xA;    &#x9;&#x9;valorComparacion = -1;&#xA;    &#x9;}else if(valorComparacion == 0){&#xA;    &#x9;&#x9;valorComparacion = 0;&#xA;    &#x9;}else{&#xA;    &#x9;&#x9;valorComparacion = 1;&#xA;    &#x9;}&#xA;        return valorComparacion;&#xA;">
+      <attributes name="p" type="Perro"/>
+    </methods>
+    <methods name="compararPorPuntos" return="int" code="        if( puntos == p.puntos )&#xA;            return 0;&#xA;        else if( puntos > p.puntos )&#xA;            return 1;&#xA;        else&#xA;            return -1;&#xA;">
+      <attributes name="p" type="Perro"/>
+    </methods>
+    <methods name="compararPorEdad" return="int" code="        if( edad == p.edad )&#xA;            return 0;&#xA;        else if( edad > p.edad )&#xA;            return 1;&#xA;        else&#xA;            return -1;&#xA;">
+      <attributes name="p" type="Perro"/>
+    </methods>
+    <methods name="toString" return="String" code="        return nombre + &quot; (&quot; + raza + &quot;)&quot;;&#xA;"/>
+    <methods name="verificarInvariante" return="void" code="        assert ( puntos >= 0 ) : &quot;Los puntos no pueden ser menores a 0&quot;;&#xA;        assert ( edad > 0 ) : &quot;La edad no puede ser 0&quot;;&#xA;        assert ( imagen != null ) : &quot;La imagen no puede ser null&quot;;&#xA;        assert ( nombre != null ) : &quot;El nombre no puede ser null&quot;;&#xA;        assert ( raza != null ) : &quot;La raza no puede ser null&quot;;&#xA;"/>
+  </entities>
+  <services name="ExposicionPerrosService">
+    <serviceMethods name="ExposicionPerros" return="void" code="        perros = new ArrayList( );&#xA;">
+      <anotations name="GET"/>
+      <anotations name="Path">
+        <parameter name="ExposicionPerros"/>
+      </anotations>
+    </serviceMethods>
+    <serviceMethods name="darPerros" return="ArrayList&lt;E>" code="        ArrayList copiaLista = new ArrayList( perros );&#xA;        return copiaLista;&#xA;">
+      <anotations name="GET"/>
+      <anotations name="Path">
+        <parameter name="darPerros"/>
+      </anotations>
+    </serviceMethods>
+    <serviceMethods name="ordenarPorRaza" return="void" code="        for( int i = perros.size( ); i > 0; i-- )&#xA;        {&#xA;            for( int j = 0; j &lt; i - 1; j++ )&#xA;            {&#xA;                Perro p1 = ( Perro )perros.get( j );&#xA;                Perro p2 = ( Perro )perros.get( j + 1 );&#xA;&#xA;                // Si es necesario se deben intercambiar p1 y p2&#xA;                if( p1.compararPorRaza( p2 ) > 0 )&#xA;                {&#xA;                    perros.set( j, p2 );&#xA;                    perros.set( j + 1, p1 );&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;">
+      <anotations name="GET"/>
+      <anotations name="Path">
+        <parameter name="ordenarPorRaza"/>
+      </anotations>
+    </serviceMethods>
+    <serviceMethods name="ordenarPorNombre" return="void" code="        for( int i = perros.size( ); i > 0; i-- )&#xA;        {&#xA;            for( int j = 0; j &lt; i - 1; j++ )&#xA;            {&#xA;                Perro p1 = ( Perro )perros.get( j );&#xA;                Perro p2 = ( Perro )perros.get( j + 1 );&#xA;&#xA;                // Si es necesario se deben intercambiar p1 y p2&#xA;                if( p1.compararPorNombre( p2 ) > 0 )&#xA;                {&#xA;                    perros.set( j, p2 );&#xA;                    perros.set( j + 1, p1 );&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;">
+      <anotations name="GET"/>
+      <anotations name="Path">
+        <parameter name="ordenarPorNombre"/>
+      </anotations>
+    </serviceMethods>
+    <serviceMethods name="ordenarPorPuntos" return="void" code="        for( int i = 1; i &lt; perros.size( ); i++ )&#xA;        {&#xA;            Perro porInsertar = ( Perro )perros.get( i );&#xA;            boolean termino = false;&#xA;            for( int j = i; j > 0 &amp;&amp; !termino; j-- )&#xA;            {&#xA;                Perro actual = ( Perro )perros.get( j - 1 );&#xA;                if( actual.compararPorPuntos( porInsertar ) > 0 )&#xA;                {&#xA;                    perros.set( j, actual );&#xA;                    perros.set( j - 1, porInsertar );&#xA;                }&#xA;                else&#xA;                    termino = true;&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;">
+      <anotations name="GET"/>
+      <anotations name="Path">
+        <parameter name="ordenarPorPuntos"/>
+      </anotations>
+    </serviceMethods>
+    <serviceMethods name="ordenarPorEdad" return="void" code="        int inicial;&#xA;&#xA;        // En cada iteraci&#xfffd;n se sabe que:&#xA;        // 1. Todos los valores antes de perros[inicial] est&#xfffd;n ordenados por edad&#xA;        // 2. No hay ning&#xfffd;n valor despu&#xfffd;s de perros[inicial-1] que sea menor que perros[inicial-1]&#xA;        // En cada iteraci&#xfffd;n se busca el menor entre perros[inicial] y perros[final] y se ubica en perros[inicial]&#xA;&#xA;        for( inicial = 0; inicial &lt; perros.size( ); inicial++ )&#xA;        {&#xA;            int posicionMenor = inicial;&#xA;            Perro perroMenor = ( Perro )perros.get( inicial );&#xA;&#xA;            // Buscar el perro de menor edad entre inicial y final&#xA;            for( int i = inicial + 1; i &lt; perros.size( ); i++ )&#xA;            {&#xA;                Perro perroPosicion = ( Perro )perros.get( i );&#xA;&#xA;                // El perro de la posici&#xfffd;n actual es menor que el menor encontrado hasta el momento&#xA;                if( perroPosicion.compararPorEdad( perroMenor ) &lt; 0 )&#xA;                {&#xA;                    perroMenor = perroPosicion;&#xA;                    posicionMenor = i;&#xA;                }&#xA;            }&#xA;&#xA;            if( posicionMenor != inicial )&#xA;            {&#xA;                Perro temp = ( Perro )perros.get( inicial );&#xA;                perros.set( inicial, perroMenor );&#xA;                perros.set( posicionMenor, temp );&#xA;            }&#xA;&#xA;        }&#xA;        verificarInvariante( );&#xA;">
+      <anotations name="GET"/>
+      <anotations name="Path">
+        <parameter name="ordenarPorEdad"/>
+      </anotations>
+    </serviceMethods>
+    <serviceMethods name="buscarPerro" return="int" code="        int posicion = -1;&#xA;        boolean termine = false;&#xA;&#xA;        for( int i = 0; i &lt; perros.size( ) &amp;&amp; !termine; i++ )&#xA;        {&#xA;            Perro perroPosicion = ( Perro )perros.get( i );&#xA;            String nombrePerro = perroPosicion.darNombre( );&#xA;&#xA;            // Los nombres son iguales&#xA;            if( nombrePerro.equalsIgnoreCase( nombre ) )&#xA;            {&#xA;                posicion = i;&#xA;                termine = true;&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;">
+      <attributes name="nombre" type="String">
+        <anotations name="PathParam">
+          <parameter name="nombre"/>
+        </anotations>
+      </attributes>
+      <anotations name="GET"/>
+      <anotations name="Path">
+        <parameter name="buscarPerro"/>
+      </anotations>
+    </serviceMethods>
+    <serviceMethods name="buscarBinarioPorNombre" return="int" code="        int posicion = -1;&#xA;        int inicio = 0;&#xA;        int fin = perros.size( ) - 1;&#xA;        Perro aBuscar = new Perro( nombre, &quot;&quot;, &quot;&quot;, 1, 1 );&#xA;        while( inicio &lt;= fin &amp;&amp; posicion == -1 )&#xA;        {&#xA;            int medio = ( inicio + fin ) / 2;&#xA;            Perro mitad = ( Perro )perros.get( medio );&#xA;            if( mitad.compararPorNombre( aBuscar ) == 0 )&#xA;            {&#xA;                posicion = medio;&#xA;            }&#xA;            else if( mitad.compararPorNombre( aBuscar ) > 0 )&#xA;            {&#xA;                fin = medio - 1;&#xA;            }&#xA;            else&#xA;            {&#xA;                inicio = medio + 1;&#xA;            }&#xA;        }&#xA;        return posicion;&#xA;">
+      <attributes name="nombre" type="String">
+        <anotations name="PathParam">
+          <parameter name="nombre"/>
+        </anotations>
+      </attributes>
+      <anotations name="GET"/>
+      <anotations name="Path">
+        <parameter name="buscarBinarioPorNombre"/>
+      </anotations>
+    </serviceMethods>
+    <serviceMethods name="agregarPerro" return="boolean" code="        int perroBuscado = buscarPerro( nombreP );&#xA;        boolean agregado = false;&#xA;        if( perroBuscado == -1 )&#xA;        {&#xA;            Perro nuevoPerro = new Perro( nombreP, razaP, imagenP, puntosP, edadP );&#xA;            perros.add( nuevoPerro );&#xA;            agregado = true;&#xA;        }&#xA;&#xA;        verificarInvariante( );&#xA;&#xA;        return agregado;&#xA;">
+      <attributes name="nombreP" type="String">
+        <anotations name="PathParam">
+          <parameter name="nombreP"/>
+        </anotations>
+      </attributes>
+      <attributes name="razaP" type="String">
+        <anotations name="PathParam">
+          <parameter name="razaP"/>
+        </anotations>
+      </attributes>
+      <attributes name="imagenP" type="String">
+        <anotations name="PathParam">
+          <parameter name="imagenP"/>
+        </anotations>
+      </attributes>
+      <attributes name="puntosP" type="int">
+        <anotations name="PathParam">
+          <parameter name="puntosP"/>
+        </anotations>
+      </attributes>
+      <attributes name="edadP" type="int">
+        <anotations name="PathParam">
+          <parameter name="edadP"/>
+        </anotations>
+      </attributes>
+      <anotations name="POST"/>
+      <anotations name="Path">
+        <parameter name="agregarPerro"/>
+      </anotations>
+    </serviceMethods>
+    <serviceMethods name="buscarPerroMayorPuntaje" return="int" code="        int posicion = -1;&#xA;&#xA;        if( perros.size( ) > 0 )&#xA;        {&#xA;            Perro pMayorPuntaje = ( Perro )perros.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; perros.size( ); i++ )&#xA;            {&#xA;                Perro perroPosicion = ( Perro )perros.get( i );&#xA;&#xA;                // Los nombres son iguales&#xA;                if( pMayorPuntaje.compararPorPuntos( perroPosicion ) == -1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    pMayorPuntaje = perroPosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;">
+      <anotations name="GET"/>
+      <anotations name="Path">
+        <parameter name="buscarPerroMayorPuntaje"/>
+      </anotations>
+    </serviceMethods>
+    <serviceMethods name="buscarPerroMenorPuntaje" return="int" code="        int posicion = -1;&#xA;&#xA;        if( perros.size( ) > 0 )&#xA;        {&#xA;            Perro pMenorPuntaje = ( Perro )perros.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; perros.size( ); i++ )&#xA;            {&#xA;                Perro perroPosicion = ( Perro )perros.get( i );&#xA;&#xA;                // Los nombres son iguales&#xA;                if( pMenorPuntaje.compararPorPuntos( perroPosicion ) == 1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    pMenorPuntaje = perroPosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;">
+      <anotations name="GET"/>
+      <anotations name="Path">
+        <parameter name="buscarPerroMenorPuntaje"/>
+      </anotations>
+    </serviceMethods>
+    <serviceMethods name="buscarPerroMayorEdad" return="int" code="        int posicion = -1;&#xA;&#xA;        if( perros.size( ) > 0 )&#xA;        {&#xA;            Perro pMayorEdad = ( Perro )perros.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; perros.size( ); i++ )&#xA;            {&#xA;                Perro perroPosicion = ( Perro )perros.get( i );&#xA;&#xA;                // Los nombres son iguales&#xA;                if( pMayorEdad.compararPorEdad( perroPosicion ) == -1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    pMayorEdad = perroPosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;">
+      <anotations name="GET"/>
+      <anotations name="Path">
+        <parameter name="buscarPerroMayorEdad"/>
+      </anotations>
+    </serviceMethods>
+    <serviceMethods name="verificarInvariante" return="void" code="        assert ( perros != null ) : &quot;La lista de perros no debe ser null&quot;;&#xA;        assert ( !buscarPerrosConNombresRepetidos( ) ) : &quot;Hay dos perros con el mismo nombre&quot;;&#xA;">
+      <anotations name="GET"/>
+      <anotations name="Path">
+        <parameter name="verificarInvariante"/>
+      </anotations>
+    </serviceMethods>
+    <serviceMethods name="buscarPerrosConNombresRepetidos" return="boolean" code="        for( int i = 0; i &lt; perros.size( ); i++ )&#xA;        {&#xA;            Perro perroI = ( Perro )perros.get( i );&#xA;            for( int j = 0; j &lt; perros.size( ); j++ )&#xA;            {&#xA;                if( i != j )&#xA;                {&#xA;                    Perro perroJ = ( Perro )perros.get( j );&#xA;                    if( perroJ.darNombre( ).equals( perroI.darNombre( ) ) )&#xA;                    {&#xA;                        return true;&#xA;                    }&#xA;                }&#xA;            }&#xA;        }&#xA;        return false;&#xA;">
+      <anotations name="GET"/>
+      <anotations name="Path">
+        <parameter name="buscarPerrosConNombresRepetidos"/>
+      </anotations>
+    </serviceMethods>
+    <serviceMethods name="metodo1" return="String" code="        return &quot;respuesta1&quot;;&#xA;">
+      <anotations name="GET"/>
+      <anotations name="Path">
+        <parameter name="metodo1"/>
+      </anotations>
+    </serviceMethods>
+    <serviceMethods name="metodo2" return="String" code="        return &quot;respuesta2&quot;;&#xA;">
+      <anotations name="GET"/>
+      <anotations name="Path">
+        <parameter name="metodo2"/>
+      </anotations>
+    </serviceMethods>
+  </services>
+</jEE:JEE>

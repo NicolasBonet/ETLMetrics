@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:jEE="http://www.example.org/jEE">
+  <jEE:JEE/>
+  <jEE:JEE>
+    <Ejbs name="BolsaDeEmpleoEJB">
+      <bussinesMethods name="BolsaDeEmpleo" return="void" code="        aspirantes = new ArrayList( );&#xA;&#xA;"/>
+      <bussinesMethods name="darAspirantes" return="ArrayList&lt;E>" code="        ArrayList copia = new ArrayList( aspirantes );&#xA;        return copia;&#xA;"/>
+      <bussinesMethods name="ordenarPorNombre" return="void" code="        for( int i = aspirantes.size( ); i > 0; i-- )&#xA;        {&#xA;            for( int j = 0; j &lt; i - 1; j++ )&#xA;            {&#xA;                Aspirante a1 = ( Aspirante )aspirantes.get( j );&#xA;                Aspirante a2 = ( Aspirante )aspirantes.get( j + 1 );&#xA;&#xA;                // Si es necesario se deben intercambiar a1 y a2&#xA;                if( a1.compararPorNombre( a2 ) > 0 )&#xA;                {&#xA;                    aspirantes.set( j, a2 );&#xA;                    aspirantes.set( j + 1, a1 );&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+      <bussinesMethods name="ordenarPorEdad" return="void" code="        int inicial;&#xA;        // En cada iteraci&#xfffd;n se sabe que:&#xA;        // 1. Las posiciones antes de aspirantes[inicial] est&#xfffd;n ordenadas por edad&#xA;        // 2. No hay ning&#xfffd;n valor despu&#xfffd;s de aspirantes[inicial-1] que sea menor que aspirantes[inicial-1]&#xA;        // En cada iteraci&#xfffd;n se busca el menor entre aspirantes[inicial] y aspirantes[final] y se ubica en aspirantes[inicial]&#xA;&#xA;        for( inicial = 0; inicial &lt; aspirantes.size( ); inicial++ )&#xA;        {&#xA;            int posicionMenor = inicial;&#xA;            Aspirante aspiranteMenor = ( Aspirante )aspirantes.get( inicial );&#xA;&#xA;            // Buscar el Aspirante de menor [int, Edad, Seleccion] entre inicial y final&#xA;            for( int i = inicial + 1; i &lt; aspirantes.size( ); i++ )&#xA;            {&#xA;                Aspirante aspirantePosicion = ( Aspirante )aspirantes.get( i );&#xA;&#xA;                // El aspirante de la posicion actual es menor que el menor encontrado hasta el momento&#xA;                if( aspirantePosicion.compararPorEdad( aspiranteMenor ) &lt; 0 )&#xA;                {&#xA;                    aspiranteMenor = aspirantePosicion;&#xA;                    posicionMenor = i;&#xA;                }&#xA;            }&#xA;&#xA;            if( posicionMenor != inicial )&#xA;            {&#xA;                Aspirante temp = ( Aspirante )aspirantes.get( inicial );&#xA;                aspirantes.set( inicial, aspiranteMenor );&#xA;                aspirantes.set( posicionMenor, temp );&#xA;            }&#xA;&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+      <bussinesMethods name="ordenarPorProfesion" return="void" code="        for( int i = aspirantes.size( ); i > 0; i-- )&#xA;        {&#xA;            for( int j = 0; j &lt; i - 1; j++ )&#xA;            {&#xA;                Aspirante a1 = ( Aspirante )aspirantes.get( j );&#xA;                Aspirante a2 = ( Aspirante )aspirantes.get( j + 1 );&#xA;&#xA;                // Si es necesario se deben intercambiar a1 y a2&#xA;                if( a1.compararPorProfesion( a2 ) > 0 )&#xA;                {&#xA;                    aspirantes.set( j, a2 );&#xA;                    aspirantes.set( j + 1, a1 );&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+      <bussinesMethods name="ordenarPorAniosDeExperiencia" return="void" code="        int inicial;&#xA;&#xA;        // En cada paso se sabe que:&#xA;        // 1. Las posiciones antes de aspirantes[inicial] est&#xfffd;n ordenadas&#xA;        // En cada paso lo que se hace es encontrar en qu&#xfffd; posici&#xfffd;n entre aspirantes[0] y aspirantes[inicial] deber&#xfffd;a&#xA;        // estar el aspirante que en este momento se encuentra en aspirante[inicial]&#xA;&#xA;        for( inicial = 1; inicial &lt; aspirantes.size( ); inicial++ )&#xA;        {&#xA;            Aspirante insertado = ( Aspirante )aspirantes.get( inicial );&#xA;&#xA;            boolean termine = false;&#xA;            int i = inicial - 1;&#xA;&#xA;            while( !termine )&#xA;            {&#xA;                // Si encuentra un cilindraje mayor, entonces hay que intercambiarlos&#xA;                Aspirante aspirantePosicion = ( Aspirante )aspirantes.get( i );&#xA;&#xA;                if( aspirantePosicion.compararPorAniosExperiencia( insertado ) > 0 )&#xA;                {&#xA;                    aspirantes.set( i, insertado );&#xA;                    aspirantes.set( i + 1, aspirantePosicion );&#xA;                    i--;&#xA;                }&#xA;                // Si se encuentra un cilindraje igual o menor entonces ya se encontr&#xfffd; la posici&#xfffd;n&#xA;                else&#xA;                {&#xA;                    termine = true;&#xA;                }&#xA;&#xA;                // Si ya se lleg&#xfffd; al principio de la lista no hay nada m&#xfffd;s que hacer&#xA;                if( i &lt; 0 )&#xA;                {&#xA;                    termine = true;&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+      <bussinesMethods name="buscarAspirante" return="int" code="        int posicion = -1;&#xA;        boolean termine = false;&#xA;&#xA;        for( int i = 0; i &lt; aspirantes.size( ) &amp;&amp; !termine; i++ )&#xA;        {&#xA;            Aspirante aspirantePosicion = ( Aspirante )aspirantes.get( i );&#xA;            String nombreAspirante = aspirantePosicion.darNombre( );&#xA;&#xA;            // Los nombres son iguales&#xA;            if( nombreAspirante.equalsIgnoreCase( nombre ) )&#xA;            {&#xA;                posicion = i;&#xA;                termine = true;&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;">
+        <attributes name="nombre" type="String"/>
+      </bussinesMethods>
+      <bussinesMethods name="buscarBinarioPorNombre" return="int" code="        int posicion = -1;&#xA;        int inicio = 0;&#xA;        int fin = aspirantes.size( ) - 1;&#xA;&#xA;        Aspirante aBuscar = new Aspirante( nombre, Aspirante.INGENIERO_INDUSTRIAL, 1, 1, &quot;&quot;, &quot;&quot; );&#xA;        while( inicio &lt;= fin &amp;&amp; posicion == -1 )&#xA;        {&#xA;            int medio = ( inicio + fin ) / 2;&#xA;            Aspirante mitad = ( Aspirante )aspirantes.get( medio );&#xA;            if( mitad.compararPorNombre( aBuscar ) == 0 )&#xA;            {&#xA;                posicion = medio;&#xA;            }&#xA;            else if( mitad.compararPorNombre( aBuscar ) > 0 )&#xA;            {&#xA;                fin = medio - 1;&#xA;            }&#xA;            else&#xA;            {&#xA;                inicio = medio + 1;&#xA;            }&#xA;        }&#xA;        return posicion;&#xA;">
+        <attributes name="nombre" type="String"/>
+      </bussinesMethods>
+      <bussinesMethods name="agregarAspirante" return="boolean" code="        int aspiranteBuscado = buscarAspirante( nombreA );&#xA;        boolean agregado = false;&#xA;        if( aspiranteBuscado == -1 )&#xA;        {&#xA;            Aspirante nuevoAspirante = new Aspirante( nombreA, profesionA, aniosExperienciaA, edadA, telefonoA, imagenA );&#xA;            aspirantes.add( nuevoAspirante );&#xA;            agregado = true;&#xA;&#xA;        } &#xA;&#xA;        verificarInvariante( );&#xA;&#xA;        return agregado;&#xA;">
+        <attributes name="nombreA" type="String"/>
+        <attributes name="profesionA" type="String"/>
+        <attributes name="aniosExperienciaA" type="int"/>
+        <attributes name="edadA" type="int"/>
+        <attributes name="telefonoA" type="String"/>
+        <attributes name="imagenA" type="String"/>
+      </bussinesMethods>
+      <bussinesMethods name="buscarAspiranteMasJoven" return="int" code="        int posicion = -1;&#xA;&#xA;        if( aspirantes.size( ) > 0 )&#xA;        {&#xA;            Aspirante aMenorEdad = ( Aspirante )aspirantes.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; aspirantes.size( ); i++ )&#xA;            {&#xA;                Aspirante aspirantePosicion = ( Aspirante )aspirantes.get( i );&#xA;&#xA;                if( aMenorEdad.compararPorEdad( aspirantePosicion ) == 1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    aMenorEdad = aspirantePosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;"/>
+      <bussinesMethods name="buscarAspiranteMayorEdad" return="int" code="        int posicion = -1;&#xA;&#xA;        if( aspirantes.size( ) > 0 )&#xA;        {&#xA;            Aspirante aMayorEdad = ( Aspirante )aspirantes.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; aspirantes.size( ); i++ )&#xA;            {&#xA;                Aspirante aspirantePosicion = ( Aspirante )aspirantes.get( i );&#xA;&#xA;                if( aMayorEdad.compararPorEdad( aspirantePosicion ) == -1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    aMayorEdad = aspirantePosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;"/>
+      <bussinesMethods name="buscarAspiranteMayorExperiencia" return="int" code="        int posicion = -1;&#xA;&#xA;        if( aspirantes.size( ) > 0 )&#xA;        {&#xA;            Aspirante aMayorExp = ( Aspirante )aspirantes.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; aspirantes.size( ); i++ )&#xA;            {&#xA;                Aspirante aspirantePosicion = ( Aspirante )aspirantes.get( i );&#xA;&#xA;                if( aMayorExp.compararPorAniosExperiencia( aspirantePosicion ) == -1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    aMayorExp = aspirantePosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;"/>
+      <bussinesMethods name="contratarAspirante" return="boolean" code="        boolean contratado = false;&#xA;&#xA;        if( !aspirantes.isEmpty( ) )&#xA;        {&#xA;            int posicionAspirante = buscarAspirante( nombre );&#xA;            if( posicionAspirante != -1 )&#xA;            {&#xA;                aspirantes.remove( posicionAspirante );&#xA;                contratado = true;&#xA;            }&#xA;        }&#xA;&#xA;        verificarInvariante( );&#xA;&#xA;        return contratado;&#xA;">
+        <attributes name="nombre" type="String"/>
+      </bussinesMethods>
+      <bussinesMethods name="eliminarAspirantesPorExperiencia" return="int" code="        int eliminados = 0;&#xA;&#xA;        int cont = 0;&#xA;&#xA;        while( cont &lt; aspirantes.size( ) )&#xA;        {&#xA;            Aspirante aspirante = ( Aspirante )aspirantes.get( cont );&#xA;&#xA;            if( aspirante.darAniosExperiencia( ) &lt; aniosExperiencia )&#xA;            {&#xA;                aspirantes.remove( cont );&#xA;                eliminados++;&#xA;            }&#xA;            else&#xA;            {&#xA;                cont++;&#xA;            }&#xA;        }&#xA;&#xA;        verificarInvariante( );&#xA;&#xA;        return eliminados;&#xA;">
+        <attributes name="aniosExperiencia" type="int"/>
+      </bussinesMethods>
+      <bussinesMethods name="verificarInvariante" return="void" code="        assert ( aspirantes != null ) : &quot;La lista de aspirantes no debe ser null&quot;;&#xA;        assert ( !buscarAspirantesConNombresRepetidos( ) ) : &quot;Hay dos aspirantes con el mismo nombre&quot;;&#xA;"/>
+      <bussinesMethods name="buscarAspirantesConNombresRepetidos" return="boolean" code="        for( int i = 0; i &lt; aspirantes.size( ); i++ )&#xA;        {&#xA;            Aspirante aspiranteI = ( Aspirante )aspirantes.get( i );&#xA;            for( int j = 0; j &lt; aspirantes.size( ); j++ )&#xA;            {&#xA;                if( i != j )&#xA;                {&#xA;                    Aspirante aspiranteJ = ( Aspirante )aspirantes.get( j );&#xA;                    if( aspiranteJ.darNombre( ).equals( aspiranteI.darNombre( ) ) )&#xA;                    {&#xA;                        return true;&#xA;                    }&#xA;                }&#xA;            }&#xA;        }&#xA;        return false;&#xA;"/>
+      <bussinesMethods name="metodo1" return="String" code="        return &quot;Respuesta 1&quot;;&#xA;"/>
+      <bussinesMethods name="metodo2" return="String" code="        return &quot;Respuesta 2&quot;;&#xA;"/>
+    </Ejbs>
+    <entities name="Aspirante">
+      <attributes name="nombre" type="String"/>
+      <attributes name="profesion" type="String"/>
+      <attributes name="aniosExperiencia" type="int"/>
+      <attributes name="edad" type="int"/>
+      <attributes name="telefono" type="String"/>
+      <attributes name="imagen" type="String"/>
+      <methods name="Aspirante" return="void" code="        nombre = nombreA;&#xA;        profesion = profesionA;&#xA;        aniosExperiencia = aniosExperienciaA;&#xA;        edad = edadA;&#xA;        telefono = telefonoA;&#xA;        imagen = imagenA;&#xA;&#xA;        verificarInvariante( );&#xA;&#xA;">
+        <attributes name="nombreA" type="String"/>
+        <attributes name="profesionA" type="String"/>
+        <attributes name="aniosExperienciaA" type="int"/>
+        <attributes name="edadA" type="int"/>
+        <attributes name="telefonoA" type="String"/>
+        <attributes name="imagenA" type="String"/>
+      </methods>
+      <methods name="darNombre" return="String" code="        return nombre;&#xA;"/>
+      <methods name="darProfesion" return="String" code="        return profesion;&#xA;"/>
+      <methods name="darAniosExperiencia" return="int" code="        return aniosExperiencia;&#xA;"/>
+      <methods name="darEdad" return="int" code="        return edad;&#xA;"/>
+      <methods name="darTelefono" return="String" code="        return telefono;&#xA;"/>
+      <methods name="darImagen" return="String" code="        return imagen;&#xA;"/>
+      <methods name="compararPorNombre" return="int" code="        int resultado = nombre.compareToIgnoreCase( a.nombre );&#xA;        if( resultado > 0 )&#xA;            return 1;&#xA;        else if( resultado &lt; 0 )&#xA;            return -1;&#xA;        else&#xA;            return 0;&#xA;">
+        <attributes name="a" type="Aspirante"/>
+      </methods>
+      <methods name="compararPorProfesion" return="int" code="        int resultado = profesion.compareToIgnoreCase( a.darProfesion( ) );&#xA;        if( resultado > 0 )&#xA;            return 1;&#xA;        else if( resultado &lt; 0 )&#xA;            return -1;&#xA;        else&#xA;            return 0;&#xA;">
+        <attributes name="a" type="Aspirante"/>
+      </methods>
+      <methods name="compararPorAniosExperiencia" return="int" code="        if( aniosExperiencia == a.darAniosExperiencia( ) )&#xA;            return 0;&#xA;        else if( aniosExperiencia > a.darAniosExperiencia( ) )&#xA;            return 1;&#xA;        else&#xA;            return -1;&#xA;&#xA;">
+        <attributes name="a" type="Aspirante"/>
+      </methods>
+      <methods name="compararPorEdad" return="int" code="        if( edad == a.darEdad( ) )&#xA;            return 0;&#xA;        else if( edad > a.darEdad( ) )&#xA;            return 1;&#xA;        else&#xA;            return -1;&#xA;">
+        <attributes name="a" type="Aspirante"/>
+      </methods>
+      <methods name="toString" return="String" code="        return nombre + &quot; - &quot; + profesion;&#xA;"/>
+      <methods name="verificarInvariante" return="void" code="        assert ( nombre != null ) : &quot;nombre no puede ser null&quot;;&#xA;        assert ( profesion.equals( ADMINISTRADOR ) || profesion.equals( INGENIERO_INDUSTRIAL ) || profesion.equals( CONTADOR ) || profesion.equals( ECONOMISTA ) ) : &quot;La profesi&#xfffd;n debe ser uno de los valores v&#xfffd;lidos&quot;;&#xA;        assert ( aniosExperiencia > 0 ) : &quot;aniosExperiencia no puede ser 0&quot;;&#xA;        assert ( edad > 0 ) : &quot;edad no puede ser 0&quot;;&#xA;        assert ( telefono != null ) : &quot;telefono no puede ser null&quot;;&#xA;        assert ( imagen != null ) : &quot;imagen no puede ser null&quot;;&#xA;&#xA;"/>
+    </entities>
+    <services name="BolsaDeEmpleoService">
+      <serviceMethods name="BolsaDeEmpleo" return="void" code="        aspirantes = new ArrayList( );&#xA;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="BolsaDeEmpleo"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="darAspirantes" return="ArrayList&lt;E>" code="        ArrayList copia = new ArrayList( aspirantes );&#xA;        return copia;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="darAspirantes"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="ordenarPorNombre" return="void" code="        for( int i = aspirantes.size( ); i > 0; i-- )&#xA;        {&#xA;            for( int j = 0; j &lt; i - 1; j++ )&#xA;            {&#xA;                Aspirante a1 = ( Aspirante )aspirantes.get( j );&#xA;                Aspirante a2 = ( Aspirante )aspirantes.get( j + 1 );&#xA;&#xA;                // Si es necesario se deben intercambiar a1 y a2&#xA;                if( a1.compararPorNombre( a2 ) > 0 )&#xA;                {&#xA;                    aspirantes.set( j, a2 );&#xA;                    aspirantes.set( j + 1, a1 );&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="ordenarPorNombre"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="ordenarPorEdad" return="void" code="        int inicial;&#xA;        // En cada iteraci&#xfffd;n se sabe que:&#xA;        // 1. Las posiciones antes de aspirantes[inicial] est&#xfffd;n ordenadas por edad&#xA;        // 2. No hay ning&#xfffd;n valor despu&#xfffd;s de aspirantes[inicial-1] que sea menor que aspirantes[inicial-1]&#xA;        // En cada iteraci&#xfffd;n se busca el menor entre aspirantes[inicial] y aspirantes[final] y se ubica en aspirantes[inicial]&#xA;&#xA;        for( inicial = 0; inicial &lt; aspirantes.size( ); inicial++ )&#xA;        {&#xA;            int posicionMenor = inicial;&#xA;            Aspirante aspiranteMenor = ( Aspirante )aspirantes.get( inicial );&#xA;&#xA;            // Buscar el Aspirante de menor [int, Edad, Seleccion] entre inicial y final&#xA;            for( int i = inicial + 1; i &lt; aspirantes.size( ); i++ )&#xA;            {&#xA;                Aspirante aspirantePosicion = ( Aspirante )aspirantes.get( i );&#xA;&#xA;                // El aspirante de la posicion actual es menor que el menor encontrado hasta el momento&#xA;                if( aspirantePosicion.compararPorEdad( aspiranteMenor ) &lt; 0 )&#xA;                {&#xA;                    aspiranteMenor = aspirantePosicion;&#xA;                    posicionMenor = i;&#xA;                }&#xA;            }&#xA;&#xA;            if( posicionMenor != inicial )&#xA;            {&#xA;                Aspirante temp = ( Aspirante )aspirantes.get( inicial );&#xA;                aspirantes.set( inicial, aspiranteMenor );&#xA;                aspirantes.set( posicionMenor, temp );&#xA;            }&#xA;&#xA;        }&#xA;        verificarInvariante( );&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="ordenarPorEdad"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="ordenarPorProfesion" return="void" code="        for( int i = aspirantes.size( ); i > 0; i-- )&#xA;        {&#xA;            for( int j = 0; j &lt; i - 1; j++ )&#xA;            {&#xA;                Aspirante a1 = ( Aspirante )aspirantes.get( j );&#xA;                Aspirante a2 = ( Aspirante )aspirantes.get( j + 1 );&#xA;&#xA;                // Si es necesario se deben intercambiar a1 y a2&#xA;                if( a1.compararPorProfesion( a2 ) > 0 )&#xA;                {&#xA;                    aspirantes.set( j, a2 );&#xA;                    aspirantes.set( j + 1, a1 );&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="ordenarPorProfesion"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="ordenarPorAniosDeExperiencia" return="void" code="        int inicial;&#xA;&#xA;        // En cada paso se sabe que:&#xA;        // 1. Las posiciones antes de aspirantes[inicial] est&#xfffd;n ordenadas&#xA;        // En cada paso lo que se hace es encontrar en qu&#xfffd; posici&#xfffd;n entre aspirantes[0] y aspirantes[inicial] deber&#xfffd;a&#xA;        // estar el aspirante que en este momento se encuentra en aspirante[inicial]&#xA;&#xA;        for( inicial = 1; inicial &lt; aspirantes.size( ); inicial++ )&#xA;        {&#xA;            Aspirante insertado = ( Aspirante )aspirantes.get( inicial );&#xA;&#xA;            boolean termine = false;&#xA;            int i = inicial - 1;&#xA;&#xA;            while( !termine )&#xA;            {&#xA;                // Si encuentra un cilindraje mayor, entonces hay que intercambiarlos&#xA;                Aspirante aspirantePosicion = ( Aspirante )aspirantes.get( i );&#xA;&#xA;                if( aspirantePosicion.compararPorAniosExperiencia( insertado ) > 0 )&#xA;                {&#xA;                    aspirantes.set( i, insertado );&#xA;                    aspirantes.set( i + 1, aspirantePosicion );&#xA;                    i--;&#xA;                }&#xA;                // Si se encuentra un cilindraje igual o menor entonces ya se encontr&#xfffd; la posici&#xfffd;n&#xA;                else&#xA;                {&#xA;                    termine = true;&#xA;                }&#xA;&#xA;                // Si ya se lleg&#xfffd; al principio de la lista no hay nada m&#xfffd;s que hacer&#xA;                if( i &lt; 0 )&#xA;                {&#xA;                    termine = true;&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="ordenarPorAniosDeExperiencia"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="buscarAspirante" return="int" code="        int posicion = -1;&#xA;        boolean termine = false;&#xA;&#xA;        for( int i = 0; i &lt; aspirantes.size( ) &amp;&amp; !termine; i++ )&#xA;        {&#xA;            Aspirante aspirantePosicion = ( Aspirante )aspirantes.get( i );&#xA;            String nombreAspirante = aspirantePosicion.darNombre( );&#xA;&#xA;            // Los nombres son iguales&#xA;            if( nombreAspirante.equalsIgnoreCase( nombre ) )&#xA;            {&#xA;                posicion = i;&#xA;                termine = true;&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;">
+        <attributes name="nombre" type="String">
+          <anotations name="PathParam">
+            <parameter name="nombre"/>
+          </anotations>
+        </attributes>
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="buscarAspirante"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="buscarBinarioPorNombre" return="int" code="        int posicion = -1;&#xA;        int inicio = 0;&#xA;        int fin = aspirantes.size( ) - 1;&#xA;&#xA;        Aspirante aBuscar = new Aspirante( nombre, Aspirante.INGENIERO_INDUSTRIAL, 1, 1, &quot;&quot;, &quot;&quot; );&#xA;        while( inicio &lt;= fin &amp;&amp; posicion == -1 )&#xA;        {&#xA;            int medio = ( inicio + fin ) / 2;&#xA;            Aspirante mitad = ( Aspirante )aspirantes.get( medio );&#xA;            if( mitad.compararPorNombre( aBuscar ) == 0 )&#xA;            {&#xA;                posicion = medio;&#xA;            }&#xA;            else if( mitad.compararPorNombre( aBuscar ) > 0 )&#xA;            {&#xA;                fin = medio - 1;&#xA;            }&#xA;            else&#xA;            {&#xA;                inicio = medio + 1;&#xA;            }&#xA;        }&#xA;        return posicion;&#xA;">
+        <attributes name="nombre" type="String">
+          <anotations name="PathParam">
+            <parameter name="nombre"/>
+          </anotations>
+        </attributes>
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="buscarBinarioPorNombre"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="agregarAspirante" return="boolean" code="        int aspiranteBuscado = buscarAspirante( nombreA );&#xA;        boolean agregado = false;&#xA;        if( aspiranteBuscado == -1 )&#xA;        {&#xA;            Aspirante nuevoAspirante = new Aspirante( nombreA, profesionA, aniosExperienciaA, edadA, telefonoA, imagenA );&#xA;            aspirantes.add( nuevoAspirante );&#xA;            agregado = true;&#xA;&#xA;        } &#xA;&#xA;        verificarInvariante( );&#xA;&#xA;        return agregado;&#xA;">
+        <attributes name="nombreA" type="String">
+          <anotations name="PathParam">
+            <parameter name="nombreA"/>
+          </anotations>
+        </attributes>
+        <attributes name="profesionA" type="String">
+          <anotations name="PathParam">
+            <parameter name="profesionA"/>
+          </anotations>
+        </attributes>
+        <attributes name="aniosExperienciaA" type="int">
+          <anotations name="PathParam">
+            <parameter name="aniosExperienciaA"/>
+          </anotations>
+        </attributes>
+        <attributes name="edadA" type="int">
+          <anotations name="PathParam">
+            <parameter name="edadA"/>
+          </anotations>
+        </attributes>
+        <attributes name="telefonoA" type="String">
+          <anotations name="PathParam">
+            <parameter name="telefonoA"/>
+          </anotations>
+        </attributes>
+        <attributes name="imagenA" type="String">
+          <anotations name="PathParam">
+            <parameter name="imagenA"/>
+          </anotations>
+        </attributes>
+        <anotations name="POST"/>
+        <anotations name="Path">
+          <parameter name="agregarAspirante"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="buscarAspiranteMasJoven" return="int" code="        int posicion = -1;&#xA;&#xA;        if( aspirantes.size( ) > 0 )&#xA;        {&#xA;            Aspirante aMenorEdad = ( Aspirante )aspirantes.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; aspirantes.size( ); i++ )&#xA;            {&#xA;                Aspirante aspirantePosicion = ( Aspirante )aspirantes.get( i );&#xA;&#xA;                if( aMenorEdad.compararPorEdad( aspirantePosicion ) == 1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    aMenorEdad = aspirantePosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="buscarAspiranteMasJoven"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="buscarAspiranteMayorEdad" return="int" code="        int posicion = -1;&#xA;&#xA;        if( aspirantes.size( ) > 0 )&#xA;        {&#xA;            Aspirante aMayorEdad = ( Aspirante )aspirantes.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; aspirantes.size( ); i++ )&#xA;            {&#xA;                Aspirante aspirantePosicion = ( Aspirante )aspirantes.get( i );&#xA;&#xA;                if( aMayorEdad.compararPorEdad( aspirantePosicion ) == -1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    aMayorEdad = aspirantePosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="buscarAspiranteMayorEdad"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="buscarAspiranteMayorExperiencia" return="int" code="        int posicion = -1;&#xA;&#xA;        if( aspirantes.size( ) > 0 )&#xA;        {&#xA;            Aspirante aMayorExp = ( Aspirante )aspirantes.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; aspirantes.size( ); i++ )&#xA;            {&#xA;                Aspirante aspirantePosicion = ( Aspirante )aspirantes.get( i );&#xA;&#xA;                if( aMayorExp.compararPorAniosExperiencia( aspirantePosicion ) == -1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    aMayorExp = aspirantePosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="buscarAspiranteMayorExperiencia"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="contratarAspirante" return="boolean" code="        boolean contratado = false;&#xA;&#xA;        if( !aspirantes.isEmpty( ) )&#xA;        {&#xA;            int posicionAspirante = buscarAspirante( nombre );&#xA;            if( posicionAspirante != -1 )&#xA;            {&#xA;                aspirantes.remove( posicionAspirante );&#xA;                contratado = true;&#xA;            }&#xA;        }&#xA;&#xA;        verificarInvariante( );&#xA;&#xA;        return contratado;&#xA;">
+        <attributes name="nombre" type="String">
+          <anotations name="PathParam">
+            <parameter name="nombre"/>
+          </anotations>
+        </attributes>
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="contratarAspirante"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="eliminarAspirantesPorExperiencia" return="int" code="        int eliminados = 0;&#xA;&#xA;        int cont = 0;&#xA;&#xA;        while( cont &lt; aspirantes.size( ) )&#xA;        {&#xA;            Aspirante aspirante = ( Aspirante )aspirantes.get( cont );&#xA;&#xA;            if( aspirante.darAniosExperiencia( ) &lt; aniosExperiencia )&#xA;            {&#xA;                aspirantes.remove( cont );&#xA;                eliminados++;&#xA;            }&#xA;            else&#xA;            {&#xA;                cont++;&#xA;            }&#xA;        }&#xA;&#xA;        verificarInvariante( );&#xA;&#xA;        return eliminados;&#xA;">
+        <attributes name="aniosExperiencia" type="int">
+          <anotations name="PathParam">
+            <parameter name="aniosExperiencia"/>
+          </anotations>
+        </attributes>
+        <anotations name="DELETE"/>
+        <anotations name="Path">
+          <parameter name="eliminarAspirantesPorExperiencia"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="verificarInvariante" return="void" code="        assert ( aspirantes != null ) : &quot;La lista de aspirantes no debe ser null&quot;;&#xA;        assert ( !buscarAspirantesConNombresRepetidos( ) ) : &quot;Hay dos aspirantes con el mismo nombre&quot;;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="verificarInvariante"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="buscarAspirantesConNombresRepetidos" return="boolean" code="        for( int i = 0; i &lt; aspirantes.size( ); i++ )&#xA;        {&#xA;            Aspirante aspiranteI = ( Aspirante )aspirantes.get( i );&#xA;            for( int j = 0; j &lt; aspirantes.size( ); j++ )&#xA;            {&#xA;                if( i != j )&#xA;                {&#xA;                    Aspirante aspiranteJ = ( Aspirante )aspirantes.get( j );&#xA;                    if( aspiranteJ.darNombre( ).equals( aspiranteI.darNombre( ) ) )&#xA;                    {&#xA;                        return true;&#xA;                    }&#xA;                }&#xA;            }&#xA;        }&#xA;        return false;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="buscarAspirantesConNombresRepetidos"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="metodo1" return="String" code="        return &quot;Respuesta 1&quot;;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="metodo1"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="metodo2" return="String" code="        return &quot;Respuesta 2&quot;;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="metodo2"/>
+        </anotations>
+      </serviceMethods>
+    </services>
+  </jEE:JEE>
+</xmi:XMI>

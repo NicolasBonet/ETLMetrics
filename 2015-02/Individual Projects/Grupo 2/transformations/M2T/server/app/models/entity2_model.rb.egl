@@ -1,0 +1,33 @@
+class [%= entity.name.toLowerCase().firstToUpperCase() %] < ActiveRecord::Base
+  default_scope { order("#{table_name}.id") }
+[%
+ 	for(association in entity.associationAsSource){
+ 	  if(association.manyTarget){
+ 	  	if(association.manySource)
+ 	  		out.println("  has_and_belongs_to_many :"+association.targetName+ ", join_table: '"+association.sourceName.toLowerCase()+'_'+association.targetName.toLowerCase()+"'");
+ 	  	else
+ 	  		out.println("  has_many :"+association.targetName);
+ 	  }else
+ 	  	out.println("  belongs_to :"+association.targetName);
+ 	}
+ 	for(association in entity.associationAsTarget){
+ 	  if(association.manySource){
+ 	  	if(association.manyTarget)
+ 	  		out.println("  has_and_belongs_to_many :"+association.sourceName+ ", join_table: '"+association.sourceName.toLowerCase()+'_'+association.targetName.toLowerCase()+"'");
+ 	  	else
+ 	  		out.println("  has_many :"+association.sourceName);
+ 	  }else
+ 	  	out.println("  has_one :"+association.sourceName);
+ 	}
+	for(attribute in entity.attributes.select(a|a.validations.size()>0)){
+	  var validations = new Sequence();
+	  validations.add("  validates :"+attribute.name);
+	  if(attribute.validations.select(v|v.validationType == railsModel!ValidationType#required).size()>0)
+	  	validations.add('presence: true');
+	  if(attribute.validations.select(v|v.validationType == railsModel!ValidationType#uniqueness).size()>0)
+	  	validations.add('uniqueness: true');
+	  if(validations.size()>1)
+	  	out.println(validations.toString().replace("\\[",'').replace("\\]",''));
+	}
+%]
+end

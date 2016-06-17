@@ -1,0 +1,10 @@
+
+class Create[%=associationName.replace('_','')%] < ActiveRecord::Migration
+  def change
+    create_table :[%=associationName.toLowerCase()%] do |t|
+      t.integer :[%=association.source.name.toLowerCase().replace(' ','_')%]_id
+      t.integer :[%=association.target.name.toLowerCase().replace(' ','_')%]_id
+      t.timestamps null: false
+    end
+  end
+end

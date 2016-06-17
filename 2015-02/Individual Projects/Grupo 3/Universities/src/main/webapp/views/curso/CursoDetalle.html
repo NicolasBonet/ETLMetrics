@@ -1,0 +1,31 @@
+<div>
+<ul class="nav navbar-nav">
+	<li><a ng-href="#/cursolista">Lista Curso</a></li>
+</ul>
+<div>
+
+		<form ng-controller="CursoDetalleCtrl"
+			ng-submit="save(data)"
+			class="jumbotron"
+			role="form">
+			<fieldset class="form-group">
+				<p>Nombre</p>
+				<input ng-model="data.nombre" type="text" class="form-control"/>
+			</fieldset>
+			<fieldset class="form-group">
+				<p>Profesor</p>
+				<select name="profesor" id="Profesor" class="form-control"
+			      ng-options="option.codigo for option in Profesors track by option.id"
+			      ng-model="data.Profesor">
+
+			      </select>
+			</fieldset>
+				<input type="button"
+				ng-click="save(data)" 
+				class="btn btn-default" 
+				value="Guardar"/>
+				<input type="button" ng-click="eliminar(data)"
+				ng-hide="data.id"
+				class="btn btn-primary" value="Eliminar"/>
+		<form>
+

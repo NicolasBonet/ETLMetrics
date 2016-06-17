@@ -1,0 +1,18 @@
+class ApplicationController < ActionController::Base
+  # Prevent CSRF attacks by raising an exception.
+  # For APIs, you may want to use :null_session instead.
+  protect_from_forgery with: :null_session
+  include CleanPagination
+
+  rescue_from Exception do |exception|
+    logger.fatal "#{exception.class} #{exception.message}"
+    exception.backtrace[0..10].
+      each { |line| logger.fatal(line) }
+    render json: {internal_error: exception.message}, status: 500
+  end
+
+  rescue_from ActiveRecord::RecordNotFound do |exception|
+    render json: {not_found: exception.message}, status: 404
+  end
+
+end

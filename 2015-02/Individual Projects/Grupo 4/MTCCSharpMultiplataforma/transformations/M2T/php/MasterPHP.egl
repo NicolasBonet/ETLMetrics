@@ -1,0 +1,25 @@
+[% 
+	for (clase in php!Clase.all) 
+	{ 
+		if(clase.isMain==true)
+		{				
+			for(metodo in clase.metodos)
+			{
+				for(parametro in metodo.parametros)
+				{
+					if(parametro.valores <> null)
+					{
+						//Genera el .html
+						var t1:Template:= TemplateFactory.load('PHP2HTML.egl'); 
+						t1.populate('metodoName', metodo.name); 
+						t1.generate('../../../generated/php/' + metodo.name + '.php');
+						//Genera el .php
+						var t2:Template:= TemplateFactory.load('PHP2PHP.egl'); 
+						t2.populate('metodoName', metodo.name); 
+						t2.generate('../../../generated/php/' + metodo.name + 'api.php');
+					}
+				}
+			}
+		} 
+	}
+%]

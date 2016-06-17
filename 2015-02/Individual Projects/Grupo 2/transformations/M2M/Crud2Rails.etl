@@ -1,0 +1,138 @@
+pre{
+}
+post{
+	//mapear asociaciones
+	var entities_by_name=rails!Entity.allInstances().aggregate(a|a.name,a);
+ 	for(s in crud!Association.allInstances()){
+ 		//reordenar asociaciones muchos a uno
+ 		if(s.manySource and not s.manyTarget ){
+ 			("Association2Association -"+s.sourceName+' /  '+s.targetName).println();
+ 			var t = new rails!Association();
+ 			t.sourceName = s.targetName;
+		 	t.source = entities_by_name.get(s.target.name.toLowerCase().firstToUpperCase().replace(' ',''));
+		 	t.manySource = false;
+		 	
+		 	t.targetName = s.sourceName;
+		 	t.target = entities_by_name.get(s.source.name.toLowerCase().firstToUpperCase().replace(' ',''));
+		 	t.manyTarget=true;	
+ 		}else
+ 			var t_association = s.equivalent();
+ 	}
+}
+
+rule App2App
+	transform s : crud!Application
+	to t : rails!Application {
+	("App2App"+s.name).println();
+	t.name = s.name.split(' ').collect(a|a.firstToUpperCase()).toString().replace('\\[','').replace('\\]','').replace(',','').replace(' ','');
+	("App2App "+t.name).println(); 
+	t.entities = s.entities.equivalent();
+}
+
+
+@lazy
+rule Association2Association
+	transform s : crud!Association
+	to t : rails!Association {
+	("Association2Association "+s.sourceName+' /  '+s.targetName).println();
+	t.sourceName = s.sourceName;
+ 	t.source = entities_by_name.get(s.source.name);
+ 	t.manySource = s.manySource;
+ 	t.targetName = s.targetName;
+ 	t.target = entities_by_name.get(s.target.name);
+ 	t.manyTarget=s.manyTarget;	
+}
+
+@lazy
+rule Entity2Entity
+	transform s : crud!Entity
+	to t : rails!Entity {
+	("  Entity2Entity: "+s.name).println();
+	t.name = s.name.toLowerCase().firstToUpperCase().replace(' ',''); 
+	t.attributes = s.atributes.equivalent();
+	if(not (s.crud == null)){
+		("    Entity2Service: "+s.crud.name).println();
+		t.service = new rails!Service();
+		t.service.allowCreate = s.crud.allowCreate;
+		t.service.allowRead = s.crud.allowRead;
+		t.service.allowUpdate = s.crud.allowUpdate;
+		t.service.allowDelete = s.crud.allowDelete;
+		t.service.name = "admin/"+s.name.toLowerCase().replace(' ','_')+'s';
+		t.service.fields = s.crud.fields.select(f|f.isKindOf(crud!PrimitiveField)).equivalent();
+		for(associationField in s.crud.fields.select(f|f.isKindOf(crud!AssociationField))){
+			("    associationField "+associationField.association.source.name+" / "+associationField.association.target.name).println();
+			var field = new rails!Field();
+			if(s == associationField.association.source){
+				//entity is src
+				if(associationField.association.manyTarget){
+					field.dataType=rails!DataType#array;
+					field.name = associationField.association.target.name.toLowerCase().replace(' ','_')+'_ids';
+				}
+				else{
+					field.dataType=rails!DataType#int;
+					field.name = associationField.association.target.name.toLowerCase().replace(' ','_')+'_id';
+					var fk_attribute=new rails!Attribute();
+					fk_attribute.name = field.name; 
+					fk_attribute.dataType=field.dataType;
+					t.attributes.add(fk_attribute);
+				}
+			}else{
+				//entity is target
+				if(associationField.association.manySource){
+					field.dataType=rails!DataType#array;
+					field.name = associationField.association.source.name.toLowerCase().replace(' ','_')+'_ids';
+				}
+				else{
+					field.dataType=rails!DataType#int;
+					field.name = associationField.association.source.name.toLowerCase().replace(' ','_')+'_id';
+					var fk_attribute=new rails!Attribute();
+					fk_attribute.name = field.name; 
+					fk_attribute.dataType=field.dataType;
+					t.attributes.add(fk_attribute);
+				}
+			}
+			t.service.fields.add(field);
+		}
+	}
+}
+
+@lazy
+rule PrimitiveField2Field
+	transform s : crud!PrimitiveField
+	to t : rails!Field {
+	("    PrimitiveField2Field: "+s.attribute.name).println();
+	t.name = s.attribute.name.toLowerCase().replace(' ','_');
+	t.dataType=convertDataType(s.attribute.dataType);
+}
+
+@lazy
+rule Attr2Attr
+	transform s : crud!Atribute
+	to t : rails!Attribute {
+	("    Attr2Attr: "+s.name).println();
+	t.name = s.name.toLowerCase().replace(' ','_'); 
+	t.validations = s.validations.equivalent();
+	t.dataType=convertDataType(s.dataType);
+}
+
+@lazy
+rule Validation2Validation
+	transform s : crud!Validation
+	to t : rails!Validation {
+	("      Validation2Validation: "+s.validationType.name).println();
+	switch(s.validationType){
+		case crud!ValidationType#required: t.validationType=rails!ValidationType#required;
+		case crud!ValidationType#uniqueness: t.validationType=rails!ValidationType#uniqueness;
+	}
+}
+
+
+operation convertDataType(dataType){
+	switch(dataType){
+		case crud!DataType#int: return rails!DataType#int;
+		case crud!DataType#string:  return rails!DataType#string;
+		case crud!DataType#text:  return  rails!DataType#text;
+		case crud!DataType#decimal: return  rails!DataType#decimal;
+		case crud!DataType#dateTime: return rails!DataType#dateTime;
+	}
+}

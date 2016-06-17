@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/contactoFrame">
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/contacto">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_centerHorizontal="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+[%switch(fragm.background){
+	case android!Color#grisClaro:%]                android:background="@color/grisClaro"[% break;
+	case android!Color#azul:%]                android:background="@color/azul"[% break;
+	case android!Color#blanco:%]                android:background="@color/blanco"[% break;
+	case android!Color#azulClaro:%]                android:background="@color/azulClaro"[% break;
+	case android!Color#negro:%]                android:background="@color/negro"[% break;}%]
+                android:layout_margin="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:id="@+id/infoContactoLinearLayout">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SERVICIO AL CLIENTE"
+                    android:layout_gravity="center_horizontal"
+[%switch(fragm.font){
+	case android!Color#grisClaro:%]                    android:textColor="@color/grisClaro"[% break;
+	case android!Color#azul:%]                    android:textColor="@color/azul"[% break;
+	case android!Color#blanco:%]                    android:textColor="@color/blanco"[% break;
+	case android!Color#azulClaro:%]                    android:textColor="@color/azulClaro"[% break;
+	case android!Color#negro:%]                    android:textColor="@color/negro"[% break;}%]
+                    android:textSize="@dimen/abc_text_size_medium_material"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Linea Nacional: 01 8000 123 456\nBogota: +57(1) 123 4567 Ext: 123"
+                    android:layout_gravity="center_horizontal"
+[%switch(fragm.font){
+	case android!Color#grisClaro:%]                    android:textColor="@color/grisClaro"[% break;
+	case android!Color#azul:%]                    android:textColor="@color/azul"[% break;
+	case android!Color#blanco:%]                    android:textColor="@color/blanco"[% break;
+	case android!Color#azulClaro:%]                    android:textColor="@color/azulClaro"[% break;
+	case android!Color#negro:%]                    android:textColor="@color/negro"[% break;}%]
+                    android:gravity="center"
+                    android:textSize="@dimen/abc_text_size_small_material"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TIENDA EN LINEA"
+                    android:layout_gravity="center_horizontal"
+[%switch(fragm.font){
+	case android!Color#grisClaro:%]                    android:textColor="@color/grisClaro"[% break;
+	case android!Color#azul:%]                    android:textColor="@color/azul"[% break;
+	case android!Color#blanco:%]                    android:textColor="@color/blanco"[% break;
+	case android!Color#azulClaro:%]                    android:textColor="@color/azulClaro"[% break;
+	case android!Color#negro:%]                    android:textColor="@color/negro"[% break;}%]
+                    android:textSize="@dimen/abc_text_size_medium_material"
+                    android:layout_marginTop="20dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="e-mail: eshop@example.com.co"
+[%switch(fragm.font){
+	case android!Color#grisClaro:%]                    android:textColor="@color/grisClaro"[% break;
+	case android!Color#azul:%]                    android:textColor="@color/azul"[% break;
+	case android!Color#blanco:%]                    android:textColor="@color/blanco"[% break;
+	case android!Color#azulClaro:%]                    android:textColor="@color/azulClaro"[% break;
+	case android!Color#negro:%]                    android:textColor="@color/negro"[% break;}%]
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center"
+                    android:textSize="@dimen/abc_text_size_small_material"/>
+
+			<TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ESCRIBENOS"
+                    android:layout_gravity="center_horizontal"
+[%switch(fragm.font){
+	case android!Color#grisClaro:%]                    android:textColor="@color/grisClaro"[% break;
+	case android!Color#azul:%]                    android:textColor="@color/azul"[% break;
+	case android!Color#blanco:%]                    android:textColor="@color/blanco"[% break;
+	case android!Color#azulClaro:%]                    android:textColor="@color/azulClaro"[% break;
+	case android!Color#negro:%]                    android:textColor="@color/negro"[% break;}%]
+                    android:textSize="@dimen/abc_text_size_medium_material"
+                    android:layout_marginTop="20dp"/>
+[%if(fragm.objects.select(o|o.type = android!ObjectType#nombreContacto).size()>0){%]
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Nombre"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center"/>
+[%}%]
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="E-mail"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Comentario"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="5dp"
+                android:layout_below="@+id/infoContactoLinearLayout"
+[%if(fragm.objects.select(o|o.type = android!ObjectType#redesSocialesContacto).size()=0){%]
+                android:visibility="gone"
+[%}%]           >
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:weightSum="1"
+                        android:layout_marginTop="10dp">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+[%switch(fragm.imageSize){
+	case android!ImgSize#small:%]                    android:layout_height="30dp"[% break;
+	case android!ImgSize#large:%]                    android:layout_height="50dp"[% break;}%]
+                            android:src="@drawable/twitter"
+                            android:layout_weight="0.2"
+                            android:id="@+id/twitterContacto" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+[%switch(fragm.imageSize){
+	case android!ImgSize#small:%]                    android:layout_height="30dp"[% break;
+	case android!ImgSize#large:%]                    android:layout_height="50dp"[% break;}%]
+                            android:src="@drawable/facebook"
+                            android:layout_weight="0.2"
+                            android:id="@+id/facebookContacto" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+[%switch(fragm.imageSize){
+	case android!ImgSize#small:%]                    android:layout_height="30dp"[% break;
+	case android!ImgSize#large:%]                    android:layout_height="50dp"[% break;}%]
+                            android:src="@drawable/pinterest"
+                            android:layout_weight="0.2"
+                            android:id="@+id/pinterestContacto" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+[%switch(fragm.imageSize){
+	case android!ImgSize#small:%]                    android:layout_height="30dp"[% break;
+	case android!ImgSize#large:%]                    android:layout_height="50dp"[% break;}%]
+                            android:src="@drawable/instagram"
+                            android:layout_weight="0.2"
+                            android:id="@+id/instagramContacto" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+[%switch(fragm.imageSize){
+	case android!ImgSize#small:%]                    android:layout_height="30dp"[% break;
+	case android!ImgSize#large:%]                    android:layout_height="50dp"[% break;}%]
+                            android:src="@drawable/googleplus"
+                            android:layout_weight="0.2"
+                            android:id="@+id/youtubeContacto" />
+
+                    </LinearLayout>
+
+
+            </LinearLayout>
+
+
+
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+</FrameLayout>

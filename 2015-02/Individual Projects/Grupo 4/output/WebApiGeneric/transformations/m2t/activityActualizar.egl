@@ -1,0 +1,346 @@
+package webapigeneric.co.edu.uniandes.webapigeneric;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.StrictMode;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
+import android.widget.Toast;
+import org.apache.http.HttpResponse;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.util.ArrayList;
+import webapigeneric.co.edu.uniandes.Utils.Conexiones;
+import webapigeneric.co.edu.uniandes.Utils.GetSpinnerValuesTask;
+import java.util.concurrent.ExecutionException;
+
+public class ActualizarActivity extends Activity {//q
+    //generado desde aqui
+    
+   [%
+for(controlador in xmlAndroid!Controlador.all){
+	if(controlador.main==true){
+	for(mt in controlador.metodos){					
+			if(mt.viewType=="Update"){
+				for(propiedad in controlador.metodos.at(0).parametros.valor.propiedades){
+					if(propiedad.esOculto==false){
+						var widgets=propiedad.formElement;
+					if(widgets.isTypeOf(EditText)){//edittrext
+					%]
+private EditText m[%= propiedad.nombre%];
+					[%
+					}
+					else if(widgets.isTypeOf(Radiobutton)){//radiobutton
+					%]
+private RadioGroup mRadioGroup[%= propiedad.nombre%];
+private RadioButton mRadioButton[%= propiedad.nombre%];				
+					[%
+					for (opcion in widgets.opciones){
+					%]
+					private RadioButton mRadioButton[%= opcion.nombre%];					
+					[%
+					}			
+					}
+					else if(widgets.isTypeOf(CheckBox)){//checkbox
+					%]	
+private CheckBox m[%= propiedad.nombre%];		
+					[%
+					}
+					else {//spinner
+					%]
+private Spinner m[%= propiedad.nombre%];
+					[%
+				 }							
+		       }
+	          }											
+						break;
+			}
+		}        	
+  	}  
+  }   
+%]
+    //generado hasta aqui
+    
+    
+    private Button btnSave;//q
+    private Button btnCancel;//q
+    JSONObject object2 = new JSONObject();//q ciudad
+    JSONObject objectExistente = new JSONObject();//q estdiante existente
+    JSONObject object1 = new JSONObject();//q estudiante
+    @Override//q
+    protected void onCreate(Bundle savedInstanceState) {//q
+        super.onCreate(savedInstanceState);//q
+        final int idBuscar = getIntent().getExtras().getInt("idBuscar");//q
+        setContentView(R.layout.activity_actualizar);//q
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();//q
+        StrictMode.setThreadPolicy(policy);//q
+    
+       
+[%
+for(controlador in xmlAndroid!Controlador.all){
+	if(controlador.main==true){
+	for(mt in controlador.metodos){					
+			if(mt.viewType=="Update"){
+				for(propiedad in controlador.metodos.at(0).parametros.valor.propiedades){
+					if(propiedad.esOculto==false){
+						var widgets=propiedad.formElement;
+					if(widgets.isTypeOf(EditText)){//edittrext
+					%]
+/** Text views **/
+m[%= propiedad.nombre%] = (EditText) findViewById(R.id.[%= propiedad.nombre.toLowerCase()%]);
+					[%
+					}
+					else if(widgets.isTypeOf(Radiobutton)){//radiobutton
+					%]
+ /** Radio buttons **/
+mRadioGroup[%= propiedad.nombre%] = (RadioGroup) findViewById(R.id.[%= propiedad.nombre.toLowerCase()%]radioGroup);
+[%
+					for (opcion in widgets.opciones){
+					%]
+mRadioButton[%= opcion.nombre%] =(RadioButton)findViewById(R.id.[%= opcion.nombre.toLowerCase()%]);					
+					[%
+					}
+
+						
+					}
+					else if(widgets.isTypeOf(CheckBox)){//checkbox
+					%]
+/** Check button **/
+m[%= propiedad.nombre%] = (CheckBox) findViewById(R.id.[%= propiedad.nombre.toLowerCase()%]);				
+					[%
+					}
+					else {//spinner
+					%]
+/** Spinner - dropdown **/
+    m[%= propiedad.nombre%] = (Spinner) findViewById(R.id.spinner[%= propiedad.nombre.toLowerCase()%]);
+
+    //This list must be filled with the info received by the respective service.
+    [%
+               var urlAux;
+               var url;
+               for(controlador in xmlAndroid!Controlador.all){
+					if(controlador.main==false){
+						urlAux = controlador.domain + controlador.RoutePrefix;
+						for(metodo in controlador.metodos){
+							
+								url = urlAux + "/" + metodo.nombre;
+								%]
+	 GetSpinnerValuesTask mSpinnerTask = new GetSpinnerValuesTask(this, "[%=url%]");		
+								[%
+							
+						}
+					}
+				}
+               %]
+   
+    try {
+        ArrayList<String> ciudades = mSpinnerTask.execute().get();
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, ciudades);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        m[%= propiedad.nombre%].setAdapter(dataAdapter);
+         m[%= propiedad.nombre%].setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override//q
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {//q
+                    try {//q
+                        object2.put("Id",position+1);
+                        object2.put("Nombre", m[%= propiedad.nombre%].getSelectedItem().toString());
+                    } catch (JSONException e) {//q
+                        e.printStackTrace();//q
+                    }//q
+            }//q
+            @Override//q
+                public void onNothingSelected(AdapterView<?> parent) {//q
+                }//q
+            });//q
+        
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    } catch (ExecutionException e) {
+        e.printStackTrace();
+    }
+					[%
+				 }							
+		       }
+	          }											
+						break;
+			}
+		}        	
+  	}  
+  }
+      
+%]
+    
+        btnSave = (Button) findViewById(R.id.btnSave);//q
+        btnCancel = (Button) findViewById(R.id.btnCancel);//q
+        try {//q
+ [%
+               var urlAux;
+               var url;
+               for(controlador in xmlAndroid!Controlador.all){
+					if(controlador.main==true){
+						urlAux = controlador.domain + controlador.RoutePrefix;
+						for(metodo in controlador.metodos){
+								if(metodo.viewType<>""){
+								url = urlAux + "/" + metodo.nombre;
+								%]
+								
+								[%
+							
+						}
+						break;
+						}
+					}
+				}
+               %]
+
+		//poraui voy
+
+		String json = Conexiones.conexionGetController("[%=url%]", idBuscar);
+            if(json.equals("null")){//q
+                Toast.makeText(this,"Objeto no encontrado",Toast.LENGTH_SHORT).show();//q
+                finish();//q
+            }//q
+            else{//q
+                objectExistente= new JSONObject(json);//q
+                
+                
+                [%   
+for(controlador in xmlAndroid!Controlador.all){
+	if(controlador.main==true){
+	for(mt in controlador.metodos){					
+			if(mt.viewType=="Update"){
+				for(propiedad in controlador.metodos.at(0).parametros.valor.propiedades){
+					if(propiedad.esOculto==false){
+						var widgets=propiedad.formElement;
+					if(widgets.isTypeOf(EditText)){//edittrext
+					%]
+m[%= propiedad.nombre%].setText(objectExistente.getString("[%= propiedad.nombre%]")) ;
+					[%
+					}
+					else if(widgets.isTypeOf(Radiobutton)){//radiobutton
+					%]
+
+         /*if(objectExistente.getInt("[%= propiedad.nombre%]")==0){
+                    mRadioButtonMujer.setChecked(true);
+                }else{
+                    mRadioButtonHombre.setChecked(true);
+                }
+                */			
+					[%			
+					}
+					else if(widgets.isTypeOf(CheckBox)){//checkbox
+					%]
+					  if(objectExistente.getString("[%= propiedad.nombre%]").equals("true")){
+					m[%= propiedad.nombre%].setChecked(true);		
+					}
+				[%
+					}
+			   }
+	          }											
+						break;
+			}
+		}        	
+  	}  
+  }   
+%]
+       
+                btnSave.setOnClickListener(new View.OnClickListener() {//q
+                    @Override//q
+                    public void onClick(View v) {//q
+                        try {//q
+                  
+                          
+                            
+                            //de aqui
+                                
+   [%
+   var urlAux;
+	          var url;				
+for(controlador in xmlAndroid!Controlador.all){
+	if(controlador.main==true){
+	urlAux = controlador.domain + controlador.RoutePrefix;
+	for(mt in controlador.metodos){					
+			if(mt.viewType=="Update"){
+			url = urlAux + "/" + mt.nombre;
+			%]
+			object1.put("Id",idBuscar);
+				[%
+				for(propiedad in controlador.metodos.at(0).parametros.valor.propiedades){
+					if(propiedad.esOculto==false){
+						var widgets=propiedad.formElement;
+					if(widgets.isTypeOf(EditText)){//edittrext
+					%]
+					   object1.put("[%= propiedad.nombre%]", m[%= propiedad.nombre%].getText().toString());
+				[%
+					}
+					else if(widgets.isTypeOf(Radiobutton)){//radiobutton
+					%]
+					int selectedId = mRadioGroup[%= propiedad.nombre%].getCheckedRadioButtonId();
+mRadioButton[%= propiedad.nombre%] = (RadioButton) findViewById(selectedId);
+String [%= propiedad.nombre%] = mRadioButton[%= propiedad.nombre%].getText().toString();
+					
+					object1.put("[%= propiedad.nombre%]", [%= propiedad.nombre%]);
+					[%			
+					}
+					else if(widgets.isTypeOf(CheckBox)){//checkbox
+					%]	
+					   object1.put("[%= propiedad.nombre%]", m[%= propiedad.nombre%].isChecked());
+					[%
+					}
+					else {//spinner
+					%]
+					object1.put("[%= propiedad.nombre%]", object2);
+					[%
+				 }							
+		       }
+	          }	
+	          
+	          %]
+	          		   String object2String=object1.toString();
+	          		   			   HttpResponse resp = null;//q	
+	          		   			    resp = Conexiones.conexionPutController("[%=url%]",object2String);
+                  
+                            if(resp.getStatusLine().getStatusCode()==200){//q
+                                Toast.makeText(getApplicationContext(),"OK",Toast.LENGTH_SHORT).show();//q
+                                finish();//Q
+                            }else{//q
+                                Toast.makeText(getApplicationContext(),"ERROR "+resp.getStatusLine().getStatusCode()+" : "+resp.getStatusLine().getReasonPhrase(),Toast.LENGTH_SHORT).show();//q
+                            }//q
+				[%
+						break;
+			}
+		}        	
+  	}  
+  }   
+%]
+   
+                            //hasta aqui
+            
+                         
+                  
+                           
+                        } catch (Exception e) {//q
+                            e.printStackTrace();//q
+                        }//q
+                    }//q
+                });//q
+            }//q
+            } catch (Exception e) {//q
+            e.printStackTrace();//q
+        }//q
+        btnCancel.setOnClickListener(new View.OnClickListener() {//q
+        @Override//q
+            public void onClick(View v) {//q
+                finish();//q
+            }//q
+        });//q
+    }//q
+}//q

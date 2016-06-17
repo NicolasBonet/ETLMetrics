@@ -1,0 +1,14 @@
+'use strict'
+
+describe 'Service: Curso', ->
+
+  # load the service's module
+  beforeEach module 'uiApp'
+
+  # instantiate service
+  Curso = {}
+  beforeEach inject (_Curso_) ->
+    Curso = _Curso_
+
+  it 'should do something', ->
+    expect(!!Curso).toBe true

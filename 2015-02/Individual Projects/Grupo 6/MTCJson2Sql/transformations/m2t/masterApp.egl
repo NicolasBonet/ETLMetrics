@@ -1,0 +1,53 @@
+[% 
+	("Iniciando proceso de generaci�n de aplicaci�n de migraci�n").println;
+	var mergerFields = CO!MergedField.all;
+	("Mergers: "+mergerFields.size()).println;
+	var sql = SQL!Table.all;
+	for(table in sql){
+		var t:Template:= TemplateFactory.load('model.egl');
+		t.populate("table", table);
+		var merger = null;
+		if(mergerFields.size()>0){
+			merger = mergerFields.select(m | m.tableName.equals(table.name)).first();
+		}
+		if(null == merger){
+			t.populate("merger", null);
+		}else{
+			t.populate("merger", merger);
+		}
+		var foraneas = SQL!ForeignKey.all.obtenerLlaves(table);
+		if(foraneas.size>0){
+			t.populate("foraneas", foraneas);
+		}else{
+			t.populate("foraneas", null);
+		}
+		t.generate('../../DocumentalToSql/src/main/java/co/com/ap/model/'+(table.name.removerComillas()).firstToUpperCase()+'.java');
+	}
+	
+	if(not(mergerFields == null and mergerFields.size()>0)){
+		for(mergerField in mergerFields){
+			var t:Template:= TemplateFactory.load('mergerField.egl');
+			t.populate("mergeField", mergerField);
+			t.generate('../../DocumentalToSql/src/main/java/co/com/ap/model/'+(mergerField.tableName.removerComillas()).firstToUpperCase()+'MergerField.java');
+		}
+	}
+	
+	var t:Template:= TemplateFactory.load('genericModel.egl');
+	t.generate('../../DocumentalToSql/src/main/java/co/com/ap/model/GenericJSon.java');
+	
+	var t:Template:= TemplateFactory.load('conexion.egl');
+	t.generate('../../DocumentalToSql/src/main/java/co/com/ap/core/Conexion.java');
+	
+	operation Collection obtenerLlaves(table){
+		//TODO: Es necesario que la clave foranea tenga ademas de la columna key column, 
+		//lat tabla correspondiente f.referencedKey.key_column.table.name.first.equals(table.name)
+		var llaves = SQL!ForeignKey.all.select(f | 
+			f.referencedKey.key_column.table.name.first.removerComillas().equals(table.name.removerComillas()) or 
+			f.foreign_column.table.name.removerComillas().equals(table.name.removerComillas()));
+		return llaves;
+	}	
+	
+	operation String removerComillas(){
+		return self.replace("\"","");
+	}
+%]

@@ -1,0 +1,38 @@
+<div>
+<ul class="nav navbar-nav">
+	<li><a ng-href="#/personadetalle">Detalle Persona</a></li>
+</ul>
+<div>
+
+		<div id="Lista" 
+		ng-controller="PersonaListaCtrl"
+		class="ibox">
+				<div class="ibox-title" >
+					<h3>Seccion Lista personas</h3>
+				</div>
+				<div class="ibox-content" >
+				<table id="Persona Tabla"
+					class="table">
+					<thead>
+					 <tr>
+								<th id="nombre">Nombre</th>
+								<th id="apellido">Apellido</th>
+								<th id="documento">Documento</th>
+								<th id="direccion">Direccion</th>
+								<th id="edad">Edad</th>
+								<th id="vivebogota">ViveBogota</th>
+					 </tr>
+					</thead>
+					<tbody>
+					<tr ng-repeat="data in datos">
+							<td><a ng-href="#/personadetalle/{{data.personaId}}">{{data.nombre}}<a></td>
+							<td><a ng-href="#/personadetalle/{{data.personaId}}">{{data.apellido}}<a></td>
+							<td><a ng-href="#/personadetalle/{{data.personaId}}">{{data.documento}}<a></td>
+							<td><a ng-href="#/personadetalle/{{data.personaId}}">{{data.direccion}}<a></td>
+							<td><a ng-href="#/personadetalle/{{data.personaId}}">{{data.edad}}<a></td>
+							<td><a ng-href="#/personadetalle/{{data.personaId}}">{{data.vivebogota}}<a></td>
+					</tr>
+					</tbody>
+				<table>
+				</div>
+<div>

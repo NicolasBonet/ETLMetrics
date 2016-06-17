@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project  default="m2m" name="presentacion">
+	<target name="m2m">
+		<echo>Realizar transformación ETL - Web</echo>
+		<epsilon.emf.register file="metamodelos/presentacion.ecore"/>
+		<epsilon.emf.register file="metamodelos/proyectos.ecore"/>
+		<epsilon.emf.loadModel name="view" store="true" read="false" metamodeluri="http://www.example.org/presentacion" modelfile="modelos/Design.xmi"/>
+		<epsilon.emf.loadModel name="mp" store="false" read="true" metamodeluri="http://www.example.org/proyectos" modelfile="modelos/MarketPlace.xmi"/>
+		<epsilon.etl src="transformaciones/M2M/MarketToView.etl">
+			<model ref="mp"/>
+			<model ref="view"/>
+		</epsilon.etl>
+		<antcall target="m2t"/>
+	</target>
+	<target name="m2t">
+		<echo>Corriendo Template EGL - Web</echo>
+		<epsilon.emf.register file="modelos/Design.xmi"/>
+		<epsilon.emf.loadModel name="view" store="false" read="true" metamodeluri="http://www.example.org/presentacion" modelfile="modelos/Design.xmi"/>
+		<epsilon.egl src="transformaciones/M2T/saveHtml.egl">
+			<model ref="view"/>
+		</epsilon.egl>
+		<antcall target="m2mA"/>
+	</target>
+	<target name="m2mA">
+		
+		<echo>Realizar transformación ETL - Android</echo>
+		<epsilon.emf.register file="metamodelos/presentacion.ecore"/>
+		<epsilon.emf.register file="metamodelos/android.ecore"/>
+		<epsilon.emf.loadModel name="android" store="true" read="false" 
+		    metamodeluri="http://www.example.org/android" modelfile="modelos/AndroidApp.xmi"/>
+		<epsilon.emf.loadModel name="mp" store="false" read="true" 
+		    metamodeluri="http://www.example.org/proyectos" modelfile="modelos/MarketPlace.xmi"/>
+		<epsilon.etl src="transformaciones/M2M/Market2Android.etl">
+			<model ref="mp"/>
+			<model ref="android"/>
+		</epsilon.etl>
+		<antcall target="m2tA"/>
+	</target>
+	<target name="m2tA">
+		<echo>Corriendo Template EGL - Android</echo>
+		<epsilon.emf.register file="modelos/AndroidApp.xmi"/>
+		<epsilon.emf.loadModel name="android" store="false" read="true" metamodeluri="http://www.example.org/android" modelfile="modelos/AndroidApp.xmi"/>
+		<epsilon.egl src="transformaciones/AndroidM2T/main.egx">
+			<model ref="android"/>
+		</epsilon.egl>
+	</target>
+</project>

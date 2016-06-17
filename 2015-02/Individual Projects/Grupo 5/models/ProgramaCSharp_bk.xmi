@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:csharp="http://www.example.org/csharp">
+  <csharp:Programa nombre="RDK08301.CBL">
+    <controlador modelos="/0/@controlador/@vistas.0/@modelo /0/@controlador/@vistas.1/@modelo">
+      <vistas nombre="Entrada" esEntrada="true">
+        <elementos propiedad="/0/@controlador/@vistas.0/@modelo/@propiedades.0"/>
+        <elementos propiedad="/0/@controlador/@vistas.0/@modelo/@propiedades.1"/>
+        <elementos propiedad="/0/@controlador/@vistas.0/@modelo/@propiedades.2"/>
+        <elementos propiedad="/0/@controlador/@vistas.0/@modelo/@propiedades.3"/>
+        <elementos propiedad="/0/@controlador/@vistas.0/@modelo/@propiedades.4"/>
+        <elementos propiedad="/0/@controlador/@vistas.0/@modelo/@propiedades.6"/>
+        <elementos propiedad="/0/@controlador/@vistas.0/@modelo/@propiedades.7"/>
+        <elementos propiedad="/0/@controlador/@vistas.0/@modelo/@propiedades.8"/>
+        <modelo nombre="Entrada" esEntrada="true">
+          <propiedades tipo="string" longitud="4" nombre="RD63-TRN"/>
+          <propiedades tipo="string" longitud="13" nombre="RD63-USUARIO"/>
+          <propiedades tipo="string" longitud="8" nombre="RD63-CLAVE"/>
+          <propiedades tipo="string" longitud="2" nombre="RD63-MONITOR"/>
+          <propiedades longitud="6" nombre="RD63-TRANSACCION"/>
+          <propiedades tipo="string" longitud="20" nombre="FILLER1" esRelleno="true"/>
+          <propiedades tipo="string" longitud="1" nombre="RD63-TIP-IDE"/>
+          <propiedades longitud="16" nombre="RD63-NUM-IDE"/>
+          <propiedades longitud="3" nombre="RD63-NUM-OFI"/>
+          <propiedades tipo="string" longitud="4023" nombre="FILLER2" esRelleno="true"/>
+        </modelo>
+      </vistas>
+      <vistas nombre="Salida">
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.0" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.1" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.2" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.3" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.4" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.5" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.6" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.7" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.8" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.9" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.10" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.11" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.12" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.13" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.14" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.15" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.16" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.18" tipoWidget="Label"/>
+        <elementos propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.19" tipoWidget="Label"/>
+        <modelo nombre="Salida">
+          <propiedades longitud="4" nombre="RD63-COD-RESP"/>
+          <propiedades tipo="string" longitud="60" nombre="RD63-DES-RESP"/>
+          <propiedades tipo="string" longitud="20" nombre="RD63-PRI-APELLIDO"/>
+          <propiedades tipo="string" longitud="20" nombre="RD63-SEG-APELLIDO"/>
+          <propiedades tipo="string" longitud="20" nombre="RD63-PRI-NOMBRE"/>
+          <propiedades tipo="string" longitud="20" nombre="RD63-SEG-NOMBRE"/>
+          <propiedades longitud="8" nombre="RD63-FEC-NAC"/>
+          <propiedades tipo="string" longitud="1" nombre="RD63-IND-SEX"/>
+          <propiedades longitud="4" nombre="RD63-COD-CIIU"/>
+          <propiedades longitud="5" nombre="RD63-CIU-RES"/>
+          <propiedades tipo="string" longitud="50" nombre="RD63-NOM-CIU-RES"/>
+          <propiedades longitud="5" nombre="RD63-COD-DPT"/>
+          <propiedades tipo="string" longitud="50" nombre="RD63-NOM-COD-DPT"/>
+          <propiedades tipo="string" longitud="100" nombre="RD63-DIR-RES"/>
+          <propiedades longitud="10" nombre="RD63-TEL-RES"/>
+          <propiedades longitud="3" nombre="RD63-OFI-FUN"/>
+          <propiedades tipo="string" longitud="50" nombre="RD63-NOM-OFI"/>
+          <propiedades tipo="string" longitud="1686" nombre="FILLER3" esRelleno="true"/>
+          <propiedades longitud="16" nombre="RD63-NUM-TC"/>
+          <propiedades tipo="string" longitud="50" nombre="RD63-TIP-TC"/>
+        </modelo>
+      </vistas>
+    </controlador>
+  </csharp:Programa>
+  <csharp:Widget propiedad="/0/@controlador/@vistas.0/@modelo/@propiedades.5"/>
+  <csharp:Widget propiedad="/0/@controlador/@vistas.0/@modelo/@propiedades.9"/>
+  <csharp:Widget propiedad="/0/@controlador/@vistas.1/@modelo/@propiedades.17" tipoWidget="Label"/>
+</xmi:XMI>

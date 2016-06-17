@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:html5="http://www.example.org/html5">
+  <html5:html>
+    <container xsi:type="html5:div" class="container">
+      <innercontainer xsi:type="html5:div" class="row">
+        <innercontainer xsi:type="html5:div" class="col-md-12  jumbotron" id="PanelImagen">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:img" src="data/titulo.png"/>
+            <legend valor=""/>
+          </innercontainer>
+        </innercontainer>
+      </innercontainer>
+      <innercontainer xsi:type="html5:div" class="row">
+        <innercontainer xsi:type="html5:div" class="col-md-6" id="PanelLista">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:select" multiple="SINGLE_SELECTION " size="5"/>
+            <legend valor="Aspirantes Registrados en la Bolsa"/>
+          </innercontainer>
+        </innercontainer>
+        <innercontainer xsi:type="html5:div" class="col-md-6" id="PanelInformacion">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:img" src="IMANGEN_VACIA"/>
+            <elements xsi:type="html5:label" value="Nombre: "/>
+            <elements xsi:type="html5:input" value=""/>
+            <elements xsi:type="html5:label" value="Edad: "/>
+            <elements xsi:type="html5:input" value=""/>
+            <elements xsi:type="html5:label" value="Profesi&#xfffd;n: "/>
+            <elements xsi:type="html5:input" value=""/>
+            <elements xsi:type="html5:label" value="Experiencia: "/>
+            <elements xsi:type="html5:input" value=""/>
+            <elements xsi:type="html5:label" value="Tel&#xfffd;fono: "/>
+            <elements xsi:type="html5:input" value=""/>
+            <legend valor="Datos del Aspirante"/>
+          </innercontainer>
+        </innercontainer>
+      </innercontainer>
+      <innercontainer xsi:type="html5:div" class="row">
+        <innercontainer xsi:type="html5:div" class="col-md-4" id="PanelAgregarAspirante">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:label" value="Nombre: "/>
+            <elements xsi:type="html5:input" value=""/>
+            <elements xsi:type="html5:label" value="Edad: "/>
+            <elements xsi:type="html5:input" value=""/>
+            <elements xsi:type="html5:label" value="Profesi&#xfffd;n: "/>
+            <elements xsi:type="html5:label" value="A&#xfffd;os experiencia: "/>
+            <elements xsi:type="html5:input" value=""/>
+            <elements xsi:type="html5:label" value="Imagen: "/>
+            <elements xsi:type="html5:table">
+              <tr>
+                <td>
+                  <elements xsi:type="html5:input" value=""/>
+                </td>
+                <td>
+                  <elements xsi:type="html5:button" value="Examinar" action="BUSCAR_IMAGEN"/>
+                </td>
+              </tr>
+            </elements>
+            <elements xsi:type="html5:label" value="Tel&#xfffd;fono: "/>
+            <elements xsi:type="html5:input" value=""/>
+            <elements xsi:type="html5:div">
+              <elements xsi:type="html5:button" value="Agregar hoja de vida" action="AGREGAR"/>
+            </elements>
+            <legend valor="Agregar Aspirante"/>
+          </innercontainer>
+        </innercontainer>
+        <innercontainer xsi:type="html5:div" class="col-md-4" id="PanelBusquedaOrdenamiento">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:button" value="Ordenar por experiencia" action="ORDENAR_ANIOSEXPERIENCIA"/>
+            <elements xsi:type="html5:button" value="Ordenar por Edad" action="ORDENAR_EDAD"/>
+            <elements xsi:type="html5:button" value="Ordenar por profesi&#xfffd;n" action="ORDENAR_PROFESION"/>
+            <elements xsi:type="html5:button" value="Buscar Aspirante" action="BUSCAR"/>
+            <legend valor="B&#xfffd;squeda y Ordenamiento"/>
+          </innercontainer>
+        </innercontainer>
+        <innercontainer xsi:type="html5:div" class="col-md-4" id="PanelConsultas">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:button" value="M&#xfffd;s Joven" action="MAS_JOVEN"/>
+            <elements xsi:type="html5:button" value="Mayor Edad" action="MAYOR_EDAD"/>
+            <elements xsi:type="html5:button" value="Mayor Experiencia" action="MAYOR_EXPERIENCIA"/>
+            <elements xsi:type="html5:button" value="Contratar" action="CONTRATAR"/>
+            <elements xsi:type="html5:button" value="Eliminar por Experiencia" action="ELIMINAR_POR_EXPERIENCIA"/>
+            <legend valor="Consultas"/>
+          </innercontainer>
+        </innercontainer>
+      </innercontainer>
+      <innercontainer xsi:type="html5:div" class="row">
+        <innercontainer xsi:type="html5:div" class="col-md-12" id="PanelExtension">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:button" value="Opci&#xfffd;n 1" action="OPCION_1"/>
+            <elements xsi:type="html5:button" value="Opci&#xfffd;n 2" action="OPCION_2"/>
+            <legend valor="Puntos de Extensi&#xfffd;n"/>
+          </innercontainer>
+        </innercontainer>
+      </innercontainer>
+    </container>
+  </html5:html>
+  <html5:tr/>
+</xmi:XMI>

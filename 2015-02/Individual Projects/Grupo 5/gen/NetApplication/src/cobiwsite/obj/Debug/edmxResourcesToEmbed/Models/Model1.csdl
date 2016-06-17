@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="cobiwmodel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Entity">
+    <Key>
+      <PropertyRef Name="Identificacion" />
+    </Key>
+    <Property Name="Identificacion" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="Nombres" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="Apellidos" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="FechaNacimiento" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Telefono" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+    <Property Name="Direccion" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="Report">
+    <Key>
+      <PropertyRef Name="Identificacion" />
+    </Key>
+    <Property Name="Identificacion" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="NumeroCuenta" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+    <Property Name="Sucursal" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+    <Property Name="Nombres" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+    <Property Name="Apellidos" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityContainer Name="TestDatabaseEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Entities" EntityType="Self.Entity" />
+    <EntitySet Name="Reports" EntityType="Self.Report" />
+  </EntityContainer>
+</Schema>

@@ -1,0 +1,22 @@
+'use strict'
+
+###*
+ # @ngdoc function
+ # @name uiApp.controller:[%=ctl.service.name.firstToUpperCase()%]sCtrl
+ # @description
+ # # [%=ctl.service.name.firstToUpperCase()%]sCtrl
+ # Controller of the uiApp
+###
+angular.module 'uiApp'
+  .controller '[%=ctl.service.name.firstToUpperCase()%]sCtrl', (ENV, [%=ctl.service.name.firstToUpperCase()%]) ->
+    scope=@
+    @url=ENV.api+'/admin/[%=ctl.service.name.toLowerCase()%]s.json'
+    @destroy=(item)->
+      new_object = new [%=ctl.service.name.firstToUpperCase()%](item);
+      new_object.$delete().then(->
+        scope.alert={type: "info", msg: "Eliminado"}
+        scope.reloadPage=true;
+      , ->
+        scope.alert={type: 'danger', msg: "No guardado"}
+      )
+    return

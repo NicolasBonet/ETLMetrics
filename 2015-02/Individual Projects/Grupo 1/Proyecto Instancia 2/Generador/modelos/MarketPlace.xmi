@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ASCII"?>
+<proyectos:MarketPlace
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:proyectos="http://www.example.org/proyectos"
+    nombre="MarketOne">
+  <paginas xsi:type="proyectos:Promocion"
+      nombre="tool"/>
+  <paginas xsi:type="proyectos:Mapa"
+      nombre="Mimapa"/>
+  <paginas xsi:type="proyectos:Contacto"
+      nombre="Micontacto"/>
+  <paginas xsi:type="proyectos:Catalogo"
+      nombre="Micatalogo"/>
+  <paginas xsi:type="proyectos:Promocion"
+      nombre="promoFinal"/>
+</proyectos:MarketPlace>

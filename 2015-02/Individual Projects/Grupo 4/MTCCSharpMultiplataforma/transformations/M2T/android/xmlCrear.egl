@@ -1,0 +1,165 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+			[%
+                    for(controlador in xmlAndroid!Controlador.all){
+                    	if(controlador.main==true){
+            				//controlador.nombre.println();
+            				for(mt in controlador.metodos){
+            					
+            					if(mt.viewType<>""){
+            						//mt.nombre.print;
+            						for(propiedad in controlador.metodos.at(0).parametros.valor.propiedades){
+            							if(propiedad.esOculto==false){
+            								var widgets=propiedad.formElement;
+            							
+            							if(widgets.isTypeOf(EditText)){//edittrext
+            							%]
+            							
+									<LinearLayout
+                					android:layout_width="match_parent"
+                					android:layout_height="wrap_content"
+                					android:orientation="horizontal">
+                					<TextView
+                    				android:layout_width="wrap_content"
+                    				android:layout_height="wrap_content"
+                    				android:text="[%= propiedad.label%]"
+                    				/>
+                    				
+                					<EditText
+                    				android:layout_width="match_parent"
+                    				android:layout_height="wrap_content"
+                    				android:id="@+id/[%= propiedad.nombre.toLowerCase()%]"
+                    				android:inputType="text"
+                    				android:hint="[%= widgets.placeholder%]"
+                    				/>
+            						</LinearLayout>			 	
+            		
+            							[%
+            							}
+            							else if(widgets.isTypeOf(Radiobutton)){//radiobutton
+            							%]
+				<LinearLayout
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[%= propiedad.label%]"
+                    />
+                <RadioGroup
+                    android:id="@+id/[%= propiedad.nombre.toLowerCase()%]radioGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                [%
+                for (op in widgets.opciones){
+                %]
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[%= op.nombre%]"
+                    android:id="@+id/[%= op.nombre.toLowerCase()%]" />
+                [%}
+                %]
+                
+                
+                </RadioGroup>
+            </LinearLayout> 
+            							[%
+            							}
+            							else if(widgets.isTypeOf(CheckBox)){//checkbox
+            							%]
+            							<LinearLayout
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[%= propiedad.label%]"
+                    />
+                <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+					android:id="@+id/[%= propiedad.nombre.toLowerCase()%]"
+
+                    />
+            </LinearLayout>
+            							[%}
+            							else {//spinner
+            							%]
+            							  <LinearLayout
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[%= propiedad.label%]"
+                    />
+                <Spinner
+                    android:id="@+id/spinner[%= propiedad.nombre.toLowerCase()%]"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    />
+            </LinearLayout>
+            							[%
+            							}
+            								
+            							
+            							
+            							}
+            						}
+            						
+            						
+            						//mt.nombre.println();
+            						break;
+            					
+            					}
+            				}        	
+                    	}
+                    }
+                  
+            %]
+
+          <LinearLayout
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+                <Button
+                   android:id="@+id/btnSave"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Guardar"
+                    android:layout_marginRight="10dp"
+                    />
+                <Button
+                 android:id="@+id/btnCancel"
+                    android:layout_marginLeft="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cancelar"
+                    />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

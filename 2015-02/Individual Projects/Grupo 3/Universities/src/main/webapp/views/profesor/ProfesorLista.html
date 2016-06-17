@@ -1,0 +1,30 @@
+<div>
+<ul class="nav navbar-nav">
+	<li><a ng-href="#/profesordetalle">Detalle Profesor</a></li>
+</ul>
+<div>
+
+		<div id="Lista" 
+		ng-controller="ProfesorListaCtrl"
+		class="ibox">
+				<div class="ibox-title" >
+					<h3>Seccion Lista profesors</h3>
+				</div>
+				<div class="ibox-content" >
+				<table id="Profesor Tabla"
+					class="table">
+					<thead>
+					 <tr>
+								<th id="codigo">Codigo</th>
+								<th id="persona">Persona</th>
+					 </tr>
+					</thead>
+					<tbody>
+					<tr ng-repeat="data in datos">
+							<td><a ng-href="#/profesordetalle/{{data.profesorId}}">{{data.codigo}}<a></td>
+							<td><a ng-href="#/profesordetalle/{{data.profesorId}}">{{data.persona}}<a></td>
+					</tr>
+					</tbody>
+				<table>
+				</div>
+<div>

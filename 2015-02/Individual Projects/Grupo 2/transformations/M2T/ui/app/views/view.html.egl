@@ -1,0 +1,50 @@
+[%('  ListView: '+crud.service.name).println();%]
+[%('    filters: '+crud.service.filters).println();%]
+<uib-alert ng-if="controller.alert" type="{{controller.alert.type}}" >{{controller.alert.msg}}
+</uib-alert>
+
+<h2>[%= crud.service.name.firstToUpperCase()%]s</h2>
+
+<div class="row marketing">
+  <div class='row'>
+  	[% if(crud.allowCreate){%]
+    	<a class='pull-right btn btn-success' href='#/[%= crud.service.name.toLowerCase()%]s/new'>
+      	Registrar
+    	</a>
+    [%}%]
+  </div>
+  [%if(crud.allowRead){%]
+  <table class="table table-striped table-hover">
+    <thead>
+      <tr>
+     [% for(filter in crud.service.filters){ %]
+        <th>[%= filter.key.firstToUpperCase()%]</th>
+     [%}%]
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat='item in controller.collection'>
+       [% for(filter in crud.service.filters){ %]
+        <td>{{item.[%= filter.key.toLowerCase()%]}}</td>
+       [%}%]
+        <td>
+        [% if(crud.allowUpdate){%]
+          <a ng-href="#/[%= crud.service.name.toLowerCase().replace(' ','_')%]s/{{item.id}}/edit" class='btn btn-primary btn-xs'>
+            Editar
+          </a>
+        [%}%]
+        [% if(crud.allowDelete){%]
+          <a class='btn btn-danger btn-xs' ng-click='controller.destroy(item)'>
+            Eliminar
+          </a>
+        [%}%]
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <bgf-pagination
+    collection="controller.collection" page='controller.page' per-page='10' url="controller.url" reload-page="controller.reloadPage">
+  </bgf-pagination>
+  [%}%]
+</div>

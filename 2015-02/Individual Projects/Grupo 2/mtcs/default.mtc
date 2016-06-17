@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.mtcflow.model:MTC xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:com.mtcflow.model="http://com.mtcflow.mtc/1.1" workspace="/">
+  <files name="rails services" URI="/build"/>
+  <files name="angular ui"/>
+  <metamodels name="crud" URI="crudGenerator.ecore"/>
+  <metamodels name="railsMM" URI="crudRailsGenerator.ecore" alias="rails"/>
+  <metamodels name="angularMM" URI="crudAngularGenerator.ecore"/>
+  <models name="crud" URI="input/ejemploEntrada2.xmi" metamodels="//@metamodels.0"/>
+  <models name="rails" URI="rails.xmi" metamodels="//@metamodels.1"/>
+  <models name="angular" URI="angular.xmi" metamodels="//@metamodels.2"/>
+  <inputModels model="//@models.0" modelAlias="crud" transformation="//@transformations.0" metamodelAlias="crud"/>
+  <inputModels model="//@models.0" modelAlias="crud" transformation="//@transformations.1"/>
+  <inputModels model="//@models.1" modelAlias="railsModel" transformation="//@transformations.2" metamodelAlias="railsModel"/>
+  <inputModels model="//@models.2" modelAlias="angularModel" transformation="//@transformations.3" metamodelAlias="angularModel"/>
+  <transformations xsi:type="com.mtcflow.model:M2MTransformation" name="crud2Rails" URI="Crud2Rails.etl"/>
+  <transformations xsi:type="com.mtcflow.model:M2MTransformation" name="crud2Angular" URI="Crud2Angular.etl"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="server_rails" URI="server.egl" implementationClass="" target="build/"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="ui_angular" URI="ui.egl" technology="" implementationClass="" target="build/"/>
+  <outputModels modelAlias="rails" model="//@models.1" transformation="//@transformations.0" metamodelAlias="rails"/>
+  <outputModels modelAlias="angular" model="//@models.2" transformation="//@transformations.1" metamodelAlias="angular"/>
+  <outputFiles transformation="//@transformations.2" file="//@files.0"/>
+  <outputFiles transformation="//@transformations.3" file="//@files.1"/>
+</com.mtcflow.model:MTC>

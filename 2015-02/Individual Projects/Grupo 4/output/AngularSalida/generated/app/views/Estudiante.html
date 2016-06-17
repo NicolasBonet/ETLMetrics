@@ -1,0 +1,61 @@
+<div class="container">
+    <h1>Mi sitio web</h1>
+    <div class="row">
+        <div class="col-sm-offset-4 col-sm-4">
+            <h2>{{titulo}}</h2>
+
+            <form name="form" ng-submit="form.$valid && submit()" novalidate>
+				<div class="form-group">
+                    <label for="tb_nombre">Nombre</label>
+                    <input type="text" id="tb_nombre" class="form-control" ng-model="EstudianteDTO.Nombre" required>
+                </div>
+				<div class="form-group">
+                    <label for="tb_apellido">Apellido</label>
+                    <input type="text" id="tb_apellido" class="form-control" ng-model="EstudianteDTO.Apellido" >
+                </div>
+				<div class="form-group">
+                    <label for="rb_sexo">Sexo</label>
+                	<div>
+                        <label class="radio-inline">
+                            <input type="radio" name="" ng-model="EstudianteDTO.Sexo" value="0"> Mujer
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="" ng-model="EstudianteDTO.Sexo" value="1"> Hombre
+                        </label>
+					</div>
+                </div>
+				<div class="form-group">
+                    <label for="cb_ciudad" class="required">Ciudad</label>
+                    <select id="cb_ciudad" class="form-control" ng-options="o as o.Nombre for o in Ciudades track by o.Id" ng-model="EstudianteDTO.Ciudad" required></select>
+                </div>
+				<div class="form-group">
+                    <label for="tb_correo">Correo</label>
+                    <input type="Email" id="tb_correo" class="form-control" ng-model="EstudianteDTO.Correo" >
+                </div>
+				<div class="form-group">
+                    <label for="tb_usuario">Usuario</label>
+                    <input type="text" id="tb_usuario" class="form-control" ng-model="EstudianteDTO.Usuario" required>
+                </div>
+				<div class="form-group">
+                    <label for="tb_contrasenia">Contrasenia</label>
+                    <input type="Password" id="tb_contrasenia" class="form-control" ng-model="EstudianteDTO.Contrasenia" required>
+                </div>
+				<div class="form-group">
+                    <label class="required" for="ta-razon">¿Por qué estudiar en los Andes?</label>
+                    <textarea id="ta_acercademi" class="form-control" ng-model="EstudianteDTO.AcercaDeMi" rows="3" required></textarea>
+                </div>
+				<div class="form-group">
+                    <label class="" for="ta-razon">¿Por qué estudiar en los Andes?</label>
+                    <textarea id="ta_razon" class="form-control" ng-model="EstudianteDTO.Razon" rows="10" ></textarea>
+                </div>
+				<div class="checkbox">
+                    <label>
+                        <input type="checkbox" ng-model="EstudianteDTO.RecibirCorreo" ng-checked="EstudianteDTO.RecibirCorreo"> ¿Desea recibir correo elecrónico?
+                    </label>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary pull-right">Guardar</button>
+            </form>
+        </div>
+    </div>
+</div>

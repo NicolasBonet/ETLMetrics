@@ -1,0 +1,16 @@
+[%
+
+var programa = PC!Programa.all[0];
+	if(programa.tipo == PC!TipoPrograma#join)
+	{
+		var join = programa.joins[0];
+
+		var t:Template:= TemplateFactory.load('GeneracionJoin.egl'); 
+		t.populate('SalidaJoin', programa.nombre.split('\\.')[0]); 
+		t.generate('./CobolApplication/Join/' + programa.nombre); 
+
+		var t:Template:= TemplateFactory.load('GeneracionJoin.egl');
+		t.populate('SalidaJoin', 'otro'); 
+		t.generate('./CobolApplication/Join/' + join.nomArchivoSalida.replace('"', '')); 
+	}
+%]

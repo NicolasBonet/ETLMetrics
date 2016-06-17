@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/catalogoFrameLayout">
+
+<com.etsy.android.grid.StaggeredGridView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/grid_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="110dp"
+[%switch(fragm.imageSize){
+	case android!ImgSize#small:%]    app:item_margin="35dp"[% break;
+	case android!ImgSize#large:%]    app:item_margin="12dp"[% break;}%]
+[%switch(fragm.background){
+	case android!Color#grisClaro:%]    android:background="@color/grisClaro"[% break;
+	case android!Color#azul:%]    android:background="@color/azul"[% break;
+	case android!Color#blanco:%]    android:background="@color/blanco"[% break;
+	case android!Color#azulClaro:%]    android:background="@color/azulClaro"[% break;
+	case android!Color#negro:%]    android:background="@color/negro"[% break;
+}%] 
+[%if(fragm.layout = android!Layout#vertical){%]
+	app:column_count="@integer/grid_column_count_1" 
+[%}else if(fragm.layout = android!Layout#grid){%]
+	app:column_count="@integer/grid_column_count_2"
+[%}%]    
+    />
+
+</FrameLayout>

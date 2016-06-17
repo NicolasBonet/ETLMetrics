@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:jEE="http://www.example.org/jEE" xmlns:kdm="http://www.eclipse.org/MoDisco/kdm/kdm">
+  <jEE:JEE/>
+  <jEE:JEE>
+    <Ejbs name="VentaVehiculosEJB">
+      <bussinesMethods name="VentaVehiculos" return="void" code="        vehiculos = new ArrayList( );&#xA;&#xA;"/>
+      <bussinesMethods name="darVehiculos" return="ArrayList&lt;E>" code="        ArrayList copiaLista = new ArrayList( vehiculos );&#xA;        return copiaLista;&#xA;"/>
+      <bussinesMethods name="ordenarPorMarca" return="void" code="        int inicial;&#xA;&#xA;        for( inicial = 0; inicial &lt; vehiculos.size( ); inicial++ )&#xA;        {&#xA;            for( int i = vehiculos.size( ) - 1; i > inicial; i-- )&#xA;            {&#xA;                Vehiculo p2 = ( Vehiculo )vehiculos.get( i );&#xA;                Vehiculo p1 = ( Vehiculo )vehiculos.get( i - 1 );&#xA;&#xA;                if( p1.compararPorMarca( p2 ) > 0 )&#xA;                {&#xA;                    vehiculos.set( i, p1 );&#xA;                    vehiculos.set( i - 1, p2 );&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+      <bussinesMethods name="ordenarPorCilindrada" return="void" code="        int inicial;&#xA;&#xA;        // En cada paso se sabe que:&#xA;        // 1. Las posiciones antes de veh&#xfffd;culos[inicial] est&#xfffd;n ordenadas&#xA;        // En cada paso lo que se hace es encontrar en qu&#xfffd; posici&#xfffd;n entre veh&#xfffd;culos[0] y veh&#xfffd;culos[inicial] deber&#xfffd;a&#xA;        // estar el veh&#xfffd;culo que en este momento se encuentra en veh&#xfffd;culos[inicial]&#xA;&#xA;        for( inicial = 1; inicial &lt; vehiculos.size( ); inicial++ )&#xA;        {&#xA;            Vehiculo insertado = ( Vehiculo )vehiculos.get( inicial );&#xA;&#xA;            boolean termine = false;&#xA;            int i = inicial - 1;&#xA;&#xA;            while( !termine )&#xA;            {&#xA;                // Si encuentra una cilindrada mayor, entonces hay que intercambiarlos&#xA;                Vehiculo veh&#xfffd;culoPosicion = ( Vehiculo )vehiculos.get( i );&#xA;&#xA;                if( veh&#xfffd;culoPosicion.compararPorCilindrada( insertado ) > 0 )&#xA;                {&#xA;                    vehiculos.set( i, insertado );&#xA;                    vehiculos.set( i + 1, veh&#xfffd;culoPosicion );&#xA;                    i--;&#xA;                }&#xA;                // Si se encuentra un cilindrada igual o menor entonces ya se encontr&#xfffd; la posici&#xfffd;n&#xA;                else&#xA;                {&#xA;                    termine = true;&#xA;                }&#xA;&#xA;                // Si ya se lleg&#xfffd; al principio de la lista no hay nada m&#xfffd;s que hacer&#xA;                if( i &lt; 0 )&#xA;                {&#xA;                    termine = true;&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+      <bussinesMethods name="ordenarPorAnio" return="void" code="        int inicial;&#xA;&#xA;        // En cada paso se sabe que:&#xA;        // 1. Todos los valores antes de veh&#xfffd;culos[inicial] est&#xfffd;n ordenados&#xA;        // 2. No hay ning&#xfffd;n valor despu&#xfffd;s de veh&#xfffd;culos[inicial-1] que sea menor que veh&#xfffd;culos[inicial-1]&#xA;        // En cada paso se busca el menor entre veh&#xfffd;culos[inicial] y veh&#xfffd;culos[final] y se ubica en veh&#xfffd;culos[inicial]&#xA;&#xA;        for( inicial = 0; inicial &lt; vehiculos.size( ); inicial++ )&#xA;        {&#xA;            int posicionMenor = inicial;&#xA;            Vehiculo veh&#xfffd;culoMenor = ( Vehiculo )vehiculos.get( inicial );&#xA;&#xA;            for( int i = inicial + 1; i &lt; vehiculos.size( ); i++ )&#xA;            {&#xA;                Vehiculo veh&#xfffd;culoPosicion = ( Vehiculo )vehiculos.get( i );&#xA;&#xA;                // El veh&#xfffd;culo de la posici&#xfffd;n actual es menor que el menor encontrado hasta el momento&#xA;                if( veh&#xfffd;culoPosicion.compararPorAnio( veh&#xfffd;culoMenor ) &lt; 0 )&#xA;                {&#xA;                    veh&#xfffd;culoMenor = veh&#xfffd;culoPosicion;&#xA;                    posicionMenor = i;&#xA;                }&#xA;            }&#xA;&#xA;            if( posicionMenor != inicial )&#xA;            {&#xA;                Vehiculo temp = ( Vehiculo )vehiculos.get( inicial );&#xA;                vehiculos.set( inicial, veh&#xfffd;culoMenor );&#xA;                vehiculos.set( posicionMenor, temp );&#xA;            }&#xA;&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+    </Ejbs>
+  </jEE:JEE>
+  <jEE:Entity/>
+  <jEE:Service/>
+  <jEE:Method name="buscarVehiculo" return="int"/>
+  <kdm:Attribute/>
+  <jEE:JEE>
+    <Ejbs name="VentaVehiculosEJB">
+      <bussinesMethods name="VentaVehiculos" return="void" code="        vehiculos = new ArrayList( );&#xA;&#xA;"/>
+      <bussinesMethods name="darVehiculos" return="ArrayList&lt;E>" code="        ArrayList copiaLista = new ArrayList( vehiculos );&#xA;        return copiaLista;&#xA;"/>
+      <bussinesMethods name="ordenarPorMarca" return="void" code="        int inicial;&#xA;&#xA;        for( inicial = 0; inicial &lt; vehiculos.size( ); inicial++ )&#xA;        {&#xA;            for( int i = vehiculos.size( ) - 1; i > inicial; i-- )&#xA;            {&#xA;                Vehiculo p2 = ( Vehiculo )vehiculos.get( i );&#xA;                Vehiculo p1 = ( Vehiculo )vehiculos.get( i - 1 );&#xA;&#xA;                if( p1.compararPorMarca( p2 ) > 0 )&#xA;                {&#xA;                    vehiculos.set( i, p1 );&#xA;                    vehiculos.set( i - 1, p2 );&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+      <bussinesMethods name="ordenarPorCilindrada" return="void" code="        int inicial;&#xA;&#xA;        // En cada paso se sabe que:&#xA;        // 1. Las posiciones antes de veh&#xfffd;culos[inicial] est&#xfffd;n ordenadas&#xA;        // En cada paso lo que se hace es encontrar en qu&#xfffd; posici&#xfffd;n entre veh&#xfffd;culos[0] y veh&#xfffd;culos[inicial] deber&#xfffd;a&#xA;        // estar el veh&#xfffd;culo que en este momento se encuentra en veh&#xfffd;culos[inicial]&#xA;&#xA;        for( inicial = 1; inicial &lt; vehiculos.size( ); inicial++ )&#xA;        {&#xA;            Vehiculo insertado = ( Vehiculo )vehiculos.get( inicial );&#xA;&#xA;            boolean termine = false;&#xA;            int i = inicial - 1;&#xA;&#xA;            while( !termine )&#xA;            {&#xA;                // Si encuentra una cilindrada mayor, entonces hay que intercambiarlos&#xA;                Vehiculo veh&#xfffd;culoPosicion = ( Vehiculo )vehiculos.get( i );&#xA;&#xA;                if( veh&#xfffd;culoPosicion.compararPorCilindrada( insertado ) > 0 )&#xA;                {&#xA;                    vehiculos.set( i, insertado );&#xA;                    vehiculos.set( i + 1, veh&#xfffd;culoPosicion );&#xA;                    i--;&#xA;                }&#xA;                // Si se encuentra un cilindrada igual o menor entonces ya se encontr&#xfffd; la posici&#xfffd;n&#xA;                else&#xA;                {&#xA;                    termine = true;&#xA;                }&#xA;&#xA;                // Si ya se lleg&#xfffd; al principio de la lista no hay nada m&#xfffd;s que hacer&#xA;                if( i &lt; 0 )&#xA;                {&#xA;                    termine = true;&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+      <bussinesMethods name="ordenarPorAnio" return="void" code="        int inicial;&#xA;&#xA;        // En cada paso se sabe que:&#xA;        // 1. Todos los valores antes de veh&#xfffd;culos[inicial] est&#xfffd;n ordenados&#xA;        // 2. No hay ning&#xfffd;n valor despu&#xfffd;s de veh&#xfffd;culos[inicial-1] que sea menor que veh&#xfffd;culos[inicial-1]&#xA;        // En cada paso se busca el menor entre veh&#xfffd;culos[inicial] y veh&#xfffd;culos[final] y se ubica en veh&#xfffd;culos[inicial]&#xA;&#xA;        for( inicial = 0; inicial &lt; vehiculos.size( ); inicial++ )&#xA;        {&#xA;            int posicionMenor = inicial;&#xA;            Vehiculo veh&#xfffd;culoMenor = ( Vehiculo )vehiculos.get( inicial );&#xA;&#xA;            for( int i = inicial + 1; i &lt; vehiculos.size( ); i++ )&#xA;            {&#xA;                Vehiculo veh&#xfffd;culoPosicion = ( Vehiculo )vehiculos.get( i );&#xA;&#xA;                // El veh&#xfffd;culo de la posici&#xfffd;n actual es menor que el menor encontrado hasta el momento&#xA;                if( veh&#xfffd;culoPosicion.compararPorAnio( veh&#xfffd;culoMenor ) &lt; 0 )&#xA;                {&#xA;                    veh&#xfffd;culoMenor = veh&#xfffd;culoPosicion;&#xA;                    posicionMenor = i;&#xA;                }&#xA;            }&#xA;&#xA;            if( posicionMenor != inicial )&#xA;            {&#xA;                Vehiculo temp = ( Vehiculo )vehiculos.get( inicial );&#xA;                vehiculos.set( inicial, veh&#xfffd;culoMenor );&#xA;                vehiculos.set( posicionMenor, temp );&#xA;            }&#xA;&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+    </Ejbs>
+  </jEE:JEE>
+  <jEE:Entity/>
+  <jEE:Service/>
+  <jEE:Method name="buscarVehiculo" return="int"/>
+  <kdm:Attribute/>
+  <jEE:JEE>
+    <Ejbs name="VentaVehiculosEJB">
+      <bussinesMethods name="VentaVehiculos" return="void" code="        vehiculos = new ArrayList( );&#xA;&#xA;"/>
+      <bussinesMethods name="darVehiculos" return="ArrayList&lt;E>" code="        ArrayList copiaLista = new ArrayList( vehiculos );&#xA;        return copiaLista;&#xA;"/>
+      <bussinesMethods name="ordenarPorMarca" return="void" code="        int inicial;&#xA;&#xA;        for( inicial = 0; inicial &lt; vehiculos.size( ); inicial++ )&#xA;        {&#xA;            for( int i = vehiculos.size( ) - 1; i > inicial; i-- )&#xA;            {&#xA;                Vehiculo p2 = ( Vehiculo )vehiculos.get( i );&#xA;                Vehiculo p1 = ( Vehiculo )vehiculos.get( i - 1 );&#xA;&#xA;                if( p1.compararPorMarca( p2 ) > 0 )&#xA;                {&#xA;                    vehiculos.set( i, p1 );&#xA;                    vehiculos.set( i - 1, p2 );&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+      <bussinesMethods name="ordenarPorCilindrada" return="void" code="        int inicial;&#xA;&#xA;        // En cada paso se sabe que:&#xA;        // 1. Las posiciones antes de veh&#xfffd;culos[inicial] est&#xfffd;n ordenadas&#xA;        // En cada paso lo que se hace es encontrar en qu&#xfffd; posici&#xfffd;n entre veh&#xfffd;culos[0] y veh&#xfffd;culos[inicial] deber&#xfffd;a&#xA;        // estar el veh&#xfffd;culo que en este momento se encuentra en veh&#xfffd;culos[inicial]&#xA;&#xA;        for( inicial = 1; inicial &lt; vehiculos.size( ); inicial++ )&#xA;        {&#xA;            Vehiculo insertado = ( Vehiculo )vehiculos.get( inicial );&#xA;&#xA;            boolean termine = false;&#xA;            int i = inicial - 1;&#xA;&#xA;            while( !termine )&#xA;            {&#xA;                // Si encuentra una cilindrada mayor, entonces hay que intercambiarlos&#xA;                Vehiculo veh&#xfffd;culoPosicion = ( Vehiculo )vehiculos.get( i );&#xA;&#xA;                if( veh&#xfffd;culoPosicion.compararPorCilindrada( insertado ) > 0 )&#xA;                {&#xA;                    vehiculos.set( i, insertado );&#xA;                    vehiculos.set( i + 1, veh&#xfffd;culoPosicion );&#xA;                    i--;&#xA;                }&#xA;                // Si se encuentra un cilindrada igual o menor entonces ya se encontr&#xfffd; la posici&#xfffd;n&#xA;                else&#xA;                {&#xA;                    termine = true;&#xA;                }&#xA;&#xA;                // Si ya se lleg&#xfffd; al principio de la lista no hay nada m&#xfffd;s que hacer&#xA;                if( i &lt; 0 )&#xA;                {&#xA;                    termine = true;&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+      <bussinesMethods name="ordenarPorAnio" return="void" code="        int inicial;&#xA;&#xA;        // En cada paso se sabe que:&#xA;        // 1. Todos los valores antes de veh&#xfffd;culos[inicial] est&#xfffd;n ordenados&#xA;        // 2. No hay ning&#xfffd;n valor despu&#xfffd;s de veh&#xfffd;culos[inicial-1] que sea menor que veh&#xfffd;culos[inicial-1]&#xA;        // En cada paso se busca el menor entre veh&#xfffd;culos[inicial] y veh&#xfffd;culos[final] y se ubica en veh&#xfffd;culos[inicial]&#xA;&#xA;        for( inicial = 0; inicial &lt; vehiculos.size( ); inicial++ )&#xA;        {&#xA;            int posicionMenor = inicial;&#xA;            Vehiculo veh&#xfffd;culoMenor = ( Vehiculo )vehiculos.get( inicial );&#xA;&#xA;            for( int i = inicial + 1; i &lt; vehiculos.size( ); i++ )&#xA;            {&#xA;                Vehiculo veh&#xfffd;culoPosicion = ( Vehiculo )vehiculos.get( i );&#xA;&#xA;                // El veh&#xfffd;culo de la posici&#xfffd;n actual es menor que el menor encontrado hasta el momento&#xA;                if( veh&#xfffd;culoPosicion.compararPorAnio( veh&#xfffd;culoMenor ) &lt; 0 )&#xA;                {&#xA;                    veh&#xfffd;culoMenor = veh&#xfffd;culoPosicion;&#xA;                    posicionMenor = i;&#xA;                }&#xA;            }&#xA;&#xA;            if( posicionMenor != inicial )&#xA;            {&#xA;                Vehiculo temp = ( Vehiculo )vehiculos.get( inicial );&#xA;                vehiculos.set( inicial, veh&#xfffd;culoMenor );&#xA;                vehiculos.set( posicionMenor, temp );&#xA;            }&#xA;&#xA;        }&#xA;        verificarInvariante( );&#xA;"/>
+      <bussinesMethods name="buscarVehiculo" return="int" code="        int posicion = -1;&#xA;        boolean termine = false;&#xA;&#xA;        for( int i = 0; i &lt; vehiculos.size( ) &amp;&amp; !termine; i++ )&#xA;        {&#xA;            Vehiculo vehiculoPosicion = ( Vehiculo )vehiculos.get( i );&#xA;            String modeloVehiculo = vehiculoPosicion.darModelo( );&#xA;&#xA;            // Los modelos son iguales&#xA;            if( modeloVehiculo.equals( modelo ) &amp;&amp; vehiculoPosicion.darAnio( ) == anio )&#xA;            {&#xA;                posicion = i;&#xA;                termine = true;&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;">
+        <attributes name="modelo" type="String"/>
+        <attributes name="anio" type="int"/>
+      </bussinesMethods>
+      <bussinesMethods name="agregarVehiculo" return="boolean" code="        boolean agregado = false;&#xA;        int veh&#xfffd;culoBuscado = buscarVehiculo( modeloV, anioV );&#xA;        if( veh&#xfffd;culoBuscado == -1 )&#xA;        {&#xA;            Vehiculo nuevoveh&#xfffd;culo = new Vehiculo( modeloV, marcaV, imagenP, tipoV, anioV, cilindradaV, ejesV, valor );&#xA;            vehiculos.add( nuevoveh&#xfffd;culo );&#xA;            agregado = true;&#xA;            verificarInvariante( );&#xA;        }&#xA;&#xA;        return agregado;&#xA;&#xA;">
+        <attributes name="modeloV" type="String"/>
+        <attributes name="marcaV" type="String"/>
+        <attributes name="imagenP" type="String"/>
+        <attributes name="tipoV" type="String"/>
+        <attributes name="anioV" type="int"/>
+        <attributes name="cilindradaV" type="int"/>
+        <attributes name="ejesV" type="int"/>
+        <attributes name="valor" type="int"/>
+      </bussinesMethods>
+      <bussinesMethods name="comprarVehiculo" return="boolean" code="        boolean comprado = false;&#xA;&#xA;        for( int cont = 0; cont &lt; vehiculos.size( ) &amp;&amp; !comprado; cont++ )&#xA;        {&#xA;            Vehiculo v = ( Vehiculo )vehiculos.get( cont );&#xA;&#xA;            if( v.darAnio( ) == anio &amp;&amp; v.darModelo( ).equalsIgnoreCase( modelo ) )&#xA;            {&#xA;                vehiculos.remove( cont );&#xA;                comprado = true;&#xA;            }&#xA;        }&#xA;&#xA;        return comprado;&#xA;">
+        <attributes name="modelo" type="String"/>
+        <attributes name="anio" type="int"/>
+      </bussinesMethods>
+      <bussinesMethods name="buscarVehiculoMasAntiguo" return="int" code="        int posicion = -1;&#xA;&#xA;        if( vehiculos.size( ) > 0 )&#xA;        {&#xA;            Vehiculo vMasAntiguo = ( Vehiculo )vehiculos.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; vehiculos.size( ); i++ )&#xA;            {&#xA;                Vehiculo vPosicion = ( Vehiculo )vehiculos.get( i );&#xA;&#xA;                if( vMasAntiguo.compararPorAnio( vPosicion ) == 1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    vMasAntiguo = vPosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;        return posicion;&#xA;"/>
+      <bussinesMethods name="buscarVehiculoMasEconomico" return="int" code="        int posicion = -1;&#xA;&#xA;        if( vehiculos.size( ) > 0 )&#xA;        {&#xA;            Vehiculo vMasEconomico = ( Vehiculo )vehiculos.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; vehiculos.size( ); i++ )&#xA;            {&#xA;                Vehiculo vPosicion = ( Vehiculo )vehiculos.get( i );&#xA;&#xA;                if( vMasEconomico.compararPorValor( vPosicion ) == 1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    vMasEconomico = vPosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;        return posicion;&#xA;"/>
+      <bussinesMethods name="buscarVehiculoMasPotente" return="int" code="        int posicion = -1;&#xA;&#xA;        if( vehiculos.size( ) > 0 )&#xA;        {&#xA;            Vehiculo vMasPotente = ( Vehiculo )vehiculos.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; vehiculos.size( ); i++ )&#xA;            {&#xA;                Vehiculo vPosicion = ( Vehiculo )vehiculos.get( i );&#xA;&#xA;                if( vMasPotente.compararPorCilindrada( vPosicion ) == -1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    vMasPotente = vPosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;        return posicion;&#xA;"/>
+      <bussinesMethods name="disminuirPrecio" return="int" code="        int disminuidos = 0;&#xA;&#xA;        for( int cont = 0; cont &lt; vehiculos.size( ); cont++ )&#xA;        {&#xA;            Vehiculo v = ( Vehiculo )vehiculos.get( cont );&#xA;&#xA;            if( v.darValor( ) > valor )&#xA;            {&#xA;                int nValor = ( int ) ( v.darValor( ) * 0.9 );&#xA;&#xA;                if( nValor > 0 )&#xA;                {&#xA;                    v.cambiarValor( nValor );&#xA;                    disminuidos++;&#xA;                }&#xA;            }&#xA;        }&#xA;        return disminuidos;&#xA;">
+        <attributes name="valor" type="int"/>
+      </bussinesMethods>
+      <bussinesMethods name="verificarInvariante" return="void" code="        assert ( vehiculos != null ) : &quot;La lista de veh&#xfffd;culos no debe ser null&quot;;&#xA;        assert ( !buscarVehiculosModeloYAnioRepetido( ) ) : &quot;Hay dos veh&#xfffd;culos del mismo modelo y a&#xfffd;o&quot;;&#xA;"/>
+      <bussinesMethods name="buscarVehiculosModeloYAnioRepetido" return="boolean" code="        for( int i = 0; i &lt; vehiculos.size( ); i++ )&#xA;        {&#xA;            Vehiculo pi = ( Vehiculo )vehiculos.get( i );&#xA;            for( int j = 0; j &lt; vehiculos.size( ); j++ )&#xA;            {&#xA;                if( i != j )&#xA;                {&#xA;                    Vehiculo pj = ( Vehiculo )vehiculos.get( j );&#xA;                    if( pj.darModelo( ).equals( pi.darModelo( ) ) &amp;&amp; pj.darAnio( ) == pi.darAnio( ) )&#xA;                    {&#xA;                        return true;&#xA;                    }&#xA;                }&#xA;            }&#xA;        }&#xA;        return false;&#xA;"/>
+      <bussinesMethods name="metodo1" return="String" code="        return &quot;respuesta1&quot;;&#xA;"/>
+      <bussinesMethods name="metodo2" return="String" code="        return &quot;respuesta2&quot;;&#xA;"/>
+    </Ejbs>
+    <entities name="Vehiculo">
+      <attributes name="modelo" type="String"/>
+      <attributes name="marca" type="String"/>
+      <attributes name="imagen" type="String"/>
+      <attributes name="tipo" type="String"/>
+      <attributes name="anio" type="int"/>
+      <attributes name="cilindrada" type="int"/>
+      <attributes name="ejes" type="int"/>
+      <attributes name="valor" type="int"/>
+      <methods name="Vehiculo" return="void" code="        modelo = modeloV;&#xA;        marca = marcaV;&#xA;        imagen = imagenV;&#xA;        tipo = tipoV;&#xA;        anio = anioV;&#xA;        cilindrada = cilindradaV;&#xA;        ejes = ejesV;&#xA;        valor = valorV;&#xA;&#xA;        verificarInvariante( );&#xA;">
+        <attributes name="modeloV" type="String"/>
+        <attributes name="marcaV" type="String"/>
+        <attributes name="imagenV" type="String"/>
+        <attributes name="tipoV" type="String"/>
+        <attributes name="anioV" type="int"/>
+        <attributes name="cilindradaV" type="int"/>
+        <attributes name="ejesV" type="int"/>
+        <attributes name="valorV" type="int"/>
+      </methods>
+      <methods name="darModelo" return="String" code="        return modelo;&#xA;"/>
+      <methods name="darMarca" return="String" code="        return marca;&#xA;"/>
+      <methods name="darImagen" return="String" code="        return imagen;&#xA;"/>
+      <methods name="darTipo" return="String" code="        return tipo;&#xA;"/>
+      <methods name="darAnio" return="int" code="        return anio;&#xA;"/>
+      <methods name="darCilindrada" return="int" code="        return cilindrada;&#xA;"/>
+      <methods name="darEjes" return="int" code="        return ejes;&#xA;"/>
+      <methods name="darValor" return="int" code="        return valor;&#xA;"/>
+      <methods name="compararPorCilindrada" return="int" code="        int resultado = ( cilindrada == v.darCilindrada( ) ) ? 0 : ( ( cilindrada > v.darCilindrada( ) ) ? 1 : -1 );&#xA;        return resultado;&#xA;">
+        <attributes name="v" type="Vehiculo"/>
+      </methods>
+      <methods name="compararPorMarca" return="int" code="        return marca.toLowerCase( ).compareTo( v.darMarca( ).toLowerCase( ) );&#xA;">
+        <attributes name="v" type="Vehiculo"/>
+      </methods>
+      <methods name="compararPorAnio" return="int" code="        int resultado = ( anio == v.darAnio( ) ) ? 0 : ( ( anio > v.darAnio( ) ) ? 1 : -1 );&#xA;        return resultado;&#xA;">
+        <attributes name="v" type="Vehiculo"/>
+      </methods>
+      <methods name="compararPorValor" return="int" code="        int resultado = ( valor == v.darValor( ) ) ? 0 : ( ( valor > v.darValor( ) ) ? 1 : -1 );&#xA;        return resultado;&#xA;">
+        <attributes name="v" type="Vehiculo"/>
+      </methods>
+      <methods name="cambiarValor" return="void" code="        valor = nValor;&#xA;">
+        <attributes name="nValor" type="int"/>
+      </methods>
+      <methods name="toString" return="String" code="        return marca + &quot; &quot; + modelo + &quot; (&quot; + anio + &quot;)&quot;;&#xA;"/>
+      <methods name="verificarInvariante" return="void" code="        assert ( tipo.equals( BUS ) || tipo.equals( AUTOMOVIL ) || tipo.equals( MOTOCICLETA ) || tipo.equals( CAMION )  ) : &quot;El tipo debe ser uno de los valores v&#xfffd;lidos&quot;;&#xA;        assert ( anio > 0 ) : &quot;El a&#xfffd;o no puede ser 0&quot;;&#xA;        assert ( imagen != null ) : &quot;La imagen no puede ser null&quot;;&#xA;        assert ( modelo != null ) : &quot;El modelo no puede ser null&quot;;&#xA;        assert ( marca != null ) : &quot;La marca no puede ser null&quot;;&#xA;        assert ( cilindrada > 0 ) : &quot;La cilindrada no puede ser 0&quot;;&#xA;        assert ( ejes > 1 ) : &quot;El n&#xfffd;mero de ejes debe ser mayor a 1&quot;;&#xA;        assert ( valor > 0 ) : &quot;El veh&#xfffd;culo debe tener un valor mayor a 0&quot;;&#xA;"/>
+    </entities>
+    <services name="VentaVehiculosService">
+      <serviceMethods name="VentaVehiculos" return="void" code="        vehiculos = new ArrayList( );&#xA;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="VentaVehiculos"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="darVehiculos" return="ArrayList&lt;E>" code="        ArrayList copiaLista = new ArrayList( vehiculos );&#xA;        return copiaLista;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="darVehiculos"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="ordenarPorMarca" return="void" code="        int inicial;&#xA;&#xA;        for( inicial = 0; inicial &lt; vehiculos.size( ); inicial++ )&#xA;        {&#xA;            for( int i = vehiculos.size( ) - 1; i > inicial; i-- )&#xA;            {&#xA;                Vehiculo p2 = ( Vehiculo )vehiculos.get( i );&#xA;                Vehiculo p1 = ( Vehiculo )vehiculos.get( i - 1 );&#xA;&#xA;                if( p1.compararPorMarca( p2 ) > 0 )&#xA;                {&#xA;                    vehiculos.set( i, p1 );&#xA;                    vehiculos.set( i - 1, p2 );&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="ordenarPorMarca"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="ordenarPorCilindrada" return="void" code="        int inicial;&#xA;&#xA;        // En cada paso se sabe que:&#xA;        // 1. Las posiciones antes de veh&#xfffd;culos[inicial] est&#xfffd;n ordenadas&#xA;        // En cada paso lo que se hace es encontrar en qu&#xfffd; posici&#xfffd;n entre veh&#xfffd;culos[0] y veh&#xfffd;culos[inicial] deber&#xfffd;a&#xA;        // estar el veh&#xfffd;culo que en este momento se encuentra en veh&#xfffd;culos[inicial]&#xA;&#xA;        for( inicial = 1; inicial &lt; vehiculos.size( ); inicial++ )&#xA;        {&#xA;            Vehiculo insertado = ( Vehiculo )vehiculos.get( inicial );&#xA;&#xA;            boolean termine = false;&#xA;            int i = inicial - 1;&#xA;&#xA;            while( !termine )&#xA;            {&#xA;                // Si encuentra una cilindrada mayor, entonces hay que intercambiarlos&#xA;                Vehiculo veh&#xfffd;culoPosicion = ( Vehiculo )vehiculos.get( i );&#xA;&#xA;                if( veh&#xfffd;culoPosicion.compararPorCilindrada( insertado ) > 0 )&#xA;                {&#xA;                    vehiculos.set( i, insertado );&#xA;                    vehiculos.set( i + 1, veh&#xfffd;culoPosicion );&#xA;                    i--;&#xA;                }&#xA;                // Si se encuentra un cilindrada igual o menor entonces ya se encontr&#xfffd; la posici&#xfffd;n&#xA;                else&#xA;                {&#xA;                    termine = true;&#xA;                }&#xA;&#xA;                // Si ya se lleg&#xfffd; al principio de la lista no hay nada m&#xfffd;s que hacer&#xA;                if( i &lt; 0 )&#xA;                {&#xA;                    termine = true;&#xA;                }&#xA;            }&#xA;        }&#xA;        verificarInvariante( );&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="ordenarPorCilindrada"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="ordenarPorAnio" return="void" code="        int inicial;&#xA;&#xA;        // En cada paso se sabe que:&#xA;        // 1. Todos los valores antes de veh&#xfffd;culos[inicial] est&#xfffd;n ordenados&#xA;        // 2. No hay ning&#xfffd;n valor despu&#xfffd;s de veh&#xfffd;culos[inicial-1] que sea menor que veh&#xfffd;culos[inicial-1]&#xA;        // En cada paso se busca el menor entre veh&#xfffd;culos[inicial] y veh&#xfffd;culos[final] y se ubica en veh&#xfffd;culos[inicial]&#xA;&#xA;        for( inicial = 0; inicial &lt; vehiculos.size( ); inicial++ )&#xA;        {&#xA;            int posicionMenor = inicial;&#xA;            Vehiculo veh&#xfffd;culoMenor = ( Vehiculo )vehiculos.get( inicial );&#xA;&#xA;            for( int i = inicial + 1; i &lt; vehiculos.size( ); i++ )&#xA;            {&#xA;                Vehiculo veh&#xfffd;culoPosicion = ( Vehiculo )vehiculos.get( i );&#xA;&#xA;                // El veh&#xfffd;culo de la posici&#xfffd;n actual es menor que el menor encontrado hasta el momento&#xA;                if( veh&#xfffd;culoPosicion.compararPorAnio( veh&#xfffd;culoMenor ) &lt; 0 )&#xA;                {&#xA;                    veh&#xfffd;culoMenor = veh&#xfffd;culoPosicion;&#xA;                    posicionMenor = i;&#xA;                }&#xA;            }&#xA;&#xA;            if( posicionMenor != inicial )&#xA;            {&#xA;                Vehiculo temp = ( Vehiculo )vehiculos.get( inicial );&#xA;                vehiculos.set( inicial, veh&#xfffd;culoMenor );&#xA;                vehiculos.set( posicionMenor, temp );&#xA;            }&#xA;&#xA;        }&#xA;        verificarInvariante( );&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="ordenarPorAnio"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="buscarVehiculo" return="int" code="        int posicion = -1;&#xA;        boolean termine = false;&#xA;&#xA;        for( int i = 0; i &lt; vehiculos.size( ) &amp;&amp; !termine; i++ )&#xA;        {&#xA;            Vehiculo vehiculoPosicion = ( Vehiculo )vehiculos.get( i );&#xA;            String modeloVehiculo = vehiculoPosicion.darModelo( );&#xA;&#xA;            // Los modelos son iguales&#xA;            if( modeloVehiculo.equals( modelo ) &amp;&amp; vehiculoPosicion.darAnio( ) == anio )&#xA;            {&#xA;                posicion = i;&#xA;                termine = true;&#xA;            }&#xA;        }&#xA;&#xA;        return posicion;&#xA;">
+        <attributes name="modelo" type="String">
+          <anotations name="PathParam">
+            <parameter name="modelo"/>
+          </anotations>
+        </attributes>
+        <attributes name="anio" type="int">
+          <anotations name="PathParam">
+            <parameter name="anio"/>
+          </anotations>
+        </attributes>
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="buscarVehiculo"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="agregarVehiculo" return="boolean" code="        boolean agregado = false;&#xA;        int veh&#xfffd;culoBuscado = buscarVehiculo( modeloV, anioV );&#xA;        if( veh&#xfffd;culoBuscado == -1 )&#xA;        {&#xA;            Vehiculo nuevoveh&#xfffd;culo = new Vehiculo( modeloV, marcaV, imagenP, tipoV, anioV, cilindradaV, ejesV, valor );&#xA;            vehiculos.add( nuevoveh&#xfffd;culo );&#xA;            agregado = true;&#xA;            verificarInvariante( );&#xA;        }&#xA;&#xA;        return agregado;&#xA;&#xA;">
+        <attributes name="modeloV" type="String">
+          <anotations name="PathParam">
+            <parameter name="modeloV"/>
+          </anotations>
+        </attributes>
+        <attributes name="marcaV" type="String">
+          <anotations name="PathParam">
+            <parameter name="marcaV"/>
+          </anotations>
+        </attributes>
+        <attributes name="imagenP" type="String">
+          <anotations name="PathParam">
+            <parameter name="imagenP"/>
+          </anotations>
+        </attributes>
+        <attributes name="tipoV" type="String">
+          <anotations name="PathParam">
+            <parameter name="tipoV"/>
+          </anotations>
+        </attributes>
+        <attributes name="anioV" type="int">
+          <anotations name="PathParam">
+            <parameter name="anioV"/>
+          </anotations>
+        </attributes>
+        <attributes name="cilindradaV" type="int">
+          <anotations name="PathParam">
+            <parameter name="cilindradaV"/>
+          </anotations>
+        </attributes>
+        <attributes name="ejesV" type="int">
+          <anotations name="PathParam">
+            <parameter name="ejesV"/>
+          </anotations>
+        </attributes>
+        <attributes name="valor" type="int">
+          <anotations name="PathParam">
+            <parameter name="valor"/>
+          </anotations>
+        </attributes>
+        <anotations name="POST"/>
+        <anotations name="Path">
+          <parameter name="agregarVehiculo"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="comprarVehiculo" return="boolean" code="        boolean comprado = false;&#xA;&#xA;        for( int cont = 0; cont &lt; vehiculos.size( ) &amp;&amp; !comprado; cont++ )&#xA;        {&#xA;            Vehiculo v = ( Vehiculo )vehiculos.get( cont );&#xA;&#xA;            if( v.darAnio( ) == anio &amp;&amp; v.darModelo( ).equalsIgnoreCase( modelo ) )&#xA;            {&#xA;                vehiculos.remove( cont );&#xA;                comprado = true;&#xA;            }&#xA;        }&#xA;&#xA;        return comprado;&#xA;">
+        <attributes name="modelo" type="String">
+          <anotations name="PathParam">
+            <parameter name="modelo"/>
+          </anotations>
+        </attributes>
+        <attributes name="anio" type="int">
+          <anotations name="PathParam">
+            <parameter name="anio"/>
+          </anotations>
+        </attributes>
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="comprarVehiculo"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="buscarVehiculoMasAntiguo" return="int" code="        int posicion = -1;&#xA;&#xA;        if( vehiculos.size( ) > 0 )&#xA;        {&#xA;            Vehiculo vMasAntiguo = ( Vehiculo )vehiculos.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; vehiculos.size( ); i++ )&#xA;            {&#xA;                Vehiculo vPosicion = ( Vehiculo )vehiculos.get( i );&#xA;&#xA;                if( vMasAntiguo.compararPorAnio( vPosicion ) == 1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    vMasAntiguo = vPosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;        return posicion;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="buscarVehiculoMasAntiguo"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="buscarVehiculoMasEconomico" return="int" code="        int posicion = -1;&#xA;&#xA;        if( vehiculos.size( ) > 0 )&#xA;        {&#xA;            Vehiculo vMasEconomico = ( Vehiculo )vehiculos.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; vehiculos.size( ); i++ )&#xA;            {&#xA;                Vehiculo vPosicion = ( Vehiculo )vehiculos.get( i );&#xA;&#xA;                if( vMasEconomico.compararPorValor( vPosicion ) == 1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    vMasEconomico = vPosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;        return posicion;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="buscarVehiculoMasEconomico"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="buscarVehiculoMasPotente" return="int" code="        int posicion = -1;&#xA;&#xA;        if( vehiculos.size( ) > 0 )&#xA;        {&#xA;            Vehiculo vMasPotente = ( Vehiculo )vehiculos.get( 0 );&#xA;            posicion = 0;&#xA;            for( int i = 1; i &lt; vehiculos.size( ); i++ )&#xA;            {&#xA;                Vehiculo vPosicion = ( Vehiculo )vehiculos.get( i );&#xA;&#xA;                if( vMasPotente.compararPorCilindrada( vPosicion ) == -1 )&#xA;                {&#xA;                    posicion = i;&#xA;                    vMasPotente = vPosicion;&#xA;                }&#xA;            }&#xA;        }&#xA;        return posicion;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="buscarVehiculoMasPotente"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="disminuirPrecio" return="int" code="        int disminuidos = 0;&#xA;&#xA;        for( int cont = 0; cont &lt; vehiculos.size( ); cont++ )&#xA;        {&#xA;            Vehiculo v = ( Vehiculo )vehiculos.get( cont );&#xA;&#xA;            if( v.darValor( ) > valor )&#xA;            {&#xA;                int nValor = ( int ) ( v.darValor( ) * 0.9 );&#xA;&#xA;                if( nValor > 0 )&#xA;                {&#xA;                    v.cambiarValor( nValor );&#xA;                    disminuidos++;&#xA;                }&#xA;            }&#xA;        }&#xA;        return disminuidos;&#xA;">
+        <attributes name="valor" type="int">
+          <anotations name="PathParam">
+            <parameter name="valor"/>
+          </anotations>
+        </attributes>
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="disminuirPrecio"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="verificarInvariante" return="void" code="        assert ( vehiculos != null ) : &quot;La lista de veh&#xfffd;culos no debe ser null&quot;;&#xA;        assert ( !buscarVehiculosModeloYAnioRepetido( ) ) : &quot;Hay dos veh&#xfffd;culos del mismo modelo y a&#xfffd;o&quot;;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="verificarInvariante"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="buscarVehiculosModeloYAnioRepetido" return="boolean" code="        for( int i = 0; i &lt; vehiculos.size( ); i++ )&#xA;        {&#xA;            Vehiculo pi = ( Vehiculo )vehiculos.get( i );&#xA;            for( int j = 0; j &lt; vehiculos.size( ); j++ )&#xA;            {&#xA;                if( i != j )&#xA;                {&#xA;                    Vehiculo pj = ( Vehiculo )vehiculos.get( j );&#xA;                    if( pj.darModelo( ).equals( pi.darModelo( ) ) &amp;&amp; pj.darAnio( ) == pi.darAnio( ) )&#xA;                    {&#xA;                        return true;&#xA;                    }&#xA;                }&#xA;            }&#xA;        }&#xA;        return false;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="buscarVehiculosModeloYAnioRepetido"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="metodo1" return="String" code="        return &quot;respuesta1&quot;;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="metodo1"/>
+        </anotations>
+      </serviceMethods>
+      <serviceMethods name="metodo2" return="String" code="        return &quot;respuesta2&quot;;&#xA;">
+        <anotations name="GET"/>
+        <anotations name="Path">
+          <parameter name="metodo2"/>
+        </anotations>
+      </serviceMethods>
+    </services>
+  </jEE:JEE>
+</xmi:XMI>

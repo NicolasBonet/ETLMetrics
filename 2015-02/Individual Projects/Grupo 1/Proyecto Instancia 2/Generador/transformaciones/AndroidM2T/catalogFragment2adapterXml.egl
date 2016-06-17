@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+android:orientation="horizontal" 
+android:id="@+id/panel_content" 
+android:layout_width="match_parent" 
+android:layout_height="wrap_content" 
+android:descendantFocusability="blocksDescendants">
+
+    <com.etsy.android.grid.util.DynamicHeightImageView android:id="@+id/txt_line1" 
+    android:layout_width="match_parent" 
+    android:layout_height="wrap_content" 
+    android:gravity="center" 
+    android:adjustViewBounds="true" 
+    android:scaleType="fitCenter">
+    </com.etsy.android.grid.util.DynamicHeightImageView>
+
+    <ProgressBar android:id="@+id/progressBarLoadingCatalogo" 
+    style="?android:attr/progressBarStyleSmall" 
+    android:layout_width="25dp" 
+    android:layout_height="25dp" 
+    android:layout_gravity="center" 
+    android:layout_margin="20dp"></ProgressBar>
+
+    <Button android:id="@+id/btn_go" 
+    android:layout_width="wrap_content" 
+    android:layout_height="wrap_content" 
+    android:layout_gravity="top|right" 
+    android:text="Click" 
+    android:visibility="gone"></Button>
+
+</FrameLayout>

@@ -1,0 +1,108 @@
+<div>
+<ul class="nav navbar-nav">
+[%for (navegacion in vista.navegaciones){%]
+	<li><a ng-href="#/[%=navegacion.destino.toLowerCase()%]">[%=navegacion.nombre%]</a></li>
+[%}%]
+</ul>
+<div>
+
+[%for (seccion in vista.secciones){%]
+	[%if (seccion.tipoSeccion == angular!TipoSeccion#LISTA){%]
+		<div id="[%=seccion.nombre%]" 
+		ng-controller="[%=vista.controlador.nombre%]"
+		class="ibox">
+		[%for (elemento in seccion.elementos){
+			if (elemento.tipoElemento == angular!TipoElemento#TABLA){%]
+				<div class="ibox-title" >
+					<h3>Seccion Lista [%=elemento.valor%]s</h3>
+				</div>
+				<div class="ibox-content" >
+				<table id="[%=elemento.nombre%]"
+					class="table">
+					<thead>
+					 <tr>
+						[%for (hijo in elemento.hijos){
+							if (hijo.tipoElemento == angular!TipoElemento#COLUMNA){%]
+								<th id="[%=hijo.valor%]">[%=hijo.nombre%]</th>
+							[%}
+						}%]
+					 </tr>
+					</thead>
+					<tbody>
+					<tr ng-repeat="data in datos">
+						[%for (hijo in elemento.hijos){
+							if (hijo.tipoElemento == angular!TipoElemento#COLUMNA){%]
+							<td><a ng-href="#/[%=vista.entidad%]detalle/{{data.[%=vista.entidad%]Id}}">{{data.[%
+							if ( not hijo.hijos.isUndefined() and hijo.hijos.size() > 0 ){
+								out.print(hijo.valor.toJavaName()+"."+hijo.hijos.first().valor.toJavaName());
+
+							}else{
+								out.print(hijo.valor.toJavaName());
+							}
+							%]}}<a></td>
+							[%}
+						}%]
+					</tr>
+					</tbody>
+				<table>
+				</div>
+			[%}
+		}
+		%]<div>[%
+	}else if (seccion.tipoSeccion == angular!TipoSeccion#FORMULARIO){%]
+		<form ng-controller="[%=vista.controlador.nombre%]"
+			ng-submit="save(data)"
+			class="jumbotron"
+			role="form">
+		[%for (elemento in seccion.elementos){%]
+			<fieldset class="form-group">
+				<p>[%=elemento.valor%]</p>
+				[%if (elemento.tipoElemento == angular!TipoElemento#TEXTOENTRADA){%]
+				<input ng-model="data.[%=elemento.nombre.toJavaName()%]" type="text" class="form-control"/>
+				[%}else if (elemento.tipoElemento == angular!TipoElemento#FECHA){%]
+				<input ng-model="data.[%=elemento.nombre.toJavaName()%]" type="date" class="form-control"/>
+				[%}else if (elemento.tipoElemento == angular!TipoElemento#NUMERO){%]
+				<input ng-model="data.[%=elemento.nombre.toJavaName()%]" type="number" class="form-control"/>
+				[%}else if (elemento.tipoElemento == angular!TipoElemento#SELECCIONMULTIPLE){%]
+				<input ng-model="data.[%=elemento.nombre.toJavaName()%]" type="checkbox" class="form-control"/>
+				[%}else if (elemento.tipoElemento == angular!TipoElemento#COMBO){%]
+				<select name="[%=elemento.valor.toJavaName()%]" id="[%=elemento.nombre%]" class="form-control"
+			      ng-options="option.[%=  elemento.hijos.first().nombre.toJavaName() %] for option in [%=elemento.nombre%]s track by option.[%=elemento.nombre.toJavaName()%]Id"
+			      ng-model="data.[%=elemento.nombre.toJavaName()%]">
+
+			      </select>
+				[%}%]
+			</fieldset>
+		[%}for (accion in seccion.acciones){
+			if (accion.tipoAccion == angular!TipoAccion#REGISTRAR){%]
+				<input type="button"
+				ng-click="save(data)" 
+				class="btn btn-default" 
+				value="[%=accion.nombre%]"/>
+			[%}else if (accion.tipoAccion == angular!TipoAccion#ELIMINAR){%]
+				<input type="button" ng-click="eliminar(data)"
+				ng-hide="data.id"
+				class="btn btn-primary" value="[%=accion.nombre%]"/>
+			[%}
+		}%]
+		<form>
+	[%}
+}%]
+
+[%
+operation String toJavaName():String{
+
+(self.substring(0,1).toLowerCase() + ""+ self.substring(1,self.length)).println();
+
+return self.substring(0,1).toLowerCase() + ""+ self.substring(1,self.length);
+
+}
+%]
+[%
+operation String primeraUpperCase():String{
+
+return self.substring(0,1).toUpperCase() + ""+ self.substring(1,self.length);
+
+}
+
+%]

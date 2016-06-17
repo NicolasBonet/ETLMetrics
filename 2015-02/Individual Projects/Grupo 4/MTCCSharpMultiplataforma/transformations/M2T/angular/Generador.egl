@@ -1,0 +1,24 @@
+[% 
+	var root = '../../../generated/angular/app/';
+	
+	for (controlador in NG!Controller.all) 
+	{ 
+		var t : Template := TemplateFactory.load('Controller.egl'); 
+		t.populate('nombreController', controlador.nombre); 
+		t.generate(root + 'controllers/' + controlador.nombre + '.js'); 
+	}
+	
+	for (servicio in NG!Service.all) 
+	{ 
+		var t : Template := TemplateFactory.load('Service.egl'); 
+		t.populate('nombreService', servicio.nombre); 
+		t.generate(root + 'services/' + servicio.nombre + 'Service.js'); 
+	}
+	
+	for (vista in NG!Vista.all) 
+	{ 
+		var t : Template := TemplateFactory.load('View.egl'); 
+		t.populate('nombreVista', vista.nombre); 
+		t.generate(root + 'views/' + vista.nombre + '.html'); 
+	}
+%]

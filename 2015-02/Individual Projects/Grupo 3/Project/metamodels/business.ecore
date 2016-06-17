@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="business" nsURI="http://www.humantech.co/business" nsPrefix="business">
+  <eClassifiers xsi:type="ecore:EClass" name="Entidad">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="atributos" lowerBound="1"
+        upperBound="-1" eType="#//Atributo" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="relaciones" lowerBound="1"
+        upperBound="-1" eType="#//Relacion" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Atributo">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipo" eType="#//ETipoDato"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="validaciones" lowerBound="1"
+        upperBound="-1" eType="#//Validaciones" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Relacion">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="destino" lowerBound="1"
+        upperBound="-1" eType="#//Entidad" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="multiplicidadOrigen" eType="#//ETipoMultiplicidad"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="multiplicidadDestino" eType="#//ETipoMultiplicidad"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipo" eType="#//ETipoRelacion"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Validaciones">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipo" eType="#//ETipoValidacion"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="valor" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ETipoValidacion">
+    <eLiterals name="Obligatorio" value="1"/>
+    <eLiterals name="Igual" value="4"/>
+    <eLiterals name="MayorIgualQue" value="5"/>
+    <eLiterals name="MenorIgualQue" value="6"/>
+    <eLiterals name="Patron" value="8"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ETipoDato">
+    <eLiterals name="CadenaTexto"/>
+    <eLiterals name="Numerico" value="1"/>
+    <eLiterals name="Entero" value="2"/>
+    <eLiterals name="Fecha" value="3"/>
+    <eLiterals name="FechaHora" value="4"/>
+    <eLiterals name="Booleano" value="5"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ETipoMultiplicidad">
+    <eLiterals name="Cero" literal="0"/>
+    <eLiterals name="Uno" value="1" literal="1"/>
+    <eLiterals name="Muchos" value="2" literal="*"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Universidad"/>
+  <eClassifiers xsi:type="ecore:EEnum" name="ETipoRelacion">
+    <eLiterals name="Herencia"/>
+    <eLiterals name="Agregacion" value="1"/>
+    <eLiterals name="Composicion" value="2"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Proyecto">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entidades" lowerBound="1"
+        upperBound="-1" eType="#//Entidad" containment="true"/>
+  </eClassifiers>
+</ecore:EPackage>

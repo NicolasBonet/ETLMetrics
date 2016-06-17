@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:html5="http://www.example.org/html5">
+  <html5:html>
+    <container xsi:type="html5:div" class="container">
+      <innercontainer xsi:type="html5:div" class="row">
+        <innercontainer xsi:type="html5:div" class="col-md-4" id="PanelDatosPerro">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:div">
+              <elements xsi:type="html5:label" value=""/>
+            </elements>
+            <elements xsi:type="html5:table">
+              <tr>
+                <td>
+                  <elements xsi:type="html5:label" value="Nombre: "/>
+                </td>
+                <td>
+                  <elements xsi:type="html5:input" value=""/>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <elements xsi:type="html5:label" value="Raza: "/>
+                </td>
+                <td>
+                  <elements xsi:type="html5:input" value=""/>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <elements xsi:type="html5:label" value="Edad: "/>
+                </td>
+                <td>
+                  <elements xsi:type="html5:input" value=""/>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <elements xsi:type="html5:label" value="Puntos: "/>
+                </td>
+                <td>
+                  <elements xsi:type="html5:input" value=""/>
+                </td>
+              </tr>
+            </elements>
+            <legend valor="Datos Perro"/>
+          </innercontainer>
+        </innercontainer>
+        <innercontainer xsi:type="html5:div" class="col-md-4" id="PanelListaPerros">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:select" multiple="SINGLE_SELECTION "/>
+            <legend valor="Perros en la exposici&#xfffd;n"/>
+          </innercontainer>
+        </innercontainer>
+        <innercontainer xsi:type="html5:div" class="col-md-4" id="PanelBusquedaOrdenamientos">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:button" value="Ordenar por Raza" action="ORDENAR_RAZA"/>
+            <elements xsi:type="html5:button" value="Ordenar por Puntos" action="ORDENAR_PUNTOS"/>
+            <elements xsi:type="html5:button" value="Ordenar por Edad" action="ORDENAR_EDAD"/>
+            <elements xsi:type="html5:button" value="Buscar Perro" action="BUSCAR"/>
+            <legend valor="B&#xfffd;squeda y ordenamientos"/>
+          </innercontainer>
+        </innercontainer>
+      </innercontainer>
+      <innercontainer xsi:type="html5:div" class="row">
+        <innercontainer xsi:type="html5:div" class="col-md-6" id="PanelConsultas">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:button" value="Ganador" action="GANADOR"/>
+            <elements xsi:type="html5:button" value="Menor Puntaje" action="MENOS_PUNTOS"/>
+            <elements xsi:type="html5:button" value="M&#xfffd;s Viejo" action="MAYOR_EDAD"/>
+            <legend valor="Consultas Exposici&#xfffd;n"/>
+          </innercontainer>
+        </innercontainer>
+        <innercontainer xsi:type="html5:div" class="col-md-6" id="PanelAgregarPerro">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:table">
+              <tr>
+                <td>
+                  <elements xsi:type="html5:label" value="Nombre: "/>
+                </td>
+                <td>
+                  <elements xsi:type="html5:input" value=""/>
+                </td>
+                <td>
+                  <elements xsi:type="html5:label" value="Raza: "/>
+                </td>
+                <td>
+                  <elements xsi:type="html5:input" value=""/>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <elements xsi:type="html5:label" value="Edad: "/>
+                </td>
+                <td>
+                  <elements xsi:type="html5:input" value=""/>
+                </td>
+                <td>
+                  <elements xsi:type="html5:label" value="Puntos: "/>
+                </td>
+                <td>
+                  <elements xsi:type="html5:input" value=""/>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <elements xsi:type="html5:label" value="Imagen: "/>
+                </td>
+                <td>
+                  <elements xsi:type="html5:table">
+                    <tr>
+                      <td>
+                        <elements xsi:type="html5:input" value=""/>
+                      </td>
+                      <td>
+                        <elements xsi:type="html5:button" value="Examinar" action="BUSCAR"/>
+                      </td>
+                    </tr>
+                  </elements>
+                </td>
+                <td/>
+                <td/>
+              </tr>
+            </elements>
+            <elements xsi:type="html5:div">
+              <elements xsi:type="html5:button" value="Agregar Perro" action="AGREGAR"/>
+            </elements>
+            <legend valor="Agregar Perro"/>
+          </innercontainer>
+        </innercontainer>
+      </innercontainer>
+      <innercontainer xsi:type="html5:div" class="row">
+        <innercontainer xsi:type="html5:div" class="col-md-12" id="PanelExtension">
+          <innercontainer xsi:type="html5:fieldset">
+            <elements xsi:type="html5:button" value="Opci&#xfffd;n 1" action="OPCION_1"/>
+            <elements xsi:type="html5:button" value="Opci&#xfffd;n 2" action="OPCION_2"/>
+            <legend valor="Puntos de Extensi&#xfffd;n"/>
+          </innercontainer>
+        </innercontainer>
+      </innercontainer>
+    </container>
+  </html5:html>
+  <html5:tr/>
+  <html5:tr/>
+</xmi:XMI>

@@ -1,0 +1,83 @@
+'use strict';
+
+/**
+ * @ngdoc overview
+ * @name [%= app.nombre.toLowerCase() %]
+ * @description
+ * # [%= app.nombre.toLowerCase() %]
+ *
+ * Main module of the application.
+ */
+angular
+  .module('[%= app.nombre.toLowerCase() %]', ['ngRoute', 'ui.bootstrap','dialogs', 'pascalprecht.translate', 'ngStorage']) 
+ .config(function ($routeProvider, $translateProvider, $httpProvider) {
+    $routeProvider
+  	
+      [%
+      
+      for ( vista in app.vistas )
+      {
+      
+      %]
+      .when('/[%=vista.nombre.toLowerCase()%]', {
+        templateUrl: 'views/[%=vista.entidad%]/[%=vista.nombre%].html',
+        controller: '[%=vista.controlador.nombre%]'
+      })
+      
+      [%
+      
+      if (vista.tipo == angular!ETipoVista#FORMULARIO){
+      
+      %]
+      .when('/[%=vista.nombre.toLowerCase()%]/:id', {
+        templateUrl: 'views/[%=vista.entidad%]/[%=vista.nombre%].html',
+        controller: '[%=vista.controlador.nombre%]'
+      })
+      [%
+      
+      }
+      
+      %]
+      
+      [%
+      
+      }
+      
+      %]
+      
+      
+      .otherwise({
+        redirectTo: '/'
+      });
+    
+		$translateProvider.useStaticFilesLoader({
+        prefix: 'res/locale-',
+        suffix: '.json'
+      });
+
+      $translateProvider.preferredLanguage("es_CO");
+      
+      $httpProvider.interceptors.push(['$q', '$location', '$localStorage', function($q, $location, $localStorage) {
+          return {
+              'request': function (config) {
+                  config.headers = config.headers || {};
+                  
+                  //if ($localStorage.token) {
+            	  if (localStorage["token"] && localStorage["username"]) {
+                      //config.headers.Authorization = $localStorage.token;
+                      config.headers.Authorization = localStorage["username"] +"@-"+localStorage["token"];
+                  }
+                  return config;
+              },
+              'responseError': function(response) {
+                  if(response.status === 401 || response.status === 403 || response.status === 409) {
+                      //$location.path('/');
+                      window.location = "login.html#/";
+                  }
+                  return $q.reject(response);
+              }
+          };
+      }]);
+
+ 
+});

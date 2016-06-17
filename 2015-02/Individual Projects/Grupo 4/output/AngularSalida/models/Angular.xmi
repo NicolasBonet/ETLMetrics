@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ASCII"?>
+<testAngular1:Angular xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:testAngular1="http://www.example.org/testAngular1">
+  <controllers nombre="EstudiantesCrearController" titulo="Crear estudiante" services="//@services.0 //@services.1" vista="//@vistas.1" submit="//@services.1/@metodos.1" listas="//@services.0/@metodos.0"/>
+  <controllers nombre="EstudiantesActualizarController" titulo="Actualizar estudiante" services="//@services.0 //@services.1" vista="//@vistas.1" submit="//@services.1/@metodos.2" obtenerPorId="//@services.1/@metodos.0" listas="//@services.0/@metodos.0"/>
+  <services nombre="Ciudades">
+    <metodos nombre="ObtenerTodos" verbo="get" ruta="http://192.168.0.6:51792/api/Ciudades/ObtenerTodos" service="//@services.0"/>
+  </services>
+  <services nombre="Estudiantes">
+    <metodos nombre="ObtenerPorId" verbo="get" ruta="http://192.168.0.6:51792/api/Estudiantes/ObtenerPorId" service="//@services.1">
+      <parametros nombre="id"/>
+    </metodos>
+    <metodos nombre="Crear" verbo="post" ruta="http://192.168.0.6:51792/api/Estudiantes/Crear" service="//@services.1">
+      <parametros nombre="estudianteDTO"/>
+    </metodos>
+    <metodos nombre="Actualizar" verbo="put" ruta="http://192.168.0.6:51792/api/Estudiantes/Actualizar" service="//@services.1">
+      <parametros nombre="estudianteDTO"/>
+    </metodos>
+  </services>
+  <vistas nombre="Ciudad" dto="CiudadDTO">
+    <formElements xsi:type="testAngular1:Input" nombre="Nombre" label="Nombre" id="tb_nombre" tipo="text" placeholder=""/>
+  </vistas>
+  <vistas nombre="Estudiante" dto="EstudianteDTO">
+    <formElements xsi:type="testAngular1:Input" nombre="Nombre" label="Nombre" id="tb_nombre" tipo="text" placeholder=""/>
+    <formElements xsi:type="testAngular1:Input" nombre="Apellido" required="false" label="Apellido" id="tb_apellido" tipo="text" placeholder=""/>
+    <formElements xsi:type="testAngular1:FormGroup" nombre="Sexo" label="Sexo" id="rb_sexo">
+      <elements nombre="Mujer"/>
+      <elements nombre="Hombre"/>
+    </formElements>
+    <formElements xsi:type="testAngular1:FormGroup" nombre="Ciudad" label="Ciudad" id="cb_ciudad" lista="Ciudades"/>
+    <formElements xsi:type="testAngular1:Input" nombre="Correo" required="false" label="Correo" id="tb_correo" tipo="Email" placeholder=""/>
+    <formElements xsi:type="testAngular1:Input" nombre="Usuario" label="Usuario" id="tb_usuario" tipo="text" placeholder="No debe contener espacios"/>
+    <formElements xsi:type="testAngular1:Input" nombre="Contrasenia" label="Contrasenia" id="tb_contrasenia" tipo="Password" placeholder=""/>
+    <formElements xsi:type="testAngular1:Textarea" nombre="AcercaDeMi" label="Acerca de mi" id="ta_acercademi" tipo="text"/>
+    <formElements xsi:type="testAngular1:Textarea" nombre="Razon" required="false" label="&#xbf;Por qu&#xe9; estudiar en los Andes?" id="ta_razon" tipo="text" filas="10"/>
+    <formElements xsi:type="testAngular1:Input" nombre="RecibirCorreo" required="false" label="&#xbf;Desea recibir correo elecr&#xf3;nico?" id="chb_recibircorreo" tipo="checkbox" placeholder=""/>
+  </vistas>
+</testAngular1:Angular>

@@ -1,0 +1,18 @@
+Rails.application.routes.draw do
+  [%for(entity in services){%]
+  	[%// ("    routes services "+entity.service.name.toString()).println() %]
+  	[% var fullname = entity.service.name.toString().split('/').select(a| not(a='')) ;%]
+	[%= process(fullname)%]
+  [%}%]
+end
+
+
+[% function process(array){
+array.println();
+	if(array.size() > 1){
+		return "namespace :"+array.first+ " do \n"+
+		process(array.select(x|not(x=array.first))) + "end";
+	}else{
+		return "			resources :"+array.first+"  \n";
+	}
+}%]

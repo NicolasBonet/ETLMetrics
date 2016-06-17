@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/csharp/src" modelPluginID="csharp" modelName="Csharp"
+    rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="7.0" copyrightFields="false" operationReflection="true" importOrganizing="true">
+  <foreignModel>csharp.ecore</foreignModel>
+  <genPackages prefix="Csharp" disposableProviderFactory="true" ecorePackage="csharp.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="csharp.ecore#//TipoEntrada">
+      <genEnumLiterals ecoreEnumLiteral="csharp.ecore#//TipoEntrada/numerica"/>
+      <genEnumLiterals ecoreEnumLiteral="csharp.ecore#//TipoEntrada/caracter"/>
+    </genEnums>
+    <genClasses ecoreClass="csharp.ecore#//Vista">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute csharp.ecore#//Vista/nombre"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference csharp.ecore#//Vista/contiene"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference csharp.ecore#//Vista/modelo"/>
+    </genClasses>
+    <genClasses ecoreClass="csharp.ecore#//Controlador">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute csharp.ecore#//Controlador/nombre"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute csharp.ecore#//Controlador/metodo"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference csharp.ecore#//Controlador/referencia"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference csharp.ecore#//Controlador/controla"/>
+    </genClasses>
+    <genClasses ecoreClass="csharp.ecore#//Modelo">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute csharp.ecore#//Modelo/nombre"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference csharp.ecore#//Modelo/compuestoPor"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference csharp.ecore#//Modelo/vista"/>
+    </genClasses>
+    <genClasses ecoreClass="csharp.ecore#//Widget">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute csharp.ecore#//Widget/esEntrada"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference csharp.ecore#//Widget/presentada"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute csharp.ecore#//Propiedad/nombre"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute csharp.ecore#//Propiedad/longitud"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute csharp.ecore#//Propiedad/tipo"/>
+    </genClasses>
+    <genClasses ecoreClass="csharp.ecore#//Input"/>
+    <genClasses ecoreClass="csharp.ecore#//Tabla">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute csharp.ecore#//Tabla/occurs"/>
+    </genClasses>
+    <genClasses ecoreClass="csharp.ecore#//Boton"/>
+    <genClasses ecoreClass="csharp.ecore#//Propiedad">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute csharp.ecore#//Propiedad/tipo"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute csharp.ecore#//Propiedad/longitud"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute csharp.ecore#//Propiedad/nombre"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute csharp.ecore#//Propiedad/precision"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

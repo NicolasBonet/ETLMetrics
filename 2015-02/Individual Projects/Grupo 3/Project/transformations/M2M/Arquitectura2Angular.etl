@@ -1,0 +1,272 @@
+rule Sistema2Aplicacion
+	transform sistema:mm_arquitectura!Sistema
+	to aplicacion:angular!Aplicacion{
+	
+		aplicacion.nombre = sistema.nombre;
+		
+		for ( vista in sistema.proyecto_web.capa_presentacion.vistas ){
+		
+			var _vista = new angular!Vista();
+			_vista.entidad = vista.entidad.nombre.toLowerCase();
+			
+			if ( vista.tipo ==  mm_arquitectura!ETipoVista#LISTA){
+				
+				var entidad = vista.entidad;
+				
+				var navegacion = new angular!Navegacion();
+				navegacion.nombre = "Detalle " + entidad.nombre;
+				navegacion.destino = entidad.nombre+"Detalle";
+				_vista.navegaciones.add(navegacion);
+			
+				_vista.tipo = angular!ETipoVista#LISTA;
+				
+				// si la vista es de tipo LISTA debo crear un controlador con un servicio de tipo lista
+				
+				var controlador = new angular!Controlador();
+				controlador.nombre = vista.nombre + 'Ctrl';
+				
+				var servicio = new angular!Servicio();
+				
+				servicio.entidad = entidad.nombre; 
+				servicio.tipoServicio = angular!TipoServicio#LISTAR;
+				servicio.nombre = entidad.nombre + "Listar";
+				controlador.servicios.add(servicio);
+				
+				_vista.controlador = controlador;
+				
+				// creo la seccion de la lista
+				
+				var seccionLista = new angular!Seccion();
+				seccionLista.nombre = "Lista";
+				seccionLista.tipoSeccion = angular!TipoSeccion#LISTA;
+				
+				_vista.secciones.add(seccionLista);
+				
+				var elementoTabla = new angular!Elemento();
+				elementoTabla.nombre = entidad.nombre + " Tabla";
+				elementoTabla.tipoElemento = angular!TipoElemento#TABLA;
+				elementoTabla.valor = entidad.nombre.toLowerCase().replace(" ","_");
+				
+				seccionLista.elementos.add(elementoTabla);
+				
+				// creo las columnas de la tabla por cada atributo de la entidad
+				
+				for ( atributo in entidad.atributos ){
+					var col = new angular!Elemento();
+					col.nombre = atributo.nombre;
+					col.tipoElemento = angular!TipoElemento#COLUMNA;
+					col.valor = atributo.nombre.toLowerCase().replace(" ","_");
+					elementoTabla.hijos.add(col);			
+				
+				}
+				
+				for ( relacion in entidad.relaciones ){
+					var col = new angular!Elemento();
+					col.nombre = relacion.nombre;
+					col.tipoElemento = angular!TipoElemento#COLUMNA;
+					col.valor = relacion.nombre.toLowerCase().replace(" ","_");
+					elementoTabla.hijos.add(col);			
+				}
+			}
+			
+			if ( vista.tipo ==  mm_arquitectura!ETipoVista#DETALLE){
+				_vista.tipo = angular!ETipoVista#FORMULARIO;
+				var entidad = vista.entidad;
+				
+				var navegacion = new angular!Navegacion();
+				navegacion.nombre = "Lista " + entidad.nombre;
+				navegacion.destino = entidad.nombre+"Lista";
+				_vista.navegaciones.add(navegacion);
+				
+				// si la vista es de tipo FORMULARIO debo crear un controlador con un servicio de tipo lista
+				
+				var controlador = new angular!Controlador();
+				controlador.nombre = vista.nombre + 'Ctrl';
+				
+				var servicioDetalle = new angular!Servicio();				
+				servicioDetalle.entidad = entidad.nombre;
+				servicioDetalle.tipoServicio = angular!TipoServicio#CONSULTAR;
+				servicioDetalle.nombre = entidad.nombre + "Detalle";
+				controlador.servicios.add(servicioDetalle);
+				
+				var servicioAgregar = new angular!Servicio();				
+				servicioAgregar.entidad = entidad.nombre;
+				servicioAgregar.tipoServicio = angular!TipoServicio#AGREGAR;
+				servicioAgregar.nombre = entidad.nombre + "Agregar";
+				controlador.servicios.add(servicioAgregar);
+				
+				var servicioModificar = new angular!Servicio();				
+				servicioModificar.entidad = entidad.nombre;
+				servicioModificar.tipoServicio = angular!TipoServicio#MODIFICAR;
+				servicioModificar.nombre = entidad.nombre + "Modificar";
+				controlador.servicios.add(servicioModificar);
+				
+				var servicioEliminar = new angular!Servicio();				
+				servicioEliminar.entidad = entidad.nombre;
+				servicioEliminar.tipoServicio = angular!TipoServicio#ELIMINAR;
+				servicioEliminar.nombre = entidad.nombre + "Eliminar";
+				controlador.servicios.add(servicioEliminar);
+				
+				
+				_vista.controlador = controlador;
+				
+				// creo la seccion de la lista
+				
+				var seccion = new angular!Seccion();
+				seccion.nombre = "Detalle";
+				seccion.tipoSeccion = angular!TipoSeccion#FORMULARIO;
+				
+				_vista.secciones.add(seccion);
+				
+				
+				// creo las columnas de la tabla por cada atributo de la entidad
+				
+				for ( atributo in entidad.atributos ){
+					var el = new angular!Elemento();
+					el.nombre = atributo.nombre;
+					
+					switch(atributo.tipoDato){
+						case mm_arquitectura!TipoDato#CadenaTexto:
+							el.tipoElemento = angular!TipoElemento#TEXTOENTRADA;
+						case mm_arquitectura!TipoDato#Numerico:
+							el.tipoElemento = angular!TipoElemento#NUMERO;
+						case mm_arquitectura!TipoDato#Entero:
+							el.tipoElemento = angular!TipoElemento#NUMERO;
+						case mm_arquitectura!TipoDato#Booleano:
+							el.tipoElemento = angular!TipoElemento#SELECCIONUNICA;
+						case mm_arquitectura!TipoDato#Fecha:
+							el.tipoElemento = angular!TipoElemento#FECHA;
+						case mm_arquitectura!TipoDato#FechaHora:
+							el.tipoElemento = angular!TipoElemento#FECHA;
+					}
+					
+					el.valor = atributo.nombre;
+					seccion.elementos.add(el);	
+				
+				}
+				
+				var relacionesCombo = entidad.relaciones.select(r|r.tipo == mm_arquitectura!ETipoRelacion#AGREGACION );
+				
+				for ( rel in relacionesCombo ){
+					var el = new angular!Elemento();
+					el.nombre = rel.nombre;
+					el.tipoElemento = angular!TipoElemento#COMBO;
+					el.valor = rel.nombre;
+					
+					var servicio = new angular!Servicio();
+					servicio.tipoServicio = angular!TipoServicio#LISTAR;
+					servicio.nombre = rel.destino.nombre;
+					servicio.entidad = rel.destino.nombre; 					
+					controlador.servicios.add(servicio);
+					el.servicio = servicio;
+					seccion.elementos.add(el);
+				}
+				
+				"buscando herencia".println();
+				
+				entidad.println();
+				
+				var relacionHerencia = entidad.relaciones.select(r|r.tipo == mm_arquitectura!ETipoRelacion#HERENCIA ).first();
+				
+				relacionHerencia.println();
+				
+				if ( relacionHerencia <> null ){
+					seccion.elementos.addAll(resolverHerencia(relacionHerencia,sistema.entidades));
+				}
+				
+				
+				
+				var guardar = new angular!Accion();
+				guardar.nombre = "Guardar";
+				guardar.tipoAccion = angular!TipoAccion#REGISTRAR;
+				
+				var eliminar = new angular!Accion();
+				eliminar.nombre = "Eliminar";
+				eliminar.tipoAccion = angular!TipoAccion#ELIMINAR;
+				
+				seccion.acciones.add(guardar);
+				seccion.acciones.add(eliminar);
+			}
+			
+			_vista.nombre = vista.nombre; 
+			aplicacion.vistas.add(_vista);
+		}
+		
+		/*var vistaIndex = new angular!Vista();
+		vistaIndex.nombre = "Index";
+		var controlerIndex = new angular!Controlador();
+		controlerIndex.nombre = sistema.nombre+"Ctrl";
+		vistaIndex.controlador = controlerIndex;
+		var navegacion;
+		
+		for ( entidad in sistema.entidades ){
+			navegacion = new angular!Navegacion();
+			navegacion.nombre = entidad.nombre;
+			navegacion.destino = entidad.nombre+"Lista.html";
+			vistaIndex.navegaciones.add(navegacion);
+		}
+		
+		aplicacion.vistas.add(vistaIndex);*/
+	}
+	
+	
+	operation resolverHerencia (relacion,entidades:Collection):Collection{
+			
+			var seccion = new Set();	
+			var entidad = entidades.select(e|e.nombre==relacion.destino.nombre).first();
+			
+			for ( atributo in entidad.atributos ){
+					var el = new angular!Elemento();
+					el.nombre = atributo.nombre;
+					
+					switch(atributo.tipoDato){
+						case mm_arquitectura!TipoDato#CadenaTexto:
+							el.tipoElemento = angular!TipoElemento#TEXTOENTRADA;
+						case mm_arquitectura!TipoDato#Numerico:
+							el.tipoElemento = angular!TipoElemento#NUMERO;
+						case mm_arquitectura!TipoDato#Entero:
+							el.tipoElemento = angular!TipoElemento#NUMERO;
+						case mm_arquitectura!TipoDato#Booleano:
+							el.tipoElemento = angular!TipoElemento#SELECCIONUNICA;
+						case mm_arquitectura!TipoDato#Fecha:
+							el.tipoElemento = angular!TipoElemento#FECHA;
+						case mm_arquitectura!TipoDato#FechaHora:
+							el.tipoElemento = angular!TipoElemento#FECHA;
+					}
+					
+					el.valor = atributo.nombre;
+					seccion.add(el);
+				
+				}
+				
+				var relacionesCombo = entidad.relaciones.select(r|r.tipo == mm_arquitectura!ETipoRelacion#AGREGACION );
+				
+				for ( rel in relacionesCombo ){
+					var el = new angular!Elemento();
+					el.nombre = rel.nombre;
+					el.tipoElemento = angular!TipoElemento#COMBO;
+					el.valor = rel.nombre;
+					
+					var servicio = new angular!Servicio();
+					servicio.tipoServicio = angular!TipoServicio#LISTAR;
+					servicio.nombre = rel.destino.nombre;
+					servicio.entidad = rel.destino.nombre; 					
+					controlador.servicios.add(servicio);
+					el.servicio = servicio;
+					seccion.add(el);
+				}
+				
+				"buscando herencia".println();
+				
+				entidad.println();
+				
+				var relacionHerencia = entidad.relaciones.select(r|r.tipo == mm_arquitectura!ETipoRelacion#HERENCIA ).first();
+				
+				relacionHerencia.println();
+				
+				if ( relacionHerencia <> null ){
+					seccion.addAll(resolverHerencia(relacionHerencia,sistema.entidades));
+				}
+				
+				return seccion;
+	}

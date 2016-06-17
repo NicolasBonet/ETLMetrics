@@ -1,0 +1,14 @@
+ <?xml version="1.0" encoding="ASCII"?>
+<proyectos:MarketPlace
+xmi:version="2.0"
+xmlns:xmi="http://www.omg.org/XMI"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:proyectos="http://www.example.org/proyectos"
+xsi:schemaLocation="http://www.example.org/proyectos proyectos.ecore" 
+nombre="Mi recurso"
+presentacion="gold">
+<paginas xsi:type="proyectos:Promocion" nombre="pague uno mil" estilo="profesional"/>
+<paginas xsi:type="proyectos:Mapa" nombre="sucursales" estilo="empresarial"/>
+<paginas xsi:type="proyectos:Contacto" nombre="contactenos" estilo="clasico"/>
+<paginas xsi:type="proyectos:Catalogo" nombre="productos 2015" estilo="moderno"/>
+</proyectos:MarketPlace>

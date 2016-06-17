@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/TestAngular1/src" modelPluginID="TestAngular1"
+    modelName="TestAngular1" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="7.0" copyrightFields="false"
+    operationReflection="true" importOrganizing="true">
+  <foreignModel>testAngular1.ecore</foreignModel>
+  <genPackages prefix="TestAngular1" disposableProviderFactory="true" ecorePackage="testAngular1.ecore#/">
+    <genClasses ecoreClass="testAngular1.ecore#//Angular">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference testAngular1.ecore#//Angular/controllers"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference testAngular1.ecore#//Angular/services"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference testAngular1.ecore#//Angular/vistas"/>
+    </genClasses>
+    <genClasses ecoreClass="testAngular1.ecore#//Controller">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute testAngular1.ecore#//Controller/titulo"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference testAngular1.ecore#//Controller/services"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference testAngular1.ecore#//Controller/vista"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference testAngular1.ecore#//Controller/submit"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference testAngular1.ecore#//Controller/obtenerPorId"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference testAngular1.ecore#//Controller/listas"/>
+    </genClasses>
+    <genClasses ecoreClass="testAngular1.ecore#//Metodo">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference testAngular1.ecore#//Metodo/parametros"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute testAngular1.ecore#//Metodo/verbo"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute testAngular1.ecore#//Metodo/ruta"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference testAngular1.ecore#//Metodo/service"/>
+    </genClasses>
+    <genClasses ecoreClass="testAngular1.ecore#//Parametro"/>
+    <genClasses ecoreClass="testAngular1.ecore#//Service">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference testAngular1.ecore#//Service/metodos"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute testAngular1.ecore#//Service/readonly"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="testAngular1.ecore#//Object">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute testAngular1.ecore#//Object/nombre"/>
+    </genClasses>
+    <genClasses ecoreClass="testAngular1.ecore#//Vista">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute testAngular1.ecore#//Vista/dto"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference testAngular1.ecore#//Vista/formElements"/>
+    </genClasses>
+    <genClasses ecoreClass="testAngular1.ecore#//FormElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute testAngular1.ecore#//FormElement/required"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute testAngular1.ecore#//FormElement/label"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute testAngular1.ecore#//FormElement/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute testAngular1.ecore#//FormElement/tipo"/>
+    </genClasses>
+    <genClasses ecoreClass="testAngular1.ecore#//Input">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute testAngular1.ecore#//Input/placeholder"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute testAngular1.ecore#//Input/seleccionado"/>
+    </genClasses>
+    <genClasses ecoreClass="testAngular1.ecore#//FormGroup">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute testAngular1.ecore#//FormGroup/lista"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference testAngular1.ecore#//FormGroup/elements"/>
+    </genClasses>
+    <genClasses ecoreClass="testAngular1.ecore#//RadioButton"/>
+    <genClasses ecoreClass="testAngular1.ecore#//Textarea">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute testAngular1.ecore#//Textarea/filas"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

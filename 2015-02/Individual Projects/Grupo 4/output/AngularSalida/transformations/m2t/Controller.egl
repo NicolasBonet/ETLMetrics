@@ -1,0 +1,63 @@
+[% 
+var angular = NG!Angular.all.first();
+var controlador = angular.controllers.select( x | x.nombre == nombreController).first();		 	 
+var dto = controlador.vista.dto; 
+
+// Acción del string del mensaje de respuesta ("Objeto fue agregado/modificado exitósamente")
+var accionRealizada = "agregado";
+
+// Aplica únicamente cuando el tipo de formulario es editar  
+var esTipoEditar = controlador.obtenerPorId <> null;
+var parametrosEditar = "";
+if(esTipoEditar)
+{
+	accionRealizada = "modificado";
+	parametrosEditar = ", $stateParams";
+}
+
+// Estudiantes, Ciudades
+var parametrosServicios = "";
+for(service in controlador.services)
+{
+	parametrosServicios = parametrosServicios + ", " + service.nombre;
+}
+
+var metodoSubmit = controlador.submit.nombre;
+var servicioSubmit = controlador.submit.service.nombre;
+%]
+app.controller('[%=controlador.nombre%]', function($scope, $state[%=parametrosEditar%][%=parametrosServicios%]) {
+	
+	$scope.titulo = '[%=controlador.titulo%]';
+[%
+	// Aplica únicamente cuando el tipo de formulario es editar 
+	if(esTipoEditar)
+	{
+		var metodoGetId = controlador.obtenerPorId.nombre;
+		var servicioGetId = controlador.obtenerPorId.service.nombre;
+%]
+	
+	invokeService([%=servicioGetId%].[%=metodoGetId%]($stateParams.id).then(function(response){
+        $scope.[%=dto%] = response.data;
+    }));    
+[%
+	} 
+	  
+	// Si hay n listas desplegables se invocaran n servicios respectivamente
+	for(metodoLista in controlador.listas)
+	{
+		var metodo = metodoLista.nombre;
+		var service = metodoLista.service.nombre;
+%]
+
+	invokeService([%=service%].[%=metodo%]().then(function(response){
+        $scope.[%=service%] = response.data;
+    }));
+[%	
+	}
+%]	
+	$scope.submit = function(){
+        invokeService([%=servicioSubmit%].[%=metodoSubmit%]($scope.[%=dto%]).then(function(response){
+            alert("[%=dto%] [%=accionRealizada%] exitósamente");
+        }));
+    }
+});

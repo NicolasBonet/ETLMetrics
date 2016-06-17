@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+	<head>
+		<meta charset="utf-8">
+			<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+				<title>Bolsa de Empleo</title>
+				<link rel="stylesheet" href="css/bootstrap.min.css">
+					<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+						<link rel="stylesheet" href="css/main.css">
+						</head>
+						<body>
+							<div  class='container' >
+								<div  class='row' >
+									<div  id='PanelImagen'   class='col-md-12  jumbotron' >
+										<fieldset class='scheduler-border'>
+											<legend class='scheduler-border'></legend>
+											<img src='data/titulo.png' style='width:100%'>
+											</fieldset>
+											
+										</div>
+										
+									</div>
+									
+									<div  class='row' >
+										<div  id='PanelLista'   class='col-md-6' >
+											<fieldset class='scheduler-border'>
+												<legend class='scheduler-border'>Aspirantes Registrados en la Bolsa</legend>
+												<select SINGLE_SELECTION  size='5' ></select>
+											</fieldset>
+											
+										</div>
+										
+										<div  id='PanelInformacion'   class='col-md-6' >
+											<fieldset class='scheduler-border'>
+												<legend class='scheduler-border'>Datos del Aspirante</legend>
+												<img src='IMANGEN_VACIA' width='200' height='200'><br/>
+													<label>Nombre: </label>
+													<input type='text' id='' value=''><br/>
+														<label>Edad: </label>
+														<input type='text' id='' value=''><br/>
+															<label>Profesi�n: </label>
+															<input type='text' id='' value=''><br/>
+																<label>Experiencia: </label>
+																<input type='text' id='' value=''><br/>
+																	<label>Tel�fono: </label>
+																	<input type='text' id='' value=''><br/>
+																	</fieldset>
+																	
+																</div>
+																
+															</div>
+															
+															<div  class='row' >
+																<div  id='PanelAgregarAspirante'   class='col-md-4' >
+																	<fieldset class='scheduler-border'>
+																		<legend class='scheduler-border'>Agregar Aspirante</legend>
+																		<label>Nombre: </label>
+																		<input type='text' id='' value=''><br/>
+																			<label>Edad: </label>
+																			<input type='text' id='' value=''><br/>
+																				<label>Profesi�n: </label>
+																				<label>A�os experiencia: </label>
+																				<input type='text' id='' value=''><br/>
+																					<label>Imagen: </label>
+																					<table><tr><td><input type='text' id='' value=''><br/>
+																								</td>
+																								<td><input type='button' value='Examinar'>
+																									</td>
+																								</tr>
+																							</table>
+																							<label>Tel�fono: </label>
+																							<input type='text' id='' value=''><br/>
+																								<div  class='col-md-4' >
+																									<input type='button' value='Agregar hoja de vida'>
+																									</div>
+																									
+																								</fieldset>
+																								
+																							</div>
+																							
+																							<div  id='PanelBusquedaOrdenamiento'   class='col-md-4' >
+																								<fieldset class='scheduler-border'>
+																									<legend class='scheduler-border'>B�squeda y Ordenamiento</legend>
+																									<input type='button' value='Ordenar por experiencia'>
+																										<input type='button' value='Ordenar por Edad'>
+																											<input type='button' value='Ordenar por profesi�n'>
+																												<input type='button' value='Buscar Aspirante'>
+																												</fieldset>
+																												
+																											</div>
+																											
+																											<div  id='PanelConsultas'   class='col-md-4' >
+																												<fieldset class='scheduler-border'>
+																													<legend class='scheduler-border'>Consultas</legend>
+																													<input type='button' value='M�s Joven'>
+																														<input type='button' value='Mayor Edad'>
+																															<input type='button' value='Mayor Experiencia'>
+																																<input type='button' value='Contratar'>
+																																	<input type='button' value='Eliminar por Experiencia'>
+																																	</fieldset>
+																																	
+																																</div>
+																																
+																															</div>
+																															
+																															<div  class='row' >
+																																<div  id='PanelExtension'   class='col-md-12' >
+																																	<fieldset class='scheduler-border'>
+																																		<legend class='scheduler-border'>Puntos de Extensi�n</legend>
+																																		<input type='button' value='Opci�n 1'>
+																																			<input type='button' value='Opci�n 2'>
+																																			</fieldset>
+																																			
+																																		</div>
+																																		
+																																	</div>
+																																	
+																																</div>
+																																
+																															</body>
+																														</html>
+																														

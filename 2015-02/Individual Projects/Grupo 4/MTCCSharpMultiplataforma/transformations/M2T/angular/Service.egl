@@ -1,0 +1,53 @@
+[% 
+var angular = NG!Angular.all.first();
+var servicio = angular.services.select( x | x.nombre == nombreService).first();
+%]
+app.service('[%=servicio.nombre%]', function ($http) {
+[%
+for(metodo in servicio.metodos)
+{
+	var parametros = "";
+	var rutaParametros = "";
+	var parametro1 = "";
+	if( not metodo.parametros.isEmpty() )
+	{
+		var totalParametros = metodo.parametros.size() - 1;
+		parametro1 = metodo.parametros.at(0).nombre;
+		
+		parametros = parametro1;
+		rutaParametros = "?" + parametro1 + "=' + " + parametro1;
+		
+		
+		if(metodo.parametros.size() > 1 )
+		{
+			for (i in Sequence{1..totalParametros})
+			{
+				var p = metodo.parametros[i];
+				parametros = parametros + ", " + p.nombre;
+				rutaParametros = rutaParametros + "+ '&" + p.nombre + "=" + "' + " + p.nombre ;
+			}
+		}
+	} 
+	else {
+		rutaParametros = rutaParametros + "'";
+	}
+%]
+	
+	this.[%=metodo.nombre%] = function ([%=parametros%]) {
+[%
+	if(metodo.verbo <> "get"){
+%]
+		return $http.[%=metodo.verbo%]('[%=metodo.ruta%]', [%=parametro1%]);
+[%
+	}
+	else {
+%]
+		return $http.[%=metodo.verbo%]('[%=metodo.ruta%][%=rutaParametros%]);
+[%
+	}   
+%]
+	}
+[% 
+} // for (Metodos) 
+%]
+});

@@ -1,0 +1,74 @@
+[%
+	var aplicacion = jee!Aplicacion.all().at(0);
+	var capa = aplicacion.capas.select(c|c.nombre.endsWith("Negocio")).at(0);
+	var entidades = capa.clases;
+	for (entidad in entidades){
+		if (className = entidad.nombre){
+	
+%]
+package co.edu.uniandes.[%=capa.nombre.toLowerCase().split("negocio")[0].concat(".negocio")%].interfaces;
+
+import java.util.*;
+import co.edu.uniandes.[%=capa.nombre.toLowerCase().replace("negocio","entidad").split("entidad")[0].concat(".entidad")%].*;
+/**
+ * Interface para el EJB: [%=entidad.nombre%].
+ * 
+ * @author Grupo 3
+ * 
+ */
+public interface [%=entidad.nombre%]Local{
+
+[%
+			for (servicio in entidad.servicios){
+				var sRetorno : String = null;
+				if (servicio.retorno = null){
+					sRetorno = "void";
+				}else{
+					if (servicio.retorno.tipo <> null and servicio.retorno.tipo.isTypeOf(jee!Primitivo)){
+						sRetorno = servicio.retorno.tipo.tipoPrimitivo.toString().toLowerCase().firstToUpperCase(); 
+					}else if (servicio.retorno.tipo <> null and servicio.retorno.tipo.isTypeOf(jee!Complejo)){
+						sRetorno = servicio.retorno.tipo.nombre;
+					}
+				}
+				
+				//parametros
+				var parametros : String;
+				var aCont : Integer = 0;
+				var comentariosParametros : String = "";
+				for (parametro in servicio.parametros){
+					var tipoParametro : String;
+					if (parametro.tipo <> null and parametro.tipo.isTypeOf(jee!Primitivo)){
+						tipoParametro = parametro.tipo.tipoPrimitivo.toString().toLowerCase().firstToUpperCase(); 
+					}else if (parametro.tipo <> null and parametro.tipo.isTypeOf(jee!Complejo)){
+						tipoParametro = parametro.tipo.nombre;
+					}
+					parametros = parametros + tipoParametro + " " + parametro.nombre;
+					comentariosParametros = comentariosParametros+"\t* @param "+parametro.nombre+", parametro enviado al metodo con tipo de dato: "+tipoParametro;
+					if (aCont<servicio.parametros.size()-1){
+						parametros = parametros + ", ";
+						comentariosParametros = comentariosParametros + "\n";
+					} 	
+					aCont=aCont+1;
+				}
+				var comentariosRetorno : String = "\t*";
+				if (servicio.retorno <> null){
+					comentariosRetorno = comentariosRetorno+"\n\t* @return Tipo de retorno "+sRetorno;
+				}
+	%]
+	
+  /**
+	* Método que sirve para [%=servicio.nombre%] registros a la base de datos
+	*
+[%=comentariosParametros%]
+[%=comentariosRetorno%]
+	*/
+	[%=sRetorno%] [%=servicio.nombre%] ([%=parametros%]);
+	[%		
+			}
+%]
+	
+}
+[%
+		}
+	}
+%]

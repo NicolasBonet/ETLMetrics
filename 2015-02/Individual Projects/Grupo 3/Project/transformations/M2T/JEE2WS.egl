@@ -1,0 +1,200 @@
+[%
+	var aplicacion = jee!Aplicacion.all().at(0);
+	var capa = aplicacion.capas.select(c|c.nombre.endsWith("Servicio")).at(0);
+	var entidades = capa.clases;
+	for (entidad in entidades){
+		if (className = entidad.nombre){
+	
+%]
+package co.edu.uniandes.[%=capa.nombre.toLowerCase().split("servicio")[0].concat(".servicio")%];
+
+import javax.ejb.*;
+import javax.ws.rs.*;
+import java.util.*;
+import javax.ws.rs.core.*;
+import co.edu.uniandes.[%=capa.nombre.toLowerCase().replace("servicio","negocio").split("negocio")[0].concat(".negocio")%].interfaces.*;
+import co.edu.uniandes.[%=capa.nombre.toLowerCase().replace("servicio","entidad").split("entidad")[0].concat(".entidad")%].*;
+
+
+/**
+ * Servicio REST para: [%=entidad.nombre%].
+ * 
+ * @author Grupo 3
+ * 
+ */
+[%
+			var esAppConfiguracion : Boolean = false;
+			for (anotacion in entidad.anotaciones){
+				var sAnotacion = "@"+anotacion.nombre;
+				if (anotacion.argumentos.size()>0){
+					var cont : Integer = 0;
+					sAnotacion = sAnotacion + "(";
+					for (argumento in anotacion.argumentos){
+						if (anotacion.nombre = "Local"){
+							sAnotacion = sAnotacion + argumento.nombre + "="+argumento.valor+".class";
+						}else{
+							sAnotacion = sAnotacion + argumento.nombre + "=\""+argumento.valor+"\"";
+						}
+						if (cont<anotacion.argumentos.size()-1){
+							sAnotacion = sAnotacion + ",";	
+						}
+						if (anotacion.nombre.contains("ApplicationPath")){
+							 esAppConfiguracion = true;
+						} 	
+						cont = cont +1;	
+					}
+					sAnotacion = sAnotacion + ")";
+				}
+				%]
+[%=sAnotacion%]
+				[% 
+			}
+			
+			var appConfiguracion = "";
+			if (esAppConfiguracion){
+				appConfiguracion = "extends Application";
+			}
+%]
+public class [%=entidad.nombre%] [%=appConfiguracion%]{
+[%
+			for(atributo in entidad.atributos){
+				var sVisibilidad : String = null;
+				var tipoAtributo : String;
+				if (atributo.tipo <> null and atributo.tipo.isTypeOf(jee!Primitivo)){
+					tipoAtributo = atributo.tipo.tipoPrimitivo.toString().toLowerCase().firstToUpperCase(); 
+				}else if (atributo.tipo <> null and atributo.tipo.isTypeOf(jee!Complejo)){
+					tipoAtributo = atributo.tipo.nombre;
+				}
+				if (atributo.visibilidad <> jee!Visibilidad#DEFAULT){
+					sVisibilidad = atributo.visibilidad.toString().toLowerCase(); 
+				}else{
+					sVisibilidad = "";
+				}
+			
+	%]
+	
+	/** Atributo [%=atributo.nombre.firstToLowerCase()%]. */
+	[%			for (anotacion in atributo.anotaciones){
+					var sAnotacionA = "@"+anotacion.nombre;
+					if (anotacion.argumentos.size()>0){
+						var cont : Integer = 0;
+						sAnotacionA = sAnotacionA + "(";
+						for (argumento in anotacion.argumentos){
+							sAnotacionA = sAnotacionA + argumento.nombre + "=\""+argumento.valor+"\"";
+							if (cont<anotacion.argumentos.size()-1){
+								sAnotacionA = sAnotacionA + ",";	
+							} 	
+							cont = cont +1;	
+						}
+						sAnotacionA = sAnotacionA + ")";
+					}
+				%]
+	[%=sAnotacionA%]
+				[% 
+				}
+		%]
+	[%=sVisibilidad%] [%=tipoAtributo%] [%=atributo.nombre.firstToLowerCase()%];
+	
+		[%
+			
+			}	
+			for (servicio in entidad.servicios){
+				var sVisibilidad : String = null;
+				var sRetorno : String = null;
+				if (servicio.retorno = null){
+					sRetorno = "void";
+				}else{
+					if (servicio.retorno.tipo <> null and servicio.retorno.tipo.isTypeOf(jee!Primitivo)){
+						sRetorno = servicio.retorno.tipo.tipoPrimitivo.toString().toLowerCase().firstToUpperCase(); 
+					}else if (servicio.retorno.tipo <> null and servicio.retorno.tipo.isTypeOf(jee!Complejo)){
+						sRetorno = servicio.retorno.tipo.nombre;
+					}
+				}
+				
+				if (servicio.visibilidad <> jee!Visibilidad#DEFAULT){
+					sVisibilidad = servicio.visibilidad.toString().toLowerCase(); 
+				}else{
+					sVisibilidad = "";
+				}
+				
+				//parametros
+				var parametros : String;
+				var aCont : Integer = 0;
+				var comentariosParametros : String = "";
+				for (parametro in servicio.parametros){
+					var tipoParametro : String;
+					if (parametro.tipo <> null and parametro.tipo.isTypeOf(jee!Primitivo)){
+						tipoParametro = parametro.tipo.tipoPrimitivo.toString().toLowerCase().firstToUpperCase(); 
+					}else if (parametro.tipo <> null and parametro.tipo.isTypeOf(jee!Complejo)){
+						tipoParametro = parametro.tipo.nombre;
+					}
+					if (servicio.peticion = jee!Peticion#GET or servicio.peticion = jee!Peticion#DELETE){
+						parametros = parametros + "@PathParam(\""+parametro.nombre+"\") ";
+					}
+					parametros = parametros + tipoParametro + " " + parametro.nombre;
+					comentariosParametros = comentariosParametros+"\t* @param "+parametro.nombre+", parametro enviado al metodo con tipo de dato: "+tipoParametro;
+					if (aCont<servicio.parametros.size()-1){
+						parametros = parametros + ", ";
+						comentariosParametros = comentariosParametros + "\n";
+					} 	
+					aCont=aCont+1;
+				}
+				
+				//anotaciones
+				var todasAnotaciones = new String();
+				var contAnotaciones : Integer = 0;
+				for (anotacion in servicio.anotaciones){
+					var sAnotacionA = "\t@"+anotacion.nombre;
+					if (anotacion.argumentos.size()>0){
+						var cont : Integer = 0;
+						sAnotacionA = sAnotacionA + "(";
+						for (argumento in anotacion.argumentos){
+							sAnotacionA = sAnotacionA + argumento.nombre + "=\""+argumento.valor+"\"";
+							if (cont<anotacion.argumentos.size()-1){
+								sAnotacionA = sAnotacionA + ",";	
+							} 	
+							cont = cont +1;	
+						}
+						sAnotacionA = sAnotacionA + ")";
+					}
+					todasAnotaciones = todasAnotaciones+sAnotacionA;
+					if (contAnotaciones<servicio.anotaciones.size()-1){
+						todasAnotaciones = todasAnotaciones+"\n";
+					}
+					contAnotaciones = contAnotaciones +1;
+				}
+				if (comentariosParametros.length()=0){
+					comentariosParametros = "\t*";
+				}
+				var comentariosRetorno : String = "\t*";
+				if (servicio.retorno <> null){
+					comentariosRetorno = comentariosRetorno+"\n\t* @return Tipo de retorno "+sRetorno;
+				}
+			
+	%]
+  /**
+	* Método - Servicio Web REST que sirve para [%=servicio.nombre%] registros a la base de datos
+	*
+[%=comentariosParametros%]
+[%=comentariosRetorno%]
+	*/
+[%=todasAnotaciones%]
+	[%=sVisibilidad%] [%=sRetorno%] [%=servicio.nombre%] ([%=parametros%]) throws Exception{
+		[%
+				//instrucciones
+				for (instruccion in servicio.instrucciones){
+				%]
+		[%=instruccion.valor%]		
+				[%
+				}
+		%]
+	}
+	
+	[%		
+			}
+	%]
+}
+[%
+		}
+	}
+%]

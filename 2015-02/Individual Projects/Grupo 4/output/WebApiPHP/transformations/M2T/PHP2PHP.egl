@@ -1,0 +1,52 @@
+<?php
+extract($_POST);
+[%
+for(clase in php!Clase.all)
+{
+	if(clase.isMain==true)
+	{
+		for(metodo in clase.metodos)
+		{
+			if(metodo.name==metodoName)
+			{
+				for(parametro in metodo.parametros)
+				{
+					var i=0;
+					var t=parametro.valores.atributos.size();				
+					for(atributo in parametro.valores.atributos)
+					{
+					%]
+$[%=atributo.name%]=$_POST['[%=atributo.name%]'];
+					[%
+					}
+					%]	
+$vars = array([%for(atributo in parametro.valores.atributos){i=i+1;%]"[%=atributo.name%]"[%if(i<t){%],[%}}%]);
+$data = compact( $vars);                                                       
+$obj = json_encode($data); 
+$ch=curl_init("[%=clase.domain%][%=clase.routePrefix%][%=metodo.route%]");
+curl_setopt_array($ch, array(
+    CURLOPT_POST => TRUE,
+    CURLOPT_RETURNTRANSFER => TRUE,
+    CURLOPT_HTTPHEADER => array(
+        'Content-Type: application/json'
+    ),
+    CURLOPT_POSTFIELDS => $obj
+));
+// Send the request
+$response = curl_exec($ch);
+// Check for errors
+if($response === FALSE){
+    die(curl_error($ch));
+}
+// Decode the response
+$responseData = json_decode($response, TRUE);
+// Print the date from the response
+echo $responseData['published'];
+				[%
+				}
+			}
+		}
+	}
+}
+%]
+?>

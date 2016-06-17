@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@color/azul" android:id="@+id/headerPopUpLinearLayout" android:layout_alignParentTop="true" android:padding="10dp">
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFF" android:id="@+id/titlePopUpTextView" android:text="Detalles" android:textSize="@dimen/abc_text_size_large_material" android:layout_alignParentLeft="true"></TextView>
+
+        <ImageView android:id="@+id/closePopUpImageView" android:layout_width="22dp" android:layout_height="22dp" android:layout_centerVertical="true" android:layout_alignParentRight="true" android:src="@drawable/close"></ImageView>
+
+    </RelativeLayout>
+
+    <ImageView android:id="@+id/detalle_prod_dialog_image_view" android:layout_width="match_parent" android:layout_height="wrap_content" android:adjustViewBounds="true" android:layout_below="@+id/headerPopUpLinearLayout" android:layout_marginBottom="3dp"></ImageView>
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/detalle_promo_nombre_text_view" android:layout_centerHorizontal="true" android:layout_margin="3dp" android:layout_below="@id/detalle_prod_dialog_image_view"></TextView>
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/detalle_promo_descripcion_text_view" android:layout_centerHorizontal="true" android:layout_margin="3dp" android:layout_below="@id/detalle_promo_nombre_text_view"></TextView>
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/detalle_promo_terminos_text_view" android:layout_centerHorizontal="true" android:layout_margin="3dp" android:layout_below="@+id/detalle_promo_descripcion_text_view"></TextView>
+
+    <ImageView android:id="@+id/shareProductoImageView" android:visibility="gone" android:layout_width="35dp" android:layout_height="35dp" android:layout_alignBottom="@+id/detalle_prod_dialog_image_view" android:layout_alignLeft="@+id/detalle_prod_dialog_image_view" android:layout_margin="8dp" android:src="@drawable/share"></ImageView>
+    <ImageView android:id="@+id/verEnTiendaProductoImageView" android:visibility="gone" android:layout_width="35dp" android:layout_height="35dp" android:layout_alignBottom="@+id/detalle_prod_dialog_image_view" android:layout_alignRight="@+id/detalle_prod_dialog_image_view" android:layout_margin="8dp" android:src="@drawable/i"></ImageView>
+
+</RelativeLayout>

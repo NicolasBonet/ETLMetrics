@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Bolsa de Empleo</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="css/main.css">
+    </head>
+	<body>
+[%
+
+	var html=h!html.all.get(0);
+	for(element in html.container){
+		var content=parseContainer(element);
+		out.println(content);
+	}
+%]
+	</body>
+</html>
+
+[%
+	operation parseContainer(element){
+		if(element.isTypeOf(h!div)){
+			return parseDiv(element);
+		}else if(element.isTypeOf(h!fieldset)){
+			return parseFielSet(element);
+		}else if(element.isTypeOf(h!img)){
+			return parseImg(element);
+		}else if(element.isTypeOf(h!label)){
+			return parseLabel(element);
+		}else if(element.isTypeOf(h!input)){
+			return parseInput(element);
+		}else if(element.isTypeOf(h!button)){
+			return parseButton(element);
+		}else if(element.isTypeOf(h!select)){
+			return parseSelect(element);
+		}else if(element.isTypeOf(h!table)){
+			return parseTable(element);
+		}else if(element.isTypeOf(h!tr)){
+			return parseTr(element);
+		}else if(element.isTypeOf(h!td)){
+			return parseTd(element);
+		}else{
+			element.println();
+			"No ENCONTRO PARSER".println();
+		}
+	}
+	operation parseTd(td:h!td){
+		var content="<td>";
+		content=content+loadElements(td.elements);
+		content=content+"</td>";
+		return content;
+	}
+	operation parseTr(tr:h!tr){
+		var content="<tr>";
+		content=content+loadElements(tr.td);
+		content=content+"</tr>";
+		return content;
+	}
+	operation parseTable(table:h!table){
+		var content="<table>";
+		content=content+loadElements(table.tr);
+		content=content+"</table>";
+		
+		return content;
+	}
+	operation parseSelect(select:h!select){
+		var content= "<select "+select.multiple;
+		if(select.size<>""){
+			content = content +" size='"+select.size+"'";
+		}
+		content = content +" >";
+		content = content +"</select>";
+		
+		return content;
+	}
+	operation parseButton(button:h!button){
+		return "<input type='button' value='"+button.value+"'>";
+	}
+	operation parseInput(input:h!input){
+		return "<input type='text' id='' value='"+input.value+"'><br/>";
+	}
+	operation parseLabel(label:h!label){
+		return "<label>"+label.value+"</label>";
+	}
+	operation parseImg(img:h!img){
+		if(img.src.matches("IMANGEN_VACIA")){
+			return "<img src='"+img.src+"' width='200' height='200'><br/>";
+		}else{
+			return "<img src='"+img.src+"' style='width:100%'>";
+		}
+	}
+	
+	operation parseDiv(div:h!div){
+		var content="<div";
+		if(div.id<>null and div.id.trim()<>''){
+			content= content +"  id='"+div.id+"' ";
+		}
+		
+		if(div.class<>null and div.class.trim()<>''){
+			content= content +"  class='"+div.class+"' ";
+		}else{
+			content= content +"  class='col-md-4' ";
+		}
+		content = content +">\n";
+		content=content+loadElements(div.innercontainer);
+		content=content+loadElements(div.elements);
+		content=content+"</div>\n";
+	
+		return content;
+	} 
+	
+	operation loadElements(elements){
+		var content="";
+		for(element in elements){
+				content=content+parseContainer(element)+"\n";
+		}
+		return content;
+	}
+	
+	operation parseFielSet(fieldset:h!fieldset){
+		var content="<fieldset class='scheduler-border'>\n";
+		if(fieldset.legend <>null){
+			var legend=fieldset.legend.valor;
+			content=content+"<legend class='scheduler-border'>"+legend+"</legend>\n";
+		} 
+		content=content+loadElements(fieldset.innercontainer);
+		content=content+loadElements(fieldset.elements);
+		content=content+"</fieldset>\n";
+		
+		return content;
+	}
+%]

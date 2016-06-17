@@ -1,0 +1,32 @@
+<div>
+<ul class="nav navbar-nav">
+	<li><a href="/#/PersonaDetalle">Agregar Persona</a></li>
+</ul>
+<div>
+
+		<div id="Lista" 
+		ng-controller="PersonaListaCtrl"
+		class="ibox">
+				<div class="ibox-title" >
+				
+				<h3>Seccion Lista personas</h3>
+				
+				</div>
+				<div class="ibox-content" >
+				<table id="Persona Tabla"
+					class="table">
+					<thead>
+					 <tr>
+					
+								<th id="nombre">Nombre</th>
+					
+					 </tr>
+					</thead>
+					<tbody>
+					<tr ng-repeat="data in datos">
+							<td >{{data.nombre}}</td>
+					</tr>
+					</tbody>
+				<table>
+				</div>
+<div>

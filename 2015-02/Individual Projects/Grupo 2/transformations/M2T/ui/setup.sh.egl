@@ -1,0 +1,8 @@
+#!/bin/bash
+
+nvm use v0.12.7
+npm install 
+bower install
+rvm use 2.2.1
+bundle install
+grunt server

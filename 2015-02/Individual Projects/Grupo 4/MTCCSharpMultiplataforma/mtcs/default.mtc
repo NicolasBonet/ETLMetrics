@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.mtcflow.model:MTC xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:com.mtcflow.model="http://com.mtcflow.mtc/1.1">
+  <files name="ActualizarActivity.java" URI="generated/android/WebApiGeneric/app/src/main/java/webapigeneric/co/edu/uniandes/webapigeneric/ActualizarActivity.java"/>
+  <files name="CrearActivity.java" URI="generated/android/WebApiGeneric/app/src/main/java/webapigeneric/co/edu/uniandes/webapigeneric/CrearActivity.java"/>
+  <files name="activity_crear.xml" URI="generated/android/WebApiGeneric/app/src/main/res/layout/activity_crear.xml"/>
+  <files name="EstudiantesActualizarController.js" URI="generated/angular/app/controllers/EstudiantesActualizarController.js"/>
+  <files name="EstudiantesCrearController.js" URI="generated/angular/app/controllers/EstudiantesCrearController.js"/>
+  <files name="CiudadesService.js" URI="generated/angular/app/services/CiudadesService.js"/>
+  <files name="EstudiantesService.js" URI="generated/angular/app/services/EstudiantesService.js"/>
+  <files name="Ciudad.html" URI="generated/angular/app/views/Ciudad.html"/>
+  <files name="Estudiante.html" URI="generated/angular/app/views/Estudiante.html"/>
+  <files name="ActualizarVista.php" URI="generated/php/Actualizar.php"/>
+  <files name="ActualizarAPI.php" URI="generated/php/Actualizarapi.php"/>
+  <files name="CrearVista.php" URI="generated/php/Crear.php"/>
+  <files name="CrearAPI.php" URI="generated/php/Crearapi.php"/>
+  <metamodels name="webApiInput.ecore" URI="webApiInput.ecore" alias="webApiInput.ecore"/>
+  <metamodels name="webApiGeneric.ecore" URI="webApiGeneric.ecore" alias="webApiGeneric.ecore"/>
+  <metamodels name="testAngular1.ecore" URI="testAngular1.ecore" alias="testAngular1.ecore"/>
+  <metamodels name="webApiPHP.ecore" URI="webApiPHP.ecore" alias="webApiPHP.ecore"/>
+  <models name="testt.cs" URI="testt.cs" metamodels="//@metamodels.0"/>
+  <models name="AndroidOut.xmi" URI="AndroidOut.xmi" metamodels="//@metamodels.1"/>
+  <models name="Angular.xmi" URI="Angular.xmi" metamodels="//@metamodels.2"/>
+  <models name="php.xmi" URI="php.xmi" metamodels="//@metamodels.3"/>
+  <inputModels model="//@models.0" transformation="//@transformations.0">
+    <properties name="CSharp" value="CSharp"/>
+    <properties name="AndroidOut" value="AndroidOut"/>
+  </inputModels>
+  <inputModels model="//@models.0" transformation="//@transformations.1"/>
+  <inputModels model="//@models.0" transformation="//@transformations.2"/>
+  <inputModels model="//@models.1" transformation="//@transformations.3"/>
+  <inputModels model="//@models.1" transformation="//@transformations.4"/>
+  <inputModels model="//@models.1" transformation="//@transformations.5"/>
+  <inputModels model="//@models.1" transformation="//@transformations.6"/>
+  <inputModels model="//@models.2" transformation="//@transformations.7"/>
+  <inputModels model="//@models.2" transformation="//@transformations.10"/>
+  <inputModels model="//@models.2" transformation="//@transformations.9"/>
+  <inputModels model="//@models.2" transformation="//@transformations.8"/>
+  <inputModels model="//@models.3" transformation="//@transformations.11"/>
+  <inputModels model="//@models.3" transformation="//@transformations.12"/>
+  <inputModels model="//@models.3" transformation="//@transformations.13"/>
+  <transformations xsi:type="com.mtcflow.model:M2MTransformation" name="M2MInputOutput.etl" URI="M2MInputOutput.etl" modelDependencies="//@models.0 //@models.1"/>
+  <transformations xsi:type="com.mtcflow.model:M2MTransformation" name="InputToAngular.etl" URI="InputToAngular.etl"/>
+  <transformations xsi:type="com.mtcflow.model:M2MTransformation" name="API2PHP.etl" URI="API2PHP.etl"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="activityActualizar.egl" URI="android/activityActualizar.egl"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="activityCrear.egl" URI="android/activityCrear.egl"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="xmlForm.egl" URI="android/xmlCrear.egl"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="masterAndroid.egl" URI="android/masterAndroid.egl"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="Controller.egl" URI="angular/Controller.egl"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="Generador.egl" URI="angular/Generador.egl"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="Service.egl" URI="angular/Service.egl"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="View.egl" URI="angular/View.egl"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="MasterPHP.egl" URI="php/MasterPHP.egl"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="PHP2HTML.egl" URI="php/PHP2HTML.egl"/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="PHP2PHP.egl" URI="php/PHP2PHP.egl"/>
+  <outputModels model="//@models.1" transformation="//@transformations.0"/>
+  <outputModels model="//@models.2" transformation="//@transformations.1"/>
+  <outputModels model="//@models.3" transformation="//@transformations.2"/>
+  <outputFiles transformation="//@transformations.3" file="//@files.0"/>
+  <outputFiles transformation="//@transformations.4" file="//@files.1"/>
+  <outputFiles transformation="//@transformations.5" file="//@files.2"/>
+  <outputFiles transformation="//@transformations.7" file="//@files.3"/>
+  <outputFiles transformation="//@transformations.7" file="//@files.4"/>
+  <outputFiles transformation="//@transformations.10" file="//@files.7"/>
+  <outputFiles transformation="//@transformations.10" file="//@files.8"/>
+  <outputFiles transformation="//@transformations.9" file="//@files.5"/>
+  <outputFiles transformation="//@transformations.9" file="//@files.6"/>
+  <outputFiles transformation="//@transformations.12" file="//@files.11"/>
+  <outputFiles transformation="//@transformations.12" file="//@files.9"/>
+  <outputFiles transformation="//@transformations.13" file="//@files.12"/>
+  <outputFiles transformation="//@transformations.13" file="//@files.10"/>
+</com.mtcflow.model:MTC>

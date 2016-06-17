@@ -1,0 +1,60 @@
+class Admin::[%= entity.name.toLowerCase.firstToUpperCase() %]sController < ApplicationController
+  [% if(entity.service.allowRead) {%]
+  def index
+    max_per_page = 250
+    search = [%= entity.name %].ransack(params[:q]).result
+    paginate search.count, max_per_page do |limit, offset|
+      render json: search.limit(limit).offset(offset).
+        to_json()
+    end
+  end
+
+  def show
+    @object = [%= entity.name %].find(params[:id])
+    [% var includes = entity.associationAsSource.select(a|a.manyTarget).collect(a|":"+a.targetName.substring(0,a.targetName.length()-1)+"_ids");
+       includes.addAll(entity.associationAsTarget.select(a|a.manySource).collect(a|":"+a.sourceName.substring(0,a.sourceName.length()-1)+"_ids"));
+    %]
+    render json: @object.to_json(:methods=>[%=includes%])
+  end
+  [%}%]
+  [% if(entity.service.allowCreate) {%]
+  def create
+    @object = [%= entity.name %].new(get_params)
+    if @object.save
+      render json: @object
+    else
+      render json: @object.errors, status: :unprocessable_entity
+    end
+  end
+  [%}%]
+  [% if(entity.service.allowUpdate) {%]
+  def update
+    @object = [%= entity.name %].find(params[:id])
+    if @object.update_attributes(get_params)
+      render json: @object
+    else
+      render json: @object.errors, status: :unprocessable_entity
+    end
+  end
+  [%}%]
+  [% if(entity.service.allowDelete) {%]
+  def destroy
+    @object = [%= entity.name %].find(params[:id])
+    if @object.destroy
+      render json: @object
+    else
+      render json: @object.errors, status: :unprocessable_entity
+    end
+  end
+  [%}%]
+  protected
+  def get_params
+  	[% 	var allowed = entity.attributes.collect(a|':'+a.name);
+  	 	allowed.addAll(entity.associationAsSource.select(a|a.manyTarget).
+  	 		collect(a|":"+a.targetName.substring(0,a.targetName.length()-1)+"_ids=>[]"));
+   		allowed.addAll(entity.associationAsTarget.select(a|a.manySource).
+   			collect(a|":"+a.sourceName.substring(0,a.sourceName.length()-1)+"_ids=>[]"));
+   	%]
+  	params.permit([%= allowed.toString().substring(1,allowed.toString().length()-1)%])
+  end
+end

@@ -1,0 +1,13 @@
+[% 
+	var xmlCrear:Template:= TemplateFactory.load('xmlCrear.egl');
+	xmlCrear.generate('../../generated/WebApiGeneric/app/src/main/res/layout/activity_crear.xml');
+	
+	var activityCrear:Template:= TemplateFactory.load('activityCrear.egl');
+	activityCrear.generate('../../generated/WebApiGeneric/app/src/main/java/webapigeneric/co/edu/uniandes/webapigeneric/CrearActivity.java');
+
+	var xmlActualizar:Template:= TemplateFactory.load('xmlActualizar.egl');
+	xmlActualizar.generate('../../generated/WebApiGeneric/app/src/main/res/layout/activity_actualizar.xml');
+	
+	var activityActualizar:Template:= TemplateFactory.load('activityActualizar.egl');
+	activityActualizar.generate('../../generated/WebApiGeneric/app/src/main/java/webapigeneric/co/edu/uniandes/webapigeneric/ActualizarActivity.java');	
+%]

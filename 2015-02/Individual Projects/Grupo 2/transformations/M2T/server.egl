@@ -1,0 +1,100 @@
+Archivos dinamicos
+Controllers/Services
+[% var date = new Native("java.util.Date")(); %]
+[% var services = railsModel!Entity.allInstances().select(e| not (e.service = null)).select(e| not (e.service.name = null)) ;%]
+[% var route_template = TemplateFactory.load('./server/config/routes.rb.egl'); 
+	route_template.populate('services', services);
+	route_template.generate('../build/server/config/routes.rb');
+%]
+
+[%for(entity in services){
+	var template = TemplateFactory.load('./server/test/controllers/admin/entity2_controller_test.rb.egl');
+	template.populate('entity', entity);
+    template.generate('../build/server/test/controllers/admin/'+entity.name.toLowerCase().replace(' ','_')+'s_controller_test.rb');
+
+	var template = TemplateFactory.load('./server/app/controllers/admin/entity2_controller.rb.egl');
+	template.populate('entity', entity);
+    template.generate('../build/server/app/controllers/admin/'+entity.name.toLowerCase().replace(' ','_')+'s_controller.rb');
+}%]
+
+
+
+Modelos
+[%for(entity in railsModel!Entity.allInstances()){
+	var template = TemplateFactory.load('./server/app/models/entity2_model.rb.egl');
+	template.populate('entity', entity);
+    template.generate('../build/server/app/models/'+entity.name.toLowerCase().replace(' ','_')+'.rb'); 
+    //Test
+    var template = TemplateFactory.load('./server/test/models/entity2_model_test.rb.egl');
+	template.populate('entity', entity);
+    template.generate('../build/server/test/models/'+entity.name.toLowerCase().replace(' ','_')+'_test.rb');
+}%]
+
+
+
+Migraciones
+[% 
+var format = new Native("java.text.SimpleDateFormat")("yyyyMMdd");
+var timestamp = format.format(date);
+var index = 1;	
+for(entity in railsModel!Entity.allInstances()){
+	var template = TemplateFactory.load('./server/db/migrate/entity2_migration.rb.egl');
+	template.populate('entity', entity);
+    template.generate('../build/server/db/migrate/'+timestamp+"9999"+index+'_create_'+entity.name.toLowerCase().replace(' ','_')+'s.rb');
+    index=index+1; 
+}
+for(association in railsModel!Association.allInstances().select(a|a.manySource and a.manyTarget)){
+	var associationName = association.sourceName.firstToUpperCase()+'_'+association.targetName.firstToUpperCase();
+	var template = TemplateFactory.load('./server/db/migrate/association2_migration.rb.egl');
+	template.populate('association', association);
+	template.populate('associationName', associationName);
+    template.generate('../build/server/db/migrate/'+timestamp+"9999"+index+'_create_'+associationName.toLowerCase().replace(' ','_')+'.rb');
+    index=index+1; 
+}
+
+
+%]
+
+
+
+
+[% TemplateFactory.load('./server/app/controllers/application_controller.rb.egl').generate('../build/server/app/controllers/application_controller.rb'); %]
+[% TemplateFactory.load('./server/app/helpers/application_helper.rb.egl').generate('../build/server/app/helpers/application_helper.rb'); %]
+
+
+
+[% TemplateFactory.load('./server/config/application.rb.egl').generate('../build/server/config/application.rb'); %]
+[% TemplateFactory.load('./server/config/boot.rb.egl').generate('../build/server/config/boot.rb'); %]
+[% TemplateFactory.load('./server/config/database.yml.egl').generate('../build/server/config/database.yml'); %]
+[% TemplateFactory.load('./server/config/environment.rb.egl').generate('../build/server/config/environment.rb'); %]
+[% TemplateFactory.load('./server/config/environments/development.rb.egl').generate('../build/server/config/environments/development.rb'); %]
+[% TemplateFactory.load('./server/config/environments/production.rb.egl').generate('../build/server/config/environments/production.rb'); %]
+[% TemplateFactory.load('./server/config/environments/test.rb.egl').generate('../build/server/config/environments/test.rb'); %]
+[% TemplateFactory.load('./server/config/initializers/assets.rb.egl').generate('../build/server/config/initializers/assets.rb'); %]
+[% TemplateFactory.load('./server/config/initializers/backtrace_silencers.rb.egl').generate('../build/server/config/initializers/backtrace_silencers.rb'); %]
+[% TemplateFactory.load('./server/config/initializers/cookies_serializer.rb.egl').generate('../build/server/config/initializers/cookies_serializer.rb'); %]
+[% TemplateFactory.load('./server/config/initializers/filter_parameter_logging.rb.egl').generate('../build/server/config/initializers/filter_parameter_logging.rb'); %]
+[% TemplateFactory.load('./server/config/initializers/inflections.rb.egl').generate('../build/server/config/initializers/inflections.rb'); %]
+[% TemplateFactory.load('./server/config/initializers/mime_types.rb.egl').generate('../build/server/config/initializers/mime_types.rb'); %]
+[% TemplateFactory.load('./server/config/initializers/session_store.rb.egl').generate('../build/server/config/initializers/session_store.rb'); %]
+[% TemplateFactory.load('./server/config/initializers/wrap_parameters.rb.egl').generate('../build/server/config/initializers/wrap_parameters.rb'); %]
+[% TemplateFactory.load('./server/config/locales/en.yml.egl').generate('../build/server/config/locales/en.yml'); %]
+[% TemplateFactory.load('./server/config.ru.egl').generate('../build/server/config.ru'); %]
+[% TemplateFactory.load('./server/config/secrets.yml.egl').generate('../build/server/config/secrets.yml'); %]
+
+
+[% TemplateFactory.load('./server/Gemfile.egl').generate('../build/server/Gemfile'); %]
+[% TemplateFactory.load('./server/Gemfile.lock.egl').generate('../build/server/Gemfile.lock'); %]
+[% TemplateFactory.load('./server/log/development.log.egl').generate('../build/server/log/development.log'); %]
+[% TemplateFactory.load('./server/Rakefile.egl').generate('../build/server/Rakefile'); %]
+[% TemplateFactory.load('./server/README.rdoc.egl').generate('../build/server/README.rdoc'); %]
+[% TemplateFactory.load('./server/test/test_helper.rb.egl').generate('../build/server/test/test_helper.rb'); %]
+
+
+[% TemplateFactory.load('./server/bin/bundle.egl').generate('../build/server/bin/bundle'); %]
+[% TemplateFactory.load('./server/bin/rails.egl').generate('../build/server/bin/rails'); %]
+[% TemplateFactory.load('./server/bin/rake.egl').generate('../build/server/bin/rake'); %]
+[% TemplateFactory.load('./server/bin/setup.egl').generate('../build/server/bin/setup'); %]
+[% TemplateFactory.load('./server/bin/spring.egl').generate('../build/server/bin/spring'); %]
+[% TemplateFactory.load('./server/setup.sh.egl').generate('../build/server/setup.sh'); %]
+

@@ -1,0 +1,255 @@
+package webapigeneric.co.edu.uniandes.webapigeneric;
+
+import android.os.StrictMode;
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
+import android.widget.Toast;
+import webapigeneric.co.edu.uniandes.Utils.ConnectionTask;
+import webapigeneric.co.edu.uniandes.Utils.GetSpinnerValuesTask;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ * Created by LuisSebastian on 10/25/15.
+ */
+public class CrearActivity extends Activity {
+
+[%
+for(controlador in xmlAndroid!Controlador.all){
+	if(controlador.main==true){
+	for(mt in controlador.metodos){					
+			if(mt.viewType<>""){
+				for(propiedad in controlador.metodos.at(0).parametros.valor.propiedades){
+					if(propiedad.esOculto==false){
+						var widgets=propiedad.formElement;
+					if(widgets.isTypeOf(EditText)){//edittrext
+					%]
+private EditText m[%= propiedad.nombre%];
+					[%
+					}
+					else if(widgets.isTypeOf(Radiobutton)){//radiobutton
+					%]
+private RadioGroup mRadioGroup[%= propiedad.nombre%];			
+private RadioButton mRadioButton[%= propiedad.nombre%];			
+					[%			
+					}
+					else if(widgets.isTypeOf(CheckBox)){//checkbox
+					%]	
+private CheckBox m[%= propiedad.nombre%];		
+					[%
+					}
+					else {//spinner
+					%]
+private Spinner m[%= propiedad.nombre%];
+					[%
+				 }							
+		       }
+	          }											
+						break;
+			}
+		}        	
+  	}  
+  }   
+%]
+    private Button btnSave;
+    private Button btnCancel;
+    private JSONObject jsonObject = new JSONObject();
+    private JSONObject jsonObject1 = new JSONObject();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_crear);
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();//q
+        StrictMode.setThreadPolicy(policy);//q
+		
+
+[%
+for(controlador in xmlAndroid!Controlador.all){
+	if(controlador.main==true){
+	for(mt in controlador.metodos){					
+			if(mt.viewType<>""){
+				for(propiedad in controlador.metodos.at(0).parametros.valor.propiedades){
+					if(propiedad.esOculto==false){
+						var widgets=propiedad.formElement;
+					if(widgets.isTypeOf(EditText)){//edittrext
+					%]
+/** Text views **/
+m[%= propiedad.nombre%] = (EditText) findViewById(R.id.[%= propiedad.nombre.toLowerCase()%]);
+					[%
+					}
+					else if(widgets.isTypeOf(Radiobutton)){//radiobutton
+					%]
+ /** Radio buttons **/
+mRadioGroup[%= propiedad.nombre%] = (RadioGroup) findViewById(R.id.[%= propiedad.nombre.toLowerCase()%]radioGroup);
+					[%	
+					}
+					else if(widgets.isTypeOf(CheckBox)){//checkbox
+					%]
+/** Check button **/
+m[%= propiedad.nombre%] = (CheckBox) findViewById(R.id.[%= propiedad.nombre.toLowerCase()%]);				
+					[%
+					}
+					else {//spinner
+					%]
+/** Spinner - dropdown **/
+    m[%= propiedad.nombre%] = (Spinner) findViewById(R.id.spinner[%= propiedad.nombre.toLowerCase()%]);
+
+    //This list must be filled with the info received by the respective service.
+    [%
+               var urlAux;
+               var url;
+               for(controlador in xmlAndroid!Controlador.all){
+					if(controlador.main==false){
+						urlAux = controlador.domain + controlador.RoutePrefix;
+						for(metodo in controlador.metodos){
+							
+								url = urlAux + "/" + metodo.nombre;
+								%]
+	 GetSpinnerValuesTask mSpinnerTask = new GetSpinnerValuesTask(this, "[%=url%]");		
+								[%
+							
+						}
+					}
+				}
+               %]
+   
+    try {
+        ArrayList<String> ciudades = mSpinnerTask.execute().get();
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, ciudades);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        m[%= propiedad.nombre%].setAdapter(dataAdapter);
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    } catch (ExecutionException e) {
+        e.printStackTrace();
+    }
+					[%
+				 }							
+		       }
+	          }											
+						break;
+			}
+		}        	
+  	}  
+  }
+      
+%]
+
+        /** Button **/
+        btnSave = (Button) findViewById(R.id.btnSave);
+        btnSave.setOnClickListener( new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                //TODO send form to server (httpPost/httpPut)
+              try {
+               [%
+for(controlador in xmlAndroid!Controlador.all){
+	if(controlador.main==true){
+	for(mt in controlador.metodos){					
+			if(mt.viewType<>""){
+				for(propiedad in controlador.metodos.at(0).parametros.valor.propiedades){
+					if(propiedad.esOculto==false){
+						var widgets=propiedad.formElement;
+					if(widgets.isTypeOf(EditText)){//edittrext
+					%]
+/** Text views **/
+//Get value
+String [%= propiedad.nombre%] = m[%= propiedad.nombre%].getText().toString();
+jsonObject.accumulate("[%= propiedad.nombre%]", [%= propiedad.nombre%]);
+					[%
+					}
+					else if(widgets.isTypeOf(Radiobutton)){//radiobutton
+					%]
+ /** Radio buttons **/
+//Get value
+int selectedId = mRadioGroup[%= propiedad.nombre%].getCheckedRadioButtonId();
+mRadioButton[%= propiedad.nombre%] = (RadioButton) findViewById(selectedId);
+String [%= propiedad.nombre%] = mRadioButton[%= propiedad.nombre%].getText().toString();
+jsonObject.accumulate("[%= propiedad.nombre%]", [%= propiedad.nombre%]);
+					[%	
+					}
+					else if(widgets.isTypeOf(CheckBox)){//checkbox
+					%]
+/** Check button **/
+//Get value
+boolean isChecked = m[%= propiedad.nombre%].isChecked();
+jsonObject.accumulate("[%= propiedad.nombre%]", isChecked);					
+					[%
+					}
+					else {//spinner
+					%]
+/** Spinner - dropdown **/
+   
+
+        //Get value
+        String spinnerValue = String.valueOf(m[%= propiedad.nombre%].getSelectedItem());
+        int id = mCiudad.getSelectedItemPosition();
+        jsonObject1.accumulate("Id",(id+1));
+        jsonObject1.accumulate("Nombre",spinnerValue);
+        jsonObject.accumulate("[%= propiedad.nombre%]", jsonObject1);
+   
+					[%
+				 }							
+		       }
+	          }											
+						break;
+			}
+		}        	
+  	}  
+  }
+      
+%]
+               
+               [%
+               var urlAux;
+               var url;
+               for(controlador in xmlAndroid!Controlador.all){
+					if(controlador.main==true){
+						urlAux = controlador.domain + controlador.RoutePrefix;
+						for(metodo in controlador.metodos){
+							if(metodo.nombre.contains("Crear")){
+								url = urlAux + "/" + metodo.nombre;
+								%]
+	 ConnectionTask connectionTask = new ConnectionTask("[%=url%]",jsonObject.toString(),getApplicationContext());			
+								[%
+							}
+						}
+					}
+				}
+               %]
+            connectionTask.execute();
+            } catch (JSONException e) {
+            e.printStackTrace();
+        }        
+            }
+        });
+        btnCancel = (Button) findViewById(R.id.btnCancel);
+        btnCancel.setOnClickListener( new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // TODO cancel action
+                finish();
+
+            }
+        });
+
+        
+
+    }
+
+
+}

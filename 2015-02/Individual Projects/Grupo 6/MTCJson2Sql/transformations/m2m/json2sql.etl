@@ -1,0 +1,208 @@
+pre {
+  var config = CONFIG!Config;
+  (config).println;
+  var DataBase =  DB!Database;
+  var TablesWithAssociations: Collection ;
+  var TableParentAssociation: Collection ;
+  var fKColumn;
+}
+--This Rule is creating and extra empty database
+rule Config2Database
+ transform c: CONFIG!Config
+ to  db: DB!Database{
+  db.name = "helper";
+  TablesWithAssociations = Collection{};
+  TableParentAssociation = Collection{};
+  config = c ;
+ } 
+
+rule Document2Database
+ transform doc: JSON!Document
+ to db: DB!Database{ 
+  DataBase = db;
+  db.name = "databaseTest";
+   var objs = doc.objects.select(e|e.isTypeOf(JSON!Object));
+   for(obj in objs){
+    for(pair in obj.pairs){
+     if(db.tables.size()==0){
+      var table = obj.pairs[0].value.equivalent("ValueObject2Table");
+      db.tables.add(table);
+     }
+    }
+   }
+   DataBase = db;
+   // Set foreignKeys
+  db.tables.addforeignKeys(TablesWithAssociations);   
+ }
+
+
+ 
+@lazy
+rule ValueObject2Table
+ transform obj: JSON!ValueObject
+ to tb: DB!Table{
+  
+  tb.name = obj.eContainer().name.MergeFieldChecker();
+  tb.name.println();
+  var columns = obj.value.pairs.equivalent("Pair2Column");
+  tb.columns = columns.exludeColumn(obj.value.pairs.collect(p|p.value.isTypeOf(JSON!ArrayValue)));
+  tb.columns.println();
+  tb.setPK(tb.columns.has_ID());
+  tb.database = DataBase; 
+   
+  tb.columns.setTable(tb);
+ }
+
+@lazy
+rule ArrayValue2Table
+ transform a: JSON!ArrayValue
+ to tb: DB!Table{
+  tb.name = a.eContainer().name.MergeFieldChecker();
+  var columns = a.values[0].value.pairs.equivalent("Pair2Column");
+  tb.columns = columns.exludeColumn(a.values[0].value.pairs.collect(p|p.value.isTypeOf(JSON!ArrayValue)));
+  //tb.columns.println();
+  //System.out.println("t.primary_key: "+ tb.primary_key);
+  tb.setPK(tb.columns.has_ID());
+  tb.database = DataBase;
+  
+  tb.columns.setTable(tb);
+ }
+
+@lazy
+rule Pair2Column
+ transform p: JSON!Pair
+ to col: DB!Column{
+  //Here MergeFieldChecker has to be called to change the name of the column.
+  //System.out.println("p.name: "+ p.name);
+  
+  col.name = p.name.MergeFieldChecker();
+  //System.out.println("col.name: "+ col.name);
+  if(p.value.isTypeOf(JSON!StringValue)){
+   col.type = DB!DataType#varchar;
+  }else if(p.value.isTypeOf(JSON!NumberValue)){
+   col.type = DB!DataType#int;
+  }else if(p.value.isTypeOf(JSON!DecimalValue)){
+   col.type = DB!DataType#decimal;
+  }else if(p.value.isTypeOf(JSON!ArrayValue)){ 
+     
+   var table = p.value.equivalent("ArrayValue2Table");
+   DataBase.tables.add(table);
+   var parentTable = p.eContainer.eContainer.eContainer.name.MergeFieldChecker();
+   TablesWithAssociations.add(Collection{parentTable,table});
+   //System.out.println("ForeignTable: "+ TablesWithAssociations);
+  }else{
+   col.type = DB!DataType#unknown;
+  }
+ }
+@lazy
+rule Column2Key
+ transform c: DB!Column
+ to k: DB!Key{
+  k.name = c.name;
+  k.key_column.add(c);
+  //Column falta
+ }
+@lazy
+rule Column2ForeignKey
+ transform c: DB!Column
+ to fk: DB!ForeignKey{
+  
+  fk.foreign_column = c;
+  fk.referencedKey = fKColumn.equivalent("Column2Key");
+  
+ }
+operation Sequence exludeColumn(conditionSequence){
+ var i = 0;
+ var newColumns :Sequence;
+ for(column in self){
+  //System.out.println("Excluded Column: "+ conditionSequence[i]);
+  if(not conditionSequence[i]){
+   newColumns.add(column);
+  }
+  i = i + 1;
+ }
+ //System.out.println("newColumns: "+ newColumns); 
+ return newColumns;
+}
+operation OrderedSet has_ID(){
+ //System.out.println("Original Column: "+ self);
+ if( self.name.select(e|e.equals('"_id"')).size()==0){
+  var col =  new DB!Column;
+  col.name = '"_id"';
+  col.type = DB!DataType#int;
+  
+  self.add(col);
+  //"add column \"_id\": ".print();
+  //System.out.println("Modify Column: "+ self);
+ }
+ return self; 
+}
+
+operation OrderedSet addforeignKeys(TablesWithAssociation){
+ TablesWithAssociation;
+ for(table in self){
+  var association = TablesWithAssociation.first().first();
+  if(TablesWithAssociation.first().second().collect(t|t.name.equals(table.name)).first()){
+   System.out.println("table : "+ table.name+ " has association with " + association+" table");
+   //var foreignPrimary
+   var column = new DB!Column;
+   column.name = '"'+association.removeQuotes() + '_id'+'"';
+   column.notNull = true;
+   column.table = table;
+   table.columns.add(column);
+   fKColumn = DataBase.tables.getPrimaryColumn(association);
+   table.foreignkeys.add(column.equivalent("Column2ForeignKey"));
+   //table.println(); 
+  }
+ }
+}
+
+operation OrderedSet getPrimaryColumn(association){
+ var fkColumn;
+ for(table in self){
+  if(table.name == association){
+   fkColumn = table.primary_key.key_column.first().first();
+   //System.out.print("From Table :"+ table.name + " fkColum "+ fkColumn);
+  }
+ }
+ return fkColumn;
+}
+
+operation DB!Table setPK(columns){
+ for(column in columns){
+  if('"_id"' == column.name){
+   //"\n∆∆∆∆∆∆∆".println();
+   self.primary_key.add(column.equivalent("Column2Key"));
+   //System.out.println("Table.primary_key: "+ self.primary_key);
+   
+  }
+ }
+}
+
+
+operation OrderedSet setTable(table){
+ for(column in self){
+  column.table=table;
+ }
+}
+	
+ 
+operation String MergeFieldChecker(){ 
+ var finalField = self;
+ //"".println();
+ //System.out.println("MergeField from: "+ self);
+
+ for(attrNames in config.mergeFields.attributeNames){
+  for(attrName in attrNames){
+   if(attrName.oldField == self){
+    finalField = attrName.finalField.name;
+   }
+  }
+ }
+ //System.out.println("MergeField to: "+ finalField);
+ return finalField; 
+}
+operation String removeQuotes(){
+ //self.split('"').second().println();
+ return self.split('"').second();
+}

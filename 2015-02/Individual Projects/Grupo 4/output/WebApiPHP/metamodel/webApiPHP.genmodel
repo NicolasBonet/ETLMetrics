@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/WebApiPHP/src" modelPluginID="WebApiPHP" modelName="WebApiPHP"
+    rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="5.0" copyrightFields="false" operationReflection="true" importOrganizing="true">
+  <foreignModel>webApiPHP.ecore</foreignModel>
+  <genPackages prefix="WebApiPHP" disposableProviderFactory="true" ecorePackage="webApiPHP.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="webApiPHP.ecore#//TipoVerbo">
+      <genEnumLiterals ecoreEnumLiteral="webApiPHP.ecore#//TipoVerbo/GET"/>
+      <genEnumLiterals ecoreEnumLiteral="webApiPHP.ecore#//TipoVerbo/POST"/>
+      <genEnumLiterals ecoreEnumLiteral="webApiPHP.ecore#//TipoVerbo/PUT"/>
+      <genEnumLiterals ecoreEnumLiteral="webApiPHP.ecore#//TipoVerbo/DELETE"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="webApiPHP.ecore#//TipoCampo">
+      <genEnumLiterals ecoreEnumLiteral="webApiPHP.ecore#//TipoCampo/text"/>
+      <genEnumLiterals ecoreEnumLiteral="webApiPHP.ecore#//TipoCampo/email"/>
+      <genEnumLiterals ecoreEnumLiteral="webApiPHP.ecore#//TipoCampo/password"/>
+      <genEnumLiterals ecoreEnumLiteral="webApiPHP.ecore#//TipoCampo/radio"/>
+      <genEnumLiterals ecoreEnumLiteral="webApiPHP.ecore#//TipoCampo/checkbox"/>
+    </genEnums>
+    <genClasses ecoreClass="webApiPHP.ecore#//PHPCore">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference webApiPHP.ecore#//PHPCore/clases"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference webApiPHP.ecore#//PHPCore/dtos"/>
+    </genClasses>
+    <genClasses ecoreClass="webApiPHP.ecore#//Clase">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute webApiPHP.ecore#//Clase/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference webApiPHP.ecore#//Clase/metodos"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute webApiPHP.ecore#//Clase/routePrefix"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute webApiPHP.ecore#//Clase/domain"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute webApiPHP.ecore#//Clase/isMain"/>
+    </genClasses>
+    <genClasses ecoreClass="webApiPHP.ecore#//DTO">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference webApiPHP.ecore#//DTO/atributos"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute webApiPHP.ecore#//DTO/name"/>
+    </genClasses>
+    <genClasses ecoreClass="webApiPHP.ecore#//Metodo">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute webApiPHP.ecore#//Metodo/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute webApiPHP.ecore#//Metodo/verbo"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference webApiPHP.ecore#//Metodo/parametros"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute webApiPHP.ecore#//Metodo/route"/>
+    </genClasses>
+    <genClasses ecoreClass="webApiPHP.ecore#//Atributo">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference webApiPHP.ecore#//Atributo/elementos"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute webApiPHP.ecore#//Atributo/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute webApiPHP.ecore#//Atributo/title"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute webApiPHP.ecore#//Atributo/isHide"/>
+    </genClasses>
+    <genClasses ecoreClass="webApiPHP.ecore#//Parametro">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute webApiPHP.ecore#//Parametro/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference webApiPHP.ecore#//Parametro/valores"/>
+    </genClasses>
+    <genClasses ecoreClass="webApiPHP.ecore#//Elemento">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute webApiPHP.ecore#//Elemento/isRequired"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute webApiPHP.ecore#//Elemento/placeholder"/>
+    </genClasses>
+    <genClasses ecoreClass="webApiPHP.ecore#//DropDown">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference webApiPHP.ecore#//DropDown/despliegue"/>
+    </genClasses>
+    <genClasses ecoreClass="webApiPHP.ecore#//Input">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference webApiPHP.ecore#//Input/opciones"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute webApiPHP.ecore#//Input/tipo"/>
+    </genClasses>
+    <genClasses ecoreClass="webApiPHP.ecore#//TextArea"/>
+    <genClasses ecoreClass="webApiPHP.ecore#//Opcion">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute webApiPHP.ecore#//Opcion/value"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

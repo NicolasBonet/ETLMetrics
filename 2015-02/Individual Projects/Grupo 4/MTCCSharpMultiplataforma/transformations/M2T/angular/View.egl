@@ -1,0 +1,97 @@
+<div class="container">
+    <h1>Mi sitio web</h1>
+    <div class="row">
+        <div class="col-sm-offset-4 col-sm-4">
+            <h2>{{titulo}}</h2>
+
+            <form name="form" ng-submit="form.$valid && submit()" novalidate>
+[% 
+var angular = NG!Angular.all.first();
+var vista = angular.vistas.select( x | x.nombre == nombreVista).first();
+var dto = vista.dto;
+for(formElement in vista.formElements)
+{
+	var propiedad = formElement.nombre;
+	var label = formElement.label;  
+	var id = formElement.id;
+	var tipo = formElement.tipo;
+	
+	var requerido = "required";
+	if(formElement.required == false ) {
+		requerido = "";
+	}
+	if(formElement.isTypeOf(Input))
+	{	
+		if(tipo <> "checkbox")
+		{
+%]
+				<div class="form-group">
+                    <label for="[%=id%]">[%=label%]</label>
+                    <input type="[%=tipo%]" id="[%=id%]" class="form-control" ng-model="[%=dto%].[%=propiedad%]" [%=requerido%]>
+                </div>
+[%
+		}
+		else
+		{
+%]
+				<div class="checkbox">
+                    <label>
+                        <input type="checkbox" ng-model="[%=dto%].[%=propiedad%]" ng-checked="[%=dto%].[%=propiedad%]"> [%=label%]
+                    </label>
+                </div>
+[%
+		}
+	}
+	else if(formElement.isTypeOf(FormGroup))
+	{
+		if(formElement.elements.isEmpty())
+		{
+%]
+				<div class="form-group">
+                    <label for="[%=id%]" class="[%=requerido%]">Ciudad</label>
+                    <select id="[%=id%]" class="form-control" ng-options="o as o.Nombre for o in [%=formElement.lista%] track by o.Id" ng-model="EstudianteDTO.Ciudad" [%=requerido%]></select>
+                </div>
+[%		
+		} 
+		else 
+		{
+%]
+				<div class="form-group">
+                    <label for="[%=id%]">[%=label%]</label>
+                	<div>
+[%
+			var i = 0;
+			for(element in formElement.elements)
+			{
+				var valor = element.nombre;
+%]
+                        <label class="radio-inline">
+                            <input type="radio" name="[%=formElement.lista%]" ng-model="[%=dto%].[%=propiedad%]" value="[%=i%]"> [%=valor%]
+                        </label>
+[%
+				i = i + 1;
+			}
+%]
+					</div>
+                </div>
+[%
+		}	
+	}
+	else if(formElement.isTypeOf(Textarea))
+	{
+		var filas = formElement.filas;
+%]
+				<div class="form-group">
+                    <label class="[%=requerido%]" for="ta-razon">¿Por qué estudiar en los Andes?</label>
+                    <textarea id="[%=id%]" class="form-control" ng-model="[%=dto%].[%=propiedad%]" rows="[%=filas%]" [%=requerido%]></textarea>
+                </div>
+[%
+	}		
+}
+%]
+                <br>
+                <button type="submit" class="btn btn-primary pull-right">Guardar</button>
+            </form>
+        </div>
+    </div>
+</div>
