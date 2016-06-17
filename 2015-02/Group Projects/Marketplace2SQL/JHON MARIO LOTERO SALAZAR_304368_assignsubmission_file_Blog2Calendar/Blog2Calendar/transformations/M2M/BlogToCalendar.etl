@@ -1,0 +1,63 @@
+
+
+rule blogToCalendar 
+transform blog : Blog!Blog
+to calendar : Calendar!Calendar
+{
+	calendar.name = blog.name;
+	
+	calendar.years.println();
+	
+	for (cat in  blog.categories ){
+		for (art in cat.articles){
+			
+			var fecha = art.date.split('/');
+			var mes = new Calendar!Month;
+			var dia = new Calendar!Day;
+			var evento = new Calendar!Event;
+			
+			evento.event = art.summary;
+			evento.owner = art.author.name;
+			
+			var calendarTags = "";
+			
+			var i = 1;
+			
+			for (tag in art.tags) {
+				
+				if (i == art.tags.size()){
+					calendarTags = calendarTags + tag.tag;
+				} else {
+					calendarTags = calendarTags + tag.tag + ",";
+				}
+				
+				i = i + 1;
+			}
+			
+			evento.tags = calendarTags;
+			
+			dia.day = fecha.at(0).asInteger();
+			dia.events.add(evento);
+			mes.month = fecha.at(1).asInteger();
+			mes.days.add(dia);
+			var year = fecha.at(2).asInteger();
+			
+			
+			if (calendar.years->exists(y|y.year = year)) {
+				
+				calendar.years->select(y|y.year = year).at(0).months.add(mes);
+				
+			} else {
+				var annio = new Calendar!Year; 
+				annio.year = year;
+				annio.months.add(mes);
+				calendar.years.add(annio);
+			}
+			
+		}
+	}
+	
+	
+}
+
+

@@ -1,0 +1,64 @@
+BEGIN:VCALENDAR
+
+VERSION:2.0
+
+PRODID:-//Uniandes//BlogToCalendar v1.0//EN
+
+[%
+var mesF;
+var diaF;
+
+	for(annio in Calendar!Year.all){
+		for(mes in annio.months){
+			for(dia in mes.days){
+				for(evento in dia.events) {
+%]
+BEGIN:VEVENT
+
+[%
+	if (mes.month < 10){ 
+		mesF = '0' + mes.month;
+	} 
+	else { 
+		mesF = mes.month.asString(); 
+	}  
+	
+	if (dia.day < 10)
+	{ 
+		diaF = '0' + dia.day;
+	} 
+	else 
+	{ 
+		diaF = dia.day.asString(); 
+	}
+%]
+
+DTSTART;VALUE=DATE:[%=annio.year.asString() + mesF + diaF %] 
+
+DTEND;VALUE=DATE:[%=annio.year.asString() + mesF + diaF %]
+
+DTSTAMP:[%=annio.year.asString() + mesF + diaF %]T202954Z
+
+UID:[%=evento.event.replace(' ', '-')%]@google.com
+
+CREATED:[%=annio.year.asString() + mesF + diaF %]T202836Z
+
+DESCRIPTION:[%=evento.tags%]
+
+LOCATION:
+
+SEQUENCE:0
+
+STATUS:CONFIRMED
+
+SUMMARY:[%=evento.event%]
+
+END:VEVENT
+			
+[%				}
+			}
+		}
+	}
+%]
+
+END:VCALENDAR

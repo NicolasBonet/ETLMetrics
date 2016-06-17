@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewpoint:DAnalysis xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:description="http://www.eclipse.org/sirius/table/description/1.1.0" xmlns:description_1="http://www.eclipse.org/sirius/description/1.1.0" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:table="http://www.eclipse.org/sirius/table/1.1.0" xmlns:viewpoint="http://www.eclipse.org/sirius/1.1.0" xsi:schemaLocation="http://www.eclipse.org/sirius/table/description/1.1.0 http://www.eclipse.org/sirius/table/1.1.0#//description http://www.eclipse.org/sirius/description/1.1.0 http://www.eclipse.org/sirius/1.1.0#//description" xmi:id="_axjZwI_tEeWZ5-J_ZAZm9g" selectedViews="_a1e3gI_tEeWZ5-J_ZAZm9g _a1h60I_tEeWZ5-J_ZAZm9g _a1oogI_tEeWZ5-J_ZAZm9g _a1pPkI_tEeWZ5-J_ZAZm9g" version="10.0.0.201505222000">
+  <semanticResources>Blog.ecore</semanticResources>
+  <semanticResources>http://www.eclipse.org/emf/2002/Ecore</semanticResources>
+  <ownedViews xmi:type="viewpoint:DRepresentationContainer" xmi:id="_a1e3gI_tEeWZ5-J_ZAZm9g">
+    <ownedRepresentations xmi:type="table:DTable" xmi:id="_cL0YUI_tEeWZ5-J_ZAZm9g" name="Blog class table" headerColumnWidth="169">
+      <target xmi:type="ecore:EPackage" href="Blog.ecore#/"/>
+      <lines xmi:type="table:DLine" xmi:id="_cL0YUY_tEeWZ5-J_ZAZm9g" label="Blog">
+        <target xmi:type="ecore:EClass" href="Blog.ecore#//Blog"/>
+        <lines xmi:type="table:DLine" xmi:id="_cL0YUo_tEeWZ5-J_ZAZm9g" label="categories : Category">
+          <target xmi:type="ecore:EReference" href="Blog.ecore#//Blog/categories"/>
+          <semanticElements xmi:type="ecore:EReference" href="Blog.ecore#//Blog/categories"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_cL0YU4_tEeWZ5-J_ZAZm9g" label="categories" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EReference" href="Blog.ecore#//Blog/categories"/>
+            <semanticElements xmi:type="ecore:EReference" href="Blog.ecore#//Blog/categories"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_cL0YVI_tEeWZ5-J_ZAZm9g" label="tags : Tags">
+          <target xmi:type="ecore:EReference" href="Blog.ecore#//Blog/tags"/>
+          <semanticElements xmi:type="ecore:EReference" href="Blog.ecore#//Blog/tags"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_cL0YVY_tEeWZ5-J_ZAZm9g" label="tags" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EReference" href="Blog.ecore#//Blog/tags"/>
+            <semanticElements xmi:type="ecore:EReference" href="Blog.ecore#//Blog/tags"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_cL0YVo_tEeWZ5-J_ZAZm9g" label="editors : Editors">
+          <target xmi:type="ecore:EReference" href="Blog.ecore#//Blog/editors"/>
+          <semanticElements xmi:type="ecore:EReference" href="Blog.ecore#//Blog/editors"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_cL0YV4_tEeWZ5-J_ZAZm9g" label="editors" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EReference" href="Blog.ecore#//Blog/editors"/>
+            <semanticElements xmi:type="ecore:EReference" href="Blog.ecore#//Blog/editors"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_cL0YWI_tEeWZ5-J_ZAZm9g" label="name : EString">
+          <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Blog/name"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Blog/name"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_cL0YWY_tEeWZ5-J_ZAZm9g" label="name" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Blog/name"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Blog/name"/>
+          </cells>
+        </lines>
+        <semanticElements xmi:type="ecore:EClass" href="Blog.ecore#//Blog"/>
+        <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']"/>
+        <cells xmi:type="table:DCell" xmi:id="_cL0YWo_tEeWZ5-J_ZAZm9g" label="Blog" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+          <target xmi:type="ecore:EClass" href="Blog.ecore#//Blog"/>
+          <semanticElements xmi:type="ecore:EClass" href="Blog.ecore#//Blog"/>
+        </cells>
+      </lines>
+      <lines xmi:type="table:DLine" xmi:id="_cL0YW4_tEeWZ5-J_ZAZm9g" label="Article">
+        <target xmi:type="ecore:EClass" href="Blog.ecore#//Article"/>
+        <lines xmi:type="table:DLine" xmi:id="_cL0YXI_tEeWZ5-J_ZAZm9g" label="date : EString">
+          <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/date"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/date"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_cL0YXY_tEeWZ5-J_ZAZm9g" label="date" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/date"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/date"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_cL0YXo_tEeWZ5-J_ZAZm9g" label="content : EString">
+          <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/content"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/content"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_cL0YX4_tEeWZ5-J_ZAZm9g" label="content" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/content"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/content"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_cL0YYI_tEeWZ5-J_ZAZm9g" label="id : EString">
+          <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/id"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/id"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_cL0YYY_tEeWZ5-J_ZAZm9g" label="id" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/id"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/id"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_cL0YYo_tEeWZ5-J_ZAZm9g" label="tags : Tags">
+          <target xmi:type="ecore:EReference" href="Blog.ecore#//Article/tags"/>
+          <semanticElements xmi:type="ecore:EReference" href="Blog.ecore#//Article/tags"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_cL0YY4_tEeWZ5-J_ZAZm9g" label="tags" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EReference" href="Blog.ecore#//Article/tags"/>
+            <semanticElements xmi:type="ecore:EReference" href="Blog.ecore#//Article/tags"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_cL0YZI_tEeWZ5-J_ZAZm9g" label="url : EString">
+          <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/url"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/url"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_cL0YZY_tEeWZ5-J_ZAZm9g" label="url" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/url"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/url"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_cL0YZo_tEeWZ5-J_ZAZm9g" label="author : Editors">
+          <target xmi:type="ecore:EReference" href="Blog.ecore#//Article/author"/>
+          <semanticElements xmi:type="ecore:EReference" href="Blog.ecore#//Article/author"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_cL0YZ4_tEeWZ5-J_ZAZm9g" label="author" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EReference" href="Blog.ecore#//Article/author"/>
+            <semanticElements xmi:type="ecore:EReference" href="Blog.ecore#//Article/author"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_cL0YaI_tEeWZ5-J_ZAZm9g" label="summary : EString">
+          <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/summary"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/summary"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_cL0YaY_tEeWZ5-J_ZAZm9g" label="summary" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/summary"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Article/summary"/>
+          </cells>
+        </lines>
+        <semanticElements xmi:type="ecore:EClass" href="Blog.ecore#//Article"/>
+        <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']"/>
+        <cells xmi:type="table:DCell" xmi:id="_cL0Yao_tEeWZ5-J_ZAZm9g" label="Article" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+          <target xmi:type="ecore:EClass" href="Blog.ecore#//Article"/>
+          <semanticElements xmi:type="ecore:EClass" href="Blog.ecore#//Article"/>
+        </cells>
+      </lines>
+      <lines xmi:type="table:DLine" xmi:id="_cL0Ya4_tEeWZ5-J_ZAZm9g" label="Category">
+        <target xmi:type="ecore:EClass" href="Blog.ecore#//Category"/>
+        <lines xmi:type="table:DLine" xmi:id="_cL0YbI_tEeWZ5-J_ZAZm9g" label="articles : Article">
+          <target xmi:type="ecore:EReference" href="Blog.ecore#//Category/articles"/>
+          <semanticElements xmi:type="ecore:EReference" href="Blog.ecore#//Category/articles"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_cL0YbY_tEeWZ5-J_ZAZm9g" label="articles" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EReference" href="Blog.ecore#//Category/articles"/>
+            <semanticElements xmi:type="ecore:EReference" href="Blog.ecore#//Category/articles"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_cL0Ybo_tEeWZ5-J_ZAZm9g" label="name : EString">
+          <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Category/name"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Category/name"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_cL0Yb4_tEeWZ5-J_ZAZm9g" label="name" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Category/name"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Category/name"/>
+          </cells>
+        </lines>
+        <semanticElements xmi:type="ecore:EClass" href="Blog.ecore#//Category"/>
+        <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']"/>
+        <cells xmi:type="table:DCell" xmi:id="_cL0YcI_tEeWZ5-J_ZAZm9g" label="Category" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+          <target xmi:type="ecore:EClass" href="Blog.ecore#//Category"/>
+          <semanticElements xmi:type="ecore:EClass" href="Blog.ecore#//Category"/>
+        </cells>
+      </lines>
+      <lines xmi:type="table:DLine" xmi:id="_cL0YcY_tEeWZ5-J_ZAZm9g" label="Tags">
+        <target xmi:type="ecore:EClass" href="Blog.ecore#//Tags"/>
+        <lines xmi:type="table:DLine" xmi:id="_cL0Yco_tEeWZ5-J_ZAZm9g" label="tag : EString">
+          <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Tags/tag"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Tags/tag"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_cL0Yc4_tEeWZ5-J_ZAZm9g" label="tag" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Tags/tag"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Tags/tag"/>
+          </cells>
+        </lines>
+        <semanticElements xmi:type="ecore:EClass" href="Blog.ecore#//Tags"/>
+        <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']"/>
+        <cells xmi:type="table:DCell" xmi:id="_cL0YdI_tEeWZ5-J_ZAZm9g" label="Tags" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+          <target xmi:type="ecore:EClass" href="Blog.ecore#//Tags"/>
+          <semanticElements xmi:type="ecore:EClass" href="Blog.ecore#//Tags"/>
+        </cells>
+      </lines>
+      <lines xmi:type="table:DLine" xmi:id="_cL0YdY_tEeWZ5-J_ZAZm9g" label="Editors">
+        <target xmi:type="ecore:EClass" href="Blog.ecore#//Editors"/>
+        <lines xmi:type="table:DLine" xmi:id="_cL0Ydo_tEeWZ5-J_ZAZm9g" label="name : EString">
+          <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Editors/name"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Editors/name"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_cL0Yd4_tEeWZ5-J_ZAZm9g" label="name" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Editors/name"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Editors/name"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_cL0YeI_tEeWZ5-J_ZAZm9g" label="email : EString">
+          <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Editors/email"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Editors/email"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_cL0YeY_tEeWZ5-J_ZAZm9g" label="email" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Blog.ecore#//Editors/email"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Blog.ecore#//Editors/email"/>
+          </cells>
+        </lines>
+        <semanticElements xmi:type="ecore:EClass" href="Blog.ecore#//Editors"/>
+        <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']"/>
+        <cells xmi:type="table:DCell" xmi:id="_cL0Yeo_tEeWZ5-J_ZAZm9g" label="Editors" column="_cL0Ye4_tEeWZ5-J_ZAZm9g">
+          <target xmi:type="ecore:EClass" href="Blog.ecore#//Editors"/>
+          <semanticElements xmi:type="ecore:EClass" href="Blog.ecore#//Editors"/>
+        </cells>
+      </lines>
+      <columns xmi:type="table:DFeatureColumn" xmi:id="_cL0Ye4_tEeWZ5-J_ZAZm9g" label="Name" cells="_cL0YWo_tEeWZ5-J_ZAZm9g _cL0YU4_tEeWZ5-J_ZAZm9g _cL0YVY_tEeWZ5-J_ZAZm9g _cL0YV4_tEeWZ5-J_ZAZm9g _cL0YWY_tEeWZ5-J_ZAZm9g _cL0Yao_tEeWZ5-J_ZAZm9g _cL0YXY_tEeWZ5-J_ZAZm9g _cL0YX4_tEeWZ5-J_ZAZm9g _cL0YYY_tEeWZ5-J_ZAZm9g _cL0YY4_tEeWZ5-J_ZAZm9g _cL0YZY_tEeWZ5-J_ZAZm9g _cL0YZ4_tEeWZ5-J_ZAZm9g _cL0YaY_tEeWZ5-J_ZAZm9g _cL0YcI_tEeWZ5-J_ZAZm9g _cL0YbY_tEeWZ5-J_ZAZm9g _cL0Yb4_tEeWZ5-J_ZAZm9g _cL0YdI_tEeWZ5-J_ZAZm9g _cL0Yc4_tEeWZ5-J_ZAZm9g _cL0Yeo_tEeWZ5-J_ZAZm9g _cL0Yd4_tEeWZ5-J_ZAZm9g _cL0YeY_tEeWZ5-J_ZAZm9g" width="39" featureName="name">
+        <originMapping xmi:type="description:FeatureColumnMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedColumnMappings[name='Name']"/>
+      </columns>
+      <description xmi:type="description:EditionTableDescription" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']"/>
+    </ownedRepresentations>
+    <viewpoint xmi:type="description_1:Viewpoint" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']"/>
+  </ownedViews>
+  <ownedViews xmi:type="viewpoint:DRepresentationContainer" xmi:id="_a1h60I_tEeWZ5-J_ZAZm9g">
+    <viewpoint xmi:type="description_1:Viewpoint" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Review']"/>
+  </ownedViews>
+  <ownedViews xmi:type="viewpoint:DRepresentationContainer" xmi:id="_a1oogI_tEeWZ5-J_ZAZm9g">
+    <viewpoint xmi:type="description_1:Viewpoint" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Archetype']"/>
+  </ownedViews>
+  <ownedViews xmi:type="viewpoint:DRepresentationContainer" xmi:id="_a1pPkI_tEeWZ5-J_ZAZm9g">
+    <viewpoint xmi:type="description_1:Viewpoint" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Generation']"/>
+  </ownedViews>
+</viewpoint:DAnalysis>

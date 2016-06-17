@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.mtcflow.model:MTC xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:com.mtcflow.model="http://com.mtcflow.mtc/1.1" M2MTechnology="ETL" HOTechnology="ETL">
+  <metamodels name="blog" URI="Blog.ecore" technology="" alias="blog"/>
+  <metamodels name="calendar" URI="Calendar.ecore" alias="calendar"/>
+  <models name="blog" URI="blog.xmi" metamodels="//@metamodels.0"/>
+  <models name="calendar" URI="calendar.xmi" metamodels="//@metamodels.1"/>
+  <inputModels model="//@models.0" transformation="//@transformations.0"/>
+  <inputModels model="//@models.1" transformation="//@transformations.1"/>
+  <transformations xsi:type="com.mtcflow.model:M2MTransformation" name="blogToCalendar" URI="Blog2Calendar.etl" technology=""/>
+  <transformations xsi:type="com.mtcflow.model:M2TTransformation" name="cal2Text" URI="cal2Text.egl" technology="Blog2Calendar/transformations/M2T/cal2Text.egl" target="${salida}"/>
+  <outputModels model="//@models.1" transformation="//@transformations.0"/>
+  <configurations>
+    <variables name="calendarModel" defaultValue="Calendar.xmi"/>
+    <variables name="salida" defaultValue="generated"/>
+  </configurations>
+</com.mtcflow.model:MTC>

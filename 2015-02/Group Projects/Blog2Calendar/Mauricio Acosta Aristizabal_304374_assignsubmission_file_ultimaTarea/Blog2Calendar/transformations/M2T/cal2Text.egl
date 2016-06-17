@@ -1,0 +1,51 @@
+[%
+	for (calendar in calendar!Calendar.all){
+%]
+	BEGIN:VCALENDAR - By Mauricio Acosta
+	VERSION:2.0
+	PRODID:-//Uniandes//BlogToCalendar v1.0//EN
+	[%
+	var smes : String;
+	var sdia: String;
+	var event: String;
+	for (ano in calendar.years) {
+		for (mes in ano.months){
+			if (mes.month < 10){
+				smes = "0" + mes.month;
+			}
+			else{
+				smes = mes.month.toString();
+			}
+			for (dia in mes.days){
+				if (dia.day < 10){
+					sdia = "0" + dia.day;
+				}
+				else{
+					sdia =  dia.day.toString();
+				}
+				for (event in dia.events){
+				
+	%]
+	BEGIN:VEVENT
+	DTSTART;VALUE=DATE:[%=ano.year%][%=smes%][%=sdia%]
+	DTEND;VALUE=DATE:[%=ano.year%][%=smes%][%=sdia%]
+	DTSTAMP:[%=ano.year%][%=smes%][%=sdia%]T202954Z
+	UID:76utfpio3nb3lbb0k9h65adv40@google.com
+	CREATED:[%=20151112%]T202836Z
+	DESCRIPTION:
+	LOCATION:
+	SEQUENCE:0
+	STATUS:CONFIRMED
+	SUMMARY:[%=event.event%]
+	END:VEVENT
+	[%
+				}
+			}
+		}
+	}
+	%]
+	END:VCALENDAR
+
+[%	
+	}
+%]

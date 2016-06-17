@@ -1,0 +1,25 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Uniandes//Automatizacion//BlogToCalendar v1.0//EN
+[%
+for(ev in cl!Event.all) {
+
+var formatDate = ev.day.month.year.year.format('%d') + ev.day.month.month.format('%02d') + ev.day.day.format('%02d');
+%]
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:[%=formatDate%]
+DTEND;VALUE=DATE:[%=formatDate%]
+DTSTAMP:[%=formatDate%]T202954Z
+UID:[%=ev.event.replace(' ', '-')%][%=formatDate%]@uniandes.edu.co
+CREATED:[%=formatDate%]T202836Z
+DESCRIPTION:
+LAST-MODIFIED:[%=formatDate%]T202837Z
+LOCATION:
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:[%=ev.event%]
+END:VEVENT
+[%
+}
+%]
+END:VCALENDAR

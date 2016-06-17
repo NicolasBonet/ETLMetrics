@@ -1,0 +1,36 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Uniandes//BlogToCalendar v1.0//EN
+[%
+for (Event in Calendar!Event.all) { %]
+[% var date = Event.getDate(); %]
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:[%=date%]
+DTEND;VALUE=DATE:[%=date%]
+DTSTAMP:[%=date%]T202954Z
+UID:[%=Event.event.replace(" ", "-")%][%=date%]@uniandes.edu.co
+CREATED:[%=date%]T202836Z
+DESCRIPTION:
+LAST-MODIFIED:[%=date%]T202837Z
+LOCATION:
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:[%=Event.event%]
+END:VEVENT
+[%
+}
+%]
+END:VCALENDAR[%
+//se formatea los numeros menores a 10
+operation Integer FormatNumber() : String { 
+	if (self < 10 )
+	{
+	 return '0'+self.asString();
+	}
+return self.asString();
+}
+// se obtiene la fecha en formato
+operation Event getDate() : String { 
+return (self.day.month.year.year.asString() + self.day.month.month.FormatNumber() + self.day.day.FormatNumber());
+}
+%]

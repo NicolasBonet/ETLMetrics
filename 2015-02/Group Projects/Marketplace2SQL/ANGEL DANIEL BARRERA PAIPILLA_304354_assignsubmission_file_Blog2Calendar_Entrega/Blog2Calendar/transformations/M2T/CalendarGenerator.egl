@@ -1,0 +1,34 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Uniandes//BlogToCalendar v1.0//EN
+[%
+for (Event in Calendar!Event.all) { %]
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:[%=Event.day.ObtenerFecha()%]
+DTEND;VALUE=DATE:[%=Event.day.ObtenerFecha()%]
+DTSTAMP:[%=Event.day.ObtenerFecha()%]T202954Z
+UID:[%=Event.event.replace(" ", "-")%][%=Event.day.ObtenerFecha()%]@uniandes.edu.co
+CREATED:[%=Event.day.ObtenerFecha()%]T202836Z
+DESCRIPTION:
+LAST-MODIFIED:[%=Event.day.ObtenerFecha()%]T202837Z
+LOCATION:
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:[%=Event.event%]
+END:VEVENT
+[%
+}
+%]
+END:VCALENDAR[%
+
+operation Event ObtenerFecha() : String { 
+return (self.month.year.year.asString() + self.month.month.AsNumero() + self.day.AsNumero());
+}
+operation Integer AsNumero() : String { 
+	if (self < 10 )
+	{
+	 return '0'+self.asString();
+	}
+return self.asString();
+}
+%]

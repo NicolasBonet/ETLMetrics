@@ -1,0 +1,43 @@
+[%
+var d:String;
+var m:String;
+%]
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Uniandes/Automatizacion//BlogToCalendar v1.0//EN
+[%
+for(dia in cal!Event.all){
+   if(dia.day.day.toString().size()<2)
+   {
+        d='0'+dia.day.day.toString();
+   }
+   else
+   {
+   d=dia.day.day.toString();
+   }
+   if(dia.day.month.month.toString().size()<2)
+   {
+        m='0'+dia.day.month.month.toString();
+   }
+   else
+   {
+   m=dia.day.month.month.toString();
+   }
+%]
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:[%=dia.day.month.year.year%][%=m%][%=d%]
+DTEND;VALUE=DATE:[%=dia.day.month.year.year%][%=m%][%=d%]
+DTSTAMP:[%=dia.day.month.year.year%][%=m%][%=d%]T202954Z
+UID:[%=dia.event.replace(' ','-')%][%=dia.day.month.year.year%][%=m%][%=d%]@uniandes.edu.co
+CREATED:[%=dia.day.month.year.year%][%=m%][%=d%]T202836Z 
+DESCRIPTION:
+LAST-MODIFIED:[%=dia.day.month.year.year%][%=m%][%=d%]T202837Z
+LOCATION:
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:[%=dia.event%]
+END:VEVENT
+[%
+}
+%]
+END:VCALENDAR

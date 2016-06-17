@@ -1,0 +1,100 @@
+rule Blog2Calendar
+transform b : Blog!Blog
+to c:Calendar!Calendar{
+	c.name = b.name;
+
+	var years = new Map();
+	var months = new Map();
+	var dates = new Map();
+	
+	for (a in Blog!Article.all){
+		a.println();
+		
+		//a.date.year();
+		var year = years.get(a.date.getDatePart("year"));
+		
+		if ( year.isUndefined() ){
+		
+			var _year = new Calendar!Year();
+			_year.year = a.date.getDatePart("year").asInteger();
+			c.years.add(_year);
+			years.put(_year.year.toString(),_year);
+			year=_year;
+		}
+		
+		var month = months.get(year.year+"-"+a.date.getDatePart("month"));
+		
+		if ( month.isUndefined()){			
+			var _month = new Calendar!Month();
+			month=_month;
+			_month.month = a.date.getDatePart("month").asInteger();
+			_month.year = year;		
+				
+			year.months.add(_month);			
+			months.put(year.year + "-" + _month.month ,_month);
+			
+		}
+		
+		var day = dates.get(year.year+"-"+month.month+"-"+a.date.getDatePart("day"));
+		
+		if ( day.isUndefined()){
+			
+			var _day = new Calendar!Day();
+			day = _day;
+			
+			_day.day = a.date.getDatePart("day").asInteger();		
+			_day.month=	month;
+			month.days.add(_day);			
+			dates.put(year.year + "-" + month.month + "-" + _day.day  ,_day);
+			
+		}
+		
+		
+		
+		var event = new Calendar!Event();
+		
+		
+		
+		event.event = a.summary;
+		event.day = day;
+		event.owner = a.author.name;
+		event.tags = a.tags.collect(ta|ta.tag + ",").asBag().toTags() ;
+		
+		day.events.add(event);
+		
+		
+		
+		
+		
+		
+	}
+	
+}
+
+operation String getDatePart(part:String):String{
+
+	if ( part.equals("year") ){
+		return self.substring(6,10);
+	}
+	
+	if ( part.equals("month") ){
+		return self.substring(3,5);	
+	}
+	
+	if ( part.equals("day") ){
+		return self.substring(0,2);	
+	}
+
+	return "1";
+}
+
+operation Collection toTags():String{
+
+	var tag = "";
+	
+	for (t in self){
+		tag = t + ",";
+	}
+	
+	return tag;
+}

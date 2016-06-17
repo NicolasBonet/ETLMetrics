@@ -1,0 +1,40 @@
+[%
+for(c in calendario!Calendar.all)
+{
+%]
+BEGIN:[%= c.name %]
+VERSION:2.0
+PRODID:-//Uniandes/Automatizacion//BlogToCalendar v1.0//EN
+[%
+for(y in c.years)
+{
+	for(m in y.months)
+	{
+		for(d in m.days)
+		{
+			for(e in d.events)
+			{
+%]
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:[%= y.year %][%= m.month %][%= d.day %]
+DTEND;VALUE=DATE:[%= y.year %][%= m.month %][%= d.day %]
+DTSTAMP:[%= y.year %][%= m.month %][%= d.day %]
+UID:[%= e.event %][%= y.year %][%= m.month %][%= d.day %]@uniandes.edu.co
+CREATED:[%= y.year %][%= m.month %][%= d.day %]
+DESCRIPTION:[%= e.event %]
+LAST-MODIFIED:[%= y.year %][%= m.month %][%= d.day %]
+LOCATION:[%= e.location %]
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:[%= e.event %]
+END:VEVENT
+[%
+			}
+		}
+	}
+}
+%]
+END:VCALENDAR
+[%
+}
+%]

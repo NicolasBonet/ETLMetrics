@@ -1,0 +1,5 @@
+[% 
+	var t:Template:= TemplateFactory.load('Transform.egl'); 
+	t.populate('events', c!Event.all); 
+	t.generate('../../generated/calendario.ics'); 
+%]

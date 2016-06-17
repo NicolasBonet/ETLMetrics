@@ -1,0 +1,46 @@
+BEGIN:VCALENDAR
+
+VERSION:2.0
+
+PRODID:-//Uniandes//BlogToCalendar v1.0//EN
+[% var events = CALENDAR!Event.all(); 
+	for (event in events){
+%]
+
+
+BEGIN:VEVENT
+[%var eventDate= event.dateBuilder();%]
+DTSTART;VALUE=DATE:[%=eventDate%]
+DTEND;VALUE=DATE:[%=eventDate%]
+DTSTAMP:[%=eventDate%]T202954Z
+UID:@google.com
+CREATED:[%=eventDate%]T202836Z
+DESCRIPTION:
+LOCATION:
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:[%=event.event%]
+END:VEVENT
+
+
+[%
+}
+%]
+END:VCALENDAR
+[%
+operation CALENDAR!Event dateBuilder(){
+	return self.day.month.year.year.toString()+self.day.month.twoDigits()+self.day.twoDigits();
+}
+operation Month twoDigits(){
+	if(self.month < 10){
+	  return "0"+self.month.toString();
+	}
+	return self.month.toString();
+}
+operation Day twoDigits(){
+	if(self.day < 10){
+	  return "0"+self.day.toString();
+	}
+	return self.day.toString();
+}
+%]

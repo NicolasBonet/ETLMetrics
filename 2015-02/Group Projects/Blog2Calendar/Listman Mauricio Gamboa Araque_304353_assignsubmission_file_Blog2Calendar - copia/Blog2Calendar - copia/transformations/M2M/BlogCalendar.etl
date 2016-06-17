@@ -1,0 +1,79 @@
+pre{
+	var calendar=null;
+	var anios=new Set;
+	var meses=new Set;
+	var map=new Map;
+}
+
+rule BlogToCalendar 
+	transform blog : b!Blog
+	to cal : c!Calendar {
+	 cal.name=blog.name;
+	 calendar=cal;
+}
+rule Year 
+	transform s : b!Article
+	to y : c!Year {
+		guard :  validarAnio(s)
+		  (anios.indexOf(s.date.split("/").get(2))).println();
+		 y.year=Native("java.lang.Integer").parseInt(s.date.split("/").get(2));
+		 calendar.years.add(y);
+		 map.put(s.date.split("/").get(2),y);
+		 
+}
+
+rule Month
+	transform s : b!Article
+	to m : c!Month{
+	guard :validarMonth(s)
+		var year=map.get(s.date.split("/").get(2));
+		m.month=Native("java.lang.Integer").parseInt(s.date.split("/").get(1));
+		m.year=year;
+		year.months.add(m);
+	
+}
+rule Day
+	transform s : b!Article
+	to d : c!Day{
+		var year=s.date.split("/").get(2);
+		var month=s.date.split("/").get(1);
+		var day=s.date.split("/").get(0);
+		d.day=Native("java.lang.Integer").parseInt(day);
+		var anio=map.get(year);
+		var meses=anio.months;
+		for(mes in meses){
+			if(mes.month=Native("java.lang.Integer").parseInt(month)){
+				mes.days.add(d);
+				d.month=mes;
+				var e=new c!Event();
+				e.event=s.url;
+				e.owner=s.author.name;
+				e.day=d;
+				d.events.add(e);
+				var t="";
+				for(tag in s.tags){
+					t=t+tag.tag+";";
+				}
+				e.tags=t;
+				break;
+			}
+		}
+}
+
+
+operation validarMonth(s){
+	if(meses.indexOf(s.date.split("/").get(1))=-1){
+		meses.add(s.date.split("/").get(1));
+		return true;
+	}else{
+		return false;
+	}
+}
+operation validarAnio(s){
+	if(anios.indexOf(s.date.split("/").get(2))=-1){
+		anios.add(s.date.split("/").get(2));
+		return true;
+	}else{
+		return false;
+	}
+}

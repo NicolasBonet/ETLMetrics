@@ -1,0 +1,43 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Uniandes/Automatizacion//BlogToCalendar v1.0//EN
+[%
+for(cal in cal!Event.all)
+{
+	out.println("BEGIN:VEVENT");
+	var date = "";
+	var day = cal.day.day;
+	if (day < 10){
+		day = "0" + day;
+	}
+	date = date + day;
+	
+	var month = cal.day.month;
+	month  = month.month;
+	if (month < 10){
+		month = "0" + month;
+	}
+	date = month + date;
+	
+	var year = cal.day.month.year;
+	year = year.year;
+	
+	date = year + date;
+	
+	out.println("DTSTART;VALUE=DATE:"+date);
+	out.println("DTEND;VALUE=DATE:"+date);
+	out.println("DTSTAMP:"+date+"T000000Z");
+	out.println("UID:"+cal.event.replace(" ","-")+date+"@uniandes.edu.co");
+	out.println("CREATED:"+date+"T202836Z");
+	out.println("DESCRIPTION:");
+	out.println("LAST-MODIFIED:"+date+"T202837Z");
+	out.println("LOCATION:");
+	out.println("SEQUENCE:0");
+	out.println("STATUS:CONFIRMED");
+	out.println("SUMMARY:"+cal.event);
+	out.println("END:VEVENT");
+%]
+[%
+}
+%]
+END:VCALENDAR

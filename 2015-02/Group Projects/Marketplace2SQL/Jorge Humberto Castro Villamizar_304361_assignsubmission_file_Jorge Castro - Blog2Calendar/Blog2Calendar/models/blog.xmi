@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Blog:Blog xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:Blog="Blog"
+    name="Partidos de Futbol">
+  <categories
+      name="Previas">
+    <articles
+        date="01/09/2014"
+        content="Hoy se juega Ajax vs PSV"
+        id="3"
+        tags="//@tags.1 //@tags.2"
+        url="ajax-vs-psv"
+        author="//@editors.0"
+        summary="Partido entre Ajax v PSV"/>
+    <articles
+        date="25/10/2015"
+        content="Hoy se juega Manchester vs Juventus"
+        id="1"
+        tags="//@tags.0 //@tags.4"
+        url="manchester-vs-juve"
+        author="//@editors.0"
+        summary="Partido entre Manchester y Juventus"/>
+  </categories>
+  <categories
+      name="Analisis">
+    <articles
+        date="30/11/2015"
+        content="El dia de hoy es un gran dia, se juega un partido muy esperado por todos"
+        id="2"
+        tags="//@tags.0 //@tags.3"
+        url="milan-vs-juventus"
+        author="//@editors.1"
+        summary="Analisis de Milan vs Juventus"/>
+  </categories>
+  <tags tag="juventus"/>
+  <tags tag="ajax"/>
+  <tags tag="psv"/>
+  <tags tag="milan"/>
+  <tags tag="manchester"/>
+  <editors name="Mario Suarez"
+      email="mariosuarez@gmail.com"/>
+  <editors name="Dario Rodriguez"
+      email="dariorodriguez@msn.com"/>
+</Blog:Blog>

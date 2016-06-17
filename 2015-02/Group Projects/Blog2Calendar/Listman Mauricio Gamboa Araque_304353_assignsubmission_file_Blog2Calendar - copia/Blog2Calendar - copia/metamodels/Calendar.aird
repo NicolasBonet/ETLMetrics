@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewpoint:DAnalysis xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:description="http://www.eclipse.org/sirius/table/description/1.1.0" xmlns:description_1="http://www.eclipse.org/sirius/description/1.1.0" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:table="http://www.eclipse.org/sirius/table/1.1.0" xmlns:viewpoint="http://www.eclipse.org/sirius/1.1.0" xsi:schemaLocation="http://www.eclipse.org/sirius/table/description/1.1.0 http://www.eclipse.org/sirius/table/1.1.0#//description http://www.eclipse.org/sirius/description/1.1.0 http://www.eclipse.org/sirius/1.1.0#//description" xmi:id="_ovIH4I_tEeWZ5-J_ZAZm9g" selectedViews="_oyKNwI_tEeWZ5-J_ZAZm9g _oyMqAI_tEeWZ5-J_ZAZm9g _oyRigI_tEeWZ5-J_ZAZm9g _oySJkI_tEeWZ5-J_ZAZm9g" version="10.0.0.201505222000">
+  <semanticResources>Calendar.ecore</semanticResources>
+  <semanticResources>http://www.eclipse.org/emf/2002/Ecore</semanticResources>
+  <ownedViews xmi:type="viewpoint:DRepresentationContainer" xmi:id="_oyKNwI_tEeWZ5-J_ZAZm9g">
+    <ownedRepresentations xmi:type="table:DTable" xmi:id="_py4D4I_tEeWZ5-J_ZAZm9g" name="Calendar class table" headerColumnWidth="145">
+      <target xmi:type="ecore:EPackage" href="Calendar.ecore#/"/>
+      <lines xmi:type="table:DLine" xmi:id="_py4D4Y_tEeWZ5-J_ZAZm9g" label="Calendar">
+        <target xmi:type="ecore:EClass" href="Calendar.ecore#//Calendar"/>
+        <lines xmi:type="table:DLine" xmi:id="_py4D4o_tEeWZ5-J_ZAZm9g" label="years : Year">
+          <target xmi:type="ecore:EReference" href="Calendar.ecore#//Calendar/years"/>
+          <semanticElements xmi:type="ecore:EReference" href="Calendar.ecore#//Calendar/years"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_py4D44_tEeWZ5-J_ZAZm9g" label="years" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EReference" href="Calendar.ecore#//Calendar/years"/>
+            <semanticElements xmi:type="ecore:EReference" href="Calendar.ecore#//Calendar/years"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_py4D5I_tEeWZ5-J_ZAZm9g" label="name : EString">
+          <target xmi:type="ecore:EAttribute" href="Calendar.ecore#//Calendar/name"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Calendar.ecore#//Calendar/name"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_py4D5Y_tEeWZ5-J_ZAZm9g" label="name" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Calendar.ecore#//Calendar/name"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Calendar.ecore#//Calendar/name"/>
+          </cells>
+        </lines>
+        <semanticElements xmi:type="ecore:EClass" href="Calendar.ecore#//Calendar"/>
+        <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']"/>
+        <cells xmi:type="table:DCell" xmi:id="_py4D5o_tEeWZ5-J_ZAZm9g" label="Calendar" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+          <target xmi:type="ecore:EClass" href="Calendar.ecore#//Calendar"/>
+          <semanticElements xmi:type="ecore:EClass" href="Calendar.ecore#//Calendar"/>
+        </cells>
+      </lines>
+      <lines xmi:type="table:DLine" xmi:id="_py4D54_tEeWZ5-J_ZAZm9g" label="Year">
+        <target xmi:type="ecore:EClass" href="Calendar.ecore#//Year"/>
+        <lines xmi:type="table:DLine" xmi:id="_py4D6I_tEeWZ5-J_ZAZm9g" label="months : Month">
+          <target xmi:type="ecore:EReference" href="Calendar.ecore#//Year/months"/>
+          <semanticElements xmi:type="ecore:EReference" href="Calendar.ecore#//Year/months"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_py4D6Y_tEeWZ5-J_ZAZm9g" label="months" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EReference" href="Calendar.ecore#//Year/months"/>
+            <semanticElements xmi:type="ecore:EReference" href="Calendar.ecore#//Year/months"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_py4D6o_tEeWZ5-J_ZAZm9g" label="year : EInt">
+          <target xmi:type="ecore:EAttribute" href="Calendar.ecore#//Year/year"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Calendar.ecore#//Year/year"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_py4D64_tEeWZ5-J_ZAZm9g" label="year" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Calendar.ecore#//Year/year"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Calendar.ecore#//Year/year"/>
+          </cells>
+        </lines>
+        <semanticElements xmi:type="ecore:EClass" href="Calendar.ecore#//Year"/>
+        <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']"/>
+        <cells xmi:type="table:DCell" xmi:id="_py4D7I_tEeWZ5-J_ZAZm9g" label="Year" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+          <target xmi:type="ecore:EClass" href="Calendar.ecore#//Year"/>
+          <semanticElements xmi:type="ecore:EClass" href="Calendar.ecore#//Year"/>
+        </cells>
+      </lines>
+      <lines xmi:type="table:DLine" xmi:id="_py4D7Y_tEeWZ5-J_ZAZm9g" label="Month">
+        <target xmi:type="ecore:EClass" href="Calendar.ecore#//Month"/>
+        <lines xmi:type="table:DLine" xmi:id="_py4D7o_tEeWZ5-J_ZAZm9g" label="days : Day">
+          <target xmi:type="ecore:EReference" href="Calendar.ecore#//Month/days"/>
+          <semanticElements xmi:type="ecore:EReference" href="Calendar.ecore#//Month/days"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_py4D74_tEeWZ5-J_ZAZm9g" label="days" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EReference" href="Calendar.ecore#//Month/days"/>
+            <semanticElements xmi:type="ecore:EReference" href="Calendar.ecore#//Month/days"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_py4D8I_tEeWZ5-J_ZAZm9g" label="month : EInt">
+          <target xmi:type="ecore:EAttribute" href="Calendar.ecore#//Month/month"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Calendar.ecore#//Month/month"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_py4D8Y_tEeWZ5-J_ZAZm9g" label="month" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Calendar.ecore#//Month/month"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Calendar.ecore#//Month/month"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_py4D8o_tEeWZ5-J_ZAZm9g" label="year : Year">
+          <target xmi:type="ecore:EReference" href="Calendar.ecore#//Month/year"/>
+          <semanticElements xmi:type="ecore:EReference" href="Calendar.ecore#//Month/year"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_py4D84_tEeWZ5-J_ZAZm9g" label="year" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EReference" href="Calendar.ecore#//Month/year"/>
+            <semanticElements xmi:type="ecore:EReference" href="Calendar.ecore#//Month/year"/>
+          </cells>
+        </lines>
+        <semanticElements xmi:type="ecore:EClass" href="Calendar.ecore#//Month"/>
+        <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']"/>
+        <cells xmi:type="table:DCell" xmi:id="_py4D9I_tEeWZ5-J_ZAZm9g" label="Month" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+          <target xmi:type="ecore:EClass" href="Calendar.ecore#//Month"/>
+          <semanticElements xmi:type="ecore:EClass" href="Calendar.ecore#//Month"/>
+        </cells>
+      </lines>
+      <lines xmi:type="table:DLine" xmi:id="_py4D9Y_tEeWZ5-J_ZAZm9g" label="Day">
+        <target xmi:type="ecore:EClass" href="Calendar.ecore#//Day"/>
+        <lines xmi:type="table:DLine" xmi:id="_py4D9o_tEeWZ5-J_ZAZm9g" label="day : EInt">
+          <target xmi:type="ecore:EAttribute" href="Calendar.ecore#//Day/day"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Calendar.ecore#//Day/day"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_py4D94_tEeWZ5-J_ZAZm9g" label="day" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Calendar.ecore#//Day/day"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Calendar.ecore#//Day/day"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_py4D-I_tEeWZ5-J_ZAZm9g" label="events : Event">
+          <target xmi:type="ecore:EReference" href="Calendar.ecore#//Day/events"/>
+          <semanticElements xmi:type="ecore:EReference" href="Calendar.ecore#//Day/events"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_py4D-Y_tEeWZ5-J_ZAZm9g" label="events" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EReference" href="Calendar.ecore#//Day/events"/>
+            <semanticElements xmi:type="ecore:EReference" href="Calendar.ecore#//Day/events"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_py4D-o_tEeWZ5-J_ZAZm9g" label="month : Month">
+          <target xmi:type="ecore:EReference" href="Calendar.ecore#//Day/month"/>
+          <semanticElements xmi:type="ecore:EReference" href="Calendar.ecore#//Day/month"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_py4D-4_tEeWZ5-J_ZAZm9g" label="month" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EReference" href="Calendar.ecore#//Day/month"/>
+            <semanticElements xmi:type="ecore:EReference" href="Calendar.ecore#//Day/month"/>
+          </cells>
+        </lines>
+        <semanticElements xmi:type="ecore:EClass" href="Calendar.ecore#//Day"/>
+        <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']"/>
+        <cells xmi:type="table:DCell" xmi:id="_py4D_I_tEeWZ5-J_ZAZm9g" label="Day" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+          <target xmi:type="ecore:EClass" href="Calendar.ecore#//Day"/>
+          <semanticElements xmi:type="ecore:EClass" href="Calendar.ecore#//Day"/>
+        </cells>
+      </lines>
+      <lines xmi:type="table:DLine" xmi:id="_py4D_Y_tEeWZ5-J_ZAZm9g" label="Event">
+        <target xmi:type="ecore:EClass" href="Calendar.ecore#//Event"/>
+        <lines xmi:type="table:DLine" xmi:id="_py4D_o_tEeWZ5-J_ZAZm9g" label="event : EString">
+          <target xmi:type="ecore:EAttribute" href="Calendar.ecore#//Event/event"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Calendar.ecore#//Event/event"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_py4D_4_tEeWZ5-J_ZAZm9g" label="event" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Calendar.ecore#//Event/event"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Calendar.ecore#//Event/event"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_py4EAI_tEeWZ5-J_ZAZm9g" label="location : EString">
+          <target xmi:type="ecore:EAttribute" href="Calendar.ecore#//Event/location"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Calendar.ecore#//Event/location"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_py4EAY_tEeWZ5-J_ZAZm9g" label="location" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Calendar.ecore#//Event/location"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Calendar.ecore#//Event/location"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_py4EAo_tEeWZ5-J_ZAZm9g" label="owner : EString">
+          <target xmi:type="ecore:EAttribute" href="Calendar.ecore#//Event/owner"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Calendar.ecore#//Event/owner"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_py4EA4_tEeWZ5-J_ZAZm9g" label="owner" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Calendar.ecore#//Event/owner"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Calendar.ecore#//Event/owner"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_py4EBI_tEeWZ5-J_ZAZm9g" label="tags : EString">
+          <target xmi:type="ecore:EAttribute" href="Calendar.ecore#//Event/tags"/>
+          <semanticElements xmi:type="ecore:EAttribute" href="Calendar.ecore#//Event/tags"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_py4EBY_tEeWZ5-J_ZAZm9g" label="tags" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EAttribute" href="Calendar.ecore#//Event/tags"/>
+            <semanticElements xmi:type="ecore:EAttribute" href="Calendar.ecore#//Event/tags"/>
+          </cells>
+        </lines>
+        <lines xmi:type="table:DLine" xmi:id="_py4EBo_tEeWZ5-J_ZAZm9g" label="day : Day">
+          <target xmi:type="ecore:EReference" href="Calendar.ecore#//Event/day"/>
+          <semanticElements xmi:type="ecore:EReference" href="Calendar.ecore#//Event/day"/>
+          <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']/@ownedSubLines[name='Feature']"/>
+          <cells xmi:type="table:DCell" xmi:id="_py4EB4_tEeWZ5-J_ZAZm9g" label="day" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+            <target xmi:type="ecore:EReference" href="Calendar.ecore#//Event/day"/>
+            <semanticElements xmi:type="ecore:EReference" href="Calendar.ecore#//Event/day"/>
+          </cells>
+        </lines>
+        <semanticElements xmi:type="ecore:EClass" href="Calendar.ecore#//Event"/>
+        <originMapping xmi:type="description:LineMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedLineMappings[name='Classes%20lines']"/>
+        <cells xmi:type="table:DCell" xmi:id="_py4ECI_tEeWZ5-J_ZAZm9g" label="Event" column="_py4ECY_tEeWZ5-J_ZAZm9g">
+          <target xmi:type="ecore:EClass" href="Calendar.ecore#//Event"/>
+          <semanticElements xmi:type="ecore:EClass" href="Calendar.ecore#//Event"/>
+        </cells>
+      </lines>
+      <columns xmi:type="table:DFeatureColumn" xmi:id="_py4ECY_tEeWZ5-J_ZAZm9g" label="Name" cells="_py4D5o_tEeWZ5-J_ZAZm9g _py4D44_tEeWZ5-J_ZAZm9g _py4D5Y_tEeWZ5-J_ZAZm9g _py4D7I_tEeWZ5-J_ZAZm9g _py4D6Y_tEeWZ5-J_ZAZm9g _py4D64_tEeWZ5-J_ZAZm9g _py4D9I_tEeWZ5-J_ZAZm9g _py4D74_tEeWZ5-J_ZAZm9g _py4D8Y_tEeWZ5-J_ZAZm9g _py4D84_tEeWZ5-J_ZAZm9g _py4D_I_tEeWZ5-J_ZAZm9g _py4D94_tEeWZ5-J_ZAZm9g _py4D-Y_tEeWZ5-J_ZAZm9g _py4D-4_tEeWZ5-J_ZAZm9g _py4ECI_tEeWZ5-J_ZAZm9g _py4D_4_tEeWZ5-J_ZAZm9g _py4EAY_tEeWZ5-J_ZAZm9g _py4EA4_tEeWZ5-J_ZAZm9g _py4EBY_tEeWZ5-J_ZAZm9g _py4EB4_tEeWZ5-J_ZAZm9g" width="35" featureName="name">
+        <originMapping xmi:type="description:FeatureColumnMapping" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']/@ownedColumnMappings[name='Name']"/>
+      </columns>
+      <description xmi:type="description:EditionTableDescription" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']/@ownedRepresentations[name='Classes']"/>
+    </ownedRepresentations>
+    <viewpoint xmi:type="description_1:Viewpoint" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Design']"/>
+  </ownedViews>
+  <ownedViews xmi:type="viewpoint:DRepresentationContainer" xmi:id="_oyMqAI_tEeWZ5-J_ZAZm9g">
+    <viewpoint xmi:type="description_1:Viewpoint" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Review']"/>
+  </ownedViews>
+  <ownedViews xmi:type="viewpoint:DRepresentationContainer" xmi:id="_oyRigI_tEeWZ5-J_ZAZm9g">
+    <viewpoint xmi:type="description_1:Viewpoint" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Archetype']"/>
+  </ownedViews>
+  <ownedViews xmi:type="viewpoint:DRepresentationContainer" xmi:id="_oySJkI_tEeWZ5-J_ZAZm9g">
+    <viewpoint xmi:type="description_1:Viewpoint" href="platform:/plugin/org.eclipse.emf.ecoretools.design/description/ecore.odesign#//@ownedViewpoints[name='Generation']"/>
+  </ownedViews>
+</viewpoint:DAnalysis>

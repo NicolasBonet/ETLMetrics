@@ -1,0 +1,45 @@
+BEGIN:VCALENDAR
+
+VERSION:2.0
+
+PRODID:-//Uniandes//BlogToCalendar v1.0//EN
+
+
+[% for(e in events) {%]
+	BEGIN:VEVENT
+	[%
+		var fecha=""+e.day.month.year.year;
+		if(e.day.month.month<10){
+			fecha=fecha+"0"+e.day.month.month;
+		}else{
+			fecha=fecha+e.day.month.month;
+		}
+		if(e.day.day<10){
+			fecha=fecha+"0"+e.day.day;
+		}else{
+			fecha=fecha+e.day.day;
+		}
+	%]
+	DTSTART;VALUE=DATE:[%=fecha%]
+	DTEND;VALUE=DATE:[%=fecha%]
+
+	DTSTAMP:[%=fecha%]T202954Z
+
+	UID:[%=e.event%]@google.com
+	
+	
+	DESCRIPTION:
+	
+	LOCATION:
+	
+	SEQUENCE:0
+	
+	STATUS:CONFIRMED
+	
+	SUMMARY: [%=e.event%]
+	
+	END:VEVENT
+[%}%]
+
+
+END:VCALENDAR

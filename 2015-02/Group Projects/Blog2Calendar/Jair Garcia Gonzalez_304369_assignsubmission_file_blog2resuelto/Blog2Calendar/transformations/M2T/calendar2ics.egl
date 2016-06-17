@@ -1,0 +1,25 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Uniandes/Automatizacion//BlogToCalendar v1.1//EN
+
+[%
+var rand = new Native('java.util.Random');
+for(event in cal!Event.allInstances()){  
+	var time = event.day.month.year.year.toString()+event.day.month.month.format('%02d')+event.day.day.format('%02d');
+%]
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:[%=time%]
+DTEND;VALUE=DATE:[%=time%]
+DTSTAMP:[%=time%]T202954Z
+UID:[%=time+'_'+rand.nextInt(10000000)%]
+CREATED:[%=time%]T202954Z
+DESCRIPTION: [%=event.tags%]
+LAST-MODIFIED:[%=time%]T202954Z
+LOCATION: [%= event.location%]
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:[%=event.event%]
+END:VEVENT
+
+[% } %]
+END:VCALENDAR

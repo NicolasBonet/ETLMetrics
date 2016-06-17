@@ -1,0 +1,59 @@
+BEGIN:VCALENDAR
+
+VERSION:2.0
+
+PRODID:-//Uniandes/Automatizacion//BlogToCalendar v1.0//EN
+[%
+for(calendario in calendar!Calendar.all)
+{
+	for(years in calendario.years)
+	{
+		for(meses in years.months)
+		{
+			for(dias in meses.days)
+			{
+				for (eventos in dias.events)
+				{
+					var mesesToString;
+					if(meses.month<10)
+					{
+						mesesToString="0".concat(meses.month.asString());
+					}
+					else
+					{
+						mesesToString=meses.month.asString();
+					}
+					var diasToString;
+					if(dias.day<10)
+					{
+						diasToString="0".concat(dias.day.asString());
+					}
+					else
+					{
+						diasToString=dias.day.asString();
+					}
+%]
+
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:[%=years.year.asString.concat(mesesToString).concat(diasToString)%]
+DTEND;VALUE=DATE:[%=years.year.asString.concat(mesesToString).concat(diasToString)%]
+DTSTAMP:[%=years.year.asString.concat(mesesToString).concat(diasToString)%]T202954Z
+UID:[%=eventos.event.replace(' ','-')%][%=years.year.asString.concat(mesesToString).concat(diasToString)%]@uniandes.edu.co
+CREATED:[%=years.year.asString.concat(mesesToString).concat(diasToString)%]T202836Z
+DESCRIPTION:
+LAST-MODIFIED:[%=years.year.asString.concat(mesesToString).concat(diasToString)%]T202837Z
+LOCATION:
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:[%=eventos.event%]
+END:VEVENT
+
+[%
+				}
+			}
+		}		
+	
+	}
+}
+%]
+END:VCALENDAR

@@ -1,0 +1,58 @@
+pre {
+	var years = new Set();
+	var months = new Map();
+}
+
+
+rule Blog2Calendar
+transform f:bl!Blog
+to t:cal!Calendar{
+
+	t.name = f.name;
+	t.years = new Set();
+	
+	for(cat in f.categories){
+		
+		for(art in cat.articles){
+			
+			var seqDate = art.date.split("/");
+			var dayInt = seqDate.first().asInteger();
+			var monthInt = seqDate.second().asInteger();
+			var yearInt = seqDate.third().asInteger();	
+			
+			if(not t.years.collect(e|e.year).contains(yearInt)){
+				t.years.add(new cal!Year);
+				t.years.last().year = yearInt;
+				t.years.last().months = new Set(); 
+			}
+			
+			var year = t.years.selectOne(y|y.year=yearInt);
+			
+			if(not year.months.collect(e|e.month).contains(monthInt)){
+				year.months.add(new cal!Month);
+				year.months.last().month = monthInt;
+				year.months.last().year = year;
+				year.months.last().days = new Set();
+			}
+			
+			var month = t.years.selectOne(y|y.year=yearInt).months.selectOne(m|m.month=monthInt);
+			
+			if(not month.days.collect(e|e.day).contains(dayInt)){
+				month.days.add(new cal!Day);
+				month.days.last().day = dayInt;
+				month.days.last().month = month;
+				month.days.last().events = new Set();
+			}
+			
+			var day = t.years.selectOne(y|y.year=yearInt).months.selectOne(m|m.month=monthInt).days.selectOne(d|d.day=dayInt);
+			
+			day.events.add(new cal!Event);
+			day.events.last().event = art.summary;
+			day.events.last().owner = art.author.name;
+			day.events.last().tags = art.tags.collect(t|t.tag).asString().substring(10).replace("}","");
+			day.events.last().day = day;	
+		}
+		
+	}
+	
+}

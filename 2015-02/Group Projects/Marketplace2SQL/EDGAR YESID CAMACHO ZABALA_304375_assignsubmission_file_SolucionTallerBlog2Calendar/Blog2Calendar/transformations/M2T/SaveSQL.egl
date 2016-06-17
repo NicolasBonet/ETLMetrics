@@ -1,0 +1,4 @@
+[% 
+	var t:Template:= TemplateFactory.load('Calendar2ICS.egl');
+	t.generate('../../generated/calendario.ics');
+%]

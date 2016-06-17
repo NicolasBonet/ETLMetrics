@@ -1,0 +1,50 @@
+BEGIN:VCALENDAR
+
+VERSION:2.0
+
+PRODID:-//Uniandes//BlogToCalendar v1.0//EN
+
+[%for (e in Calendar!Event.all){%]
+
+BEGIN:VEVENT
+
+DTSTART;VALUE=DATE:[%=e.day.month.year.year%][%=e.day.month.month.formatDate()%][%=e.day.day.formatDate()%]
+
+DTEND;VALUE=DATE:[%=e.day.month.year.year%][%=e.day.month.month.formatDate()%][%=e.day.day.formatDate()%]
+
+DTSTAMP:[%=e.day.month.year.year%][%=e.day.month.month.formatDate()%][%=e.day.day.formatDate()%]T202954Z
+
+UID:[%=e.event.replaceSpaces()%][%=e.day.month.year.year%][%=e.day.month.month.formatDate()%][%=e.day.day.formatDate()%]@uniandes.edu.co
+
+CREATED:[%=e.day.month.year.year%][%=e.day.month.month.formatDate()%][%=e.day.day.formatDate()%]T202954Z
+
+DESCRIPTION:[%=e.event%]
+
+LOCATION:
+
+SEQUENCE:0
+
+STATUS:CONFIRMED
+
+SUMMARY:[%=e.event%]
+
+END:VEVENT
+[%}%]
+
+END:VCALENDAR
+
+[%
+
+operation Integer formatDate():String{
+	if (self < 10){
+		return "0" + self;
+	}else{
+		return self.toString();
+	}
+}
+
+operation String replaceSpaces():String{
+	return self.replaceAll(' ','-');
+}
+
+%]
