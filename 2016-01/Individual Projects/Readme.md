@@ -24,7 +24,7 @@ WebCrud is a project that wanted to automatize the creation of web platforms doi
 To get an idea of the quality of each implementation we've provided the grades obtained from each group:
 
 |Group      |Grade|
-------------------
+------------|-----|
 |Catalog    | 4.7 |
 |ClinicPro  | 3.7 |
 |CRUD Java  | 3.8 |
