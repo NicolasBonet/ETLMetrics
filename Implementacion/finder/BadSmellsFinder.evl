@@ -1,0 +1,326 @@
+/*
+* Settings
+*/
+pre{
+	var threshold_complex_ocl = 3;
+	var threhold_output_code = 5;
+}
+
+/*
+* ETL Module
+*/
+context ETL!ETLModule
+{
+	/*
+		Bad Smell: Merge Rules
+	*/
+	critique MergeRules
+	{
+		guard : self.transformationRules.size() > 0
+		
+		check {
+		 
+			var bindings = new Map;
+			
+			// First get all bindings for a rule
+			for (rule in self.transformationRules)
+			{
+				var ruleStatements = rule.body.statements.select(s | s.isTypeOf(AssignmentStatement));
+				var ruleSequence : new Sequence;
+				
+				for (rs in ruleStatements)
+				{
+					ruleSequence.append(rs.lhs.name.name + "=" + rs.rhs.name.name);
+				}
+				
+				bindings.put(rule.name.name, ruleSequence);
+			}
+			
+			// Now verify if they are similar
+			for (rule in self.transformationRules)
+			{
+				var ruleStatements = rule.body.statements.select(s | s.isTypeOf(AssignmentStatement));
+				
+			}
+		}
+	    
+	    message : "The name of transformation rule " + self.name.name + " should start with a upper-case letter"
+    }
+}
+
+/*
+* Rules
+*/
+context ETL!TransformationRule
+{
+	/*
+		Bad Smell: Name convention
+	*/
+	critique NameShouldStartWithUpperCase
+	{
+		guard : self.name.name <> ""
+		
+		check : self.name.name.substring(0,1) = self.name.name.substring(0,1).toUpperCase()
+	    
+	    message : "The name of transformation rule " + self.name.name + " should start with a upper-case letter"
+    }
+    
+    critique SourceNameShouldStartWitLowerCase
+	{
+		guard : self.source.name.name <> ""
+	
+		check : self.source.name.name.substring(0,1) = self.source.name.name.substring(0,1).toLowerCase()
+	    
+	    message : "The source parameter " + source.name.name + " of transformation rule " + self.name.name + " should start with a lower-case letter"
+    }
+    
+    critique TargetNameShouldStartWitLowerCase
+	{
+		guard : self.targets.size() > 0
+	
+		check : self.targets.select(target | target.name.name <> "" and target.name.name.substring(0,1) <> target.name.name.substring(0,1).toLowerCase()).size() = 0
+	    
+	    message : "All target parameters of transformation rule " + self.name.name + " should start with a lower-case letter"
+    }
+    
+    /*
+	* Bad Smell: Avoid output code
+	*/
+	critique AvoidOutputCode
+	{
+		check {
+			var nameOcurrences = new Map;
+			var nameVariable = "";
+			for (nameStatement in self.body.statements.select(s | s.hasProperty('lhs') and s.hasProperty('rhs') and ((s.lhs.hasProperty('target') and s.lhs.target.isTypeOf(ETL!NameExpression)) or s.lhs.isTypeOf(ETL!NameExpression)) and s.rhs.isTypeOf(ETL!PlusOperatorExpression) and s.rhs.hasProperty('rhs') and s.rhs.rhs.isTypeOf(ETL!StringExpression)))
+			{
+				// Get the name
+				if (nameStatement.lhs.hasProperty('target'))
+					nameVariable = nameStatement.lhs.target.name;
+				else 
+					nameVariable = nameStatement.lhs.name;
+				
+				if (nameOcurrences.containsKey(nameVariable) and nameOcurrences.get(nameVariable) >= threhold_output_code)
+					return false;
+				else if (nameOcurrences.containsKey(nameVariable))
+					nameOcurrences.put(nameVariable, nameOcurrences.get(nameVariable) + 1);
+				else
+					nameOcurrences.put(nameVariable, 1);
+			}
+			
+			return true;
+		}
+		
+		message : "On rule " + self.name.name + " the variable " + nameVariable + " is concatenated multiple times, make sure you're not adding output code on this transformation."
+	}
+	
+	/*
+		Bad Smell: Split Rules
+	*/
+	critique SplitRules
+	{
+		guard : self.body.statements.size() = 1
+		
+		check : self.body.statements.select(s | s.isTypeOf(ETL!IfStatement)).size() = 0
+		
+		message : "The rule " + self.name.name + " (between lines " + self.region.start.line + " and " + self.region.end.line + ") has an if as its only child, consider the use of guards to factorize it."
+    }
+}
+
+/*
+* Operations
+*/
+context ETL!OperationDefinition
+{
+	/*
+		Bad Smell: Name convention
+	*/
+	critique NameShouldStartWithLowerCase
+	{
+		guard : self.name.name <> ""
+		
+		check : self.name.name.substring(0,1) = self.name.name.substring(0,1).toLowerCase()
+	    
+	    message : "The name of operation " + self.name.name + " (line #" + self.region.start.line  + ") should start with a lower-case letter"
+    }
+    
+    /*
+		(NOT WORKING) Bad Smell: Inline Operations
+	*/
+	critique UseInlineOperations
+	{
+		guard : self.name.name <> ""
+		
+		check : self.container.eAllContents().select(c | c.isTypeOf(MethodCallExpression) and c.method.name = self.name.name).size() = 3
+	    
+	    message : "Operation " + self.name.name + " (line #" + self.region.start.line  + ") is only being used once, consider to remove it and place content inside the parent"
+    }
+    
+    /*
+	* Bad Smell: Avoid output code
+	*/
+	critique AvoidOutputCode
+	{
+		check {
+			var nameOcurrences = new Map;
+			var nameVariable = "";
+			for (nameStatement in self.body.statements.select(s | s.hasProperty('lhs') and s.hasProperty('rhs') and ((s.lhs.hasProperty('target') and s.lhs.target.isTypeOf(ETL!NameExpression)) or s.lhs.isTypeOf(ETL!NameExpression)) and s.rhs.isTypeOf(ETL!PlusOperatorExpression) and s.rhs.hasProperty('rhs') and s.rhs.rhs.isTypeOf(ETL!StringExpression)))
+			{
+				// Get the name
+				if (nameStatement.lhs.hasProperty('target'))
+					nameVariable = nameStatement.lhs.target.name;
+				else 
+					nameVariable = nameStatement.lhs.name;
+				
+				if (nameOcurrences.containsKey(nameVariable) and nameOcurrences.get(nameVariable) >= threhold_output_code)
+					return false;
+				else if (nameOcurrences.containsKey(nameVariable))
+					nameOcurrences.put(nameVariable, nameOcurrences.get(nameVariable) + 1);
+				else
+					nameOcurrences.put(nameVariable, 1);
+			}
+			
+			return true;
+		}
+		
+		message : "On operation " + self.name.name + " the variable " + nameVariable + " is concatenated multiple times, make sure you're not adding output code on this transformation."
+	}
+}
+
+/*
+* For statements
+*/
+context ETL!ForStatement
+{
+	/*
+		Bad Smell: Elements creation in rules
+	*/
+	critique NoElementsCreationOnLoops
+	{
+		guard : self.body.block.statements.select(s | s.isTypeOf(ETL!AssignmentStatement)).size() > 0
+		
+		check : self.body.block.statements.select(s | s.isTypeOf(ETL!AssignmentStatement) and (s.lhs.isTypeOf(ETL!NewExpression) or s.rhs.isTypeOf(ETL!NewExpression))).size() = 0
+		
+		message : "The for statement (between lines " + self.region.start.line + " and " + self.region.end.line + ") is creating elements, consider to create these as rules."
+    }
+    
+    /*
+		Bad Smell: Avoid for/if in favor of OCL Expressions
+	*/
+	critique AvoidForIfInFavorOfOCLExpressions
+	{
+		guard : self.body.block.statements.size() = 1
+		
+		check : self.body.block.statements.select(s | s.isTypeOf(ETL!IfStatement)).size() = 0
+		
+		message : "The for statement (between lines " + self.region.start.line + " and " + self.region.end.line + ") has an if as its only child, consider the use of OCL Expressions to factorize it."
+    }
+}
+
+/*
+* If statements
+*/
+context ETL!IfStatement
+{
+	/*
+		Bad Smell: Substituting IF/ELSE Chains with Switch
+	*/
+	critique SubstitutingIFELSEChainsWithSwitch
+	{
+		check : self.eContents.select(c | c.isTypeOf(ETL!ExpressionOrStatementBlock) and c.block.statements.exists(s | s.isTypeOf(ETL!AssignmentStatement))).collect( c | c.block.statements.select(s | s.isTypeOf(ETL!AssignmentStatement)).lhs.property.name )->asSet().size() <> 1
+		
+		message : "The if statement (between lines " + self.region.start.line + " and " + self.region.end.line + ") can be replaced with a Switch or a Hashmap."
+    }
+}
+
+/*
+* Block
+*/
+context ETL!Block
+{
+	/*
+		Bad Smell: Merge Bindings
+	*/
+	critique MergeBindings
+	{
+		guard : self.statements.size() > 0
+		
+		check {
+			var nameOcurrences = new Map;
+			var nameVariable = "";
+			var statement = new ETL!EOLElement;
+			
+			for (nameStatement in self.statements.select(s | s.hasProperty('lhs') and s.lhs.isTypeOf(ETL!PropertyCallExpression)) )
+			{
+				// Get the name
+				statement = nameStatement;
+				nameVariable = nameStatement.lhs.property.name;
+				
+				// Use the map to see if it was used before
+				if (nameOcurrences.containsKey(nameVariable))
+					return false;
+				else
+					nameOcurrences.put(nameVariable, 1);
+			}
+		
+			return true;
+		}
+		
+		message : "The target feature " + nameVariable + " being set at lines " + statement.region.start.line + " and " + statement.region.end.line + " was already used before, consider to merge those bindings."
+    }
+}
+
+/*
+* Method Call Expressions (OCL for example)
+*/
+context ETL!MethodCallExpression
+{
+	/*
+		(NOT WORKING) Bad Smell: Extract complex OCL in Operations
+	*/
+	critique ExtractComplexOCLInOperations
+	{
+		guard : self.eContents.size() > 0
+		
+		check : self.eContents.select(e | e.isTypeOf(ETL!MethodCallExpression) or e.isTypeOf(ETL!FOLMethodCallExpression)).size() < threshold_complex_ocl
+		
+		message : "The OCL expression (between lines " + self.region.start.line + " and " + self.region.end.line + ") has too many OCL expressions, try to split it into operations."
+    }
+}
+
+/*
+* Property Call Expression (calls to properties, useful to know model navigation)
+*/
+context ETL!PropertyCallExpression
+{
+	/*
+		Bad Smell: Protect unsafe target navigation
+	*/
+	critique ProtectUnsafeTargetNavigation
+	{
+		guard : self.container.hasProperty('condition') and self.container.condition == self
+	
+		check {
+			var parentRule = self.findParentRule();
+			
+			if (parentRule == null)
+				return true;
+				
+			return parentRule.targets.exists( t | t.name.name = self.target.name ) == false;
+		}
+		
+		message : "The rule " + parentRule.name.name + " (between lines " + parentRule.region.start.line + " and " + parentRule.region.end.line + ") has target navigation (attribute: " + self.target.name + ") which is unsafe as those variables could be without definition, consider the use of lazy rules and equivalents to control the flow of the execution."
+    }
+}
+
+/*
+* Operations
+*/
+operation Any findParentRule(): ETL!TransformationRule
+{
+	if (self.container = null or self.container.isTypeOf(ETL!ETLModule))
+		return null;
+	else if (self.container.isTypeOf(ETL!TransformationRule))
+		return self.container;
+	else
+		return self.container.findParentRule();
+}

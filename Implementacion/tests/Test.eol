@@ -1,0 +1,19 @@
+if (devolver() or devolver2())
+{
+	devolver3();
+}
+
+operation Any devolver() : Boolean {
+	"Devolver 1".println();
+	return false;
+}
+
+operation Any devolver2() : Boolean {
+	"Devolver 2".println();
+	return true;
+}
+
+operation Any devolver3() : Boolean {
+	"Devolver 3".println();
+	return true;
+}
