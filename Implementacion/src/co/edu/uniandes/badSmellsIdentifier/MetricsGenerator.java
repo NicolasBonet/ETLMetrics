@@ -38,7 +38,7 @@ public class MetricsGenerator {
 	/**
 	 * OPERATION_TYPE is the operation type used by HAETAE, it might be AST2vrETL or AST2trETL
 	 */
-	private final static String EVL_FILE = "/finder/BadSmellsFinder.evl";
+	private final static String EVL_FILE = "finder/BadSmellsFinder.evl";
 	
 	/**
 	 * Here we store all our ETL Files
@@ -57,8 +57,8 @@ public class MetricsGenerator {
 		addModelFiles(INPUT_DIRECTORY);
 		
 		// Register metamodels
-		registerMetamodel(URI.createFileURI("./metamodels/EOL.ecore"));
-		registerMetamodel(URI.createFileURI("./metamodels/ETL.ecore"));
+		registerMetamodel(URI.createFileURI("metamodels/EOL.ecore"));
+		registerMetamodel(URI.createFileURI("metamodels/ETL.ecore"));
 	}
 	
 	/**
@@ -71,23 +71,35 @@ public class MetricsGenerator {
 		for (int i = 0; i < modelFiles.size(); i++)
 		{
 			// Parse EVL File
-			EolLibraryModule module = new EvlModule();
+			/*EvlModule module = new EvlModule();
 			try {
-				module.parse(modelFiles.get(i));
+				module.parse(new File(EVL_FILE));
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println("Unable to parse file, please ensure the file does not contain syntax errors");
 			}
 			
 			// Retrieve our models
+			System.out.println("Adding metamodels");
 			module.getContext().getModelRepository().addModel(createEmfModel("ETL", modelFiles.get(i).getAbsolutePath(), true, false));
-
-			// Unsatisfied constraints
-			EvlModule evlModule = (EvlModule) module;
-			Collection<UnsatisfiedConstraint> unsatisfied = evlModule.getContext().getUnsatisfiedConstraints();
-			System.out.println(unsatisfied.toString());
+			System.out.println("Closing metamodels");
 			
-			break;
+			// Unsatisfied constraints
+			Collection<UnsatisfiedConstraint> unsatisfied = module.getContext().getUnsatisfiedConstraints();
+			System.out.println("Model: " + modelFiles.get(i).getAbsolutePath().replace(INPUT_DIRECTORY, "") + " - Unsatisfied : " + unsatisfied.size());
+		
+			if (i == 10)
+				break;*/
+			
+			EvlStandaloneExample evlStandaloneExample = new EvlStandaloneExample();
+			evlStandaloneExample.setModelUri(modelFiles.get(i).getAbsolutePath());
+			
+			try {
+				evlStandaloneExample.execute();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -146,8 +158,8 @@ public class MetricsGenerator {
 		properties.put(EmfModel.PROPERTY_NAME, name);
 		
 		try {
-			properties.put(EmfModel.PROPERTY_FILE_BASED_METAMODEL_URI, getFileURI("./metamodels/EOL.ecore").toString());
-			properties.put(EmfModel.PROPERTY_FILE_BASED_METAMODEL_URI, getFileURI("./metamodels/ETL.ecore").toString());
+			properties.put(EmfModel.PROPERTY_FILE_BASED_METAMODEL_URI, new java.net.URI("metamodels/EOL.ecore").toString());
+			properties.put(EmfModel.PROPERTY_FILE_BASED_METAMODEL_URI, new java.net.URI("metamodels/ETL.ecore").toString());
 		} catch (URISyntaxException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -163,23 +175,5 @@ public class MetricsGenerator {
 			e.printStackTrace();
 		}
 		return emfModel;
-	}
-    
-    protected java.net.URI getFileURI(String fileName) throws URISyntaxException {
-		
-    	System.out.println("1: " + MetricsGenerator.class.toString());
-    	System.out.println("2: " + MetricsGenerator.class.getClassLoader().toString());
-    	
-    	java.net.URI binUri = MetricsGenerator.class.getClassLoader().getResource(fileName).toURI();
-    	java.net.URI uri = null;
-		
-		if (binUri.toString().indexOf("bin") > -1) {
-			uri = new java.net.URI(binUri.toString().replaceAll("bin", "src"));
-		}
-		else {
-			uri = binUri;
-		}
-		
-		return uri;
 	}
 }

@@ -14,7 +14,7 @@ context ETL!ETLModule
 	/*
 		Bad Smell: Merge Rules
 	*/
-	critique MergeRules
+	/*critique MergeRules
 	{
 		guard : self.transformationRules.size() > 0
 		
@@ -45,7 +45,7 @@ context ETL!ETLModule
 		}
 	    
 	    message : "The name of transformation rule " + self.name.name + " should start with a upper-case letter"
-    }
+    }*/
 }
 
 /*
@@ -226,7 +226,7 @@ context ETL!IfStatement
 	*/
 	critique SubstitutingIFELSEChainsWithSwitch
 	{
-		check : self.eContents.select(c | c.isTypeOf(ETL!ExpressionOrStatementBlock) and c.block.statements.exists(s | s.isTypeOf(ETL!AssignmentStatement))).collect( c | c.block.statements.select(s | s.isTypeOf(ETL!AssignmentStatement)).lhs.property.name )->asSet().size() <> 1
+		check : self.eContents.select(c | c.isTypeOf(ETL!ExpressionOrStatementBlock) and c.block.statements.exists(s | s.isTypeOf(ETL!AssignmentStatement))).collect( c | c.block.statements.select(s | s.isTypeOf(ETL!AssignmentStatement) and s.lhs.hasProperty('property')).lhs.property.name )->asSet().size() <> 1
 		
 		message : "The if statement (between lines " + self.region.start.line + " and " + self.region.end.line + ") can be replaced with a Switch or a Hashmap."
     }
@@ -285,6 +285,26 @@ context ETL!MethodCallExpression
 		
 		message : "The OCL expression (between lines " + self.region.start.line + " and " + self.region.end.line + ") has too many OCL expressions, try to split it into operations."
     }
+    
+    /*
+		Bad Smell: Replace allInstances with navigation
+	*/
+	critique ReplaceAllInstancesWithNavigation
+	{
+		check : self.method.name <> "allInstances"
+		
+		message : "The transformation is using allInstances (between lines " + self.region.start.line + " and " + self.region.end.line + "), consider to use OCL navigation instead."
+    }
+    
+    /*
+		Bad Smell: Replace select/first with any
+	*/
+	critique ReplaceSelectFirst
+	{
+		check : self.method.name <> "first" and self.hasProperty('target') and self.target.method.name <> "select"
+		
+		message : "The method between lines " + self.region.start.line + " and " + self.region.end.line + " is using a select()->first() navigation, use selectFirst() instead for better performance."
+    }
 }
 
 /*
@@ -310,7 +330,21 @@ context ETL!PropertyCallExpression
 		
 		message : "The rule " + parentRule.name.name + " (between lines " + parentRule.region.start.line + " and " + parentRule.region.end.line + ") has target navigation (attribute: " + self.target.name + ") which is unsafe as those variables could be without definition, consider the use of lazy rules and equivalents to control the flow of the execution."
     }
+    
+    /*
+		Bad Smell: Replace allInstances with navigation
+	*/
+	critique ReplaceAllInstancesWithNavigation
+	{
+		check : self.property.name <> "allInstances"
+		
+		message : "The transformation is using allInstances (between lines " + self.region.start.line + " and " + self.region.end.line + "), consider to use OCL navigation instead."
+    }
 }
+
+/*
+** MethodCallExpression: self.method.name <> "first" and self.target.method.name = "select"
+*/
 
 /*
 * Operations
