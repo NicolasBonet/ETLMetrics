@@ -37,8 +37,11 @@ public class EvlStandaloneExample extends EpsilonStandaloneExample {
 
 	@Override
 	public List<IModel> getModels() throws Exception {
+		
+		System.out.println(modelUri);
+		
 		List<IModel> models = new ArrayList<IModel>();
-		models.add(createEmfModel("ETL", modelUri, "metamodels/EOL.ecore", true, true));
+		models.add(createEmfModelByURI("ETL", modelUri, "metamodels/ETL.ecore", true, true));
 		return models;
 	}
 

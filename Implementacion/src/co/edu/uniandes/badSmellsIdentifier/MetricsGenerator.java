@@ -1,6 +1,7 @@
 package co.edu.uniandes.badSmellsIdentifier;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -100,6 +101,8 @@ public class MetricsGenerator {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			break;
 		}
 	}
 	
@@ -137,18 +140,22 @@ public class MetricsGenerator {
     protected void registerMetamodel(URI metamodelUri)
     {
     	Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("ecore", new EcoreResourceFactoryImpl());
-
-		ResourceSet rs = new ResourceSetImpl();
-		// enable extended metadata
-		final ExtendedMetaData extendedMetaData = new BasicExtendedMetaData(rs.getPackageRegistry());
-		rs.getLoadOptions().put(XMLResource.OPTION_EXTENDED_META_DATA,
-		    extendedMetaData);
+    	
+    	ResourceSet resourceSet = new ResourceSetImpl(); 
+		Resource myMetaModel= resourceSet.getResource(URI.createFileURI("metamodels/EOL.ecore"), true);
+		EPackage univEPackage = (EPackage) myMetaModel.getContents().get(0);
+		resourceSet.getPackageRegistry().put("http://www.eclipse.org/epsilon/eol", univEPackage);
 		
-		Resource r = rs.getResource(metamodelUri, true);
-		EObject eObject = r.getContents().get(0);
-		if (eObject instanceof EPackage) {
-		    EPackage p = (EPackage)eObject;
-		    rs.getPackageRegistry().put(p.getNsURI(), p);
+		Resource myMetaModel2 = resourceSet.getResource(URI.createFileURI("metamodels/ETL.ecore"), true);
+		EPackage univEPackage2 = (EPackage) myMetaModel2.getContents().get(0);
+		resourceSet.getPackageRegistry().put("http://www.eclipse.org/epsilon/etl", univEPackage2);
+		
+		try {
+			myMetaModel.save(null);
+			myMetaModel2.save(null);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
     }
     

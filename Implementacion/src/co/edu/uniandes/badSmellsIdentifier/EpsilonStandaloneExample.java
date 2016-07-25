@@ -10,6 +10,7 @@
  ******************************************************************************/
 package co.edu.uniandes.badSmellsIdentifier;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -45,9 +46,7 @@ public abstract class EpsilonStandaloneExample {
 	public void execute() throws Exception {
 		
 		module = createModule();
-		module.parse(
-				getFileURI(
-						getSource()));
+		module.parse(new File(getSource()));
 		
 		if (module.getParseProblems().size() > 0) {
 			System.err.println("Parse errors occured...");
@@ -81,44 +80,35 @@ public abstract class EpsilonStandaloneExample {
 		return module.execute();
 	}
 	
-	protected EmfModel createEmfModel(String name, String model, 
-			String metamodel, boolean readOnLoad, boolean storeOnDisposal) 
-					throws EolModelLoadingException, URISyntaxException {
+	protected EmfModel createEmfModel(String name, String model, String metamodel, boolean readOnLoad, boolean storeOnDisposal) throws EolModelLoadingException, URISyntaxException {
 		EmfModel emfModel = new EmfModel();
 		StringProperties properties = new StringProperties();
 		properties.put(EmfModel.PROPERTY_NAME, name);
-		properties.put(EmfModel.PROPERTY_FILE_BASED_METAMODEL_URI,
-				getFileURI(metamodel).toString());
-		properties.put(EmfModel.PROPERTY_MODEL_URI, 
-				getFileURI(model).toString());
+		properties.put(EmfModel.PROPERTY_FILE_BASED_METAMODEL_URI, "file://" + new File(metamodel).getAbsolutePath());
+		properties.put(EmfModel.PROPERTY_MODEL_URI, "file://" + new File(model).getAbsolutePath());
 		properties.put(EmfModel.PROPERTY_READONLOAD, readOnLoad + "");
-		properties.put(EmfModel.PROPERTY_STOREONDISPOSAL, 
-				storeOnDisposal + "");
+		properties.put(EmfModel.PROPERTY_STOREONDISPOSAL, storeOnDisposal + "");
 		emfModel.load(properties, (IRelativePathResolver) null);
 		return emfModel;
 	}
 
-	protected EmfModel createEmfModelByURI(String name, String model, 
-			String metamodel, boolean readOnLoad, boolean storeOnDisposal) 
-					throws EolModelLoadingException, URISyntaxException {
+	protected EmfModel createEmfModelByURI(String name, String model, String metamodel, boolean readOnLoad, boolean storeOnDisposal) throws EolModelLoadingException, URISyntaxException {
 		EmfModel emfModel = new EmfModel();
 		StringProperties properties = new StringProperties();
 		properties.put(EmfModel.PROPERTY_NAME, name);
-		properties.put(EmfModel.PROPERTY_METAMODEL_URI, metamodel);
-		properties.put(EmfModel.PROPERTY_MODEL_URI, 
-				getFileURI(model).toString());
+		properties.put(EmfModel.PROPERTY_METAMODEL_URI, "http://www.eclipse.org/epsilon/etl,http://www.eclipse.org/epsilon/eol");
+		properties.put(EmfModel.PROPERTY_MODEL_URI, "file://" + new File(model).getAbsolutePath());
 		properties.put(EmfModel.PROPERTY_READONLOAD, readOnLoad + "");
-		properties.put(EmfModel.PROPERTY_STOREONDISPOSAL, 
-				storeOnDisposal + "");
+		properties.put(EmfModel.PROPERTY_STOREONDISPOSAL, storeOnDisposal + "");
 		emfModel.load(properties, (IRelativePathResolver) null);
 		return emfModel;
 	}
 
 	protected URI getFileURI(String fileName) throws URISyntaxException {
 		
-		System.out.println("1: " + fileName);
+		/*System.out.println("1: " + fileName);
 		System.out.println("2: " + EpsilonStandaloneExample.class.toGenericString());
-		System.out.println("3: " + EpsilonStandaloneExample.class.getResource(fileName).toString());
+		System.out.println("3: " + EpsilonStandaloneExample.class.getResource(fileName).toString());*/
 		
 		return EpsilonStandaloneExample.class.getResource(fileName).toURI();
 	}
