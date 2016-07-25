@@ -2,7 +2,7 @@
 * Settings
 */
 pre{
-	var threshold_complex_ocl = 3;
+	var threshold_complex_ocl = 5;
 	var threhold_output_code = 5;
 }
 
@@ -281,9 +281,9 @@ context ETL!MethodCallExpression
 	{
 		guard : self.eContents.size() > 0
 		
-		check : self.eContents.select(e | e.isTypeOf(ETL!MethodCallExpression) or e.isTypeOf(ETL!FOLMethodCallExpression)).size() < threshold_complex_ocl
+		check : self.countComplexOperations(0) < threshold_complex_ocl
 		
-		message : "The OCL expression (between lines " + self.region.start.line + " and " + self.region.end.line + ") has too many OCL expressions, try to split it into operations."
+		message : "The OCL expression (between lines " + self.region.start.line + " and " + self.region.end.line + ") has too many OCL expressions (" + self.countComplexOperations(0) + "), try to split it into operations."
     }
     
     /*
@@ -359,4 +359,17 @@ operation Any findParentRule(): ETL!TransformationRule
 		return self.container;
 	else
 		return self.container.findParentRule();
+}
+
+operation Any countComplexOperations(i) : Integer
+{
+	for (c in self.eContents)
+	{
+		if (c.isTypeOf(ETL!MethodCallExpression) or c.isTypeOf(ETL!FOLMethodCallExpression))
+			i = i + 1;
+		
+		i = i + c.countComplexOperations(0);
+	}
+	
+	return i;
 }
