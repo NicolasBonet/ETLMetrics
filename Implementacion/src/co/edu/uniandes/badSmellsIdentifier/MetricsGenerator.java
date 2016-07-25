@@ -1,6 +1,7 @@
 package co.edu.uniandes.badSmellsIdentifier;
 
 import java.io.File;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -149,14 +150,7 @@ public class MetricsGenerator {
 		Resource myMetaModel2 = resourceSet.getResource(URI.createFileURI("metamodels/ETL.ecore"), true);
 		EPackage univEPackage2 = (EPackage) myMetaModel2.getContents().get(0);
 		resourceSet.getPackageRegistry().put("http://www.eclipse.org/epsilon/etl", univEPackage2);
-		
-		try {
-			myMetaModel.save(null);
-			myMetaModel2.save(null);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		System.out.println("Tam: " + resourceSet.getPackageRegistry().size());
     }
     
     protected EmfModel createEmfModel(String name, String model, boolean readOnLoad, boolean storeOnDisposal) {

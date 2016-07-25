@@ -1,5 +1,21 @@
 rule Blog2Calendar
 	transform b: Blog!Blog
 	to c: Calendar!Calendar{
-		var newVar = c.select(y|y.year = year.year).first();
+	
+		s = algo.select(a | a.isTrue = true).first();
+	
+		testPackage.
+		classes.
+		addAll(p.packages.select(p|p.name == "entities").
+		classes.
+		flatten().
+		reject(e|e.attributes.size() == e.attributes
+			.select(
+				a|a.annotateAttribute
+				.collect(i|i.name)
+				.contains("@Id")
+			)
+			.size()
+		)
+		.collect(e|e.testEntityClass()));
 	}

@@ -2,12 +2,12 @@
 <etl:ETLModule xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:eol="http://www.eclipse.org/epsilon/eol" xmlns:etl="http://www.eclipse.org/epsilon/etl">
   <region>
     <start line="1"/>
-    <end line="5" column="2"/>
+    <end line="21" column="2"/>
   </region>
   <transformationRules container="/">
     <region>
       <start line="1"/>
-      <end line="5" column="2"/>
+      <end line="21" column="2"/>
     </region>
     <name container="//@transformationRules.0" name="Blog2Calendar">
       <region>
@@ -53,122 +53,512 @@
     </targets>
     <body container="//@transformationRules.0">
       <region>
-        <start line="4" column="2"/>
-        <end line="4" column="54"/>
+        <start line="5" column="2"/>
+        <end line="20" column="35"/>
       </region>
       <statements xsi:type="eol:AssignmentStatement" container="//@transformationRules.0/@body">
         <region>
-          <start line="4" column="2"/>
-          <end line="4" column="54"/>
+          <start line="5" column="2"/>
+          <end line="5" column="47"/>
         </region>
-        <lhs xsi:type="eol:VariableDeclarationExpression" container="//@transformationRules.0/@body/@statements.0">
+        <lhs xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.0" name="s">
           <region>
-            <start line="4" column="2"/>
-            <end line="4" column="12"/>
+            <start line="5" column="2"/>
+            <end line="5" column="3"/>
           </region>
-          <resolvedType xsi:type="eol:AnyType" container="//@transformationRules.0/@body/@statements.0/@lhs">
-            <region>
-              <start line="4" column="2"/>
-              <end line="4" column="12"/>
-            </region>
-          </resolvedType>
-          <name container="//@transformationRules.0/@body/@statements.0/@lhs" name="newVar">
-            <region>
-              <start line="4" column="6"/>
-              <end line="4" column="12"/>
-            </region>
-          </name>
         </lhs>
         <rhs xsi:type="eol:MethodCallExpression" container="//@transformationRules.0/@body/@statements.0">
           <region>
-            <start line="4" column="15"/>
-            <end line="4" column="53"/>
+            <start line="5" column="6"/>
+            <end line="5" column="46"/>
           </region>
           <target xsi:type="eol:FOLMethodCallExpression" container="//@transformationRules.0/@body/@statements.0/@rhs">
             <region>
-              <start line="4" column="15"/>
-              <end line="4" column="45"/>
+              <start line="5" column="6"/>
+              <end line="5" column="38"/>
             </region>
-            <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.0/@rhs/@target" name="c">
+            <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.0/@rhs/@target" name="algo">
               <region>
-                <start line="4" column="15"/>
-                <end line="4" column="16"/>
+                <start line="5" column="6"/>
+                <end line="5" column="10"/>
               </region>
             </target>
             <iterator container="//@transformationRules.0/@body/@statements.0/@rhs/@target">
               <region>
-                <start line="4" column="24"/>
-                <end line="4" column="25"/>
+                <start line="5" column="18"/>
+                <end line="5" column="19"/>
               </region>
               <resolvedType xsi:type="eol:AnyType" container="//@transformationRules.0/@body/@statements.0/@rhs/@target/@iterator">
                 <region>
-                  <start line="4" column="24"/>
-                  <end line="4" column="25"/>
+                  <start line="5" column="18"/>
+                  <end line="5" column="19"/>
                 </region>
               </resolvedType>
-              <name container="//@transformationRules.0/@body/@statements.0/@rhs/@target/@iterator" name="y">
+              <name container="//@transformationRules.0/@body/@statements.0/@rhs/@target/@iterator" name="a">
                 <region>
-                  <start line="4" column="24"/>
-                  <end line="4" column="25"/>
+                  <start line="5" column="18"/>
+                  <end line="5" column="19"/>
                 </region>
               </name>
             </iterator>
             <conditions xsi:type="eol:EqualsOperatorExpression" container="//@transformationRules.0/@body/@statements.0/@rhs/@target">
               <region>
-                <start line="4" column="26"/>
-                <end line="4" column="44"/>
+                <start line="5" column="22"/>
+                <end line="5" column="37"/>
               </region>
               <lhs xsi:type="eol:PropertyCallExpression" container="//@transformationRules.0/@body/@statements.0/@rhs/@target/@conditions.0">
                 <region>
-                  <start line="4" column="26"/>
-                  <end line="4" column="32"/>
+                  <start line="5" column="22"/>
+                  <end line="5" column="30"/>
                 </region>
-                <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.0/@rhs/@target/@conditions.0/@lhs" name="y">
+                <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.0/@rhs/@target/@conditions.0/@lhs" name="a">
                   <region>
-                    <start line="4" column="26"/>
-                    <end line="4" column="27"/>
+                    <start line="5" column="22"/>
+                    <end line="5" column="23"/>
                   </region>
                 </target>
-                <property container="//@transformationRules.0/@body/@statements.0/@rhs/@target/@conditions.0/@lhs" name="year">
+                <property container="//@transformationRules.0/@body/@statements.0/@rhs/@target/@conditions.0/@lhs" name="isTrue">
                   <region>
-                    <start line="4" column="28"/>
-                    <end line="4" column="32"/>
+                    <start line="5" column="24"/>
+                    <end line="5" column="30"/>
                   </region>
                 </property>
               </lhs>
-              <rhs xsi:type="eol:PropertyCallExpression" container="//@transformationRules.0/@body/@statements.0/@rhs/@target/@conditions.0">
+              <rhs xsi:type="eol:BooleanExpression" container="//@transformationRules.0/@body/@statements.0/@rhs/@target/@conditions.0" value="true">
                 <region>
-                  <start line="4" column="35"/>
-                  <end line="4" column="44"/>
+                  <start line="5" column="33"/>
+                  <end line="5" column="37"/>
                 </region>
-                <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.0/@rhs/@target/@conditions.0/@rhs" name="year">
+                <resolvedType xsi:type="eol:BooleanType" container="//@transformationRules.0/@body/@statements.0/@rhs/@target/@conditions.0/@rhs">
                   <region>
-                    <start line="4" column="35"/>
-                    <end line="4" column="39"/>
+                    <start line="5" column="33"/>
+                    <end line="5" column="37"/>
                   </region>
-                </target>
-                <property container="//@transformationRules.0/@body/@statements.0/@rhs/@target/@conditions.0/@rhs" name="year">
-                  <region>
-                    <start line="4" column="40"/>
-                    <end line="4" column="44"/>
-                  </region>
-                </property>
+                </resolvedType>
               </rhs>
             </conditions>
             <method container="//@transformationRules.0/@body/@statements.0/@rhs/@target" name="select">
               <region>
-                <start line="4" column="17"/>
-                <end line="4" column="45"/>
+                <start line="5" column="11"/>
+                <end line="5" column="38"/>
               </region>
             </method>
           </target>
           <method container="//@transformationRules.0/@body/@statements.0/@rhs" name="first">
             <region>
-              <start line="4" column="46"/>
-              <end line="4" column="53"/>
+              <start line="5" column="39"/>
+              <end line="5" column="46"/>
             </region>
           </method>
         </rhs>
+      </statements>
+      <statements xsi:type="eol:ExpressionStatement" container="//@transformationRules.0/@body">
+        <region>
+          <start line="7" column="2"/>
+          <end line="20" column="35"/>
+        </region>
+        <expression xsi:type="eol:MethodCallExpression" container="//@transformationRules.0/@body/@statements.1">
+          <region>
+            <start line="7" column="2"/>
+            <end line="20" column="35"/>
+          </region>
+          <target xsi:type="eol:PropertyCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression">
+            <region>
+              <start line="7" column="2"/>
+              <end line="8" column="9"/>
+            </region>
+            <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@target" name="testPackage">
+              <region>
+                <start line="7" column="2"/>
+                <end line="7" column="13"/>
+              </region>
+            </target>
+            <property container="//@transformationRules.0/@body/@statements.1/@expression/@target" name="classes">
+              <region>
+                <start line="8" column="2"/>
+                <end line="8" column="9"/>
+              </region>
+            </property>
+          </target>
+          <arguments xsi:type="eol:FOLMethodCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression">
+            <region>
+              <start line="9" column="9"/>
+              <end line="20" column="33"/>
+            </region>
+            <target xsi:type="eol:FOLMethodCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0">
+              <region>
+                <start line="9" column="9"/>
+                <end line="19" column="3"/>
+              </region>
+              <target xsi:type="eol:MethodCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target">
+                <region>
+                  <start line="9" column="9"/>
+                  <end line="11" column="11"/>
+                </region>
+                <target xsi:type="eol:PropertyCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target">
+                  <region>
+                    <start line="9" column="9"/>
+                    <end line="10" column="9"/>
+                  </region>
+                  <target xsi:type="eol:FOLMethodCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target/@target">
+                    <region>
+                      <start line="9" column="9"/>
+                      <end line="9" column="50"/>
+                    </region>
+                    <target xsi:type="eol:PropertyCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target/@target/@target">
+                      <region>
+                        <start line="9" column="9"/>
+                        <end line="9" column="19"/>
+                      </region>
+                      <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target/@target/@target/@target" name="p">
+                        <region>
+                          <start line="9" column="9"/>
+                          <end line="9" column="10"/>
+                        </region>
+                      </target>
+                      <property container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target/@target/@target/@target" name="packages">
+                        <region>
+                          <start line="9" column="11"/>
+                          <end line="9" column="19"/>
+                        </region>
+                      </property>
+                    </target>
+                    <iterator container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target/@target/@target">
+                      <region>
+                        <start line="9" column="27"/>
+                        <end line="9" column="28"/>
+                      </region>
+                      <resolvedType xsi:type="eol:AnyType" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target/@target/@target/@iterator">
+                        <region>
+                          <start line="9" column="27"/>
+                          <end line="9" column="28"/>
+                        </region>
+                      </resolvedType>
+                      <name container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target/@target/@target/@iterator" name="p">
+                        <region>
+                          <start line="9" column="27"/>
+                          <end line="9" column="28"/>
+                        </region>
+                      </name>
+                    </iterator>
+                    <conditions xsi:type="eol:EqualsOperatorExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target/@target/@target">
+                      <region>
+                        <start line="9" column="29"/>
+                        <end line="9" column="49"/>
+                      </region>
+                      <lhs xsi:type="eol:PropertyCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target/@target/@target/@conditions.0">
+                        <region>
+                          <start line="9" column="29"/>
+                          <end line="9" column="35"/>
+                        </region>
+                        <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target/@target/@target/@conditions.0/@lhs" name="p">
+                          <region>
+                            <start line="9" column="29"/>
+                            <end line="9" column="30"/>
+                          </region>
+                        </target>
+                        <property container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target/@target/@target/@conditions.0/@lhs" name="name">
+                          <region>
+                            <start line="9" column="31"/>
+                            <end line="9" column="35"/>
+                          </region>
+                        </property>
+                      </lhs>
+                      <rhs xsi:type="eol:StringExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target/@target/@target/@conditions.0" value="entities">
+                        <region>
+                          <start line="9" column="39"/>
+                          <end line="9" column="49"/>
+                        </region>
+                        <resolvedType xsi:type="eol:StringType" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target/@target/@target/@conditions.0/@rhs">
+                          <region>
+                            <start line="9" column="39"/>
+                            <end line="9" column="49"/>
+                          </region>
+                        </resolvedType>
+                      </rhs>
+                    </conditions>
+                    <method container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target/@target/@target" name="select">
+                      <region>
+                        <start line="9" column="20"/>
+                        <end line="9" column="50"/>
+                      </region>
+                    </method>
+                  </target>
+                  <property container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target/@target" name="classes">
+                    <region>
+                      <start line="10" column="2"/>
+                      <end line="10" column="9"/>
+                    </region>
+                  </property>
+                </target>
+                <method container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@target" name="flatten">
+                  <region>
+                    <start line="11" column="2"/>
+                    <end line="11" column="11"/>
+                  </region>
+                </method>
+              </target>
+              <iterator container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target">
+                <region>
+                  <start line="12" column="9"/>
+                  <end line="12" column="10"/>
+                </region>
+                <resolvedType xsi:type="eol:AnyType" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@iterator">
+                  <region>
+                    <start line="12" column="9"/>
+                    <end line="12" column="10"/>
+                  </region>
+                </resolvedType>
+                <name container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@iterator" name="e">
+                  <region>
+                    <start line="12" column="9"/>
+                    <end line="12" column="10"/>
+                  </region>
+                </name>
+              </iterator>
+              <conditions xsi:type="eol:EqualsOperatorExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target">
+                <region>
+                  <start line="12" column="11"/>
+                  <end line="18" column="10"/>
+                </region>
+                <lhs xsi:type="eol:MethodCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0">
+                  <region>
+                    <start line="12" column="11"/>
+                    <end line="12" column="30"/>
+                  </region>
+                  <target xsi:type="eol:PropertyCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@lhs">
+                    <region>
+                      <start line="12" column="11"/>
+                      <end line="12" column="23"/>
+                    </region>
+                    <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@lhs/@target" name="e">
+                      <region>
+                        <start line="12" column="11"/>
+                        <end line="12" column="12"/>
+                      </region>
+                    </target>
+                    <property container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@lhs/@target" name="attributes">
+                      <region>
+                        <start line="12" column="13"/>
+                        <end line="12" column="23"/>
+                      </region>
+                    </property>
+                  </target>
+                  <method container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@lhs" name="size">
+                    <region>
+                      <start line="12" column="24"/>
+                      <end line="12" column="30"/>
+                    </region>
+                  </method>
+                </lhs>
+                <rhs xsi:type="eol:MethodCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0">
+                  <region>
+                    <start line="12" column="34"/>
+                    <end line="18" column="10"/>
+                  </region>
+                  <target xsi:type="eol:FOLMethodCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs">
+                    <region>
+                      <start line="12" column="34"/>
+                      <end line="17" column="4"/>
+                    </region>
+                    <target xsi:type="eol:PropertyCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target">
+                      <region>
+                        <start line="12" column="34"/>
+                        <end line="12" column="46"/>
+                      </region>
+                      <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@target" name="e">
+                        <region>
+                          <start line="12" column="34"/>
+                          <end line="12" column="35"/>
+                        </region>
+                      </target>
+                      <property container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@target" name="attributes">
+                        <region>
+                          <start line="12" column="36"/>
+                          <end line="12" column="46"/>
+                        </region>
+                      </property>
+                    </target>
+                    <iterator container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target">
+                      <region>
+                        <start line="14" column="4"/>
+                        <end line="14" column="5"/>
+                      </region>
+                      <resolvedType xsi:type="eol:AnyType" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@iterator">
+                        <region>
+                          <start line="14" column="4"/>
+                          <end line="14" column="5"/>
+                        </region>
+                      </resolvedType>
+                      <name container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@iterator" name="a">
+                        <region>
+                          <start line="14" column="4"/>
+                          <end line="14" column="5"/>
+                        </region>
+                      </name>
+                    </iterator>
+                    <conditions xsi:type="eol:MethodCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target">
+                      <region>
+                        <start line="14" column="6"/>
+                        <end line="16" column="20"/>
+                      </region>
+                      <target xsi:type="eol:FOLMethodCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@conditions.0">
+                        <region>
+                          <start line="14" column="6"/>
+                          <end line="15" column="22"/>
+                        </region>
+                        <target xsi:type="eol:PropertyCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@conditions.0/@target">
+                          <region>
+                            <start line="14" column="6"/>
+                            <end line="14" column="25"/>
+                          </region>
+                          <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@conditions.0/@target/@target" name="a">
+                            <region>
+                              <start line="14" column="6"/>
+                              <end line="14" column="7"/>
+                            </region>
+                          </target>
+                          <property container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@conditions.0/@target/@target" name="annotateAttribute">
+                            <region>
+                              <start line="14" column="8"/>
+                              <end line="14" column="25"/>
+                            </region>
+                          </property>
+                        </target>
+                        <iterator container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@conditions.0/@target">
+                          <region>
+                            <start line="15" column="13"/>
+                            <end line="15" column="14"/>
+                          </region>
+                          <resolvedType xsi:type="eol:AnyType" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@conditions.0/@target/@iterator">
+                            <region>
+                              <start line="15" column="13"/>
+                              <end line="15" column="14"/>
+                            </region>
+                          </resolvedType>
+                          <name container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@conditions.0/@target/@iterator" name="i">
+                            <region>
+                              <start line="15" column="13"/>
+                              <end line="15" column="14"/>
+                            </region>
+                          </name>
+                        </iterator>
+                        <conditions xsi:type="eol:PropertyCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@conditions.0/@target">
+                          <region>
+                            <start line="15" column="15"/>
+                            <end line="15" column="21"/>
+                          </region>
+                          <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@conditions.0/@target/@conditions.0" name="i">
+                            <region>
+                              <start line="15" column="15"/>
+                              <end line="15" column="16"/>
+                            </region>
+                          </target>
+                          <property container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@conditions.0/@target/@conditions.0" name="name">
+                            <region>
+                              <start line="15" column="17"/>
+                              <end line="15" column="21"/>
+                            </region>
+                          </property>
+                        </conditions>
+                        <method container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@conditions.0/@target" name="collect">
+                          <region>
+                            <start line="15" column="5"/>
+                            <end line="15" column="22"/>
+                          </region>
+                        </method>
+                      </target>
+                      <arguments xsi:type="eol:StringExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@conditions.0" value="@Id">
+                        <region>
+                          <start line="16" column="14"/>
+                          <end line="16" column="19"/>
+                        </region>
+                        <resolvedType xsi:type="eol:StringType" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@conditions.0/@arguments.0">
+                          <region>
+                            <start line="16" column="14"/>
+                            <end line="16" column="19"/>
+                          </region>
+                        </resolvedType>
+                      </arguments>
+                      <method container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target/@conditions.0" name="contains">
+                        <region>
+                          <start line="16" column="5"/>
+                          <end line="16" column="20"/>
+                        </region>
+                      </method>
+                    </conditions>
+                    <method container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs/@target" name="select">
+                      <region>
+                        <start line="13" column="4"/>
+                        <end line="17" column="4"/>
+                      </region>
+                    </method>
+                  </target>
+                  <method container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target/@conditions.0/@rhs" name="size">
+                    <region>
+                      <start line="18" column="4"/>
+                      <end line="18" column="10"/>
+                    </region>
+                  </method>
+                </rhs>
+              </conditions>
+              <method container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@target" name="reject">
+                <region>
+                  <start line="12" column="2"/>
+                  <end line="19" column="3"/>
+                </region>
+              </method>
+            </target>
+            <iterator container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0">
+              <region>
+                <start line="20" column="11"/>
+                <end line="20" column="12"/>
+              </region>
+              <resolvedType xsi:type="eol:AnyType" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@iterator">
+                <region>
+                  <start line="20" column="11"/>
+                  <end line="20" column="12"/>
+                </region>
+              </resolvedType>
+              <name container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@iterator" name="e">
+                <region>
+                  <start line="20" column="11"/>
+                  <end line="20" column="12"/>
+                </region>
+              </name>
+            </iterator>
+            <conditions xsi:type="eol:MethodCallExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0">
+              <region>
+                <start line="20" column="13"/>
+                <end line="20" column="32"/>
+              </region>
+              <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@conditions.0" name="e">
+                <region>
+                  <start line="20" column="13"/>
+                  <end line="20" column="14"/>
+                </region>
+              </target>
+              <method container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0/@conditions.0" name="testEntityClass">
+                <region>
+                  <start line="20" column="15"/>
+                  <end line="20" column="32"/>
+                </region>
+              </method>
+            </conditions>
+            <method container="//@transformationRules.0/@body/@statements.1/@expression/@arguments.0" name="collect">
+              <region>
+                <start line="20" column="3"/>
+                <end line="20" column="33"/>
+              </region>
+            </method>
+          </arguments>
+          <method container="//@transformationRules.0/@body/@statements.1/@expression" name="addAll">
+            <region>
+              <start line="9" column="2"/>
+              <end line="20" column="34"/>
+            </region>
+          </method>
+        </expression>
       </statements>
     </body>
   </transformationRules>
