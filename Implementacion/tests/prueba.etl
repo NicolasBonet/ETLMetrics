@@ -1,21 +1,79 @@
-rule Blog2Calendar
-	transform b: Blog!Blog
-	to c: Calendar!Calendar{
+pre {
+	"Inicio de transformacion M2M Gui2Html5".println();
+}
+
+rule Gui2WebApp
+transform g:gui!GUI
+to h:html!WebApplication{
+	h.html = g.forms.equivalent();
+}
+
+@lazy
+rule Forms2Html
+transform g:gui!Form
+to  h:html!HTML{
+	h.name = g.name;
+	h.body = new html!Body;
+	h.head = new html!Head;
+	h.body.form = g.layouts.equivalent();
 	
-		s = algo.select(a | a.isTrue = true).first();
-	
-		testPackage.
-		classes.
-		addAll(p.packages.select(p|p.name == "entities").
-		classes.
-		flatten().
-		reject(e|e.attributes.size() == e.attributes
-			.select(
-				a|a.annotateAttribute
-				.collect(i|i.name)
-				.contains("@Id")
-			)
-			.size()
-		)
-		.collect(e|e.testEntityClass()));
-	}
+}
+
+@lazy
+rule Layout2Form
+transform g:gui!Layout
+to  h:html!Form{	
+	var tipo = "";
+	h.name = g.name;
+		
+	switch(g.type){
+		case gui!Attribute#Linear:
+			tipo = "lineal";
+		break;
+		default:
+			tipo = "tabla";
+		break;
+	}	
+	h.value=tipo;
+	h.input = g.graphicalcomponent.equivalent();
+}
+
+@lazy
+rule Field2Input
+transform g:gui!Field
+to  h:html!Input{
+	h.name = g.name;
+	h.value = g.value;
+}  
+
+@lazy
+rule Button2Button
+transform g:gui!Button
+to  h:html!Button{	
+	h.name = g.name;
+	h.value = g.value;	
+} 
+
+@lazy
+rule DDL2SelOpt
+transform g:gui!DropDownList
+to  h:html!SelectOption{	
+	h.name = g.name;
+	h.value = g.value;	
+} 
+
+@lazy
+rule Label2Span
+transform g:gui!Label
+to  h:html!Span{	
+	h.name = g.name;
+	h.value = g.value;	
+}
+
+@lazy
+rule Table2Table
+transform g:gui!Table
+to  h:html!Table{	
+	h.name = g.name;
+	h.value = g.value;	
+}

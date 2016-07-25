@@ -7,48 +7,6 @@ pre{
 }
 
 /*
-* ETL Module
-*/
-context ETL!ETLModule
-{
-	/*
-		Bad Smell: Merge Rules
-	*/
-	/*critique MergeRules
-	{
-		guard : self.transformationRules.size() > 0
-		
-		check {
-		 
-			var bindings = new Map;
-			
-			// First get all bindings for a rule
-			for (rule in self.transformationRules)
-			{
-				var ruleStatements = rule.body.statements.select(s | s.isTypeOf(AssignmentStatement));
-				var ruleSequence : new Sequence;
-				
-				for (rs in ruleStatements)
-				{
-					ruleSequence.append(rs.lhs.name.name + "=" + rs.rhs.name.name);
-				}
-				
-				bindings.put(rule.name.name, ruleSequence);
-			}
-			
-			// Now verify if they are similar
-			for (rule in self.transformationRules)
-			{
-				var ruleStatements = rule.body.statements.select(s | s.isTypeOf(AssignmentStatement));
-				
-			}
-		}
-	    
-	    message : "The name of transformation rule " + self.name.name + " should start with a upper-case letter"
-    }*/
-}
-
-/*
 * Rules
 */
 context ETL!TransformationRule
@@ -124,6 +82,57 @@ context ETL!TransformationRule
 		
 		message : "The rule " + self.name.name + " (between lines " + self.region.start.line + " and " + self.region.end.line + ") has an if as its only child, consider the use of guards to factorize it."
     }
+    
+    /*
+		Bad Smell: Merge Rules
+	*/
+	critique MergeRules
+	{
+		guard : self.container.transformationRules.size() > 1
+		
+		check {
+		
+			// Variables to enhance warning
+			var ruleCompared = "";
+			var ruleComparedStart = 0;
+			var ruleComparedEnd = 0;
+		 
+		 	// Get rule bindings
+		 	var ruleStatements = self.body.statements.select(s | s.isTypeOf(ETL!AssignmentStatement) and s.lhs.isTypeOf(ETL!PropertyCallExpression) and s.rhs.isTypeOf(PropertyCallExpression));
+			var ruleSequence : new Sequence;
+			
+			for (rs in ruleStatements)
+			{
+				ruleSequence.add(rs.lhs.target.name + "." + rs.lhs.property.name + "=" + rs.rhs.target.name + "." + rs.rhs.property.name);
+			}
+		 	
+			// Now verify if they are similar to other rules
+			for (comparisonRule in self.container.transformationRules.select(s | s <> self))
+			{
+				// Get all bindings
+				var comparisonRuleStatements = comparisonRule.body.statements.select(s | s.isTypeOf(AssignmentStatement) and s.lhs.isTypeOf(ETL!PropertyCallExpression) and s.rhs.isTypeOf(PropertyCallExpression));
+				var comparisonRuleSequence : new Sequence;
+				var clonedRuleSequence = ruleSequence;
+				ruleCompared = comparisonRule.name.name;
+				ruleComparedStart = comparisonRule.region.start.line;
+				ruleComparedEnd = comparisonRule.region.end.line;
+				
+				// Now see if they have them!
+				for (rs in comparisonRuleStatements)
+				{
+					clonedRuleSequence.remove(rs.lhs.target.name + "." + rs.lhs.property.name + "=" + rs.rhs.target.name + "." + rs.rhs.property.name);
+				}
+				
+				// All included?
+				if (clonedRuleSequence.isEmpty())
+					return false;
+			}
+			
+			return true;
+		}
+	    
+	    message : "Transformation rule " + self.name.name + " (between lines #" + self.region.start.line + " and #" + self.region.end.line + ") can be merged with rule " + ruleCompared + "(between lines #" + ruleComparedStart + " and #" + ruleComparedEnd + ")"
+    }
 }
 
 /*
@@ -144,15 +153,15 @@ context ETL!OperationDefinition
     }
     
     /*
-		(NOT WORKING) Bad Smell: Inline Operations
+		Bad Smell: Inline Operations
 	*/
 	critique UseInlineOperations
 	{
 		guard : self.name.name <> ""
 		
-		check : self.container.eAllContents().select(c | c.isTypeOf(MethodCallExpression) and c.method.name = self.name.name).size() = 3
+		check : ETL!MethodCallExpression.allInstances.select(c | c.hasProperty('method') and c.method.name = self.name.name).size() <> 1
 	    
-	    message : "Operation " + self.name.name + " (line #" + self.region.start.line  + ") is only being used once, consider to remove it and place content inside the parent"
+	    message : "Operation " + self.name.name + " (line #" + self.region.start.line  + ") is only being used once, consider to remove it and place content inside the parent: " + ETL!MethodCallExpression.allInstances.select(c | c.hasProperty('method') and c.method.name = self.name.name).size()
     }
     
     /*
@@ -275,7 +284,7 @@ context ETL!Block
 context ETL!MethodCallExpression
 {
 	/*
-		(NOT WORKING) Bad Smell: Extract complex OCL in Operations
+		Bad Smell: Extract complex OCL in Operations
 	*/
 	critique ExtractComplexOCLInOperations
 	{
@@ -283,7 +292,7 @@ context ETL!MethodCallExpression
 		
 		check : self.countComplexOperations(0) < threshold_complex_ocl
 		
-		message : "The OCL expression (between lines " + self.region.start.line + " and " + self.region.end.line + ") has too many OCL expressions (" + self.countComplexOperations(0) + "), try to split it into operations."
+		message : "The OCL expression (between lines " + self.region.start.line + " and " + self.region.end.line + ") has too many OCL expressions, try to split it into operations."
     }
     
     /*
