@@ -20,7 +20,7 @@ context ETL!TransformationRule
 		
 		check : self.name.name.substring(0,1) = self.name.name.substring(0,1).toUpperCase()
 	    
-	    message : "The name of transformation rule " + self.name.name + " should start with a upper-case letter"
+	    message : "[02] The name of transformation rule " + self.name.name + " should start with a upper-case letter"
     }
     
     critique SourceNameShouldStartWitLowerCase
@@ -29,7 +29,7 @@ context ETL!TransformationRule
 	
 		check : self.source.name.name.substring(0,1) = self.source.name.name.substring(0,1).toLowerCase()
 	    
-	    message : "The source parameter " + source.name.name + " of transformation rule " + self.name.name + " should start with a lower-case letter"
+	    message : "[01] The source parameter " + source.name.name + " of transformation rule " + self.name.name + " should start with a lower-case letter"
     }
     
     critique TargetNameShouldStartWitLowerCase
@@ -38,7 +38,7 @@ context ETL!TransformationRule
 	
 		check : self.targets.select(target | target.name.name <> "" and target.name.name.substring(0,1) <> target.name.name.substring(0,1).toLowerCase()).size() = 0
 	    
-	    message : "All target parameters of transformation rule " + self.name.name + " should start with a lower-case letter"
+	    message : "[01] All target parameters of transformation rule " + self.name.name + " should start with a lower-case letter"
     }
     
     /*
@@ -68,7 +68,7 @@ context ETL!TransformationRule
 			return true;
 		}
 		
-		message : "On rule " + self.name.name + " the variable " + nameVariable + " is concatenated multiple times, make sure you're not adding output code on this transformation."
+		message : "[11] On rule " + self.name.name + " the variable " + nameVariable + " is concatenated multiple times, make sure you're not adding output code on this transformation."
 	}
 	
 	/*
@@ -80,7 +80,7 @@ context ETL!TransformationRule
 		
 		check : self.body.statements.select(s | s.isTypeOf(ETL!IfStatement)).size() = 0
 		
-		message : "The rule " + self.name.name + " (between lines " + self.region.start.line + " and " + self.region.end.line + ") has an if as its only child, consider the use of guards to factorize it."
+		message : "[07] The rule " + self.name.name + " (between lines " + self.region.start.line + " and " + self.region.end.line + ") has an if as its only child, consider the use of guards to factorize it."
     }
     
     /*
@@ -131,7 +131,7 @@ context ETL!TransformationRule
 			return true;
 		}
 	    
-	    message : "Transformation rule " + self.name.name + " (between lines #" + self.region.start.line + " and #" + self.region.end.line + ") can be merged with rule " + ruleCompared + "(between lines #" + ruleComparedStart + " and #" + ruleComparedEnd + ")"
+	    message : "[05] Transformation rule " + self.name.name + " (between lines #" + self.region.start.line + " and #" + self.region.end.line + ") can be merged with rule " + ruleCompared + "(between lines #" + ruleComparedStart + " and #" + ruleComparedEnd + ")"
     }
 }
 
@@ -149,7 +149,7 @@ context ETL!OperationDefinition
 		
 		check : self.name.name.substring(0,1) = self.name.name.substring(0,1).toLowerCase()
 	    
-	    message : "The name of operation " + self.name.name + " (line #" + self.region.start.line  + ") should start with a lower-case letter"
+	    message : "[02] The name of operation " + self.name.name + " (line #" + self.region.start.line  + ") should start with a lower-case letter"
     }
     
     /*
@@ -161,7 +161,7 @@ context ETL!OperationDefinition
 		
 		check : ETL!MethodCallExpression.allInstances.select(c | c.hasProperty('method') and c.method.name = self.name.name).size() <> 1
 	    
-	    message : "Operation " + self.name.name + " (line #" + self.region.start.line  + ") is only being used once, consider to remove it and place content inside the parent: " + ETL!MethodCallExpression.allInstances.select(c | c.hasProperty('method') and c.method.name = self.name.name).size()
+	    message : "[04] Operation " + self.name.name + " (line #" + self.region.start.line  + ") is only being used once, consider to remove it and place content inside the parent: " + ETL!MethodCallExpression.allInstances.select(c | c.hasProperty('method') and c.method.name = self.name.name).size()
     }
     
     /*
@@ -191,7 +191,7 @@ context ETL!OperationDefinition
 			return true;
 		}
 		
-		message : "On operation " + self.name.name + " the variable " + nameVariable + " is concatenated multiple times, make sure you're not adding output code on this transformation."
+		message : "[11] On operation " + self.name.name + " the variable " + nameVariable + " is concatenated multiple times, make sure you're not adding output code on this transformation."
 	}
 }
 
@@ -203,13 +203,13 @@ context ETL!ForStatement
 	/*
 		Bad Smell: Elements creation in rules
 	*/
-	critique NoElementsCreationOnLoops
+	critique ElementsCreationInLoops
 	{
 		guard : self.body.block.statements.select(s | s.isTypeOf(ETL!AssignmentStatement)).size() > 0
 		
 		check : self.body.block.statements.select(s | s.isTypeOf(ETL!AssignmentStatement) and (s.lhs.isTypeOf(ETL!NewExpression) or s.rhs.isTypeOf(ETL!NewExpression))).size() = 0
 		
-		message : "The for statement (between lines " + self.region.start.line + " and " + self.region.end.line + ") is creating elements, consider to create these as rules."
+		message : "[13] The for statement (between lines " + self.region.start.line + " and " + self.region.end.line + ") is creating elements, consider to create these as rules."
     }
     
     /*
@@ -221,7 +221,7 @@ context ETL!ForStatement
 		
 		check : self.body.block.statements.select(s | s.isTypeOf(ETL!IfStatement)).size() = 0
 		
-		message : "The for statement (between lines " + self.region.start.line + " and " + self.region.end.line + ") has an if as its only child, consider the use of OCL Expressions to factorize it."
+		message : "[12] The for statement (between lines " + self.region.start.line + " and " + self.region.end.line + ") has an if as its only child, consider the use of OCL Expressions to factorize it."
     }
 }
 
@@ -237,7 +237,7 @@ context ETL!IfStatement
 	{
 		check : self.eContents.select(c | c.isTypeOf(ETL!ExpressionOrStatementBlock) and c.block.statements.exists(s | s.isTypeOf(ETL!AssignmentStatement))).collect( c | c.block.statements.select(s | s.isTypeOf(ETL!AssignmentStatement) and s.lhs.hasProperty('property')).lhs.property.name )->asSet().size() <> 1
 		
-		message : "The if statement (between lines " + self.region.start.line + " and " + self.region.end.line + ") can be replaced with a Switch or a Hashmap."
+		message : "[16] The if statement (between lines " + self.region.start.line + " and " + self.region.end.line + ") can be replaced with a Switch or a Hashmap."
     }
 }
 
@@ -274,7 +274,7 @@ context ETL!Block
 			return true;
 		}
 		
-		message : "The target feature " + nameVariable + " being set at lines " + statement.region.start.line + " and " + statement.region.end.line + " was already used before, consider to merge those bindings."
+		message : "[08] The target feature " + nameVariable + " being set at lines " + statement.region.start.line + " and " + statement.region.end.line + " was already used before, consider to merge those bindings."
     }
 }
 
@@ -292,7 +292,7 @@ context ETL!MethodCallExpression
 		
 		check : self.countComplexOperations(0) < threshold_complex_ocl
 		
-		message : "The OCL expression (between lines " + self.region.start.line + " and " + self.region.end.line + ") has too many OCL expressions, try to split it into operations."
+		message : "[03] The OCL expression (between lines " + self.region.start.line + " and " + self.region.end.line + ") has too many OCL expressions, try to split it into operations."
     }
     
     /*
@@ -314,7 +314,7 @@ context ETL!MethodCallExpression
 	
 		check : self.method.name <> "first" or self.target.method.name <> "select"
 		
-		message : "The method between lines " + self.region.start.line + " and " + self.region.end.line + " is using a select()->first() navigation, use selectFirst() instead for better performance."
+		message : "[19] The method between lines " + self.region.start.line + " and " + self.region.end.line + " is using a select()->first() navigation, use selectFirst() instead for better performance."
     }
 }
 
@@ -339,7 +339,7 @@ context ETL!PropertyCallExpression
 			return parentRule.targets.exists( t | t.name.name = self.target.name ) == false;
 		}
 		
-		message : "The rule " + parentRule.name.name + " (between lines " + parentRule.region.start.line + " and " + parentRule.region.end.line + ") has target navigation (attribute: " + self.target.name + ") which is unsafe as those variables could be without definition, consider the use of lazy rules and equivalents to control the flow of the execution."
+		message : "[15] The rule " + parentRule.name.name + " (between lines " + parentRule.region.start.line + " and " + parentRule.region.end.line + ") has target navigation (attribute: " + self.target.name + ") which is unsafe as those variables could be without definition, consider the use of lazy rules and equivalents to control the flow of the execution."
     }
     
     /*
@@ -349,13 +349,9 @@ context ETL!PropertyCallExpression
 	{
 		check : self.property.name <> "allInstances"
 		
-		message : "The transformation is using allInstances (between lines " + self.region.start.line + " and " + self.region.end.line + "), consider to use OCL navigation instead."
+		message : "[20] The transformation is using allInstances (between lines " + self.region.start.line + " and " + self.region.end.line + "), consider to use OCL navigation instead."
     }
 }
-
-/*
-** MethodCallExpression: self.method.name <> "first" and self.target.method.name = "select"
-*/
 
 /*
 * Operations
