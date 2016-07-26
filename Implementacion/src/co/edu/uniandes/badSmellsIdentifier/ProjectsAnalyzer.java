@@ -1,11 +1,11 @@
 package co.edu.uniandes.badSmellsIdentifier;
 
 import java.io.File;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 import org.eclipse.epsilon.common.util.StringProperties;
 import org.eclipse.epsilon.emc.emf.EmfModel;
@@ -25,7 +25,7 @@ import org.eclipse.emf.ecore.util.ExtendedMetaData;
 import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
 
-public class MetricsGenerator {
+public class ProjectsAnalyzer {
 	
 	/**
 	 * INPUT_DIRECTORY is the location of model files
@@ -48,9 +48,14 @@ public class MetricsGenerator {
 	private ArrayList<File> modelFiles;
 	
 	/**
+	 * Here we store all found EVL Constraints
+	 */
+	private HashMap<File, ArrayList<String>> evlConstraints;
+	
+	/**
 	 * This is our constructor
 	 */
-	public MetricsGenerator()
+	public ProjectsAnalyzer()
 	{
 		// Initialize
 		modelFiles = new ArrayList<File>();
@@ -112,7 +117,7 @@ public class MetricsGenerator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MetricsGenerator haetae = new MetricsGenerator();
+		ProjectsAnalyzer haetae = new ProjectsAnalyzer();
 		haetae.processFiles();
 	}
 	
@@ -177,4 +182,14 @@ public class MetricsGenerator {
 		}
 		return emfModel;
 	}
+    
+    public String getOutputDirectory()
+    {
+    	return OUTPUT_DIRECTORY;
+    }
+    
+    public ArrayList<File> getModelFiles()
+    {
+    	return modelFiles;
+    }
 }
