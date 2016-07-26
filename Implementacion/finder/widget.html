@@ -1,0 +1,245 @@
+<!-- Chart.js library to make graphs -->
+<script src="assets/Chart.min.js"></script>
+
+<!-- StackedBars plugin for Chart.js -->
+<script src="assets/Chart.StackedBar.js"></script>
+
+<!-- Our own styles to manage legends -->
+<style type="text/css">
+  @import url("assets/ETLPluginStyle.css");
+</style>
+
+<div class="dashbox">
+	<div class="rules" style="height:100%;">
+		<div class="widget">
+			<div class="widget-row">
+					<div class="widget-span widget-span-6">
+						<h3 class="big">Total of Models:</h3>
+					</div>
+					<div class="widget-span widget-span-6">
+						<h3 class="big">Rules Distribution:</h3>
+					</div>
+			</div>
+			<div class="widget-row">
+					<div class="widget-span widget-span-6">
+						<canvas id="modelsChart" width="250" height="250"></canvas>
+						<div id="legend2" class="chart-legend"></div>
+						<script>
+						var modelsData = [
+						    {
+						        value: <%= get_etl_metric('num_src_models') -%>,
+						        color:"#F7464A",
+						        highlight: "#FF5A5E",
+						        label: "Source Models"
+						    },
+						    {
+						        value: <%= get_etl_metric('num_trg_models') -%>,
+						        color: "#46BFBD",
+						        highlight: "#5AD3D1",
+						        label: "Target Models"
+						    }
+						];
+						var modelsChart = new Chart(document.getElementById("modelsChart").getContext("2d")).Doughnut(modelsData);
+						var legendHolder2 = document.createElement('div');
+						legendHolder2.innerHTML = modelsChart.generateLegend();
+						document.getElementById('legend2').appendChild(legendHolder2);
+						</script>
+					</div>
+					<div class="widget-span widget-span-6">
+						<canvas id="rulesChart" width="250" height="250"></canvas>
+						<div id="legend3" class="chart-legend"></div>
+						<div>Total of rules: #<%= get_etl_metric('num_rules') -%></div>
+						<script>var rulesData = [
+						    {
+						        value: <%= get_etl_metric('num_lazy_rules') -%>,
+						        color:"#F7464A",
+						        highlight: "#FF5A5E",
+						        label: "Lazy"
+						    },
+						    {
+						        value: <%= get_etl_metric('num_abstract_rules') -%>,
+						        color: "#46BFBD",
+						        highlight: "#5AD3D1",
+						        label: "Abstract"
+						    },
+						    {
+						        value: <%= get_etl_metric('num_greedy_rules') -%>,
+						        color: "#FDB45C",
+						        highlight: "#FFC870",
+						        label: "Greedy"
+						    }
+						];
+						
+						var rulesChart = new Chart(document.getElementById("rulesChart").getContext("2d")).Doughnut(rulesData);
+						
+						var legendHolder3 = document.createElement('div');
+						legendHolder3.innerHTML = rulesChart.generateLegend();
+						document.getElementById('legend3').appendChild(legendHolder3);
+						</script>
+					</div>
+			</div>
+		</div>
+		<div class="clear"></div>
+		<div style="float: left; width: 45%;">
+			<h3 class="big">Coverage of Metamodels:</h3>
+			<div id="chart-area">
+				<canvas id="metamodelsChart" width="300" height="250"></canvas>
+				<div id="legend"><ul class="bar-legend"><li><span style="background-color:rgba(220,220,220,0.5)"></span>Covered classes</li><li><span style="background-color:rgba(151,187,205,0.5)"></span>Unconvered classes</li></ul></div>
+			</div>
+			<script type="text/javascript">
+			var data = {
+			    labels: ["Input", "Output"],
+			    datasets: [
+			        {
+			            label: "Covered classes",
+			            fillColor: "rgba(220,220,220,0.5)",
+			            strokeColor: "rgba(220,220,220,0.8)",
+			            highlightFill: "rgba(220,220,220,0.75)",
+			            highlightStroke: "rgba(220,220,220,1)",
+			            data: [<%= get_etl_metric('average_coverage_input_mm') -%>, <%= get_etl_metric('average_coverage_output_mm') -%>]
+			        },
+			        {
+			            label: "Unconvered classes",
+			            fillColor: "rgba(151,187,205,0.5)",
+			            strokeColor: "rgba(151,187,205,0.8)",
+			            highlightFill: "rgba(151,187,205,0.75)",
+			            highlightStroke: "rgba(151,187,205,1)",
+			            data: [<%= get_etl_metric('average_size_input_mm') -%>, <%= get_etl_metric('average_size_output_mm') -%>]
+			        }
+			    ]
+			};
+			
+			var myBarChart = new Chart(document.getElementById("metamodelsChart").getContext("2d")).StackedBar(data);
+			</script>
+		</div>
+		<div style="float: right; width: 45%;">
+			<h3 class="big">Unused Resources:</h3>
+			<div id="unused-resources-chart-area">
+				<canvas id="unusedResources" width="300" height="250"></canvas>
+				<div id="legend"><ul class="bar-legend"><li><span style="background-color:rgba(220,220,220,0.5)"></span>Used Resources</li><li><span style="background-color:rgba(151,187,205,0.5)"></span>Unused Resources</li></ul></div>
+			</div>
+			<script type="text/javascript">
+			var data = {
+			    labels: ["Parameters", "Operations"],
+			    datasets: [
+			        {
+			            label: "Used Resources",
+			            fillColor: "rgba(220,220,220,0.5)",
+			            strokeColor: "rgba(220,220,220,0.8)",
+			            highlightFill: "rgba(220,220,220,0.75)",
+			            highlightStroke: "rgba(220,220,220,1)",
+			            data: [(<%= get_etl_metric('num_parameters') -%> - <%= get_etl_metric('num_useless_parameters') -%>), (<%= get_etl_metric('num_operations') -%> - <%= get_etl_metric('num_useless_operations') -%>)]
+			        },
+			        {
+			            label: "Unused Resources",
+			            fillColor: "rgba(151,187,205,0.5)",
+			            strokeColor: "rgba(151,187,205,0.8)",
+			            highlightFill: "rgba(151,187,205,0.75)",
+			            highlightStroke: "rgba(151,187,205,1)",
+			            data: [<%= get_etl_metric('num_useless_parameters') -%>, <%= get_etl_metric('num_useless_operations') -%>]
+			        }
+			    ]
+			};
+			var unusedResources = new Chart(document.getElementById("unusedResources").getContext("2d")).StackedBar(data);
+			</script>
+		</div>
+		
+		<div class="clear"></div>
+		<h3 class="big">Transformation Complexity:</h3>
+		<div id="transformations-complexity-chart-area">
+			<canvas id="transformationsComplexityChart" width="500" height="250"></canvas>
+		</div>
+		<script type="text/javascript">
+		var data = {
+		    labels: ["Total of if(s)", "Total of iterators", "Total of \"selfs\"", "Calls to isTypeof & isKindOf"],
+		    datasets: [
+		        {
+		            label: "Values",
+		            fillColor: "rgba(220,220,220,0.5)",
+		            strokeColor: "rgba(220,220,220,0.8)",
+		            highlightFill: "rgba(220,220,220,0.75)",
+		            highlightStroke: "rgba(220,220,220,1)",
+		            data: [<%= get_etl_metric('num_if') -%>, <%= get_etl_metric('num_iterators') -%>, <%= get_etl_metric('num_self') -%>, <%= get_etl_metric('num_ocl_operations') -%>]
+		        }
+		    ]
+		};
+		var transformationsComplexityBarChart = new Chart(document.getElementById("transformationsComplexityChart").getContext("2d")).Bar(data);
+		</script>
+		<div class="clear"></div>
+		<h3 class="big">Rules Hierachy:</h3>
+		<div id="rules-hieracy-chart-area">
+			<canvas id="rulesHierachyChart" width="500" height="250"></canvas>
+		</div>
+		<script type="text/javascript">
+		var data = {
+		    labels: ["Calls to operations per rule", "Calls to lazy rules", "Calls to lazy rules per rule"],
+		    datasets: [
+		        {
+		            label: "Values",
+		            fillColor: "rgba(220,220,220,0.5)",
+		            strokeColor: "rgba(220,220,220,0.8)",
+		            highlightFill: "rgba(220,220,220,0.75)",
+		            highlightStroke: "rgba(220,220,220,1)",
+		            data: [<%= get_etl_metric('num_call_operations_per_rule') -%>, <%= get_etl_metric('num_call_lazy_rule') -%>, <%= get_etl_metric('num_call_lazy_per_rule') -%>]
+		        }
+		    ]
+		};
+		var rulesHierachyChart = new Chart(document.getElementById("rulesHierachyChart").getContext("2d")).Bar(data);
+		</script>
+		<div class="clear"></div>
+		<div class="clear"></div>
+		<h3 class="big">Additional Metrics:</h3>
+        <div class="widget">
+			<div class="widget-row">
+				
+			</div>
+          <div class="clear" style="height: 30px;"></div>
+          	<div class="widget-row">
+			    <div class="widget-span widget-span-3">
+			      <div class="widget-measure-container">
+			        <div class="widget-measure widget-measure-main">
+			          <span class="widget-label">LOC</span>
+			          <span id="m_sqale_index" class="widget-link"><%= get_etl_metric('num_loc') -%></span>
+			        </div>
+			      </div>
+			    </div>
+			    <div class="widget-span widget-span-3">
+			      <div class="widget-measure-container">
+			        <div class="widget-measure widget-measure-main">
+			          <span class="widget-label">Declarativa</span>
+			          <span id="m_sqale_index" class="widget-link"><%= get_is_true('is_declarative') -%></span>
+			        </div>
+			      </div>
+			    </div>
+			    <div class="widget-span widget-span-3">
+			      <div class="widget-measure-container">
+			        <div class="widget-measure widget-measure-main">
+			          <span class="widget-label">Promedio variables por rule</span>
+			          <span id="m_sqale_index" class="widget-link"><%= get_etl_metric('avarage_variables_per_rule') -%></span>
+			        </div>
+			      </div>
+			    </div>
+			</div>
+			 <div class="clear" style="height: 30px;"></div>
+          	<div class="widget-row">
+			    <div class="widget-span widget-span-3">
+			      <div class="widget-measure-container">
+			        <div class="widget-measure widget-measure-main">
+			          <span class="widget-label">#Total Guards</span>
+			          <span id="m_sqale_index" class="widget-link"><%= get_etl_metric('num_guards') -%></span>
+			        </div>
+			      </div>
+			    </div>
+			    <div class="widget-span widget-span-3">
+			      <div class="widget-measure-container">
+			        <div class="widget-measure widget-measure-main">
+			          <span class="widget-label">Imported Libraries</span>
+			          <span id="m_sqale_index" class="widget-link"><%= get_etl_metric('num_libraries') -%></span>
+			        </div>
+			      </div>
+			    </div>
+			</div>
+        </div>
+      	<div style="clear: both;"></div>
+    </div>
+</div>
