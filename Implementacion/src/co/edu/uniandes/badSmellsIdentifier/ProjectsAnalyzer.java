@@ -1,10 +1,11 @@
 package co.edu.uniandes.badSmellsIdentifier;
 
 import java.io.File;
-
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 import org.eclipse.emf.common.util.URI;
@@ -13,10 +14,16 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
+import org.eclipse.epsilon.common.parse.problem.ParseProblem;
 import org.eclipse.epsilon.common.util.StringProperties;
 import org.eclipse.epsilon.emc.emf.EmfModel;
+import org.eclipse.epsilon.emc.emf.EmfUtil;
+import org.eclipse.epsilon.eol.exceptions.EolRuntimeException;
 import org.eclipse.epsilon.eol.exceptions.models.EolModelLoadingException;
+import org.eclipse.epsilon.eol.models.IModel;
 import org.eclipse.epsilon.eol.models.IRelativePathResolver;
+import org.eclipse.epsilon.evl.EvlModule;
+import org.eclipse.epsilon.evl.execute.UnsatisfiedConstraint;
 
 public class ProjectsAnalyzer {
 	
@@ -50,6 +57,8 @@ public class ProjectsAnalyzer {
 	 */
 	private int totalConstraints;
 	
+	protected ArrayList<String> registeredMetamodels = new ArrayList<String>(); 
+	
 	/**
 	 * This is our constructor
 	 */
@@ -81,7 +90,7 @@ public class ProjectsAnalyzer {
 		for (int i = 0; i < modelFiles.size(); i++)
 		{
 			// Parse EVL File
-			/*EvlModule module = new EvlModule();
+			EvlModule module = new EvlModule();
 			try {
 				module.parse(new File(EVL_FILE));
 			} catch (Exception e) {
@@ -89,8 +98,60 @@ public class ProjectsAnalyzer {
 				System.out.println("Unable to parse file, please ensure the file does not contain syntax errors");
 			}
 			
+			// Errors?
+			if (module.getParseProblems().size() > 0) {
+				System.err.println("Parse errors occured...");
+				for (ParseProblem problem : module.getParseProblems()) {
+					System.err.println(problem.toString());
+				}
+			}
+			
+			// Add required models
+			try {
+				module.getContext().getModelRepository().addModel(
+					createEmfModel("ETL", modelFiles.get(i).getAbsolutePath(), new File("metamodels/ETL.ecore").getAbsolutePath(), true, true)
+				);
+			} catch (EolModelLoadingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (URISyntaxException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			// Execute!
+			try {
+				module.execute();
+			} catch (EolRuntimeException e) {
+				e.printStackTrace();
+				System.err.println("Error executing the EVL file: " + e.getMessage());
+			}
+			
+			// Check all unsatisfied constraints
+			Collection<UnsatisfiedConstraint> unsatisfied = module.getContext().getUnsatisfiedConstraints();
+			totalConstraints = unsatisfied.size();
+			
+			// Adding a list!
+			ArrayList<String> constraints = new ArrayList<String>();
+			if (evlConstraints.containsKey(modelFiles.get(i)))
+			{
+				constraints = evlConstraints.get(modelFiles.get(i));
+			}
+			
+			// Add the to the list
+			for (UnsatisfiedConstraint uc : unsatisfied)
+			{
+				constraints.add(uc.getMessage());
+			}
+			
+			// Store it!
+			evlConstraints.put(modelFiles.get(i), constraints);
+			
+			// Tidy up
+			module.getContext().getModelRepository().dispose();
+			
 			// Retrieve our models
-			System.out.println("Adding metamodels");
+			/*System.out.println("Adding metamodels");
 			module.getContext().getModelRepository().addModel(createEmfModel("ETL", modelFiles.get(i).getAbsolutePath(), true, false));
 			System.out.println("Closing metamodels");
 			
@@ -124,6 +185,9 @@ public class ProjectsAnalyzer {
 			evlConstraints.put(modelFiles.get(i), constraints);
 			*/
 			
+			
+			// WORKING DUMMY DATA
+			/*
 			// Adding to the list!
 			ArrayList<String> constraints = new ArrayList<String>();
 			if (evlConstraints.containsKey(modelFiles.get(i)))
@@ -143,6 +207,7 @@ public class ProjectsAnalyzer {
 			constraints.add("[" + stringCodeNumber + "] Bla bla bla");
 			evlConstraints.put(modelFiles.get(i), constraints);
 			totalConstraints++;
+			*/
 		}
 	}
 	
@@ -183,29 +248,111 @@ public class ProjectsAnalyzer {
 		System.out.println("Tam: " + resourceSet.getPackageRegistry().size());
     }
     
-    protected EmfModel createEmfModel(String name, String model, boolean readOnLoad, boolean storeOnDisposal) {
+    protected EmfModel createEmfModel(String name, String model, 
+			String metamodel, boolean readOnLoad, boolean storeOnDisposal) 
+					throws EolModelLoadingException, URISyntaxException {
+    	
 		EmfModel emfModel = new EmfModel();
-		StringProperties properties = new StringProperties();
-		properties.put(EmfModel.PROPERTY_NAME, name);
+		emfModel.setName(name);
+		emfModel.setReadOnLoad(readOnLoad);
+		emfModel.setStoredOnDisposal(storeOnDisposal);
+		emfModel.setModelFile(model);
+		
+		ArrayList<String> metamodelFiles = new ArrayList<String>();
+		metamodelFiles.add("metamodels/ETL.ecore");
+		metamodelFiles.add("metamodels/EOL.ecore");
+		emfModel.setMetamodelFiles(metamodelFiles);
 		
 		try {
-			properties.put(EmfModel.PROPERTY_FILE_BASED_METAMODEL_URI, new java.net.URI("metamodels/EOL.ecore").toString());
-			properties.put(EmfModel.PROPERTY_FILE_BASED_METAMODEL_URI, new java.net.URI("metamodels/ETL.ecore").toString());
-		} catch (URISyntaxException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		properties.put(EmfModel.PROPERTY_MODEL_URI, model);
-		properties.put(EmfModel.PROPERTY_READONLOAD, readOnLoad + "");
-		properties.put(EmfModel.PROPERTY_STOREONDISPOSAL, storeOnDisposal + "");
-		try {
-			emfModel.load(properties, (IRelativePathResolver) null);
+			emfModel.load();
 		} catch (EolModelLoadingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return emfModel;
+    }
+    
+    /*protected EmfModel createEmfModel(String name, String model, 
+			String metamodel, boolean readOnLoad, boolean storeOnDisposal) 
+					throws EolModelLoadingException, URISyntaxException {
+    	
+		EmfModel emfModel = new EmfModel();
+		StringProperties properties = new StringProperties();
+		properties.put(EmfModel.PROPERTY_NAME, name);
+		properties.put(EmfModel.PROPERTY_ALIASES, name);
+		properties.put(EmfModel.PROPERTY_EXPAND, true + "");
+		
+		if (metamodel.contains(","))
+		{
+			String[] metamodels = metamodel.split(",");
+			String[] metamodelsUri = new String[metamodels.length];
+			
+			for (int i = 0; i < metamodels.length; i++)
+			{
+				metamodelsUri[i] = new File(metamodels[i]).toURI().toString();
+			}
+			
+			StringBuilder sbStr = new StringBuilder();
+		    for (int i = 0, il = metamodelsUri.length; i < il; i++) {
+		        if (i > 0)
+		            sbStr.append(",");
+		        sbStr.append(metamodelsUri[i]);
+		    }
+		    
+		    properties.put(EmfModel.PROPERTY_FILE_BASED_METAMODEL_URI, sbStr.toString());
+		}
+		else
+		{
+			properties.put(EmfModel.PROPERTY_FILE_BASED_METAMODEL_URI, new File(metamodel).toURI().toString());
+		}
+		
+		properties.put(EmfModel.PROPERTY_IS_METAMODEL_FILE_BASED, "true");
+		properties.put(EmfModel.PROPERTY_MODEL_FILE, new File(model).toURI());
+		properties.put(EmfModel.PROPERTY_READONLOAD, readOnLoad + "");
+		properties.put(EmfModel.PROPERTY_STOREONDISPOSAL, storeOnDisposal + "");
+		emfModel.load(properties, (IRelativePathResolver) null);
+		return emfModel;
+	}*/
+    
+    protected EmfModel createEmfModelByURI(String name, String model, 
+			String metamodel, boolean readOnLoad, boolean storeOnDisposal) 
+					throws EolModelLoadingException, URISyntaxException {
+		EmfModel emfModel = new EmfModel();
+		StringProperties properties = new StringProperties();
+		properties.put(EmfModel.PROPERTY_NAME, name);
+		properties.put(EmfModel.PROPERTY_METAMODEL_URI, metamodel);
+		properties.put(EmfModel.PROPERTY_MODEL_URI, 
+				getFileURI(model).toString());
+		properties.put(EmfModel.PROPERTY_READONLOAD, readOnLoad + "");
+		properties.put(EmfModel.PROPERTY_STOREONDISPOSAL, 
+				storeOnDisposal + "");
+		emfModel.load(properties, (IRelativePathResolver) null);
+		return emfModel;
+	}
+    
+    protected java.net.URI getFileURI(String fileName) throws URISyntaxException {
+		
+    	java.net.URI binUri = ProjectsAnalyzer.class.getResource(fileName).toURI();
+    	java.net.URI uri = null;
+		
+		if (binUri.toString().indexOf("bin") > -1) {
+			uri = new java.net.URI(binUri.toString().replaceAll("bin", "src"));
+		}
+		else {
+			uri = binUri;
+		}
+		
+		return uri;
+	}
+    
+    public void registerMetamodel(String metamodelFile) throws Exception {
+		if (registeredMetamodels.contains(metamodelFile)) return;
+		EmfUtil.register(
+				URI.createURI(ProjectsAnalyzer.class
+						.getClassLoader()
+						.getResource(metamodelFile)
+						.toString()),
+				EPackage.Registry.INSTANCE);
+		registeredMetamodels.add(metamodelFile);
 	}
     
     public String getOutputDirectory()
