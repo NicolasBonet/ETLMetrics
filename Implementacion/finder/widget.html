@@ -61,28 +61,22 @@
 								<script>
 								var modelsData = [
 								    {
-								        value: 2,
-								        color:"#F7464A",
-								        highlight: "#FF5A5E",
-								        label: "Renaming"
+								        value: <!-- RENAMING_OCURRENCES -->,
+								        color: "#B6BFBD",
+								        highlight: "#bbbfbe",
+								        label: "Renaming (#<!-- RENAMING_OCURRENCES -->)"
 								    },
 								    {
-								        value: 5,
+								        value: <!-- REESTRUCTURING_OCURRENCES -->,
 								        color: "#46BFBD",
 								        highlight: "#5AD3D1",
-								        label: "Reestructuring"
+								        label: "Reestructuring (#<!-- REESTRUCTURING_OCURRENCES -->)"
 								    },
 								    {
-								        value: 5,
-								        color: "#D6BFBD",
-								        highlight: "#DAD3D1",
-								        label: "Interference"
-								    },
-								    {
-								        value: 5,
-								        color: "#B6BFBD",
-								        highlight: "#BAD3D1",
-								        label: "OCL Optimization"
+								        value: <!-- OCL_OPTIMIZATION_OCURRENCES -->,
+								        color:"#F7464A",
+								        highlight: "#FF5A5E",
+								        label: "OCL Optimization (#<!-- OCL_OPTIMIZATION_OCURRENCES -->)"
 								    }
 								];
 								var modelsChart = new Chart(document.getElementById("modelsChart").getContext("2d")).Doughnut(modelsData);
@@ -97,7 +91,7 @@
 					</div>
 				</div>
 				<div class="clear"></div>
-				<h3 class="big">Total Metrics:</h3>
+				<h3 class="big">Ocurrences:</h3>
 				<div class="row">
 					<table class="table table-striped">
 						<thead>
@@ -112,19 +106,12 @@
 						</thead>
 						<tbody>
 							<tr>
+								<td>Total:</td>
 								<td>
-									01
-								</td>
-								<td>
-									<!-- CODE 01 ocurrences -->
-									<div class="progress">
-										<div class="progress-bar" role="progressbar" aria-valuenow="<!-- CODE 01 ocurrences -->" aria-valuemin="0" aria-valuemax="100" style="width: <!-- CODE 01 ocurrences -->%;">
-									    	<!-- CODE 01 ocurrences -->%
-									    </div>
-									</div>
-									<!-- CODE 01 ocurrences -->
+									<!-- TOTAL_OCURRENCES --> ocurrences
 								</td>
 							</tr>
+							<!-- CODES_OCURRENCES -->
 						</tbody>
 					</table>
 				</div>

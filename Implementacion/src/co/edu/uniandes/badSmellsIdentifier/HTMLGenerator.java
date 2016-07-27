@@ -1,19 +1,16 @@
 package co.edu.uniandes.badSmellsIdentifier;
 
+import java.awt.Desktop;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.awt.Desktop;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.Map;
 
 public class HTMLGenerator {
 	
@@ -34,7 +31,7 @@ public class HTMLGenerator {
 	 */
 	public HTMLGenerator()
 	{
-		ProjectsAnalyzer projectsAnalyzer = new ProjectsAnalyzer();
+		projectsAnalyzer = new ProjectsAnalyzer();
 	}
 	
 	public void generateReport() {
@@ -54,22 +51,17 @@ public class HTMLGenerator {
 			File fileAsset = new File(assetsDirectory.getAbsolutePath() + "/Chart.min.js");
 			fileAsset.delete();
 			fileAsset.createNewFile();
-			writeStringToFile(fileAsset, fileToString("/static/Chart.min.js"));
+			copyFile(new File("finder/assets/Chart.min.js"), fileAsset);
 			
 			fileAsset = new File(assetsDirectory.getAbsolutePath() + "/Chart.StackedBar.js");
 			fileAsset.delete();
 			fileAsset.createNewFile();
-			writeStringToFile(fileAsset, fileToString("/static/Chart.StackedBar.js"));
+			copyFile(new File("finder/assets/Chart.StackedBar.js"), fileAsset);
 			
 			fileAsset = new File(assetsDirectory.getAbsolutePath() + "/ETLPluginStyle.css");
 			fileAsset.delete();
 			fileAsset.createNewFile();
-			writeStringToFile(fileAsset, fileToString("/static/ETLPluginStyle.css"));
-			
-			fileAsset = new File(assetsDirectory.getAbsolutePath() + "/bootstrap.min.css");
-			fileAsset.delete();
-			fileAsset.createNewFile();
-			writeStringToFile(fileAsset, fileToString("/static/bootstrap.min.css"));
+			copyFile(new File("finder/assets/ETLPluginStyle.css"), fileAsset);
 			
 			// Now the report files
 			File file = new File(reportsDirectory.getAbsolutePath() + "/index.html");
@@ -77,11 +69,13 @@ public class HTMLGenerator {
 			file.createNewFile();
 			
 			// Start the main report
-			String header = "<h2>Menu: <select name=\"URL\" onchange=\"doMenu();\" id=\"menu\"><option selected=\"selected\" value=\"./index.html\">Project Metrics</option>";
+			String header = "<h2>Menu: <select name=\"URL\" onchange=\"doMenu();\" id=\"menu\"><option selected=\"selected\" value=\"" + reportsDirectory.getAbsolutePath() + "/index.html\">Project Metrics</option>";
 			
 			// Add the menu
 			for (int i = 0; i < projectsAnalyzer.getModelFiles().size(); i++)
-				header += "<option value=\"./" + projectsAnalyzer.getModelFiles().get(i).getName().replace(".model", "") + ".html\">" + projectsAnalyzer.getModelFiles().get(i).getName() + "</option>";
+			{
+				header += "<option data-index=\"" + i + "\" value=\"" + projectsAnalyzer.getModelFiles().get(i).getAbsolutePath().replace(projectsAnalyzer.getInputDirectory(), reportsDirectory.getAbsolutePath()) + ".html\">" + projectsAnalyzer.getModelFiles().get(i).getName() + "</option>";
+			}
 			
 			header += "</select></h2> <script type=\"text/javascript\">" +
 		    "function doMenu()" +
@@ -90,115 +84,83 @@ public class HTMLGenerator {
 			    "window.location = e.options[e.selectedIndex].value;" +
 		    "}" +
 		    "</script>"
-		    + "<h1>Project Metrics</h1><br class=\"clear\" />";
+		    + "<br class=\"clear\" />";
 			
 			// Add the header title
-			String mainFileContent = fileToString("finder/widget.html");
+			String mainFileContent = fileToString(new File("finder/widget.html").getAbsolutePath());
 			mainFileContent = mainFileContent.replace("<!-- MENU_HEADER -->", header);
 			
 			// Replace assets and prepare the template
 			mainFileContent = mainFileContent.replaceAll("<%(.*\n)*%>", "");
 			
-			// Replace metrics
-			List<Metric> metrics = new DataMetrics().getMetrics();
+			// Setup a page title
+			mainFileContent = mainFileContent.replaceAll("<!-- PAGE_TITLE -->", "Project Metrics");
 			
-			// Count if there is any MM at all!
-			boolean anyMetamodel = false;
+			// Now add ocurrences!
+			int[] badSmells = new int[24];
+			int[] categoriesConstraints = new int[3];
+			String ocurrencesString = "";
 			
-			for (int i = 0; i < metrics.size(); i++)
+			for (Map.Entry<File, ArrayList<String>> entry : projectsAnalyzer.getEvlConstraints().entrySet())
 			{
-				mainFileContent = mainFileContent.replaceAll("<%= get_etl_metric[(]'" + metrics.get(i).getName() + "'[)] -%>", projectsAnalyzer.getData().get(0).get(metrics.get(i)).toString());
-				mainFileContent = mainFileContent.replaceAll("<%= get_is_true[(]'" + metrics.get(i).getName() + "'[)] -%>", projectsAnalyzer.getData().get(0).get(metrics.get(i)).toString());
-				
-				if (metrics.get(i).getName().equals(DataMetrics.AVERAGE_COVERAGE_INPUT_MM.getName()) && !projectsAnalyzer.getData().get(0).get(metrics.get(i)).toString().equals("0.0"))
+				for (int i = 0; i < entry.getValue().size(); i++)
 				{
-					anyMetamodel = true;
-				}
-				else if (metrics.get(i).getName().equals(DataMetrics.AVERAGE_COVERAGE_OUTPUT_MM.getName()) && !projectsAnalyzer.getData().get(0).get(metrics.get(i)).toString().equals("0.0"))
-				{
-					anyMetamodel = true;
-				}
-			}
-			
-			// No metamodel, no graphic
-			if (!anyMetamodel)
-			{
-				mainFileContent = mainFileContent.replaceAll("<div id=\"mm_coverage_notice\" style=\"display: none;\" class=\"alert alert-danger\">", "<div id=\"mm_coverage_notice\" style=\"display: block;\" class=\"alert alert-danger\">");
-				mainFileContent = mainFileContent.replaceAll("<div id=\"mm_coverage\" style=\"display: block;\">", "<div id=\"mm_coverage\" style=\"display: none;\">");
-			}
-			
-			// Now bindings coverage
-			String tableBody = "", jsBody = "";
-			
-			// Load the hashmap
-			HashMap<String, ArrayList<String>> bindingData = (HashMap<String, ArrayList<String>>) projectsAnalyzer.getData().get(0).get(DataMetrics.BINDINGS_COVERAGE);
-			
-			// Start populating the data!
-			Set set = bindingData.entrySet();
-			Iterator iterator = set.iterator();
-			int x = 0, y = 50;
-			
-			// Go through the entire hashmap
-			while(iterator.hasNext())
-			{
-				// The value itself
-				Map.Entry me = (Map.Entry) iterator.next();
-				
-				// The first part of the table
-				tableBody += "<tr><td>" + me.getKey() + "</td><td>";
-								
-				// Populate all classes
-				ArrayList<String> classes = (ArrayList<String>) me.getValue();
-				
-				// Concatenated string
-				String classAttributes = "";
-				
-				for (int c = 0; c < classes.size(); c++)
-				{
-					tableBody += classes.get(c);
-					classAttributes += "'" + classes.get(c) + ": String'";
+					int codeNumber = Integer.parseInt(entry.getValue().get(i).substring(1, 3));
+					badSmells[codeNumber - 1]++;
 					
-					if (c < (classes.size() - 1))
-					{
-						tableBody += ", ";
-						classAttributes += ", ";
-					}
+					if (codeNumber <= 2)
+						categoriesConstraints[0]++;
+					else if (3 >= codeNumber && codeNumber <= 13)
+						categoriesConstraints[1]++;
+					else if (codeNumber > 13)
+						categoriesConstraints[2]++;
 				}
-						
-				// Close the row
-				tableBody += "</td></tr>";
-				
-				// Re start
-				if (x == 450)
-				{
-					x = 150;
-					y += 100;
-				}
-				else
-					x += 150;
-				
-				jsBody += me.getKey() + ": new uml.Class({" +
-				        "position: { x:" + x + "  , y: " + y + " }," +
-				        "size: { width: 240, height: 100 }," +
-				        "name: '" + me.getKey() + "'," +
-				        "attributes: [" + classAttributes + "]," +
-				        "methods: []" +
-				    "}),";
 			}
 			
-			// Replace it!
-			mainFileContent = mainFileContent.replaceAll("<% COVERED BINDING %>", tableBody);
-			mainFileContent = mainFileContent.replaceAll("<% COVERED BINDING JS %>", jsBody);
+			// Our coefficient
+			double coe = 0;
+			if (projectsAnalyzer.getTotalConstraints() > 0)
+				coe = (double) (((double) 100) / ((double) projectsAnalyzer.getTotalConstraints()));
 			
-			// Add the footer
-			mainFileContent += ""
-			+ "			</div><!-- /.container -->"
-			+ "		</body>"
-			+ "</html>";
+			// Replace ocurrences
+			for (int i = 0; i < 24; i++)
+			{
+				// Porcentage of ocurrences
+				double porcentage = Math.round(coe * badSmells[i]);
+				
+				// Calculate how to show our code
+				String code = (i + 1) + "";
+				if (i < 9)
+				{
+					code = "0" + (i + 1);
+				}
+				
+				// Add our HTML
+				ocurrencesString += "<tr>" +
+								"<td>" +
+									code +
+								"</td>" +
+								"<td>" +
+									badSmells[i] + " ocurrences" +
+									"<div class=\"progress\" style=\"margin-bottom: 0px;\">" +
+										"<div class=\"progress-bar\" role=\"progressbar\" aria-valuenow=\"" + porcentage + "\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: " + porcentage + "%;\">" +
+										porcentage + "%" +
+									    "</div>" +
+									"</div>" +
+								"</td>" +
+							"</tr>";
+			}
 			
-			// Change some bootstrap classes
-			mainFileContent = mainFileContent.replace("class=\"widget-row\"", "class=\"row\"");
-			mainFileContent = mainFileContent.replace("widget-span-", "col-md-");
+			// Add ocurrences to our output
+			mainFileContent = mainFileContent.replace("<!-- CODES_OCURRENCES -->", ocurrencesString);
+			
+			// Get total
+			mainFileContent = mainFileContent.replaceAll("<!-- TOTAL_OCURRENCES -->", projectsAnalyzer.getTotalConstraints() + "");
+			
+			// Now based on category
+			mainFileContent = mainFileContent.replaceAll("<!-- RENAMING_OCURRENCES -->", categoriesConstraints[0] + "");
+			mainFileContent = mainFileContent.replaceAll("<!-- REESTRUCTURING_OCURRENCES -->", categoriesConstraints[1] + "");
+			mainFileContent = mainFileContent.replaceAll("<!-- OCL_OPTIMIZATION_OCURRENCES -->", categoriesConstraints[2] + "");
 			
 			// Write it!
 			writeStringToFile(file, mainFileContent);
@@ -206,100 +168,99 @@ public class HTMLGenerator {
 			// Log it into our GUI
 			projectsAnalyzer.logLine(file.getPath() + " has being written");
 			
-			// Now each individual ETL file!
-			ArrayList<File> etlFiles = projectsAnalyzer.getEtlFiles();
+			// Now each individual model file!
+			ArrayList<File> modelFiles = projectsAnalyzer.getModelFiles();
 			
-			for (int f = 1; f < etlFiles.size() + 1; f++)
+			for (int m = 0; m < modelFiles.size(); m++)
 			{
+				// Array of constraints
+				ArrayList<String> modelFileConstraints = projectsAnalyzer.getEvlConstraints().get(modelFiles.get(m));
+				
 				// Now the report files
-				File internalFile = new File(reportsDirectory.getAbsolutePath() + "/" + etlFiles.get(f - 1).getName().replace(".etl", "") + ".html");
+				File internalFile = new File(modelFiles.get(m).getAbsolutePath().replace(projectsAnalyzer.getInputDirectory(), reportsDirectory.getAbsolutePath()) + ".html");
 				internalFile.delete();
+				internalFile.getParentFile().mkdirs();
 				internalFile.createNewFile();
 				
 				// Start the main report
-				header = fileToString("/static/header.html");
-				header = header.replace("{title}", etlFiles.get(f - 1).getName()) + "<h2>Menu: <select name=\"URL\" onchange=\"doMenu();\" id=\"menu\"><option value=\"./index.html\">Project Metrics</option>";
+				String newHeader = header.replace("<option selected=\"selected\" value=\"./index.html\">Project Metrics</option>", "");
+				newHeader = header.replace("data-index=\"" + m + "\"", "data-index=\"" + m + "\" selected=\"selected\"");
 				
-				// Add the menu
-				for (int z = 0; z < projectsAnalyzer.getEtlFiles().size(); z++)
-					header += "<option" + (projectsAnalyzer.getEtlFiles().get(z).getName().equals(etlFiles.get(f - 1).getName()) ? " selected=\"selected\"" : "") + " value=\"./" + projectsAnalyzer.getEtlFiles().get(z).getName().replace(".etl", "") + ".html\">" + projectsAnalyzer.getEtlFiles().get(z).getName() + "</option>";
-				
-				header += "</select></h2> <script type=\"text/javascript\">" +
-			    "function doMenu()" +
-			    "{" +
-				    "var e = document.getElementById(\"menu\");" +
-				    "window.location = e.options[e.selectedIndex].value;" +
-			    "}" +
-			    "</script>";
-				
-				// Start the file report
-				String internalMainFileContent = header + "<h1>" + etlFiles.get(f - 1).getName() + "</h1><br class=\"clear\" />";;
-				
-				// Content!
-				internalMainFileContent += fileToString("/uniandes/plugins/sonarqube/etlplugin/widget.html.erb");
+				// Add the header title
+				mainFileContent = fileToString(new File("finder/widget.html").getAbsolutePath());
+				mainFileContent = mainFileContent.replace("<!-- MENU_HEADER -->", newHeader);
 				
 				// Replace assets and prepare the template
-				internalMainFileContent = internalMainFileContent.replace("<%= url_for_static(:plugin => 'etldataplugin', :path => 'Chart.min.js')-%>", "./static/Chart.min.js");
-				internalMainFileContent = internalMainFileContent.replace("<%= url_for_static(:plugin => 'etldataplugin', :path => 'Chart.StackedBar.js')-%>", "./static/Chart.StackedBar.js");
-				internalMainFileContent = internalMainFileContent.replace("<%= url_for_static(:plugin => 'etldataplugin', :path => 'ETLPluginStyle.css')-%>", "./static/ETLPluginStyle.css");
-				internalMainFileContent = internalMainFileContent.replaceAll("<%(.*\n)*%>", "");
+				mainFileContent = mainFileContent.replaceAll("<%(.*\n)*%>", "");
 				
-				// Replace metrics
-				for (int i = 0; i < metrics.size(); i++)
+				// Setup a page title
+				mainFileContent = mainFileContent.replaceAll("<!-- PAGE_TITLE -->", modelFiles.get(m).getName());
+				
+				// Now add ocurrences!
+				categoriesConstraints = new int[3];
+				badSmells = new int[24];
+				ocurrencesString = "";
+				
+				for (int i = 0; i < modelFileConstraints.size(); i++)
 				{
-					internalMainFileContent = internalMainFileContent.replaceAll("<%= get_etl_metric[(]'" + metrics.get(i).getName() + "'[)] -%>", projectsAnalyzer.getData().get(f).get(metrics.get(i)).toString());
-					internalMainFileContent = internalMainFileContent.replaceAll("<%= get_is_true[(]'" + metrics.get(i).getName() + "'[)] -%>", projectsAnalyzer.getData().get(f).get(metrics.get(i)).toString());
+					int codeNumber = Integer.parseInt(modelFileConstraints.get(i).substring(1, 3));
+					badSmells[codeNumber - 1]++;
+					
+					if (codeNumber <= 2)
+						categoriesConstraints[0]++;
+					else if (3 >= codeNumber && codeNumber <= 13)
+						categoriesConstraints[1]++;
+					else if (codeNumber > 13)
+						categoriesConstraints[2]++;
 				}
 				
-				// Now bindings coverage
-				tableBody = "";
+				// Our coefficient
+				coe = 0;
+				if (projectsAnalyzer.getTotalConstraints() > 0)
+					coe = (double) (((double) 100) / ((double) projectsAnalyzer.getTotalConstraints()));
 				
-				// Load the hashmap
-				bindingData = (HashMap<String, ArrayList<String>>) projectsAnalyzer.getData().get(f).get(DataMetrics.BINDINGS_COVERAGE);
-				
-				// Start populating the data!
-				set = bindingData.entrySet();
-				iterator = set.iterator();
-				
-				// Go through the entire hashmap
-				while(iterator.hasNext())
+				// Replace ocurrences
+				for (int i = 0; i < 24; i++)
 				{
-					// The value itself
-					Map.Entry me = (Map.Entry) iterator.next();
+					// Porcentage of ocurrences
+					double porcentage = Math.round(coe * badSmells[i]);
 					
-					// The first part of the table
-					tableBody += "<tr><td>" + me.getKey() + "</td><td>";
-					
-					// Populate all classes
-					ArrayList<String> classes = (ArrayList<String>) me.getValue();
-					
-					for (int c = 0; c < classes.size(); c++)
+					// Calculate how to show our code
+					String code = (i + 1) + "";
+					if (i < 9)
 					{
-						tableBody += classes.get(c);
-						
-						if (c < (classes.size() - 1))
-							tableBody += ", ";
+						code = "0" + (i + 1);
 					}
-							
-					// Close the row
-					tableBody += "</td></tr>";
+					
+					// Add our HTML
+					ocurrencesString += "<tr>" +
+									"<td>" +
+										code +
+									"</td>" +
+									"<td>" +
+										badSmells[i] + " ocurrences" +
+										"<div class=\"progress\" style=\"margin-bottom: 0px;\">" +
+											"<div class=\"progress-bar\" role=\"progressbar\" aria-valuenow=\"" + porcentage + "\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: " + porcentage + "%;\">" +
+											porcentage + "%" +
+										    "</div>" +
+										"</div>" +
+									"</td>" +
+								"</tr>";
 				}
 				
-				// Replace it!
-				internalMainFileContent = internalMainFileContent.replaceAll("<% COVERED BINDING %>", tableBody);
+				// Add ocurrences to our output
+				mainFileContent = mainFileContent.replace("<!-- CODES_OCURRENCES -->", ocurrencesString);
 				
-				// Add the footer
-				internalMainFileContent += ""
-				+ "			</div><!-- /.container -->"
-				+ "		</body>"
-				+ "</html>";
+				// Get total
+				mainFileContent = mainFileContent.replaceAll("<!-- TOTAL_OCURRENCES -->", modelFileConstraints.size() + "");
 				
-				// Change some bootstrap classes
-				internalMainFileContent = internalMainFileContent.replace("class=\"widget-row\"", "class=\"row\"");
-				internalMainFileContent = internalMainFileContent.replace("widget-span-", "col-md-");
+				// Now based on category
+				mainFileContent = mainFileContent.replaceAll("<!-- RENAMING_OCURRENCES -->", categoriesConstraints[0] + "");
+				mainFileContent = mainFileContent.replaceAll("<!-- REESTRUCTURING_OCURRENCES -->", categoriesConstraints[1] + "");
+				mainFileContent = mainFileContent.replaceAll("<!-- OCL_OPTIMIZATION_OCURRENCES -->", categoriesConstraints[2] + "");
 				
 				// Write it!
-				writeStringToFile(internalFile, internalMainFileContent);
+				writeStringToFile(internalFile, mainFileContent);
 				
 				// Log it!
 				projectsAnalyzer.logLine(internalFile.getPath() + " has being written");
@@ -330,9 +291,30 @@ public class HTMLGenerator {
 	}
 	
 	private String fileToString(String path) {
-		InputStream in = getClass().getResourceAsStream(path);
-		java.util.Scanner s = new java.util.Scanner(in).useDelimiter("\\A");
-		return s.hasNext() ? s.next() : "";
+		File file = new File(path);
+        FileInputStream fis = null;
+        String str = "";
+
+        try {
+            fis = new FileInputStream(file);
+            int content;
+            while ((content = fis.read()) != -1) {
+                // convert to char and display it
+                str += (char) content;
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fis != null)
+                    fis.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        
+        return str;
 	}
 	
 	private void writeStringToFile(File file, String content) throws IOException {
@@ -340,5 +322,37 @@ public class HTMLGenerator {
 		fileWriter.write(content);
 		fileWriter.flush();
 		fileWriter.close();
+	}
+	
+	private static void copyFile(File sourceFile, File destFile) throws IOException {
+	    if(!destFile.exists()) {
+	        destFile.createNewFile();
+	    }
+
+	    FileChannel source = null;
+	    FileChannel destination = null;
+
+	    try {
+	        source = new FileInputStream(sourceFile).getChannel();
+	        destination = new FileOutputStream(destFile).getChannel();
+	        destination.transferFrom(source, 0, source.size());
+	    }
+	    finally {
+	        if(source != null) {
+	            source.close();
+	        }
+	        if(destination != null) {
+	            destination.close();
+	        }
+	    }
+	}
+	
+	/**
+	 * Main method
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		HTMLGenerator htmlGenerator = new HTMLGenerator();
+		htmlGenerator.generateReport();
 	}
 }

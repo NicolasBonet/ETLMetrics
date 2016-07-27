@@ -1,29 +1,22 @@
 package co.edu.uniandes.badSmellsIdentifier;
 
 import java.io.File;
-import java.io.IOException;
+
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.Random;
 
-import org.eclipse.epsilon.common.util.StringProperties;
-import org.eclipse.epsilon.emc.emf.EmfModel;
-import org.eclipse.epsilon.eol.EolLibraryModule;
-import org.eclipse.epsilon.eol.exceptions.models.EolModelLoadingException;
-import org.eclipse.epsilon.eol.models.IRelativePathResolver;
-import org.eclipse.epsilon.evl.EvlModule;
-import org.eclipse.epsilon.evl.execute.UnsatisfiedConstraint;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.util.BasicExtendedMetaData;
-import org.eclipse.emf.ecore.util.ExtendedMetaData;
-import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
+import org.eclipse.epsilon.common.util.StringProperties;
+import org.eclipse.epsilon.emc.emf.EmfModel;
+import org.eclipse.epsilon.eol.exceptions.models.EolModelLoadingException;
+import org.eclipse.epsilon.eol.models.IRelativePathResolver;
 
 public class ProjectsAnalyzer {
 	
@@ -53,12 +46,19 @@ public class ProjectsAnalyzer {
 	private HashMap<File, ArrayList<String>> evlConstraints;
 	
 	/**
+	 * Here we store the total amount of constraints
+	 */
+	private int totalConstraints;
+	
+	/**
 	 * This is our constructor
 	 */
 	public ProjectsAnalyzer()
 	{
 		// Initialize
 		modelFiles = new ArrayList<File>();
+		evlConstraints = new HashMap<File, ArrayList<String>>();
+		totalConstraints = 0;
 		
 		// Find all ETL files
 		addModelFiles(INPUT_DIRECTORY);
@@ -66,6 +66,9 @@ public class ProjectsAnalyzer {
 		// Register metamodels
 		registerMetamodel(URI.createFileURI("metamodels/EOL.ecore"));
 		registerMetamodel(URI.createFileURI("metamodels/ETL.ecore"));
+		
+		// Process them!
+		processFiles();
 	}
 	
 	/**
@@ -95,9 +98,6 @@ public class ProjectsAnalyzer {
 			Collection<UnsatisfiedConstraint> unsatisfied = module.getContext().getUnsatisfiedConstraints();
 			System.out.println("Model: " + modelFiles.get(i).getAbsolutePath().replace(INPUT_DIRECTORY, "") + " - Unsatisfied : " + unsatisfied.size());
 		
-			if (i == 10)
-				break;*/
-			
 			EvlStandaloneExample evlStandaloneExample = new EvlStandaloneExample();
 			evlStandaloneExample.setModelUri(modelFiles.get(i).getAbsolutePath());
 			
@@ -108,17 +108,42 @@ public class ProjectsAnalyzer {
 				e.printStackTrace();
 			}
 			
-			break;
+			// Adding to the list!
+			ArrayList<String> constraints = new ArrayList<String>();
+			if (evlConstraints.containsKey(modelFiles.get(i)))
+			{
+				constraints = evlConstraints.get(modelFiles.get(i));
+			}
+			
+			for (UnsatisfiedConstraint uc : unsatisfied)
+			{
+				constraints.add(uc.getMessage());
+				totalConstraints++;
+			}
+			
+			evlConstraints.put(modelFiles.get(i), constraints);
+			*/
+			
+			// Adding to the list!
+			ArrayList<String> constraints = new ArrayList<String>();
+			if (evlConstraints.containsKey(modelFiles.get(i)))
+			{
+				constraints = evlConstraints.get(modelFiles.get(i));
+			}
+			
+			Random r = new Random();
+			int Low = 1;
+			int High = 25;
+			int codeNumber = (r.nextInt(High-Low) + Low);
+			String stringCodeNumber = codeNumber + "";
+			
+			if (codeNumber < 10)
+				stringCodeNumber = "0" + codeNumber;
+			
+			constraints.add("[" + stringCodeNumber + "] Bla bla bla");
+			evlConstraints.put(modelFiles.get(i), constraints);
+			totalConstraints++;
 		}
-	}
-	
-	/**
-	 * Main method
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		ProjectsAnalyzer haetae = new ProjectsAnalyzer();
-		haetae.processFiles();
 	}
 	
 	/**
@@ -188,8 +213,40 @@ public class ProjectsAnalyzer {
     	return OUTPUT_DIRECTORY;
     }
     
+    public String getInputDirectory()
+    {
+    	return INPUT_DIRECTORY;
+    }
+    
     public ArrayList<File> getModelFiles()
     {
     	return modelFiles;
     }
+    
+    public void setModelFiles(ArrayList<File> modelFiles)
+    {
+    	this.modelFiles = modelFiles;
+    }
+    
+    public HashMap<File, ArrayList<String>> getEvlConstraints()
+    {
+    	return evlConstraints;
+    }
+    
+    public void setEvlConstraints(HashMap<File, ArrayList<String>> evlConstraints)
+    {
+    	this.evlConstraints = evlConstraints;
+    }
+
+	public int getTotalConstraints() {
+		return totalConstraints;
+	}
+
+	public void setTotalConstraints(int totalConstraints) {
+		this.totalConstraints = totalConstraints;
+	}
+
+	public void logLine(String string) {
+		System.out.println(string);
+	}
 }
