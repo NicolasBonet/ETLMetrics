@@ -73,8 +73,8 @@ public class ProjectsAnalyzer {
 		addModelFiles(INPUT_DIRECTORY);
 		
 		// Register metamodels
-		registerMetamodel(URI.createFileURI("metamodels/EOL.ecore"));
-		registerMetamodel(URI.createFileURI("metamodels/ETL.ecore"));
+		//registerMetamodel(URI.createFileURI("metamodels/EOL.ecore"));
+		//registerMetamodel(URI.createFileURI("metamodels/ETL.ecore"));
 		
 		// Process them!
 		processFiles();
@@ -89,8 +89,10 @@ public class ProjectsAnalyzer {
 		// Process each one
 		for (int i = 0; i < modelFiles.size(); i++)
 		{
-			// Parse EVL File
+			// Create an EvlModule
 			EvlModule module = new EvlModule();
+			
+			// Parse it!
 			try {
 				module.parse(new File(EVL_FILE));
 			} catch (Exception e) {
@@ -107,9 +109,9 @@ public class ProjectsAnalyzer {
 			}
 			
 			// Add required models
-			try {
+			/*try {
 				module.getContext().getModelRepository().addModel(
-					createEmfModel("ETL", modelFiles.get(i).getAbsolutePath(), new File("metamodels/ETL.ecore").getAbsolutePath(), true, true)
+					createEmfModel("ETL", modelFiles.get(i).getAbsolutePath(), "", true, true)
 				);
 			} catch (EolModelLoadingException e1) {
 				// TODO Auto-generated catch block
@@ -117,7 +119,7 @@ public class ProjectsAnalyzer {
 			} catch (URISyntaxException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
+			}*/
 			
 			// Execute!
 			try {
@@ -257,11 +259,6 @@ public class ProjectsAnalyzer {
 		emfModel.setReadOnLoad(readOnLoad);
 		emfModel.setStoredOnDisposal(storeOnDisposal);
 		emfModel.setModelFile(model);
-		
-		ArrayList<String> metamodelFiles = new ArrayList<String>();
-		metamodelFiles.add("metamodels/ETL.ecore");
-		metamodelFiles.add("metamodels/EOL.ecore");
-		emfModel.setMetamodelFiles(metamodelFiles);
 		
 		try {
 			emfModel.load();

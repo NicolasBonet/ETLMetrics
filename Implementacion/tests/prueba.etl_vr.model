@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="ASCII"?>
+<etl:ETLModule xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:eol="http://www.eclipse.org/epsilon/eol" xmlns:etl="http://www.eclipse.org/epsilon/etl">
+  <region>
+    <start line="1"/>
+    <end line="5" column="1"/>
+  </region>
+  <transformationRules container="/">
+    <region>
+      <start line="1"/>
+      <end line="5" column="1"/>
+    </region>
+    <name container="//@transformationRules.0" name="Gui2WebApp">
+      <region>
+        <start line="1" column="5"/>
+        <end line="1" column="15"/>
+      </region>
+    </name>
+    <source container="//@transformationRules.0" references="//@transformationRules.0/@body/@statements.0/@rhs/@target/@target">
+      <region>
+        <start line="2" column="10"/>
+        <end line="2" column="19"/>
+      </region>
+      <resolvedType xsi:type="eol:ModelElementType" container="//@transformationRules.0/@source" modelName="gui" elementName="GUI">
+        <region>
+          <start line="2" column="12"/>
+          <end line="2" column="19"/>
+        </region>
+      </resolvedType>
+      <name container="//@transformationRules.0/@source" name="g">
+        <region>
+          <start line="2" column="10"/>
+          <end line="2" column="11"/>
+        </region>
+      </name>
+    </source>
+    <targets container="//@transformationRules.0" references="//@transformationRules.0/@body/@statements.0/@lhs/@target">
+      <region>
+        <start line="3" column="3"/>
+        <end line="3" column="24"/>
+      </region>
+      <resolvedType xsi:type="eol:ModelElementType" container="//@transformationRules.0/@targets.0" modelName="html" elementName="WebApplication">
+        <region>
+          <start line="3" column="5"/>
+          <end line="3" column="24"/>
+        </region>
+      </resolvedType>
+      <name container="//@transformationRules.0/@targets.0" name="h">
+        <region>
+          <start line="3" column="3"/>
+          <end line="3" column="4"/>
+        </region>
+      </name>
+    </targets>
+    <body container="//@transformationRules.0">
+      <region>
+        <start line="4" column="1"/>
+        <end line="4" column="31"/>
+      </region>
+      <statements xsi:type="eol:AssignmentStatement" container="//@transformationRules.0/@body">
+        <region>
+          <start line="4" column="1"/>
+          <end line="4" column="31"/>
+        </region>
+        <lhs xsi:type="eol:PropertyCallExpression" container="//@transformationRules.0/@body/@statements.0">
+          <region>
+            <start line="4" column="1"/>
+            <end line="4" column="7"/>
+          </region>
+          <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.0/@lhs" name="h">
+            <region>
+              <start line="4" column="1"/>
+              <end line="4" column="2"/>
+            </region>
+          </target>
+          <property container="//@transformationRules.0/@body/@statements.0/@lhs" name="html">
+            <region>
+              <start line="4" column="3"/>
+              <end line="4" column="7"/>
+            </region>
+          </property>
+        </lhs>
+        <rhs xsi:type="eol:MethodCallExpression" container="//@transformationRules.0/@body/@statements.0">
+          <region>
+            <start line="4" column="10"/>
+            <end line="4" column="30"/>
+          </region>
+          <target xsi:type="eol:PropertyCallExpression" container="//@transformationRules.0/@body/@statements.0/@rhs">
+            <region>
+              <start line="4" column="10"/>
+              <end line="4" column="17"/>
+            </region>
+            <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.0/@rhs/@target" name="g">
+              <region>
+                <start line="4" column="10"/>
+                <end line="4" column="11"/>
+              </region>
+            </target>
+            <property container="//@transformationRules.0/@body/@statements.0/@rhs/@target" name="forms">
+              <region>
+                <start line="4" column="12"/>
+                <end line="4" column="17"/>
+              </region>
+            </property>
+          </target>
+          <method container="//@transformationRules.0/@body/@statements.0/@rhs" name="equivalent">
+            <region>
+              <start line="4" column="18"/>
+              <end line="4" column="30"/>
+            </region>
+          </method>
+        </rhs>
+      </statements>
+    </body>
+  </transformationRules>
+</etl:ETLModule>

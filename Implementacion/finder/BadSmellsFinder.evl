@@ -1,3 +1,5 @@
+model Ecore driver EMF {nsuri="http://www.eclipse.org/emf/2002/Ecore"};
+
 /*
 * Settings
 */
@@ -16,7 +18,7 @@ context ETL!TransformationRule
 	*/
 	critique NameShouldStartWithUpperCase
 	{
-		guard : self.name.name <> ""
+		guard : self.println() <> "" and self.name.name <> ""
 		
 		check : self.name.name.substring(0,1) = self.name.name.substring(0,1).toUpperCase()
 	    
