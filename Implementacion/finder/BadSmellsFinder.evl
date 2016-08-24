@@ -1,5 +1,3 @@
-model Ecore driver EMF {nsuri="http://www.eclipse.org/emf/2002/Ecore"};
-
 /*
 * Settings
 */
@@ -18,7 +16,7 @@ context ETL!TransformationRule
 	*/
 	critique NameShouldStartWithUpperCase
 	{
-		guard : self.println() <> "" and self.name.name <> ""
+		guard : self.name.name <> ""
 		
 		check : self.name.name.substring(0,1) = self.name.name.substring(0,1).toUpperCase()
 	    
@@ -338,7 +336,7 @@ context ETL!PropertyCallExpression
 			if (parentRule == null)
 				return true;
 				
-			return parentRule.targets.exists( t | t.name.name = self.target.name ) == false;
+			return self.target.hasProperty('name') == false or parentRule.targets.exists( t | t.name.name = self.target.name ) == false;
 		}
 		
 		message : "[15] The rule " + parentRule.name.name + " (between lines " + parentRule.region.start.line + " and " + parentRule.region.end.line + ") has target navigation (attribute: " + self.target.name + ") which is unsafe as those variables could be without definition, consider the use of lazy rules and equivalents to control the flow of the execution."

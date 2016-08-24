@@ -30,12 +30,12 @@ public class ProjectsAnalyzer {
 	/**
 	 * INPUT_DIRECTORY is the location of model files
 	 */
-	private final static String INPUT_DIRECTORY = "/Users/mac/Documents/Repositorios/ETLMetrics/generated/models";
+	private final static String INPUT_DIRECTORY = "/Users/nicolas/Documents/Repositorios/ETLMetrics/generated/models";
 	
 	/**
 	 * OUTPUT_DIRECTORY is the output where generated reports will be placed
 	 */
-	private final static String OUTPUT_DIRECTORY = "/Users/mac/Documents/Repositorios/ETLMetrics/generated/reports";
+	private final static String OUTPUT_DIRECTORY = "/Users/nicolas/Documents/Repositorios/ETLMetrics/generated/reports";
 	
 	/**
 	 * OPERATION_TYPE is the operation type used by HAETAE, it might be AST2vrETL or AST2trETL
@@ -235,7 +235,7 @@ public class ProjectsAnalyzer {
         }
     }
     
-    protected void registerMetamodel(URI metamodelUri)
+    /*protected void registerMetamodel(URI metamodelUri)
     {
     	Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("ecore", new EcoreResourceFactoryImpl());
     	
@@ -308,7 +308,7 @@ public class ProjectsAnalyzer {
 		properties.put(EmfModel.PROPERTY_STOREONDISPOSAL, storeOnDisposal + "");
 		emfModel.load(properties, (IRelativePathResolver) null);
 		return emfModel;
-	}*/
+	}
     
     protected EmfModel createEmfModelByURI(String name, String model, 
 			String metamodel, boolean readOnLoad, boolean storeOnDisposal) 
@@ -350,7 +350,7 @@ public class ProjectsAnalyzer {
 						.toString()),
 				EPackage.Registry.INSTANCE);
 		registeredMetamodels.add(metamodelFile);
-	}
+	}*/
     
     public String getOutputDirectory()
     {

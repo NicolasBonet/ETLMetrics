@@ -22,12 +22,12 @@ public class HaetaeCaller {
 	/**
 	 * INPUT_DIRECTORY is the location of ETL Files
 	 */
-	private final static String INPUT_DIRECTORY = "/Users/mac/Documents/Repositorios/ETLMetrics";
+	private final static String INPUT_DIRECTORY = "/Users/nicolas/Documents/Repositorios/ETLMetrics";
 	
 	/**
 	 * OUTPUT_DIRECTORY is the output where generated models will be placed
 	 */
-	private final static String OUTPUT_DIRECTORY = "/Users/mac/Documents/Repositorios/ETLMetrics/generated/models";
+	private final static String OUTPUT_DIRECTORY = "/Users/nicolas/Documents/Repositorios/ETLMetrics/generated/models";
 	
 	/**
 	 * OPERATION_TYPE is the operation type used by HAETAE, it might be AST2vrETL or AST2trETL
