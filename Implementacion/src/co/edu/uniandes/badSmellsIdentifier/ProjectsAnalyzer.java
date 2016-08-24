@@ -1,6 +1,7 @@
 package co.edu.uniandes.badSmellsIdentifier;
 
 import java.io.File;
+
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,9 +73,13 @@ public class ProjectsAnalyzer {
 		// Find all ETL files
 		addModelFiles(INPUT_DIRECTORY);
 		
-		// Register metamodels
-		//registerMetamodel(URI.createFileURI("metamodels/EOL.ecore"));
-		//registerMetamodel(URI.createFileURI("metamodels/ETL.ecore"));
+		try{
+			registerMetamodels();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 		
 		// Process them!
 		processFiles();
@@ -109,7 +114,7 @@ public class ProjectsAnalyzer {
 			}
 			
 			// Add required models
-			/*try {
+			try {
 				module.getContext().getModelRepository().addModel(
 					createEmfModel("ETL", modelFiles.get(i).getAbsolutePath(), "", true, true)
 				);
@@ -119,7 +124,7 @@ public class ProjectsAnalyzer {
 			} catch (URISyntaxException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}*/
+			}
 			
 			// Execute!
 			try {
@@ -235,7 +240,26 @@ public class ProjectsAnalyzer {
         }
     }
     
-    /*protected void registerMetamodel(URI metamodelUri)
+    protected EmfModel createEmfModel(String name, String model, 
+			String metamodel, boolean readOnLoad, boolean storeOnDisposal) 
+					throws EolModelLoadingException, URISyntaxException {
+    	
+		EmfModel emfModel = new EmfModel();
+		emfModel.setName(name);
+		emfModel.setReadOnLoad(readOnLoad);
+		emfModel.setStoredOnDisposal(storeOnDisposal);
+		emfModel.setMetamodelUri("http://www.eclipse.org/epsilon/etl");
+		emfModel.setModelFile(model);
+		
+		try {
+			emfModel.load();
+		} catch (EolModelLoadingException e) {
+			e.printStackTrace();
+		}
+		return emfModel;
+    }
+    
+    protected void registerMetamodels()
     {
     	Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("ecore", new EcoreResourceFactoryImpl());
     	
@@ -248,24 +272,6 @@ public class ProjectsAnalyzer {
 		EPackage univEPackage2 = (EPackage) myMetaModel2.getContents().get(0);
 		resourceSet.getPackageRegistry().put("http://www.eclipse.org/epsilon/etl", univEPackage2);
 		System.out.println("Tam: " + resourceSet.getPackageRegistry().size());
-    }
-    
-    protected EmfModel createEmfModel(String name, String model, 
-			String metamodel, boolean readOnLoad, boolean storeOnDisposal) 
-					throws EolModelLoadingException, URISyntaxException {
-    	
-		EmfModel emfModel = new EmfModel();
-		emfModel.setName(name);
-		emfModel.setReadOnLoad(readOnLoad);
-		emfModel.setStoredOnDisposal(storeOnDisposal);
-		emfModel.setModelFile(model);
-		
-		try {
-			emfModel.load();
-		} catch (EolModelLoadingException e) {
-			e.printStackTrace();
-		}
-		return emfModel;
     }
     
     /*protected EmfModel createEmfModel(String name, String model, 
@@ -344,10 +350,7 @@ public class ProjectsAnalyzer {
     public void registerMetamodel(String metamodelFile) throws Exception {
 		if (registeredMetamodels.contains(metamodelFile)) return;
 		EmfUtil.register(
-				URI.createURI(ProjectsAnalyzer.class
-						.getClassLoader()
-						.getResource(metamodelFile)
-						.toString()),
+				URI.createURI(new File(metamodelFile).getAbsolutePath()),
 				EPackage.Registry.INSTANCE);
 		registeredMetamodels.add(metamodelFile);
 	}*/
