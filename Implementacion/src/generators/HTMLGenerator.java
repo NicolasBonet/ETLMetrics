@@ -26,7 +26,7 @@ public class HTMLGenerator {
 	/**
 	 * TEMPLATE_FILE is the location of the template
 	 */
-	private final static String TEMPLATE_FILE = "finder/widget.html";
+	private final static String TEMPLATE_FILE = "html_template/widget.html";
 	
 	/**
 	 * REPORTS_DIRECTORY is the location of the template
