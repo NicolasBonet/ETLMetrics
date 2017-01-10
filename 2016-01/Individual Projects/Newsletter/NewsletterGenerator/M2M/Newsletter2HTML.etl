@@ -1,3 +1,6 @@
+model newsletter driver EMF {path='Newsletter.ecore'};
+model html driver EMF {path='HTML.ecore'};
+
 pre {
 	"Start ETL Newsletter2HTML".println();
 }

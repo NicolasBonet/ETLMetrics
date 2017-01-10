@@ -1,3 +1,6 @@
+model mm_arquitectura driver EMF {path='arquitectura.ecore'};
+model jee driver EMF {path='jee.ecore'};
+
 rule Sistema2Aplicacion
 	transform sistema:mm_arquitectura!Sistema
 	to aplicacion:jee!Aplicacion{

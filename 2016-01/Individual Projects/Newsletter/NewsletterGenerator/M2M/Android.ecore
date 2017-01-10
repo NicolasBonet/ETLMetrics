@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="android" nsURI="android" nsPrefix="android">
+  <eClassifiers xsi:type="ecore:EClass" name="Application">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="identifier" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mainActivity" eType="#//activity/Activity"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Action">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="actionLink" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="view" lowerBound="1" eType="#//layout/view/View"/>
+  </eClassifiers>
+  <eSubpackages name="activity" nsURI="activity" nsPrefix="activity">
+    <eClassifiers xsi:type="ecore:EClass" name="Activity">
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="title" lowerBound="1"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="layout" lowerBound="1"
+          eType="#//layout/Layout" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="actions" upperBound="-1"
+          eType="#//Action" containment="true"/>
+    </eClassifiers>
+  </eSubpackages>
+  <eSubpackages name="layout" nsURI="layout" nsPrefix="layout">
+    <eClassifiers xsi:type="ecore:EClass" name="Layout">
+      <eStructuralFeatures xsi:type="ecore:EReference" name="content" lowerBound="1"
+          eType="#//layout/view/ViewGroup" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+    <eSubpackages name="view" nsURI="view" nsPrefix="view">
+      <eClassifiers xsi:type="ecore:EClass" name="View" abstract="true">
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="text" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="textColor" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="textAlignment" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="textAppearance" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="textSize" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="layout_width" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+            defaultValueLiteral="match_parent"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="layout_height" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+            defaultValueLiteral="match_parent"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="layout_weight" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="layout_gravity" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="layout_row" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+            defaultValueLiteral="0"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="layout_column" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+            defaultValueLiteral="0"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="background" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="paddingBottom" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="paddingLeft" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="paddingRight" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="paddingTop" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="textStyle" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      </eClassifiers>
+      <eClassifiers xsi:type="ecore:EClass" name="ViewGroup" abstract="true" eSuperTypes="#//layout/view/View">
+        <eStructuralFeatures xsi:type="ecore:EReference" name="views" upperBound="-1"
+            eType="#//layout/view/View" containment="true"/>
+      </eClassifiers>
+      <eClassifiers xsi:type="ecore:EClass" name="Button" eSuperTypes="#//layout/view/View"/>
+      <eClassifiers xsi:type="ecore:EClass" name="TextView" eSuperTypes="#//layout/view/View"/>
+      <eClassifiers xsi:type="ecore:EClass" name="ImageView" eSuperTypes="#//layout/view/View">
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="src" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      </eClassifiers>
+      <eClassifiers xsi:type="ecore:EClass" name="LinearLayout" eSuperTypes="#//layout/view/ViewGroup">
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="orientation" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+            defaultValueLiteral="vertical"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="layout_columnWeight"
+            eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="gravity" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      </eClassifiers>
+      <eClassifiers xsi:type="ecore:EClass" name="RelativeLayout" eSuperTypes="#//layout/view/ViewGroup"/>
+      <eClassifiers xsi:type="ecore:EClass" name="GridLayout" eSuperTypes="#//layout/view/ViewGroup">
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="rowCount" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+            defaultValueLiteral="1"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="columnCount" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+            defaultValueLiteral="1"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="layout_aligntParentTop"
+            eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+        <eStructuralFeatures xsi:type="ecore:EAttribute" name="layout_centerHorizontal"
+            eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+      </eClassifiers>
+      <eClassifiers xsi:type="ecore:EClass" name="ScrollView" eSuperTypes="#//layout/view/ViewGroup"/>
+    </eSubpackages>
+  </eSubpackages>
+</ecore:EPackage>

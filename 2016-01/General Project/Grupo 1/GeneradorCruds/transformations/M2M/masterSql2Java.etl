@@ -1,3 +1,6 @@
+model sql driver EMF {path='SQL.ecore'};
+model java driver EMF {path='mmJavaMinimalista.ecore'};
+
 import "transformOperations.eol";
 import "sql2JavaEntities.etl";
 import "sql2JavaTest.etl";

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="businessplataform" nsURI="http://co.edu.uniandes.businessplataform"
+    nsPrefix="businessplataform">
+  <eClassifiers xsi:type="ecore:EClass" name="Business">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="businessentity" lowerBound="1"
+        upperBound="-1" eType="#//BusinessEntity" containment="true" eOpposite="#//BusinessEntity/owner"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BusinessEntity">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owner" lowerBound="1" eType="#//Business"
+        eOpposite="#//Business/businessentity"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="attributes" upperBound="-1"
+        eType="#//Attribute" containment="true" eOpposite="#//Attribute/owner"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Attribute">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="owner" lowerBound="1" eType="#//BusinessEntity"
+        eOpposite="#//BusinessEntity/attributes"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="unique" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="#//DataType"
+        defaultValueLiteral="String"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="DataType">
+    <eLiterals name="String"/>
+    <eLiterals name="Double" value="1"/>
+    <eLiterals name="Long" value="2" literal="long"/>
+  </eClassifiers>
+</ecore:EPackage>

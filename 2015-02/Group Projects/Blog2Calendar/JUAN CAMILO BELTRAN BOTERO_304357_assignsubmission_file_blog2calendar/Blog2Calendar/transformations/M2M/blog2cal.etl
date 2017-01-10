@@ -1,3 +1,6 @@
+model bl driver EMF {path='Blog.ecore'};
+model cl driver EMF {path='Calendar.ecore'};
+
 rule blog2cal
 	transform
 		f : bl!Blog

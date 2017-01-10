@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="proyecto" nsURI="http://www.example.org/proyecto" nsPrefix="proyecto">
+  <eClassifiers xsi:type="ecore:EClass" name="Atributo">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="visibilidad" eType="#//Visibilidad"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tipo" lowerBound="1" eType="#//Tipo"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="anotaciones" upperBound="-1"
+        eType="#//Anotacion" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Metodo" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="visibilidad" eType="#//Visibilidad"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parametros" upperBound="-1"
+        eType="#//Parametro" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="retorno" eType="#//Retorno"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="anotaciones" upperBound="-1"
+        eType="#//Anotacion" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="instrucciones" upperBound="-1"
+        eType="#//Instruccion" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TipoClase" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="atributos" upperBound="-1"
+        eType="#//Atributo" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="anotaciones" upperBound="-1"
+        eType="#//Anotacion" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="EJB" eSuperTypes="#//TipoClase">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="servicios" upperBound="-1"
+        eType="#//MetodoEJB" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipoInterface" eType="#//TipoInterface"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Service" eSuperTypes="#//TipoClase">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="recurso" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="servicios" upperBound="-1"
+        eType="#//MetodoServicio" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TipoInterface">
+    <eLiterals name="LOCAL"/>
+    <eLiterals name="REMOTE"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="MetodoServicio" eSuperTypes="#//Metodo">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="recurso" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="peticion" eType="#//Peticion"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="consume" eType="#//TipoFormato"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="produce" eType="#//TipoFormato"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Visibilidad">
+    <eLiterals name="PRIVATE"/>
+    <eLiterals name="PROTECTED"/>
+    <eLiterals name="DEFAULT"/>
+    <eLiterals name="PUBLIC"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Peticion">
+    <eLiterals name="GET"/>
+    <eLiterals name="POST"/>
+    <eLiterals name="PUT"/>
+    <eLiterals name="DELETE"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TipoFormato">
+    <eLiterals name="JSON"/>
+    <eLiterals name="XML"/>
+    <eLiterals name="TEXT"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Tipo" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Primitivo" eSuperTypes="#//Tipo">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipoPrimitivo" eType="#//TipoPrimitivo"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Complejo" eSuperTypes="#//Tipo">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TipoPrimitivo">
+    <eLiterals name="STRING"/>
+    <eLiterals name="BOOLEAN"/>
+    <eLiterals name="INTEGER"/>
+    <eLiterals name="LONG"/>
+    <eLiterals name="DOUBLE"/>
+    <eLiterals name="DATE"/>
+    <eLiterals name="CALENDAR"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Parametro">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tipo" lowerBound="1" eType="#//Tipo"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="MetodoEJB" eSuperTypes="#//Metodo"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Retorno">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tipo" lowerBound="1" eType="#//Tipo"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Entidad" eSuperTypes="#//TipoClase">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="extension" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Capa">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="clases" upperBound="-1"
+        eType="#//TipoClase" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Aplicacion">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="capas" lowerBound="1" upperBound="3"
+        eType="#//Capa" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Anotacion">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="argumentos" upperBound="-1"
+        eType="#//Argumento" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Argumento">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="valor" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Instruccion">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="valor" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+</ecore:EPackage>

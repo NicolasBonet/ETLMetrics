@@ -1,3 +1,6 @@
+model mm_arquitectura driver EMF {path='arquitectura.ecore'};
+model business driver EMF {path='business.ecore'};
+
 rule Negocio2Sistema
 	transform proyecto:business!Proyecto
 	to sistema:mm_arquitectura!Sistema{

@@ -1,3 +1,6 @@
+model mm_arquitectura driver EMF {path='arquitectura.ecore'};
+model angular driver EMF {path='angular.ecore'};
+
 rule Sistema2Aplicacion
 	transform sistema:mm_arquitectura!Sistema
 	to aplicacion:angular!Aplicacion{

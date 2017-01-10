@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="testAngular1" nsURI="http://www.example.org/testAngular1" nsPrefix="testAngular1">
+  <eClassifiers xsi:type="ecore:EClass" name="Angular">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="controllers" upperBound="-1"
+        eType="#//Controller" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="services" upperBound="-1"
+        eType="#//Service" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="vistas" upperBound="-1"
+        eType="#//Vista" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Controller" eSuperTypes="#//Object">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="titulo" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="services" upperBound="-1"
+        eType="#//Service"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="vista" lowerBound="1" eType="#//Vista"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="submit" lowerBound="1"
+        eType="#//Metodo"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="obtenerPorId" eType="#//Metodo"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="listas" upperBound="-1"
+        eType="#//Metodo"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Metodo" eSuperTypes="#//Object">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parametros" upperBound="-1"
+        eType="#//Parametro" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="verbo" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="ruta" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="service" lowerBound="1"
+        eType="#//Service"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Parametro" eSuperTypes="#//Object"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Service" eSuperTypes="#//Object">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="metodos" upperBound="-1"
+        eType="#//Metodo" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="readonly" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Object" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Vista" eSuperTypes="#//Object">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="dto" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="formElements" upperBound="-1"
+        eType="#//FormElement" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FormElement" abstract="true" eSuperTypes="#//Object">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="required" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="label" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipo" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Input" eSuperTypes="#//FormElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="placeholder" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="seleccionado" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FormGroup" eSuperTypes="#//FormElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="lista" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="elements" upperBound="-1"
+        eType="#//RadioButton" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="RadioButton" eSuperTypes="#//Object"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Textarea" eSuperTypes="#//FormElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="filas" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="3"/>
+  </eClassifiers>
+</ecore:EPackage>

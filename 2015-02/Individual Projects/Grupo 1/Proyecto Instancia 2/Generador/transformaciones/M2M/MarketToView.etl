@@ -1,4 +1,5 @@
-
+model view driver EMF {path='presentacion.ecore'};
+model mp driver EMF {path='proyectos.ecore'};
 
 rule Market2Design
 transform m:mp!MarketPlace

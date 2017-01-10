@@ -1,3 +1,6 @@
+model AndroidOut driver EMF {path='webApiGeneric.ecore'};
+model CSharp driver EMF {path='webApiInput.ecore'};
+
 pre{
 var csharp =new CSharp!CSharp;
 var  androidCore =new  AndroidOut!AndroidCore;

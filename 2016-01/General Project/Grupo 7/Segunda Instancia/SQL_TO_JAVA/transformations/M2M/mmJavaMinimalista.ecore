@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_cG3KAAm2EeaYqaRqn1lxcQ" name="mmJavaMinimalista" nsURI="http://uniandes.edu.co/mmJavaMinimalista"
+    nsPrefix="mmJavaMinimalista">
+  <eAnnotations xmi:id="_cG3KAQm2EeaYqaRqn1lxcQ" source="genmymodel">
+    <details xmi:id="_cG3KAgm2EeaYqaRqn1lxcQ" key="uuid" value="_7jvQUPYdEeWolbMxsR5EUQ"/>
+  </eAnnotations>
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_cG3KAwm2EeaYqaRqn1lxcQ" name="Package">
+    <eAnnotations xmi:id="_cG3KBAm2EeaYqaRqn1lxcQ" source="genmymodel">
+      <details xmi:id="_cG3KBQm2EeaYqaRqn1lxcQ" key="uuid" value="_o0AHgNhMEDO0x4Or-3wTcQ"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3KCgm2EeaYqaRqn1lxcQ"
+        name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations xmi:id="_cG3KCwm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KDAm2EeaYqaRqn1lxcQ" key="uuid" value="_UqUNsNhSEDOZdqnyCxo4tQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" xmi:id="_cG3KDgm2EeaYqaRqn1lxcQ"
+        name="classes" upperBound="-1" eType="#_cG3KIQm2EeaYqaRqn1lxcQ" containment="true">
+      <eAnnotations xmi:id="_cG3KDwm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KEAm2EeaYqaRqn1lxcQ" key="uuid" value="_OwVGENhTEDO0x4Or-3wTcQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_cG3KEgm2EeaYqaRqn1lxcQ" name="Project">
+    <eAnnotations xmi:id="_cG3KEwm2EeaYqaRqn1lxcQ" source="genmymodel">
+      <details xmi:id="_cG3KFAm2EeaYqaRqn1lxcQ" key="uuid" value="_KISysNhNEDOZdqnyCxo4tQ"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" xmi:id="_cG3KFQm2EeaYqaRqn1lxcQ"
+        name="packages" lowerBound="1" upperBound="-1" eType="#_cG3KAwm2EeaYqaRqn1lxcQ"
+        containment="true">
+      <eAnnotations xmi:id="_cG3KFgm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KFwm2EeaYqaRqn1lxcQ" key="uuid" value="_fcJ8cNhOEDO0x4Or-3wTcQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3KGQm2EeaYqaRqn1lxcQ"
+        name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations xmi:id="_cG3KGgm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KGwm2EeaYqaRqn1lxcQ" key="uuid" value="_Sg0xoNhSEDOZdqnyCxo4tQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" xmi:id="_cG3KHQm2EeaYqaRqn1lxcQ"
+        name="datatype" upperBound="-1" eType="#_cG3xMQm2EeaYqaRqn1lxcQ" containment="true">
+      <eAnnotations xmi:id="_cG3KHgm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KHwm2EeaYqaRqn1lxcQ" key="uuid" value="_CV_LoOvjEDOUsItWISc23Q"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_cG3KIQm2EeaYqaRqn1lxcQ" name="Class"
+      eSuperTypes="#_cG3Kiwm2EeaYqaRqn1lxcQ">
+    <eAnnotations xmi:id="_cG3KIgm2EeaYqaRqn1lxcQ" source="genmymodel">
+      <details xmi:id="_cG3KIwm2EeaYqaRqn1lxcQ" key="uuid" value="_YdmEUNhNEDOZdqnyCxo4tQ"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" xmi:id="_cG3KJAm2EeaYqaRqn1lxcQ"
+        name="annotateClass" upperBound="-1" eType="#_cG3KXgm2EeaYqaRqn1lxcQ" containment="true">
+      <eAnnotations xmi:id="_cG3KJQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KJgm2EeaYqaRqn1lxcQ" key="uuid" value="_D1Ut4NhPEDOZdqnyCxo4tQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" xmi:id="_cG3KKAm2EeaYqaRqn1lxcQ"
+        name="methods" upperBound="-1" eType="#_cG3Kjgm2EeaYqaRqn1lxcQ" containment="true">
+      <eAnnotations xmi:id="_cG3KKQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KKgm2EeaYqaRqn1lxcQ" key="uuid" value="_U3BUUNhPEDOZdqnyCxo4tQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" xmi:id="_cG3KLAm2EeaYqaRqn1lxcQ"
+        name="attributes" upperBound="-1" eType="#_cG3KaQm2EeaYqaRqn1lxcQ" containment="true">
+      <eAnnotations xmi:id="_cG3KLQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KLgm2EeaYqaRqn1lxcQ" key="uuid" value="_VudSoNhPEDOZdqnyCxo4tQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" xmi:id="_cG3KMAm2EeaYqaRqn1lxcQ"
+        name="imports" upperBound="-1" eType="#_cG3KqQm2EeaYqaRqn1lxcQ" containment="true">
+      <eAnnotations xmi:id="_cG3KMQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KMgm2EeaYqaRqn1lxcQ" key="uuid" value="_dNOxUNhPEDOZdqnyCxo4tQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3KNAm2EeaYqaRqn1lxcQ"
+        name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations xmi:id="_cG3KNQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KNgm2EeaYqaRqn1lxcQ" key="uuid" value="_Z1ggMNhSEDOZdqnyCxo4tQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3KOAm2EeaYqaRqn1lxcQ"
+        name="visibility" eType="#_cG3KUgm2EeaYqaRqn1lxcQ">
+      <eAnnotations xmi:id="_cG3KOQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KOgm2EeaYqaRqn1lxcQ" key="uuid" value="_de3MgNhSEDOZdqnyCxo4tQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" xmi:id="_cG3KPQm2EeaYqaRqn1lxcQ" name="Primitives">
+    <eAnnotations xmi:id="_cG3KPgm2EeaYqaRqn1lxcQ" source="genmymodel">
+      <details xmi:id="_cG3KPwm2EeaYqaRqn1lxcQ" key="uuid" value="_le2UINhNEDOZdqnyCxo4tQ"/>
+    </eAnnotations>
+    <eLiterals xmi:id="_cG3KQAm2EeaYqaRqn1lxcQ" name="int" literal="int">
+      <eAnnotations xmi:id="_cG3KQQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KQgm2EeaYqaRqn1lxcQ" key="uuid" value="_7WIUANhOEDO0x4Or-3wTcQ"/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals xmi:id="_cG3KQwm2EeaYqaRqn1lxcQ" name="long" value="1" literal="long">
+      <eAnnotations xmi:id="_cG3KRAm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KRQm2EeaYqaRqn1lxcQ" key="uuid" value="_77gR8NhOEDO0x4Or-3wTcQ"/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals xmi:id="_cG3KRgm2EeaYqaRqn1lxcQ" name="float" value="2" literal="float">
+      <eAnnotations xmi:id="_cG3KRwm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KSAm2EeaYqaRqn1lxcQ" key="uuid" value="_mshWQNhPEDOZdqnyCxo4tQ"/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals xmi:id="_cG3KSQm2EeaYqaRqn1lxcQ" name="double" value="3" literal="double">
+      <eAnnotations xmi:id="_cG3KSgm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KSwm2EeaYqaRqn1lxcQ" key="uuid" value="_oW_UANhPEDOZdqnyCxo4tQ"/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals xmi:id="_cG3KTAm2EeaYqaRqn1lxcQ" name="boolean" value="4" literal="String">
+      <eAnnotations xmi:id="_cG3KTQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KTgm2EeaYqaRqn1lxcQ" key="uuid" value="_uhqtkNhPEDOZdqnyCxo4tQ"/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals xmi:id="_cG3KTwm2EeaYqaRqn1lxcQ" name="char" value="5">
+      <eAnnotations xmi:id="_cG3KUAm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KUQm2EeaYqaRqn1lxcQ" key="uuid" value="_76FboOuUEDObKfMbV8vhfw"/>
+      </eAnnotations>
+    </eLiterals>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" xmi:id="_cG3KUgm2EeaYqaRqn1lxcQ" name="Visibility">
+    <eAnnotations xmi:id="_cG3KUwm2EeaYqaRqn1lxcQ" source="genmymodel">
+      <details xmi:id="_cG3KVAm2EeaYqaRqn1lxcQ" key="uuid" value="_oltXYNhNEDOZdqnyCxo4tQ"/>
+    </eAnnotations>
+    <eLiterals xmi:id="_cG3KVQm2EeaYqaRqn1lxcQ" name="public" literal="public">
+      <eAnnotations xmi:id="_cG3KVgm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KVwm2EeaYqaRqn1lxcQ" key="uuid" value="_8jjwcNhOEDO0x4Or-3wTcQ"/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals xmi:id="_cG3KWAm2EeaYqaRqn1lxcQ" name="protected" value="1">
+      <eAnnotations xmi:id="_cG3KWQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KWgm2EeaYqaRqn1lxcQ" key="uuid" value="_9AoG8NhOEDO0x4Or-3wTcQ"/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals xmi:id="_cG3KWwm2EeaYqaRqn1lxcQ" name="private" value="2" literal="private">
+      <eAnnotations xmi:id="_cG3KXAm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KXQm2EeaYqaRqn1lxcQ" key="uuid" value="_e6lD8NhPEDOZdqnyCxo4tQ"/>
+      </eAnnotations>
+    </eLiterals>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_cG3KXgm2EeaYqaRqn1lxcQ" name="Annotation">
+    <eAnnotations xmi:id="_cG3KXwm2EeaYqaRqn1lxcQ" source="genmymodel">
+      <details xmi:id="_cG3KYAm2EeaYqaRqn1lxcQ" key="uuid" value="_3JiNMNhNEDOZdqnyCxo4tQ"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3KYQm2EeaYqaRqn1lxcQ"
+        name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations xmi:id="_cG3KYgm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KYwm2EeaYqaRqn1lxcQ" key="uuid" value="_W8tHENhSEDOZdqnyCxo4tQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" xmi:id="_cG3KZQm2EeaYqaRqn1lxcQ"
+        name="annotationParameters" upperBound="-1" eType="#_cG3xOQm2EeaYqaRqn1lxcQ"
+        containment="true">
+      <eAnnotations xmi:id="_cG3KZgm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KZwm2EeaYqaRqn1lxcQ" key="uuid" value="_FJws4Ou5EDOUsItWISc23Q"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_cG3KaQm2EeaYqaRqn1lxcQ" name="Attribute">
+    <eAnnotations xmi:id="_cG3Kagm2EeaYqaRqn1lxcQ" source="genmymodel">
+      <details xmi:id="_cG3Kawm2EeaYqaRqn1lxcQ" key="uuid" value="_-EtPkNhNEDOZdqnyCxo4tQ"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" xmi:id="_cG3KbAm2EeaYqaRqn1lxcQ"
+        name="annotateAttribute" upperBound="-1" eType="#_cG3KXgm2EeaYqaRqn1lxcQ"
+        containment="true">
+      <eAnnotations xmi:id="_cG3KbQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3Kbgm2EeaYqaRqn1lxcQ" key="uuid" value="_BIqTUNhPEDOZdqnyCxo4tQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3KcAm2EeaYqaRqn1lxcQ"
+        name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations xmi:id="_cG3KcQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3Kcgm2EeaYqaRqn1lxcQ" key="uuid" value="_XMq1sNhSEDO0x4Or-3wTcQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3KdAm2EeaYqaRqn1lxcQ"
+        name="visibility" eType="#_cG3KUgm2EeaYqaRqn1lxcQ">
+      <eAnnotations xmi:id="_cG3KdQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3Kdgm2EeaYqaRqn1lxcQ" key="uuid" value="_YqgssNhSEDO0x4Or-3wTcQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" xmi:id="_cG3KeAm2EeaYqaRqn1lxcQ"
+        name="datatypeAttribute" lowerBound="1" eType="#_cG3Kiwm2EeaYqaRqn1lxcQ">
+      <eAnnotations xmi:id="_cG3KeQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3Kegm2EeaYqaRqn1lxcQ" key="uuid" value="_SHARgNhUEDO0x4Or-3wTcQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3KfAm2EeaYqaRqn1lxcQ"
+        name="modifier" eType="#_cG3KsAm2EeaYqaRqn1lxcQ" defaultValueLiteral="none">
+      <eAnnotations xmi:id="_cG3KfQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3Kfgm2EeaYqaRqn1lxcQ" key="uuid" value="_9k7IoOubEDObKfMbV8vhfw"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_cG3KgAm2EeaYqaRqn1lxcQ" name="Parameter">
+    <eAnnotations xmi:id="_cG3KgQm2EeaYqaRqn1lxcQ" source="genmymodel">
+      <details xmi:id="_cG3Kggm2EeaYqaRqn1lxcQ" key="uuid" value="_Jp8NUNhOEDOZdqnyCxo4tQ"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" xmi:id="_cG3Kgwm2EeaYqaRqn1lxcQ"
+        name="datatypeParameter" lowerBound="1" eType="#_cG3Kiwm2EeaYqaRqn1lxcQ">
+      <eAnnotations xmi:id="_cG3KhAm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KhQm2EeaYqaRqn1lxcQ" key="uuid" value="_ca2nQNhREDO0x4Or-3wTcQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3Khwm2EeaYqaRqn1lxcQ"
+        name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations xmi:id="_cG3KiAm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3KiQm2EeaYqaRqn1lxcQ" key="uuid" value="_kPtqsNhREDO0x4Or-3wTcQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="order" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_cG3Kiwm2EeaYqaRqn1lxcQ" name="Classifier">
+    <eAnnotations xmi:id="_cG3KjAm2EeaYqaRqn1lxcQ" source="genmymodel">
+      <details xmi:id="_cG3KjQm2EeaYqaRqn1lxcQ" key="uuid" value="_RktrgNhOEDO0x4Or-3wTcQ"/>
+    </eAnnotations>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_cG3Kjgm2EeaYqaRqn1lxcQ" name="Method">
+    <eAnnotations xmi:id="_cG3Kjwm2EeaYqaRqn1lxcQ" source="genmymodel">
+      <details xmi:id="_cG3KkAm2EeaYqaRqn1lxcQ" key="uuid" value="_7fKUMNhOEDOZdqnyCxo4tQ"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" xmi:id="_cG3KkQm2EeaYqaRqn1lxcQ"
+        name="annotateMethod" upperBound="-1" eType="#_cG3KXgm2EeaYqaRqn1lxcQ" containment="true">
+      <eAnnotations xmi:id="_cG3Kkgm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3Kkwm2EeaYqaRqn1lxcQ" key="uuid" value="_CsdBUNhPEDOZdqnyCxo4tQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" xmi:id="_cG3KlQm2EeaYqaRqn1lxcQ"
+        name="methodParameters" upperBound="-1" eType="#_cG3KgAm2EeaYqaRqn1lxcQ" containment="true">
+      <eAnnotations xmi:id="_cG3Klgm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3Klwm2EeaYqaRqn1lxcQ" key="uuid" value="_7Hmd4NhQEDOZdqnyCxo4tQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" xmi:id="_cG3KmQm2EeaYqaRqn1lxcQ"
+        name="datatypeReturn" eType="#_cG3Kiwm2EeaYqaRqn1lxcQ">
+      <eAnnotations xmi:id="_cG3Kmgm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3Kmwm2EeaYqaRqn1lxcQ" key="uuid" value="_e5J1sNhREDO0x4Or-3wTcQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3KnQm2EeaYqaRqn1lxcQ"
+        name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations xmi:id="_cG3Kngm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3Knwm2EeaYqaRqn1lxcQ" key="uuid" value="_mLieMNhREDO0x4Or-3wTcQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3KoQm2EeaYqaRqn1lxcQ"
+        name="visibility" eType="#_cG3KUgm2EeaYqaRqn1lxcQ">
+      <eAnnotations xmi:id="_cG3Kogm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3Kowm2EeaYqaRqn1lxcQ" key="uuid" value="_oir7wNhREDO0x4Or-3wTcQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3KpQm2EeaYqaRqn1lxcQ"
+        name="modifier" eType="#_cG3KsAm2EeaYqaRqn1lxcQ" defaultValueLiteral="none">
+      <eAnnotations xmi:id="_cG3Kpgm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3Kpwm2EeaYqaRqn1lxcQ" key="uuid" value="_LYF9kOucEDObKfMbV8vhfw"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_cG3KqQm2EeaYqaRqn1lxcQ" name="Import">
+    <eAnnotations xmi:id="_cG3Kqgm2EeaYqaRqn1lxcQ" source="genmymodel">
+      <details xmi:id="_cG3Kqwm2EeaYqaRqn1lxcQ" key="uuid" value="_Y_4AENhPEDOZdqnyCxo4tQ"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3KrAm2EeaYqaRqn1lxcQ"
+        name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations xmi:id="_cG3KrQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3Krgm2EeaYqaRqn1lxcQ" key="uuid" value="_Qh3xoNhSEDO0x4Or-3wTcQ"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" xmi:id="_cG3KsAm2EeaYqaRqn1lxcQ" name="Modifier">
+    <eAnnotations xmi:id="_cG3KsQm2EeaYqaRqn1lxcQ" source="genmymodel">
+      <details xmi:id="_cG3Ksgm2EeaYqaRqn1lxcQ" key="uuid" value="_ELG2oOuVEDObKfMbV8vhfw"/>
+    </eAnnotations>
+    <eLiterals xmi:id="_cG3Kswm2EeaYqaRqn1lxcQ" name="none" literal="none">
+      <eAnnotations xmi:id="_cG3KtAm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3xEAm2EeaYqaRqn1lxcQ" key="uuid" value="_MFTtEOuVEDObKfMbV8vhfw"/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals xmi:id="_cG3xEQm2EeaYqaRqn1lxcQ" name="final" value="1" literal="final">
+      <eAnnotations xmi:id="_cG3xEgm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3xEwm2EeaYqaRqn1lxcQ" key="uuid" value="_OIZmMOuVEDObKfMbV8vhfw"/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals xmi:id="_cG3xFAm2EeaYqaRqn1lxcQ" name="abstract" value="2" literal="abstract">
+      <eAnnotations xmi:id="_cG3xFQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3xFgm2EeaYqaRqn1lxcQ" key="uuid" value="_QQAy8OuVEDObKfMbV8vhfw"/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals xmi:id="_cG3xFwm2EeaYqaRqn1lxcQ" name="synchronized" value="3" literal="synchronized">
+      <eAnnotations xmi:id="_cG3xGAm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3xGQm2EeaYqaRqn1lxcQ" key="uuid" value="_R4MRsOuVEDObKfMbV8vhfw"/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals xmi:id="_cG3xGgm2EeaYqaRqn1lxcQ" name="static" value="4" literal="static">
+      <eAnnotations xmi:id="_cG3xGwm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3xHAm2EeaYqaRqn1lxcQ" key="uuid" value="_2y32IOvUEDOUsItWISc23Q"/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals name="staticfinal" value="5" literal="static final"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_cG3xHQm2EeaYqaRqn1lxcQ" name="Primitive"
+      eSuperTypes="#_cG3xMQm2EeaYqaRqn1lxcQ">
+    <eAnnotations xmi:id="_cG3xHgm2EeaYqaRqn1lxcQ" source="genmymodel">
+      <details xmi:id="_cG3xHwm2EeaYqaRqn1lxcQ" key="uuid" value="_HI1SYOudEDObKfMbV8vhfw"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3xIAm2EeaYqaRqn1lxcQ"
+        name="typeName" eType="#_cG3KPQm2EeaYqaRqn1lxcQ">
+      <eAnnotations xmi:id="_cG3xIQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3xIgm2EeaYqaRqn1lxcQ" key="uuid" value="_LhsJAOudEDObKfMbV8vhfw"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_cG3xJQm2EeaYqaRqn1lxcQ" name="ListType"
+      eSuperTypes="#_cG3xMQm2EeaYqaRqn1lxcQ">
+    <eAnnotations xmi:id="_cG3xJgm2EeaYqaRqn1lxcQ" source="genmymodel">
+      <details xmi:id="_cG3xJwm2EeaYqaRqn1lxcQ" key="uuid" value="_S40uoOudEDObKfMbV8vhfw"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" xmi:id="_cG3xKAm2EeaYqaRqn1lxcQ"
+        name="datatype" lowerBound="1" eType="#_cG3Kiwm2EeaYqaRqn1lxcQ">
+      <eAnnotations xmi:id="_cG3xKQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3xKgm2EeaYqaRqn1lxcQ" key="uuid" value="_5GtJgOueEDObKfMbV8vhfw"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_cG3xMQm2EeaYqaRqn1lxcQ" name="DataType"
+      eSuperTypes="#_cG3Kiwm2EeaYqaRqn1lxcQ">
+    <eAnnotations xmi:id="_cG3xMgm2EeaYqaRqn1lxcQ" source="genmymodel">
+      <details xmi:id="_cG3xMwm2EeaYqaRqn1lxcQ" key="uuid" value="_fpHhkOuuEDObKfMbV8vhfw"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3xNAm2EeaYqaRqn1lxcQ"
+        name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations xmi:id="_cG3xNQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3xNgm2EeaYqaRqn1lxcQ" key="uuid" value="_UBRFIOvkEDOUsItWISc23Q"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" xmi:id="_cG3xOQm2EeaYqaRqn1lxcQ" name="KeyValue">
+    <eAnnotations xmi:id="_cG3xOgm2EeaYqaRqn1lxcQ" source="genmymodel">
+      <details xmi:id="_cG3xOwm2EeaYqaRqn1lxcQ" key="uuid" value="_2arpUOu4EDOUsItWISc23Q"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3xPAm2EeaYqaRqn1lxcQ"
+        name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations xmi:id="_cG3xPQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3xPgm2EeaYqaRqn1lxcQ" key="uuid" value="_5r0C4Ou4EDOUsItWISc23Q"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" xmi:id="_cG3xQAm2EeaYqaRqn1lxcQ"
+        name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations xmi:id="_cG3xQQm2EeaYqaRqn1lxcQ" source="genmymodel">
+        <details xmi:id="_cG3xQgm2EeaYqaRqn1lxcQ" key="uuid" value="_6By58Ou4EDOUsItWISc23Q"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+</ecore:EPackage>

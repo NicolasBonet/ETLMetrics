@@ -1,3 +1,7 @@
+model sql driver EMF {path='SQL.ecore'};
+model java driver EMF {path='mmJavaMinimalista.ecore'};
+
+
 pre{
 sql!Model.all.collect(d|d.getAplication()).println();
 //sql!Table.all.collect(c|c.getClasses());

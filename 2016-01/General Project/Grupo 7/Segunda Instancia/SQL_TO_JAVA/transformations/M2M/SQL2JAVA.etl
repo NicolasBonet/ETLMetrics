@@ -1,3 +1,5 @@
+model SQL driver EMF {path='SQL.ecore'};
+model JAVA driver EMF {path='mmJavaMinimalista.ecore'};
 /**
 * rule: SQL2JAVA
 * obj: Crear una conjunto de paquetes y clases que constituyen el esqueleto de aplicacion java.

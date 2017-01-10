@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="cobiw" nsURI="http://www.example.org/cobiw" nsPrefix="cobiw">
+  <eClassifiers xsi:type="ecore:EEnum" name="TipoPrograma">
+    <eLiterals name="linea"/>
+    <eLiterals name="lineaConsulta" value="1" literal="lineaConsulta"/>
+    <eLiterals name="join"/>
+    <eLiterals name="lineaBalance"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Variable">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipo" eType="#//TipoVariable"
+        defaultValueLiteral="padre"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="longitud" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="precision" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="esOccurs" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="esLlave" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="conformada" upperBound="-1"
+        eType="#//Variable" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="esSalida" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="valor" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TipoVariable">
+    <eLiterals name="numerica"/>
+    <eLiterals name="caracter" value="1"/>
+    <eLiterals name="padre" value="2"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Join">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nomArchivoSalida" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="referenciaOrigen" lowerBound="1"
+        eType="#//Variable"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="referenciaDestino" lowerBound="1"
+        eType="#//Variable"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Programa">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="contiene" upperBound="-1"
+        eType="#//Copy" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipo" eType="#//TipoPrograma"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="usa" upperBound="-1" eType="#//Variable"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="joins" upperBound="-1"
+        eType="#//Join" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="autor" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral=""/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="team" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral=""/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="objetivo" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="numeroRequerimiento" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="programaId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Copy">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="compuesto" upperBound="-1"
+        eType="#//Variable" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombreArchivo" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="esEntrada" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+</ecore:EPackage>

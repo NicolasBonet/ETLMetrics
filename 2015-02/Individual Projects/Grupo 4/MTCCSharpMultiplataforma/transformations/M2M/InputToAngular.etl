@@ -1,3 +1,6 @@
+model NG driver EMF {path='testAngular1.ecore'};
+model CS driver EMF {path='webApiInput.ecore'};
+
 rule CSharpToAngular
 	transform cs : CS!CSharp
 	to ng : NG!Angular 

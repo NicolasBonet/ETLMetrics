@@ -1,3 +1,6 @@
+model sql driver EMF {path='SQL.ecore'};
+model java driver EMF {path='mmJavaMinimalista.ecore'};
+
 pre{
  "Running ETL".println();
  //var db : new sql!Model;

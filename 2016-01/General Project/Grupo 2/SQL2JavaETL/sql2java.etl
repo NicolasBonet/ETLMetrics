@@ -1,3 +1,6 @@
+model sql driver EMF {path='SQL.ecore'};
+model javaM driver EMF {path='mmJavaMinimalista.ecore'};
+
 rule SQL2Java 
 	transform s : sql!Model
 	to j : javaM!Program {

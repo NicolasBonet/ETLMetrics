@@ -1,4 +1,5 @@
-
+model Blog driver EMF {path='Blog.ecore'};
+model Calendar driver EMF {path='Calendar.ecore'};
 
 rule blogToCalendar 
 transform blog : Blog!Blog

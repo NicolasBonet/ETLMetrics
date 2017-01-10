@@ -101,7 +101,7 @@ context ETL!TransformationRule
 		 	var ruleStatements = self.body.statements.select(s | s.isTypeOf(ETL!AssignmentStatement) and s.lhs.isTypeOf(ETL!PropertyCallExpression) and s.rhs.isTypeOf(PropertyCallExpression));
 			var ruleSequence : new Sequence;
 			
-			for (rs in ruleStatements)
+			for (rs in ruleStatements.select(rs | rs.rhs.target.hasProperty('name')))
 			{
 				ruleSequence.add(rs.lhs.target.name + "." + rs.lhs.property.name + "=" + rs.rhs.target.name + "." + rs.rhs.property.name);
 			}
@@ -118,7 +118,7 @@ context ETL!TransformationRule
 				ruleComparedEnd = comparisonRule.region.end.line;
 				
 				// Now see if they have them!
-				for (rs in comparisonRuleStatements)
+				for (rs in comparisonRuleStatements->select(s | s.lhs.property.hasProperty('name') and s.lhs.target.hasProperty('name') and s.rhs.target.hasProperty('name')))
 				{
 					clonedRuleSequence.remove(rs.lhs.target.name + "." + rs.lhs.property.name + "=" + rs.rhs.target.name + "." + rs.rhs.property.name);
 				}
@@ -161,7 +161,7 @@ context ETL!OperationDefinition
 		
 		check : ETL!MethodCallExpression.allInstances.select(c | c.hasProperty('method') and c.method.name = self.name.name).size() <> 1
 	    
-	    message : "[04] Operation " + self.name.name + " (line #" + self.region.start.line  + ") is only being used once, consider to remove it and place content inside the parent: " + ETL!MethodCallExpression.allInstances.select(c | c.hasProperty('method') and c.method.name = self.name.name).size()
+	    message : "[04] Operation " + self.name.name + " (line #" + self.region.start.line  + ") is only being used once, consider to remove it and place content inside the parent"
     }
     
     /*
@@ -302,7 +302,7 @@ context ETL!MethodCallExpression
 	{
 		check : self.method.name <> "allInstances"
 		
-		message : "The transformation is using allInstances (between lines " + self.region.start.line + " and " + self.region.end.line + "), consider to use OCL navigation instead."
+		message : "[20] The transformation is using allInstances (between lines " + self.region.start.line + " and " + self.region.end.line + "), consider to use OCL navigation instead."
     }
     
     /*

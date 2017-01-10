@@ -1,3 +1,6 @@
+model android driver EMF {path='android.ecore'};
+model mp driver EMF {path='proyectos.ecore'};
+
 pre {
 	var promoIterator = 1;
 	var mapIterator = 1;

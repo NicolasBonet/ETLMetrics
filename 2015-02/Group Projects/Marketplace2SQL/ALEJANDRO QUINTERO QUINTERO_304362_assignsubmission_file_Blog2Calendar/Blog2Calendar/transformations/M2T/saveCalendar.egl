@@ -1,8 +1,0 @@
-[%
-
-TemplateFactory.setOutputRoot('../../generated');
-var save:Template:=TemplateFactory.load('calendarEgl.egl');
-
-save.generate('calendario.ics');
-
-%]

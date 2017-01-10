@@ -1,3 +1,6 @@
+model blog driver EMF {path='Blog.ecore'};
+model calendar driver EMF {path='Calendar.ecore'};
+
 rule b2c
 transform 
  	iBlog : blog!Blog

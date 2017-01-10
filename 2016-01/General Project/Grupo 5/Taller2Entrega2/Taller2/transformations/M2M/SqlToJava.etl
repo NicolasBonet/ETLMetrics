@@ -1,3 +1,6 @@
+model sql driver EMF {path='SQL.ecore'};
+model java driver EMF {path='mmJavaMinimalista.ecore'};
+
 rule DataTable2Paquete
 transform
 	s:sql!Database

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="sQL" nsURI="http://www.uniandes.org/xtext/SQL" nsPrefix="sQL">
+  <eClassifiers xsi:type="ecore:EClass" name="DataBase">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="table" upperBound="-1"
+        eType="#//Table" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Table">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="column" upperBound="-1"
+        eType="#//Column" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="primarykey" eType="#//PrimaryKey"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="foreignkey" upperBound="-1"
+        eType="#//ForeignKey" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Column">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="#//DataType"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isNull" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PrimaryKey">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="column" unique="false"
+        upperBound="-1" eType="#//Column"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ForeignKey">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="column" unique="false"
+        upperBound="-1" eType="#//Column"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tableRef" eType="#//Table"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="columnsRef" unique="false"
+        upperBound="-1" eType="#//Column"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="DataType">
+    <eLiterals name="varchar" literal="varchar"/>
+    <eLiterals name="int" value="1" literal="int"/>
+    <eLiterals name="boolean" value="2" literal="boolean"/>
+    <eLiterals name="date" value="3" literal="date"/>
+    <eLiterals name="number" value="4" literal="number"/>
+  </eClassifiers>
+</ecore:EPackage>

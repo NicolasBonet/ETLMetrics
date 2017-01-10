@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="proyectos" nsURI="http://www.example.org/proyectos" nsPrefix="proyectos">
+  <eClassifiers xsi:type="ecore:EClass" name="MarketPlace">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="paginas" lowerBound="1"
+        upperBound="-1" eType="#//Pagina" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="presentacion" eType="#//TipoPresentacion"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Pagina" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nombre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="estilo" eType="#//Estilo"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Promocion" eSuperTypes="#//Pagina"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Mapa" eSuperTypes="#//Pagina"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Contacto" eSuperTypes="#//Pagina"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Catalogo" eSuperTypes="#//Pagina"/>
+  <eClassifiers xsi:type="ecore:EEnum" name="Estilo">
+    <eLiterals name="empresarial"/>
+    <eLiterals name="clasico"/>
+    <eLiterals name="moderno"/>
+    <eLiterals name="profesional"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TipoPresentacion">
+    <eLiterals name="basico"/>
+    <eLiterals name="premium"/>
+    <eLiterals name="gold"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="EstiloImagen">
+    <eLiterals name="compacta"/>
+    <eLiterals name="completa"/>
+  </eClassifiers>
+</ecore:EPackage>

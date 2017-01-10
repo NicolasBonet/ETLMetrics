@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="android" nsURI="http://www.example.org/android" nsPrefix="android">
+  <eClassifiers xsi:type="ecore:EClass" name="Application">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="activity" lowerBound="1"
+        eType="#//Activity" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Activity">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fragments" upperBound="-1"
+        eType="#//Fragment" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Fragment" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="font" eType="#//Color"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="background" eType="#//Color"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="imageSize" eType="#//ImgSize"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="objects" upperBound="-1"
+        eType="#//FragmentObject" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="layout" eType="#//Layout"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CatalogFragment" eSuperTypes="#//Fragment"/>
+  <eClassifiers xsi:type="ecore:EClass" name="MapFragment" eSuperTypes="#//Fragment"/>
+  <eClassifiers xsi:type="ecore:EClass" name="PromoFragment" eSuperTypes="#//Fragment"/>
+  <eClassifiers xsi:type="ecore:EClass" name="ContactoFragment" eSuperTypes="#//Fragment"/>
+  <eClassifiers xsi:type="ecore:EEnum" name="Color">
+    <eLiterals name="grisClaro"/>
+    <eLiterals name="azul"/>
+    <eLiterals name="blanco"/>
+    <eLiterals name="azulClaro"/>
+    <eLiterals name="negro"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ImgSize">
+    <eLiterals name="small"/>
+    <eLiterals name="large"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Layout">
+    <eLiterals name="horizontal"/>
+    <eLiterals name="vertical"/>
+    <eLiterals name="grid"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FragmentObject">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="#//ObjectType"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ObjectType">
+    <eLiterals name="logoEmpresa"/>
+    <eLiterals name="anunciosPublicitarios"/>
+    <eLiterals name="pieDePagina"/>
+    <eLiterals name="descripcionPromo"/>
+    <eLiterals name="masInfoPromo"/>
+    <eLiterals name="vigenciaPromo"/>
+    <eLiterals name="ubicacionActualMapa"/>
+    <eLiterals name="infoSucursalMapa"/>
+    <eLiterals name="precioCatalogo"/>
+    <eLiterals name="botonPagoCatalogo"/>
+    <eLiterals name="descripcionProductoCatalogo"/>
+    <eLiterals name="nombreContacto"/>
+    <eLiterals name="emailContacto"/>
+    <eLiterals name="comentarioContacto"/>
+    <eLiterals name="redesSocialesContacto"/>
+  </eClassifiers>
+</ecore:EPackage>

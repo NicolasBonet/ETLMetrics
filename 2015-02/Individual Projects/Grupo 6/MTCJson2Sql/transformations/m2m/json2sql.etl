@@ -1,3 +1,7 @@
+model CONFIG driver EMF {path='Config.ecore'};
+model DB driver EMF {path='SqlModel.ecore'};
+model JSON driver EMF {path='Json.ecore'};
+
 pre {
   var config = CONFIG!Config;
   (config).println;

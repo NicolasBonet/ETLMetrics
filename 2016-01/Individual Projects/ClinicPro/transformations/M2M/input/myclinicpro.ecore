@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="myclinicpro" nsURI="http://www.example.org/myclinicpro" nsPrefix="myclinicpro">
+  <eClassifiers xsi:type="ecore:EClass" name="DropDownList" eSuperTypes="#//GraphicalComponent"/>
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" ordered="false" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Field" eSuperTypes="#//GraphicalComponent">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="text" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Button" eSuperTypes="#//GraphicalComponent"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Label" eSuperTypes="#//GraphicalComponent"/>
+  <eClassifiers xsi:type="ecore:EClass" name="GraphicalComponent" abstract="true"
+      eSuperTypes="#//NamedElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="GUI">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="forms" upperBound="-1"
+        eType="#//Form" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Form" eSuperTypes="#//NamedElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="layouts" upperBound="-1"
+        eType="#//Layout" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Layout">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="#//Attribute"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="graphicalcomponent" upperBound="-1"
+        eType="#//GraphicalComponent" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Attribute">
+    <eLiterals name="Flow"/>
+    <eLiterals name="Grid" value="1"/>
+    <eLiterals name="Linear" value="2"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Table" eSuperTypes="#//GraphicalComponent"/>
+  <eClassifiers xsi:type="ecore:EEnum" name="TypeField">
+    <eLiterals name="Long"/>
+    <eLiterals name="String" value="1"/>
+  </eClassifiers>
+</ecore:EPackage>

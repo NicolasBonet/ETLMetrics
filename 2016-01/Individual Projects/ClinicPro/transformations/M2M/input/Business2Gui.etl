@@ -1,3 +1,6 @@
+model business driver EMF {path='Business.ecore'};
+model gui driver EMF {path='myclinicpro.ecore'};
+
 pre {
 	"Inicio de transformacion M2M Business2Gui".println();
 }

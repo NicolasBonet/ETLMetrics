@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="crudGenerator" nsURI="http://www.example.org/crudGenerator"
+    nsPrefix="crudGenerator">
+  <eClassifiers xsi:type="ecore:EClass" name="Application">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entities" ordered="false"
+        lowerBound="1" upperBound="-1" eType="#//Entity" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Entity">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="atributes" lowerBound="1"
+        upperBound="-1" eType="#//Atribute" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="crud" lowerBound="1" eType="#//Crud"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="associationAsTarget" upperBound="-1"
+        eType="#//Association" eOpposite="#//Association/target"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="associationAsSource" upperBound="-1"
+        eType="#//Association" containment="true" eOpposite="#//Association/source"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Atribute">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="dataType" eType="#//DataType"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="validations" upperBound="-1"
+        eType="#//Validation" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isFilter" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="DataType">
+    <eLiterals name="int"/>
+    <eLiterals name="string" value="1"/>
+    <eLiterals name="text" value="2"/>
+    <eLiterals name="decimal" value="3"/>
+    <eLiterals name="date" value="4"/>
+    <eLiterals name="dateTime" value="5"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ValidationType">
+    <eLiterals name="required"/>
+    <eLiterals name="uniqueness" value="1"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Association">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sourceName" unique="false"
+        lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="targetName" unique="false"
+        lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="manySource" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="manyTarget" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target" lowerBound="1"
+        eType="#//Entity" eOpposite="#//Entity/associationAsTarget"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="source" lowerBound="1"
+        eType="#//Entity" eOpposite="#//Entity/associationAsSource"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="validation" upperBound="-1"
+        eType="#//Validation" containment="true" resolveProxies="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Crud">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="allowCreate" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="allowRead" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="allowUpdate" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="allowDelete" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fields" lowerBound="1"
+        upperBound="-1" eType="#//Field" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AssociationField" eSuperTypes="#//Field">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="component" lowerBound="1"
+        eType="#//UIComponent"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="association" lowerBound="1"
+        eType="#//Association"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Field" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PrimitiveField" eSuperTypes="#//Field">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="attribute" lowerBound="1"
+        eType="#//Atribute"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="UIComponent">
+    <eLiterals name="select"/>
+    <eLiterals name="selectList" value="1"/>
+    <eLiterals name="radioButton" value="2"/>
+    <eLiterals name="autocomplete" value="3"/>
+    <eLiterals name="selectListMultiple" value="4"/>
+    <eLiterals name="checkbox" value="5"/>
+    <eLiterals name="autocompleteMultiple" value="6"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Validation">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="validationType" lowerBound="1"
+        eType="#//ValidationType"/>
+  </eClassifiers>
+</ecore:EPackage>

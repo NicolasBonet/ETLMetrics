@@ -19,6 +19,7 @@ import org.eclipse.epsilon.common.parse.problem.ParseProblem;
 import org.eclipse.epsilon.common.util.StringProperties;
 import org.eclipse.epsilon.emc.emf.EmfModel;
 import org.eclipse.epsilon.emc.emf.EmfUtil;
+import org.eclipse.epsilon.eol.EolModule;
 import org.eclipse.epsilon.eol.exceptions.EolRuntimeException;
 import org.eclipse.epsilon.eol.exceptions.models.EolModelLoadingException;
 import org.eclipse.epsilon.eol.models.IModel;
@@ -26,6 +27,12 @@ import org.eclipse.epsilon.eol.models.IRelativePathResolver;
 import org.eclipse.epsilon.evl.EvlModule;
 import org.eclipse.epsilon.evl.execute.UnsatisfiedConstraint;
 
+/**
+ * This class invokes finds all the model files generated with HaetaeCaller and invokes an EVL file from the location
+ * EVL_FILE to gather all the statements found on those model files and creates a report at the OUTPUT directory.
+ * 
+ * @author Nicolás Bonet Gonzalez
+ */
 public class ProjectsAnalyzer {
 	
 	/**
@@ -94,6 +101,9 @@ public class ProjectsAnalyzer {
 		// Process each one
 		for (int i = 0; i < modelFiles.size(); i++)
 		{
+			// Parsing
+			System.out.println("Parsing: " + modelFiles.get(i).getAbsolutePath());
+			
 			// Create an EvlModule
 			EvlModule module = new EvlModule();
 			
@@ -116,7 +126,7 @@ public class ProjectsAnalyzer {
 			// Add required models
 			try {
 				module.getContext().getModelRepository().addModel(
-					createEmfModel("ETL", modelFiles.get(i).getAbsolutePath(), "", true, true)
+					createEmfModel("ETL", modelFiles.get(i).getAbsolutePath(), "/metamodels/ETL.ecore", true, true)
 				);
 			} catch (EolModelLoadingException e1) {
 				// TODO Auto-generated catch block
@@ -190,13 +200,11 @@ public class ProjectsAnalyzer {
 			}
 			
 			evlConstraints.put(modelFiles.get(i), constraints);
-			*/
-			
 			
 			// WORKING DUMMY DATA
-			/*
+			
 			// Adding to the list!
-			ArrayList<String> constraints = new ArrayList<String>();
+			/*ArrayList<String> constraints = new ArrayList<String>();
 			if (evlConstraints.containsKey(modelFiles.get(i)))
 			{
 				constraints = evlConstraints.get(modelFiles.get(i));
@@ -213,8 +221,8 @@ public class ProjectsAnalyzer {
 			
 			constraints.add("[" + stringCodeNumber + "] Bla bla bla");
 			evlConstraints.put(modelFiles.get(i), constraints);
-			totalConstraints++;
-			*/
+			totalConstraints++;*/
+			
 		}
 	}
 	
@@ -243,99 +251,29 @@ public class ProjectsAnalyzer {
     protected EmfModel createEmfModel(String name, String model, 
 			String metamodel, boolean readOnLoad, boolean storeOnDisposal) 
 					throws EolModelLoadingException, URISyntaxException {
-    	
-		EmfModel emfModel = new EmfModel();
-		emfModel.setName(name);
-		emfModel.setReadOnLoad(readOnLoad);
-		emfModel.setStoredOnDisposal(storeOnDisposal);
-		emfModel.setMetamodelUri("http://www.eclipse.org/epsilon/etl");
-		emfModel.setModelFile(model);
-		
-		try {
-			emfModel.load();
-		} catch (EolModelLoadingException e) {
-			e.printStackTrace();
-		}
-		return emfModel;
-    }
-    
-    protected void registerMetamodels()
-    {
-    	Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("ecore", new EcoreResourceFactoryImpl());
-    	
-    	ResourceSet resourceSet = new ResourceSetImpl(); 
-		Resource myMetaModel= resourceSet.getResource(URI.createFileURI("metamodels/EOL.ecore"), true);
-		EPackage univEPackage = (EPackage) myMetaModel.getContents().get(0);
-		resourceSet.getPackageRegistry().put("http://www.eclipse.org/epsilon/eol", univEPackage);
-		
-		Resource myMetaModel2 = resourceSet.getResource(URI.createFileURI("metamodels/ETL.ecore"), true);
-		EPackage univEPackage2 = (EPackage) myMetaModel2.getContents().get(0);
-		resourceSet.getPackageRegistry().put("http://www.eclipse.org/epsilon/etl", univEPackage2);
-		System.out.println("Tam: " + resourceSet.getPackageRegistry().size());
-    }
-    
-    /*protected EmfModel createEmfModel(String name, String model, 
-			String metamodel, boolean readOnLoad, boolean storeOnDisposal) 
-					throws EolModelLoadingException, URISyntaxException {
-    	
 		EmfModel emfModel = new EmfModel();
 		StringProperties properties = new StringProperties();
 		properties.put(EmfModel.PROPERTY_NAME, name);
-		properties.put(EmfModel.PROPERTY_ALIASES, name);
-		properties.put(EmfModel.PROPERTY_EXPAND, true + "");
-		
-		if (metamodel.contains(","))
-		{
-			String[] metamodels = metamodel.split(",");
-			String[] metamodelsUri = new String[metamodels.length];
-			
-			for (int i = 0; i < metamodels.length; i++)
-			{
-				metamodelsUri[i] = new File(metamodels[i]).toURI().toString();
-			}
-			
-			StringBuilder sbStr = new StringBuilder();
-		    for (int i = 0, il = metamodelsUri.length; i < il; i++) {
-		        if (i > 0)
-		            sbStr.append(",");
-		        sbStr.append(metamodelsUri[i]);
-		    }
-		    
-		    properties.put(EmfModel.PROPERTY_FILE_BASED_METAMODEL_URI, sbStr.toString());
-		}
-		else
-		{
-			properties.put(EmfModel.PROPERTY_FILE_BASED_METAMODEL_URI, new File(metamodel).toURI().toString());
-		}
-		
-		properties.put(EmfModel.PROPERTY_IS_METAMODEL_FILE_BASED, "true");
-		properties.put(EmfModel.PROPERTY_MODEL_FILE, new File(model).toURI());
-		properties.put(EmfModel.PROPERTY_READONLOAD, readOnLoad + "");
-		properties.put(EmfModel.PROPERTY_STOREONDISPOSAL, storeOnDisposal + "");
-		emfModel.load(properties, (IRelativePathResolver) null);
-		return emfModel;
-	}
-    
-    protected EmfModel createEmfModelByURI(String name, String model, 
-			String metamodel, boolean readOnLoad, boolean storeOnDisposal) 
-					throws EolModelLoadingException, URISyntaxException {
-		EmfModel emfModel = new EmfModel();
-		StringProperties properties = new StringProperties();
-		properties.put(EmfModel.PROPERTY_NAME, name);
-		properties.put(EmfModel.PROPERTY_METAMODEL_URI, metamodel);
+		properties.put(EmfModel.PROPERTY_FILE_BASED_METAMODEL_URI,
+				getFileURI("EOL.ecore").toString());
+		properties.put(EmfModel.PROPERTY_FILE_BASED_METAMODEL_URI,
+				getFileURI("ETL.ecore").toString());
 		properties.put(EmfModel.PROPERTY_MODEL_URI, 
-				getFileURI(model).toString());
+				"file:/" + model);
+		
 		properties.put(EmfModel.PROPERTY_READONLOAD, readOnLoad + "");
 		properties.put(EmfModel.PROPERTY_STOREONDISPOSAL, 
 				storeOnDisposal + "");
 		emfModel.load(properties, (IRelativePathResolver) null);
 		return emfModel;
 	}
-    
+
     protected java.net.URI getFileURI(String fileName) throws URISyntaxException {
 		
-    	java.net.URI binUri = ProjectsAnalyzer.class.getResource(fileName).toURI();
+    	java.net.URI binUri = this.getClass().getClassLoader().getResource(fileName).toURI();
     	java.net.URI uri = null;
+    	
+    	System.out.println("Loading file: " + binUri);
 		
 		if (binUri.toString().indexOf("bin") > -1) {
 			uri = new java.net.URI(binUri.toString().replaceAll("bin", "src"));
@@ -347,13 +285,23 @@ public class ProjectsAnalyzer {
 		return uri;
 	}
     
-    public void registerMetamodel(String metamodelFile) throws Exception {
-		if (registeredMetamodels.contains(metamodelFile)) return;
-		EmfUtil.register(
-				URI.createURI(new File(metamodelFile).getAbsolutePath()),
-				EPackage.Registry.INSTANCE);
-		registeredMetamodels.add(metamodelFile);
-	}*/
+    protected void registerMetamodels()
+    {
+    	Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("ecore", new EcoreResourceFactoryImpl());
+    	
+    	ResourceSet resourceSet = new ResourceSetImpl(); 
+		Resource myMetaModel = resourceSet.getResource(URI.createFileURI("metamodels/EOL.ecore"), true);
+		EPackage univEPackage = (EPackage) myMetaModel.getContents().get(0);
+		resourceSet.getPackageRegistry().put(univEPackage.getNsURI(), univEPackage);
+		
+		Resource myMetaModel2 = resourceSet.getResource(URI.createFileURI("metamodels/ETL.ecore"), true);
+		EPackage univEPackage2 = (EPackage) myMetaModel2.getContents().get(0);
+		resourceSet.getPackageRegistry().put(univEPackage2.getNsURI(), univEPackage2);
+		
+		System.out.println(univEPackage.toString());
+		System.out.println(univEPackage2.toString());
+		System.out.println("Tam: " + resourceSet.getPackageRegistry().size());
+    }
     
     public String getOutputDirectory()
     {

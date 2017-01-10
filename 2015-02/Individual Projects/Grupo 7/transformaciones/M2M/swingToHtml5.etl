@@ -1,3 +1,6 @@
+model Html5 driver EMF {path='html5.ecore'};
+model Swing driver EMF {path='jEE.ecore'};
+
 pre{
 	var html: new Html5!html;
 	var divContainer=null;

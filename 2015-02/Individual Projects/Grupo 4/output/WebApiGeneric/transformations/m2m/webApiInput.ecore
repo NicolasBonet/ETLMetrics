@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="webApiInput" nsURI="http://www.example.org/webApiInput" nsPrefix="webApiInput">
+  <eClassifiers xsi:type="ecore:EClass" name="CSharp">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="clases" upperBound="-1"
+        eType="#//Clase" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Enum" eSuperTypes="#//Object #//Tipo">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="valores" upperBound="-1"
+        eType="#//EnumLiteral" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="EnumLiteral" eSuperTypes="#//Object"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Object" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="texto" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Clase" eSuperTypes="#//AttributesObject #//Tipo">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="propiedades" upperBound="-1"
+        eType="#//Propiedad" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="metodos" upperBound="-1"
+        eType="#//Metodo" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="enums" upperBound="-1"
+        eType="#//Enum" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="namespace" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="super" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="constructores" upperBound="-1"
+        eType="#//Constructor" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Propiedad" eSuperTypes="#//TypedObject"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Atributo" eSuperTypes="#//ValueObject">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="propiedades" upperBound="-1"
+        eType="#//PropiedadAtributo" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Metodo" eSuperTypes="#//TypedObject">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parametros" upperBound="-1"
+        eType="#//Parametro" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Parametro" eSuperTypes="#//TypedObject"/>
+  <eClassifiers xsi:type="ecore:EClass" name="PropiedadAtributo" eSuperTypes="#//ValueObject"/>
+  <eClassifiers xsi:type="ecore:EClass" name="TypedObject" abstract="true" eSuperTypes="#//AttributesObject">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tipoPrimitivo" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="tipo" eType="#//Tipo"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="lista" upperBound="-1"
+        eType="#//List" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AttributesObject" abstract="true" eSuperTypes="#//Object">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="atributos" upperBound="-1"
+        eType="#//Atributo" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ValueObject" abstract="true" eSuperTypes="#//Object">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="valor" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="List">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="clase" lowerBound="1" eType="#//Clase"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Tipo" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Constructor" eSuperTypes="#//Object">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parametros" upperBound="-1"
+        eType="#//Parametro" containment="true"/>
+  </eClassifiers>
+</ecore:EPackage>

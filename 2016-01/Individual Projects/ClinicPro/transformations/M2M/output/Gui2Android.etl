@@ -1,3 +1,6 @@
+model android driver EMF {path='Android.ecore'};
+model gui driver EMF {path='myclinicpro.ecore'};
+
 pre {
 	"Inicio de transformacion M2M Giu2Android".println();
 }

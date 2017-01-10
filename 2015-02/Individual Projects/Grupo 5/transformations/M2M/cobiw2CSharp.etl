@@ -1,3 +1,6 @@
+model CSharpMM driver EMF {path='csharp.ecore'};
+model CobiwMM driver EMF {path='cobiw.ecore'};
+
 pre {
 	var fillers = 1;
 }

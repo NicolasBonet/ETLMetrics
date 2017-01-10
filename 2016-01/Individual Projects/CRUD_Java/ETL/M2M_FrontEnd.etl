@@ -1,3 +1,6 @@
+model UML driver UML {path='model.uml'};
+model frontend driver EMF {path='metamodeloFront.ecore'};
+
 pre {
   "Inicia ETL M2M_FrontEnd".println();
 }

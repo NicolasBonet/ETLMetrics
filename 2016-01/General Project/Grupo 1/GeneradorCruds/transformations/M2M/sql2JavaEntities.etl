@@ -1,3 +1,6 @@
+model sql driver EMF {path='SQL.ecore'};
+model java driver EMF {path='mmJavaMinimalista.ecore'};
+
  /**
 * This file is called from masterSql2Java.etl, and handle the transformation of
 * all elements inside of the entities package

@@ -1,0 +1,54 @@
+grammar co.edu.uniandes.GenSql with org.eclipse.xtext.common.Terminals
+
+generate genSql "http://www.edu.co/uniandes/GenSql"
+
+DataBase returns DataBase:
+	{DataBase}
+	tables+=Table+
+;
+
+Table returns Table:
+	CREATE CTABLE name=ID
+	LPARENT
+	columns+=Column+
+	primarykey=PrimaryKey
+	foreignkeys+=ForeignKey*
+	RPARENT
+	(SEMICOLON | FIN)?
+;
+
+Column returns Column:
+	name=ID (SQLType=TIPO)? (Longitud=LONGITUD)? (NOT NULL)? (COMMA)? 
+;
+
+PrimaryKey returns PrimaryKey:
+	 PRIMARY KEY LPARENT columns+=[Column] (COMMA + columns+=[Column])* RPARENT (COMMA)?
+;
+
+ForeignKey returns ForeignKey:
+	FOREIGN KEY LPARENT columns+=[Column] (COMMA + columns+=[Column])* RPARENT REFERENCES tableRef=[Table]  LPARENT columnsRef+=[Column] (COMMA + columnsRef+=[Column])* RPARENT  (COMMA)?
+;
+
+//enum TIPO:
+//	varchar = 'varchar'| int = 'int'| String = 'String'| boolean = 'boolean'| date= 'date'|number = 'number'
+//;
+terminal LONGITUD: LPARENT NUMBER RPARENT; 
+terminal CREATE: "CREATE";
+terminal CTABLE: "TABLE";
+terminal LPARENT: "(";
+terminal RPARENT: ")";
+terminal SEMICOLON: ";";
+terminal COMMA: ",";
+terminal FOREIGN: "FOREIGN";
+terminal PRIMARY: "PRIMARY";
+terminal KEY: "KEY";
+terminal NULL: "NULL";
+terminal NOT: "NOT";
+terminal REFERENCES: "REFERENCES";
+
+terminal TIPO: "varchar"|"int"|"String"|"boolean"|"date"|"number";
+terminal ID:(("a".."z")|("A".."Z"))(("0".."9")|("A".."Z")|("a".."z"))*;
+terminal NUMBER: ("0".."9")*;
+//terminal NOM_TABLA: ("A".."Z")(("0".."9")|("A".."Z")|("a".."z"))*;
+
+terminal FIN: EOF;
