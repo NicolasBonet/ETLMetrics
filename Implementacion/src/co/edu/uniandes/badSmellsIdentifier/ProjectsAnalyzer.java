@@ -1,13 +1,10 @@
 package co.edu.uniandes.badSmellsIdentifier;
 
 import java.io.File;
-
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EPackage;
@@ -18,18 +15,16 @@ import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
 import org.eclipse.epsilon.common.parse.problem.ParseProblem;
 import org.eclipse.epsilon.common.util.StringProperties;
 import org.eclipse.epsilon.emc.emf.EmfModel;
-import org.eclipse.epsilon.emc.emf.EmfUtil;
-import org.eclipse.epsilon.eol.EolModule;
 import org.eclipse.epsilon.eol.exceptions.EolRuntimeException;
 import org.eclipse.epsilon.eol.exceptions.models.EolModelLoadingException;
-import org.eclipse.epsilon.eol.models.IModel;
 import org.eclipse.epsilon.eol.models.IRelativePathResolver;
 import org.eclipse.epsilon.evl.EvlModule;
 import org.eclipse.epsilon.evl.execute.UnsatisfiedConstraint;
 
 /**
  * This class invokes finds all the model files generated with HaetaeCaller and invokes an EVL file from the location
- * EVL_FILE to gather all the statements found on those model files and creates a report at the OUTPUT directory.
+ * EVL_FILE to gather all the statements found on those model files and creates a report at the OUTPUT directory. This class
+ * shouldn't be invoked directly!
  * 
  * @author Nicolás Bonet Gonzalez
  */
@@ -166,63 +161,7 @@ public class ProjectsAnalyzer {
 			
 			// Tidy up
 			module.getContext().getModelRepository().dispose();
-			
-			// Retrieve our models
-			/*System.out.println("Adding metamodels");
-			module.getContext().getModelRepository().addModel(createEmfModel("ETL", modelFiles.get(i).getAbsolutePath(), true, false));
-			System.out.println("Closing metamodels");
-			
-			// Unsatisfied constraints
-			Collection<UnsatisfiedConstraint> unsatisfied = module.getContext().getUnsatisfiedConstraints();
-			System.out.println("Model: " + modelFiles.get(i).getAbsolutePath().replace(INPUT_DIRECTORY, "") + " - Unsatisfied : " + unsatisfied.size());
-		
-			EvlStandaloneExample evlStandaloneExample = new EvlStandaloneExample();
-			evlStandaloneExample.setModelUri(modelFiles.get(i).getAbsolutePath());
-			
-			try {
-				evlStandaloneExample.execute();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			// Adding to the list!
-			ArrayList<String> constraints = new ArrayList<String>();
-			if (evlConstraints.containsKey(modelFiles.get(i)))
-			{
-				constraints = evlConstraints.get(modelFiles.get(i));
-			}
-			
-			for (UnsatisfiedConstraint uc : unsatisfied)
-			{
-				constraints.add(uc.getMessage());
-				totalConstraints++;
-			}
-			
-			evlConstraints.put(modelFiles.get(i), constraints);
-			
-			// WORKING DUMMY DATA
-			
-			// Adding to the list!
-			/*ArrayList<String> constraints = new ArrayList<String>();
-			if (evlConstraints.containsKey(modelFiles.get(i)))
-			{
-				constraints = evlConstraints.get(modelFiles.get(i));
-			}
-			
-			Random r = new Random();
-			int Low = 1;
-			int High = 25;
-			int codeNumber = (r.nextInt(High-Low) + Low);
-			String stringCodeNumber = codeNumber + "";
-			
-			if (codeNumber < 10)
-				stringCodeNumber = "0" + codeNumber;
-			
-			constraints.add("[" + stringCodeNumber + "] Bla bla bla");
-			evlConstraints.put(modelFiles.get(i), constraints);
-			totalConstraints++;*/
-			
+						
 		}
 	}
 	
@@ -248,6 +187,9 @@ public class ProjectsAnalyzer {
         }
     }
     
+    /**
+     * Crea un EmfModel para ser usado por el EVL como parametro de ejecución.
+     */
     protected EmfModel createEmfModel(String name, String model, 
 			String metamodel, boolean readOnLoad, boolean storeOnDisposal) 
 					throws EolModelLoadingException, URISyntaxException {
@@ -285,6 +227,9 @@ public class ProjectsAnalyzer {
 		return uri;
 	}
     
+    /**
+     * Registra los metamodelos EOL y ETL.
+     */
     protected void registerMetamodels()
     {
     	Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("ecore", new EcoreResourceFactoryImpl());
@@ -302,6 +247,10 @@ public class ProjectsAnalyzer {
 		System.out.println(univEPackage2.toString());
 		System.out.println("Tam: " + resourceSet.getPackageRegistry().size());
     }
+    
+    /**
+     * Getters y setters
+     */
     
     public String getOutputDirectory()
     {
@@ -341,6 +290,9 @@ public class ProjectsAnalyzer {
 		this.totalConstraints = totalConstraints;
 	}
 
+	/**
+     * Metodo que registrar los logs
+     */
 	public void logLine(String string) {
 		System.out.println(string);
 	}

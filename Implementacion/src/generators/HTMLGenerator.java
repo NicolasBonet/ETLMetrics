@@ -305,6 +305,11 @@ public class HTMLGenerator {
 		}
 	}
 	
+	/**
+	 * Este metodo convierte el contenido del archivo especificado como parametro y retorna un string con su contenido
+	 * @param path, el directorio del archivo
+	 * @return
+	 */
 	private String fileToString(String path) {
 		File file = new File(path);
         FileInputStream fis = null;
@@ -332,6 +337,12 @@ public class HTMLGenerator {
         return str;
 	}
 	
+	/**
+	 * Este metodo toma un String como parametro y poner su valor como contenido del archivo enviado como parametro
+	 * @param file, el archivo a escribir
+	 * @param content el contenido del archivo
+	 * @return void
+	 */
 	private void writeStringToFile(File file, String content) throws IOException {
 		FileWriter fileWriter = new FileWriter(file);
 		fileWriter.write(content);
@@ -339,6 +350,12 @@ public class HTMLGenerator {
 		fileWriter.close();
 	}
 	
+	/**
+	 * Este metodo copia un archivo de una ubicación a otra
+	 * @param sourceFile, el archivo origen
+	 * @param destFile, el archivo destino
+	 * @return void
+	 */
 	private static void copyFile(File sourceFile, File destFile) throws IOException {
 	    if(!destFile.exists()) {
 	        destFile.createNewFile();

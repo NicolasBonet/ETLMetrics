@@ -1,5 +1,0 @@
-rule Gui2WebApp
-transform g:gui!GUI
-to h:html!WebApplication{
-	h.html = g.forms.equivalent();
-}
