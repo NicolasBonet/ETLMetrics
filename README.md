@@ -23,20 +23,30 @@ In 2016-01, the problem stated by the professor was "SQL2Java", a description wa
 
 The entire logic is inside the "implementacion" folder. Inside you can see three important folders:
 
-## badSmellsIdentifier
+* finder: It includes the EVL file used to identify bad smells.
+* html_template: The HTML template used by the HTML generator to create the html files.
+* libs: The array of libraries used by the implementation
+* metamodels: Both ETL and EOL metamodels.
+* src: The java implementation of the bad smells finder.
+
+Below there is extended explanation about some of those folders.
+
+## /src/badSmellsIdentifier
 
 In BadSmellsIdentifier there are five files which are being used:
 
-* EpsilonStandaloneExample.java: This file is used as a base to call Epsilon Methods using their API.
-* EvlStandaloneExample.java: This is a test build to run the BadSmellsFinder.evl using its API.
-* HTMLGenerator.java: This file invokes the results gattered by the EVL and builds a HTML file with the results.
-* HaetaeCaller.java: This file finds all the ETL files placed inside the folder with all the transformations and runs HAETAE on each one to generate the ETL model.
-* ProjectsAnalyzer.java: It attempts to run the EVL file on each model, it's also a test class.
+* HaetaeCaller.java: This file finds all the ETL files placed inside the folder with all the transformations and runs HAETAE on each one to generate the ETL model at the output directory.
+* ProjectsAnalyzer.java: It involves various methods used to generate the reports on both Excel and HTML.
 
-## metamodels
+## /src/generators
+
+* ExcelGenerator.java: It create a file called report.xls with the full report of all bad smells found by the identifier.
+* HTMLGenerator.java: It create a set of HTML files with the report of all bad smells found.
+
+## /metamodels
 
 Here the two metamodels used by HAETAE are stored and loaded by the Bad Smells Identifier scripts. They are called EOL.ecore and ETL.ecore. The later is an extension of the first one.
 
-## finder
+## /finder
 
 Here the only important file is called "BadSmellsFinder.evl" which is the EVL built to find all the bad smells from the catalog following the description of each bad smell and browsing the models generated using HAETAE which have the ETL.ecore as their metamodel.
