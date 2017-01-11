@@ -1,3 +1,16 @@
+# Purpose:
+
+This repository contains a manually choosen dataset of ETL transformations, those ETL files are available inside the 2015-02 and 2016-01 folders. Those transformations were processed using [HAETAE](https://github.com/epsilonlabs/haetae) to generate a model representation of them in order to use those models to gather metrics about bad smells in their original code. The main purpose of this software is to identify the most common bad smells present at ETL transformations, for this purpose a catalog of bad smells was defined and is available [here](https://docs.google.com/document/d/1ko9W90KeJOuZQiycvN0LhLZeQbIXbMNYZJdz3qzSN7M/edit?usp=sharing), to identify bad smells this software includes an EVL file called "BadSmellsFinder.evl" which is programatically executed to generate both Excel and HTML reports of the badsmells found on the dataset.
+
+# Tooling
+
+Arquitectura de la solución, muestra como los archivos épsilon trabajan con el código Java
+
+# Evaluation
+·         Descripción del dataset que tenemos
+# User manual
+·         Un paso a paso de como correr el tooling sobre el dataset
+
 # For researchers:
 
 ## ETLMetrics
