@@ -18,13 +18,13 @@ Below there is an extended explanation about some of those folders.
 
 In BadSmellsIdentifier there are five files which are being used:
 
-* HaetaeCaller.java: This file finds all the ETL files placed inside the folder with all the transformations and runs HAETAE on each one to generate the ETL model at the output directory.
+* HaetaeCaller.java: This file finds all the ETL files placed inside the folder with all the transformations (the dataset) and runs HAETAE on each one to generate the ETL model at the output directory.
 * ProjectsAnalyzer.java: It involves various methods used to generate the reports on both Excel and HTML.
 
 ## /src/generators
 
-* ExcelGenerator.java: It create a file called report.xls with the full report of all bad smells found by the identifier.
-* HTMLGenerator.java: It create a set of HTML files with the report of all bad smells found.
+* ExcelGenerator.java: It creates a file called report.xls with the full report of all bad smells found by the identifier.
+* HTMLGenerator.java: It creates a set of HTML files with the report of all bad smells found.
 
 ## /metamodels
 
@@ -32,7 +32,7 @@ Here the two metamodels used by HAETAE are stored and loaded by the Bad Smells I
 
 ## /finder
 
-Here the only important file is called "BadSmellsFinder.evl" which is the EVL built to find all the bad smells from the catalog following the description of each bad smell and browsing the models generated using HAETAE which have the ETL.ecore as their metamodel.
+Here the only important file is called "BadSmellsFinder.evl" which is the EVL built to find all the bad smells from the catalog following the description of each bad smell and browsing the models generated using HAETAE which has the ETL.ecore as their metamodel.
 
 
 # Evaluation
@@ -72,11 +72,13 @@ In order to use this tool the developer must install [https://www.eclipse.org/](
 * [Epsilon](https://www.eclipse.org/epsilon/)
 * [HAETAE](https://github.com/epsilonlabs/haetae)
 
-When they are succesfully installed, this repository must be either cloned or downloaded and imported as a project inside Eclipse. The last step is to setup your own paths where the dataset, models and reports are available, to do this simply modify the constants defined at HaetaeCaller.java and ProjectsAnalyzer.java which are inside the co.edu.uniandes.badSmellsIdentifier package.
+When they are succesfully installed, this ETLMetrics repository must be either cloned or downloaded and imported as a project inside Eclipse. The last step is to setup your own paths where the dataset, models and reports are available, to do this simply modify the constants defined at HaetaeCaller.java and ProjectsAnalyzer.java which are inside the co.edu.uniandes.badSmellsIdentifier package.
+
+TODO hacer un ANT para automatizar la ejecución y explicar lo que se tiene que modificar en ese ant
 
 ## Remove existing models
 
-To not include former models inside the reports remove the existing models using either Eclipse or your file explorer.
+To avoid using old model versions in the bad smells discovering process, it is necessary to remove the existing models using either Eclipse or your file explorer.
 
 ## Generate ETL Models
 
@@ -84,4 +86,4 @@ To execute HAETAE over the entire dataset execute the file co.edu.uniandes.badSm
 
 ## Generate reports
 
-Now you can generate two kind of reports: HTML and Excel, this can be done executing the two java files available inside the generators folder which are ExcelGenerator.java and HTMLGenerator.java. The first one creates a new file at the root of the project called report.xls with a report of the constraints found using the EVL script. The second one generates one HTML file for each model found on the models folder with a report based on the constraints found, and also creates one index file which is automatically opened in your default web browser with a summary of all the bad smells identified in the dataset and a menu which can be used to browse the reports.
+Now you can generate two kind of reports: HTML and Excel, this can be done executing the two java files available inside the generators folder which are ExcelGenerator.java and HTMLGenerator.java. The first one creates a new file at the root of the project called report.xls with a report of the bad smells found using the EVL script. The second one generates one HTML file for each model found on the models folder with a report based on the bad smells found, and also creates one index file which is automatically opened in your default web browser with a summary of all the bad smells identified in the dataset and a menu which can be used to browse the reports.
