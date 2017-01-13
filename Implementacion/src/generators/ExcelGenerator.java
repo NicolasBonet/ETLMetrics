@@ -1,6 +1,7 @@
 package generators;
 
 import java.io.File;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,7 +15,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.IndexedColors;
 
-import co.edu.uniandes.badSmellsIdentifier.ProjectsAnalyzer;
+import identifier.BadSmellsFinder;
 
 /**
  * This class generates an excel file called report.xls with a report of all the statements found in the ETL Project
@@ -24,22 +25,30 @@ import co.edu.uniandes.badSmellsIdentifier.ProjectsAnalyzer;
  */
 public class ExcelGenerator {
 	
-	private ProjectsAnalyzer projectsAnalyzer;
+	/**
+	 * An instance of ProjectsAnalyzer
+	 */
+	private BadSmellsFinder projectsAnalyzer;
 	
+	/**
+	 * The total number of bad smells in the catalog
+	 */
 	private final static int TOTAL_CODES = 23;
+	
+	/**
+	 * EXCEL_FILE is the name of the generated XLS file with the report.
+	 */
+	private final static String EXCEL_FILE = "report.xls";
 	
 	/**
 	 * This is our constructor
 	 */
-	public ExcelGenerator()
+	public ExcelGenerator(String inputDirectory, String outputDirectory)
 	{
-		projectsAnalyzer = new ProjectsAnalyzer();
+		projectsAnalyzer = new BadSmellsFinder(inputDirectory, outputDirectory);
 	}
 	
 	public void generateReport() {
-		
-		// Generate
-		String filename = "./report.xls";
 		
 		// Excel workbook
 		HSSFWorkbook workbook = new HSSFWorkbook();
@@ -179,7 +188,7 @@ public class ExcelGenerator {
 		
 		// Generate Excel file.
 		try {
-			FileOutputStream fileOut = new FileOutputStream(filename);
+			FileOutputStream fileOut = new FileOutputStream(projectsAnalyzer.getOutputDirectory() + "/excel/" + EXCEL_FILE);
 			workbook.write(fileOut);
 	        fileOut.close();
 	        workbook.close();
@@ -192,7 +201,7 @@ public class ExcelGenerator {
 		}
 			
 		// Log it
-        projectsAnalyzer.logLine("The excel report has being generated at " + new File(filename).getAbsolutePath());
+        projectsAnalyzer.logLine("The excel report has being generated at " + new File(projectsAnalyzer.getOutputDirectory() + "/excel/" + EXCEL_FILE).getAbsolutePath());
 	}
 	
 	/**
@@ -200,7 +209,7 @@ public class ExcelGenerator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		ExcelGenerator excelGenerator = new ExcelGenerator();
+		ExcelGenerator excelGenerator = new ExcelGenerator(args[0], args[1]);
 		excelGenerator.generateReport();
 	}
 }

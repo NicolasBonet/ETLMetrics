@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project name="ETLMetricsRunner" default="clean" basedir=".">
+	<!-- Set some preferences for our folders -->
+	<property name="generated" location="../generated" />
+	<property name="models" location="../generated/models" />
+	<property name="reports" location="../generated/reports" />
+	<property name="dataset" location="../dataset" />
+	<property name="metamodels" location="metamodels" />
+		
+	<!-- Do not modify anything below -->
+	<property name="build" location="build" />
+	<property name="libs" location="libs" />
+	<property name="src" location="src" />
+		
+	<target name="clean">
+		<!-- Clean the generated folder -->
+	    <delete dir="${build}" />
+		<mkdir dir="${build}" />
+		
+       	<!-- Clean the generated folder -->
+	    <delete dir="${generated}" />
+		<mkdir dir="${models}" />
+		<mkdir dir="${reports}/excel" />
+		<mkdir dir="${reports}/html" />
+			
+		<property name="myclasspath" refid="java"/>
+		<echo message="Classpath = ${myclasspath}"/>
+			
+		<antcall target="jar" />
+		<antcall target="haetae" />
+		<antcall target="excel" />
+		<antcall target="html" />
+	</target>
+		
+	<target name="jar">
+		<javac destdir="${build}">            
+	        <src path="${src}"/>
+	        <classpath refid="java"/>
+	    </javac>
+
+		 <copy file="${metamodels}/EOL.ecore" tofile="${build}/EOL.ecore"/>
+		 <copy file="${metamodels}/ETL.ecore" tofile="${build}/ETL.ecore"/>
+	</target>
+			
+	<target name="haetae">
+		<echo message="Starting Haetae" />
+		<java classname="identifier.HaetaeCaller">
+			<classpath refid="java"/>
+			<arg value="${dataset}"/>
+			<arg value="${models}"/>
+		</java>
+	</target>
+	
+	<target name="excel">
+		<echo message="Starting excel report generation" />
+		<java classname="generators.ExcelGenerator">
+			<classpath refid="java"/>
+			<arg value="${models}"/>
+			<arg value="${reports}"/>
+		</java>
+	</target>
+	
+	<target name="html">
+		<echo message="Starting html report generation" />
+		<java classname="generators.HTMLGenerator">
+			<classpath refid="java"/>
+			<arg value="${models}"/>
+			<arg value="${reports}"/>
+		</java>
+	</target>
+
+	<path id="java">
+        <pathelement location="${build}"/>
+        <fileset dir="${libs}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+</project>

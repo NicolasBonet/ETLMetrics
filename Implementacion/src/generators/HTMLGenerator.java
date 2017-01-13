@@ -12,7 +12,7 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Map;
 
-import co.edu.uniandes.badSmellsIdentifier.ProjectsAnalyzer;
+import identifier.BadSmellsFinder;
 
 /**
  * This class generates HTML Reports with all the statements found in the ETL Project set at Project Analyzer.
@@ -21,24 +21,19 @@ import co.edu.uniandes.badSmellsIdentifier.ProjectsAnalyzer;
  */
 public class HTMLGenerator {
 	
-	private ProjectsAnalyzer projectsAnalyzer;
+	private BadSmellsFinder projectsAnalyzer;
 	
 	/**
 	 * TEMPLATE_FILE is the location of the template
 	 */
-	private final static String TEMPLATE_FILE = "html_template/widget.html";
-	
-	/**
-	 * REPORTS_DIRECTORY is the location of the template
-	 */
-	private final static String REPORTS_DIRECTORY = "output";
+	private final static String ASSETS_DIRECTORY = "html_template";
 	
 	/**
 	 * This is our constructor
 	 */
-	public HTMLGenerator()
+	public HTMLGenerator(String inputDirectory, String outputDirectory)
 	{
-		projectsAnalyzer = new ProjectsAnalyzer();
+		projectsAnalyzer = new BadSmellsFinder(inputDirectory, outputDirectory);
 	}
 	
 	public void generateReport() {
@@ -47,28 +42,28 @@ public class HTMLGenerator {
 		try {
 			
 			// The reports directory
-			File reportsDirectory = new File(projectsAnalyzer.getOutputDirectory());
+			File reportsDirectory = new File(projectsAnalyzer.getOutputDirectory() + "/html");
 			reportsDirectory.mkdir();
 			
 			// The assets directory
-			File assetsDirectory = new File(projectsAnalyzer.getOutputDirectory() + "/assets");
+			File assetsDirectory = new File(projectsAnalyzer.getOutputDirectory() + "/html/assets");
 			assetsDirectory.mkdir();
 			
 			// Load JS and CSS files
 			File fileAsset = new File(assetsDirectory.getAbsolutePath() + "/Chart.min.js");
 			fileAsset.delete();
 			fileAsset.createNewFile();
-			copyFile(new File("finder/assets/Chart.min.js"), fileAsset);
+			copyFile(new File(ASSETS_DIRECTORY + "/assets/Chart.min.js"), fileAsset);
 			
 			fileAsset = new File(assetsDirectory.getAbsolutePath() + "/Chart.StackedBar.js");
 			fileAsset.delete();
 			fileAsset.createNewFile();
-			copyFile(new File("finder/assets/Chart.StackedBar.js"), fileAsset);
+			copyFile(new File(ASSETS_DIRECTORY + "/assets/Chart.StackedBar.js"), fileAsset);
 			
 			fileAsset = new File(assetsDirectory.getAbsolutePath() + "/ETLPluginStyle.css");
 			fileAsset.delete();
 			fileAsset.createNewFile();
-			copyFile(new File("finder/assets/ETLPluginStyle.css"), fileAsset);
+			copyFile(new File(ASSETS_DIRECTORY + "/assets/ETLPluginStyle.css"), fileAsset);
 			
 			// Now the report files
 			File file = new File(reportsDirectory.getAbsolutePath() + "/index.html");
@@ -94,7 +89,7 @@ public class HTMLGenerator {
 		    + "<br class=\"clear\" />";
 			
 			// Add the header title
-			String mainFileContent = fileToString(new File("finder/widget.html").getAbsolutePath());
+			String mainFileContent = fileToString(new File(ASSETS_DIRECTORY + "/widget.html").getAbsolutePath());
 			mainFileContent = mainFileContent.replace("<!-- MENU_HEADER -->", header);
 			
 			// Replace assets and prepare the template
@@ -198,7 +193,7 @@ public class HTMLGenerator {
 				newHeader = header.replace("data-index=\"" + m + "\"", "data-index=\"" + m + "\" selected=\"selected\"");
 				
 				// Add the header title
-				mainFileContent = fileToString(new File("finder/widget.html").getAbsolutePath());
+				mainFileContent = fileToString(new File(ASSETS_DIRECTORY + "/widget.html").getAbsolutePath());
 				mainFileContent = mainFileContent.replace("<!-- MENU_HEADER -->", newHeader);
 				
 				// Replace assets and prepare the template
@@ -384,7 +379,7 @@ public class HTMLGenerator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		HTMLGenerator htmlGenerator = new HTMLGenerator();
+		HTMLGenerator htmlGenerator = new HTMLGenerator(args[0], args[1]);
 		htmlGenerator.generateReport();
 	}
 }
