@@ -13,6 +13,7 @@ import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.IndexedColors;
 
 import identifier.BadSmellsFinder;
@@ -39,6 +40,11 @@ public class ExcelGenerator {
 	 * EXCEL_FILE is the name of the generated XLS file with the report.
 	 */
 	private final static String EXCEL_FILE = "report.xls";
+	
+	/**
+	 * REPOSITORY_PATH is the beggining of the url pointing to the file in the repository
+	 */
+	private final static String REPOSITORY_PATH = "https://github.com/NicolasBonet/ETLMetricsDataset/blob/master";
 	
 	/**
 	 * This is our constructor
@@ -117,6 +123,36 @@ public class ExcelGenerator {
 	        
 	        // The total
 	        row.createCell(TOTAL_CODES + 1).setCellValue(totalSmells);
+	        
+	        // Now the row with comments
+	        row = sheet.createRow(currentRow++);
+	        
+	        for (int c = 0; c < modelFileConstraints.size(); c++)
+			{
+	        	String message = modelFileConstraints.get(c);
+				int codeNumber = Integer.parseInt(message.substring(1, 3));
+				
+				if (!message.contains("- Lines:"))
+					continue;
+				
+				// Definir el string a agregar
+				String url = REPOSITORY_PATH + "/" + projectsAnalyzer.getModelFiles().get(i).getPath().replace(".model", "").replace(System.getProperty("user.dir").substring(0, System.getProperty("user.dir").lastIndexOf('/')), "").replace("/generated/models/", "");
+				String[] lines = message.split("- Lines:")[1].trim().split("/");
+				url += "#L" + lines[0]  + "L" + lines[1] + "\n";
+				
+				// Verificar si la celda es nueva o ya existe
+				Cell currentCell = row.getCell(codeNumber + 1);
+				
+				if (currentCell == null || currentCell.getCellType() == Cell.CELL_TYPE_BLANK)
+				{
+					row.createCell(codeNumber + 1).setCellValue(url);
+				}
+				else
+				{
+					url = currentCell.getStringCellValue() + url;
+					currentCell.setCellValue(url);
+				}
+			}
 		}
 		
 		// Line of total ocurrences
