@@ -141,11 +141,11 @@ public class ExcelGenerator {
 				url += "#L" + lines[0]  + "L" + lines[1] + "\n";
 				
 				// Verificar si la celda es nueva o ya existe
-				Cell currentCell = row.getCell(codeNumber + 1);
+				Cell currentCell = row.getCell(codeNumber);
 				
 				if (currentCell == null || currentCell.getCellType() == Cell.CELL_TYPE_BLANK)
 				{
-					row.createCell(codeNumber + 1).setCellValue(url);
+					row.createCell(codeNumber).setCellValue(url);
 				}
 				else
 				{
