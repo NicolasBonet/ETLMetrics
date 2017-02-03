@@ -105,14 +105,22 @@ context ETL!TransformationRule
 			{
 				ruleSequence.add(rs.lhs.target.name + "." + rs.lhs.property.name + "=" + rs.rhs.target.name + "." + rs.rhs.property.name);
 			}
+			
+			if (ruleSequence.size() == 0)
+				return false;
 		 	
 			// Now verify if they are similar to other rules
 			for (comparisonRule in self.container.transformationRules.select(s | s <> self))
 			{
 				// Get all bindings
 				var comparisonRuleStatements = comparisonRule.body.statements.select(s | s.isTypeOf(AssignmentStatement) and s.lhs.isTypeOf(ETL!PropertyCallExpression) and s.rhs.isTypeOf(PropertyCallExpression));
+				
+				// Not of the same size
+				if (comparisonRuleStatements.size() == 0 or comparisonRuleStatements.size() <> comparisonRule.body.statements.size())
+					continue;
+				
 				var comparisonRuleSequence : new Sequence;
-				var clonedRuleSequence = ruleSequence;
+				var clonedRuleSequence = new Sequence;
 				ruleCompared = comparisonRule.name.name;
 				ruleComparedStart = comparisonRule.region.start.line;
 				ruleComparedEnd = comparisonRule.region.end.line;
@@ -120,12 +128,14 @@ context ETL!TransformationRule
 				// Now see if they have them!
 				for (rs in comparisonRuleStatements->select(s | s.lhs.property.hasProperty('name') and s.lhs.target.hasProperty('name') and s.rhs.target.hasProperty('name')))
 				{
-					clonedRuleSequence.remove(rs.lhs.target.name + "." + rs.lhs.property.name + "=" + rs.rhs.target.name + "." + rs.rhs.property.name);
+					clonedRuleSequence.add(rs.lhs.target.name + "." + rs.lhs.property.name + "=" + rs.rhs.target.name + "." + rs.rhs.property.name);
 				}
 				
 				// All included?
-				if (clonedRuleSequence.isEmpty())
+				if (clonedRuleSequence.addAll(ruleSequence) <> false)
+				{
 					return false;
+				}
 			}
 			
 			return true;
@@ -235,7 +245,11 @@ context ETL!IfStatement
 	*/
 	critique SubstitutingIFELSEChainsWithSwitch
 	{
-		check : self.eContents.select(c | c.isTypeOf(ETL!ExpressionOrStatementBlock) and c.block.statements.exists(s | s.isTypeOf(ETL!AssignmentStatement))).collect( c | c.block.statements.select(s | s.isTypeOf(ETL!AssignmentStatement) and s.lhs.hasProperty('property')).lhs.property.name )->asSet().size() <> 1
+		// check : self.eContents.select(c | c.isTypeOf(ETL!ExpressionOrStatementBlock) and c.block.statements.exists(s | s.isTypeOf(ETL!AssignmentStatement))).collect( c | c.block.statements.select(s | s.isTypeOf(ETL!AssignmentStatement) and s.lhs.hasProperty('property') and s.rhs.isTypeOf(ETL!MethodCallExpression)).lhs.property.name )->asSet().size() <> 1
+		
+		guard : self.elseIfBodies.size() > 0
+		
+		check : self.eContents.select(c | c.isTypeOf(ETL!ExpressionOrStatementBlock) and c.block.statements.exists(s | s.isTypeOf(ETL!AssignmentStatement))).collect( c | c.block.statements.select(s | s.isTypeOf(ETL!AssignmentStatement) and s.lhs.hasProperty('property') and s.rhs.isTypeOf(ETL!MethodCallExpression)).lhs.property.name )->asSet().size() <> 1
 		
 		message : "[16] The if statement (between lines " + self.region.start.line + " and " + self.region.end.line + ") can be replaced with a Switch or a Hashmap. - Lines: " + self.region.start.line + "/" + self.region.end.line
     }
@@ -260,21 +274,24 @@ context ETL!Block
 			
 			for (nameStatement in self.statements.select(s | s.hasProperty('lhs') and s.lhs.isTypeOf(ETL!PropertyCallExpression)) )
 			{
+				"Analizando".println();
+				nameStatement.lhs.println();
+				
 				// Get the name
 				statement = nameStatement;
 				nameVariable = nameStatement.lhs.property.name;
 				
 				// Use the map to see if it was used before
-				if (nameOcurrences.containsKey(nameVariable))
+				if (nameOcurrences.containsKey(nameStatement.lhs.target.name + '.' + nameVariable))
 					return false;
 				else
-					nameOcurrences.put(nameVariable, 1);
+					nameOcurrences.put(nameStatement.lhs.target.name + '.' + nameVariable, 1);
 			}
 		
 			return true;
 		}
 		
-		message : "[08] The target feature " + nameVariable + " being set at lines " + statement.region.start.line + " and " + statement.region.end.line + " was already used before, consider to merge those bindings. - Lines: " + self.region.start.line + "/" + self.region.end.line
+		message : "[08] The target feature " + nameVariable + " being set at lines " + statement.region.start.line + " and " + statement.region.end.line + " was already used before, consider to merge those bindings. - Lines: " + statement.region.start.line + "/" + statement.region.end.line
     }
 }
 

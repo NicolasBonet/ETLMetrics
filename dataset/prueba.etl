@@ -1,0 +1,24 @@
+rule DataBase2Project
+	transform d : sql!DataBase
+	to p : java!Project {
+		p.name = "co.edu.uniandes.sqlcrud";
+		p.extractTypes();
+		
+		// This package storage the entity mapping
+		var entitiesPackage = new java!Package;
+		entitiesPackage.name = "entities";
+		entitiesPackage.classes = d.table.equivalent();
+		p.packages.add(entitiesPackage);
+		
+		// This package manages the persistence
+		var entitiesPackage = new java!Package;
+		entitiesPackage.name = "marketplace";
+		entitiesPackage.classes.add(p.packages.select(p|p.name == "entities").first().entityManager());
+		p.packages.add(entitiesPackage);
+
+		// This package storage the unit tests for entities
+		var testPackage = new java!Package;
+		testPackage.name = "test";
+		testPackage.classes.addAll(p.packages.select(p|p.name == "entities").classes.flatten().reject(e|e.attributes.size() == e.attributes.select(a|a.annotateAttribute.collect(i|i.name).contains("@Id")).size()).collect(e|e.testEntityClass()));
+		p.packages.add(testPackage);
+	}

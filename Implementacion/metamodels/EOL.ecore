@@ -272,7 +272,7 @@
         eType="#//ExpressionOrStatementBlock" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="elseIfBodies" upperBound="-1"
         eType="#//ExpressionOrStatementBlock" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="elseBody" eType="#//ExpressionOrStatementBlock"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="elseBody" eType="#//ExpressionRange"
         containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ForStatement" eSuperTypes="#//Statement">

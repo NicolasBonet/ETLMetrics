@@ -129,8 +129,6 @@ public class HTMLGenerator {
 			// Replace ocurrences
 			for (int i = 0; i < 24; i++)
 			{
-				System.out.println("Total: " + totalOfBadSmells  + " - Coe:" + coe + " - Ocurrences: " + badSmells[i]);
-				
 				// Porcentage of ocurrences
 				double porcentage = Math.round(coe * badSmells[i]);
 				
@@ -232,8 +230,6 @@ public class HTMLGenerator {
 				{
 					// Porcentage of ocurrences
 					double porcentage = Math.round(coe * badSmells[i]);
-					
-					System.out.println("Ocurrences: " + coe + " - " + badSmells[i]);
 					
 					// Calculate how to show our code
 					String code = (i + 1) + "";
