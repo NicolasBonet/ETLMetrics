@@ -127,10 +127,10 @@ public class BadSmellsFinder {
 				);
 			} catch (EolModelLoadingException e1) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				// e1.printStackTrace();
 			} catch (URISyntaxException e1) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				// e1.printStackTrace();
 			}
 			
 			// Execute!

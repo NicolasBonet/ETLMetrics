@@ -120,7 +120,7 @@ context ETL!TransformationRule
 					continue;
 				
 				var comparisonRuleSequence : new Sequence;
-				var clonedRuleSequence = new Sequence;
+				var tempRuleSequence = new Sequence;
 				ruleCompared = comparisonRule.name.name;
 				ruleComparedStart = comparisonRule.region.start.line;
 				ruleComparedEnd = comparisonRule.region.end.line;
@@ -128,12 +128,14 @@ context ETL!TransformationRule
 				// Now see if they have them!
 				for (rs in comparisonRuleStatements->select(s | s.lhs.property.hasProperty('name') and s.lhs.target.hasProperty('name') and s.rhs.target.hasProperty('name')))
 				{
-					clonedRuleSequence.add(rs.lhs.target.name + "." + rs.lhs.property.name + "=" + rs.rhs.target.name + "." + rs.rhs.property.name);
+					tempRuleSequence.add(rs.lhs.target.name + "." + rs.lhs.property.name + "=" + rs.rhs.target.name + "." + rs.rhs.property.name);
 				}
 				
 				// All included?
-				if (clonedRuleSequence.addAll(ruleSequence) <> false)
+				var clonedRuleSequence = ruleSequence;
+				if (clonedRuleSequence.addAll(tempRuleSequence) <> true)
 				{
+					("[05] Rule " + self.name.name + " (between lines #" + self.region.start.line + " and #" + self.region.end.line + ") can be merged with rule " + ruleCompared + "(between lines #" + ruleComparedStart + " and #" + ruleComparedEnd + ")").println();
 					return false;
 				}
 			}
@@ -272,11 +274,8 @@ context ETL!Block
 			var nameVariable = "";
 			var statement = new ETL!EOLElement;
 			
-			for (nameStatement in self.statements.select(s | s.hasProperty('lhs') and s.lhs.isTypeOf(ETL!PropertyCallExpression)) )
+			for (nameStatement in self.statements.select(s | s.hasProperty('lhs') and s.lhs.isTypeOf(ETL!PropertyCallExpression) and s.lhs.target.hasProperty('name')) )
 			{
-				"Analizando".println();
-				nameStatement.lhs.println();
-				
 				// Get the name
 				statement = nameStatement;
 				nameVariable = nameStatement.lhs.property.name;
