@@ -67,8 +67,9 @@ The dataset must be divided in three folders:
 
 To configure the location of those folders the constants in the BadSmellsChecker.java must be configured:
 
-´´´private final static String modelPath = "/Users/nicolas/Desktop/Dataset/Models";
+```private final static String modelPath = "/Users/nicolas/Desktop/Dataset/Models";
 private final static String etlPath = "/Users/nicolas/Desktop/Dataset/ETL";
-private final static String reportsPath = "/Users/nicolas/Desktop/Dataset/Reports";´´´
+private final static String reportsPath = "/Users/nicolas/Desktop/Dataset/Reports";
+```
   
 After those paths are set simply run the BadSmellsChecker.java, then go to the reportsPath folder and see the report.xls file which has the overall status of bad smells of all projects and there'll be also an XLS for each transformation with specific smells of it.
