@@ -1,0 +1,50 @@
+rule Entity2Layout
+transform b:business!BusinessEntity
+to g:gui!Layout{
+	g.name	 = b.name;
+	g.graphicalcomponent = addMeasure();
+	g.graphicalcomponewfwe = getRefEndpointByRelationClass();
+}
+
+rule Entity2Layout2
+transform b:business!BusinessEntity
+to g:gui!Layout{
+	g.name	 = b.name;
+	called();
+}
+
+/*
+* Nombre: getRefEndpointByRelationClass
+* Parametros: relationClass -> es la metaclase que fue anotada como relación, annotation -> es el tipo de anotación a buscar
+* Descripción: 
+Este metado se encarga de buscar en las referencias de la metaclase una que contenga el tipo de anotación requerido.
+*/
+operation getRefEndpointByRelationClass(relationClass : Input!EClass, annotation : String) : Input!EReference{
+	var reference = relationClass.eAllReferences.select(r|r.getEAnnotation(annotation) <>null).first();
+	return reference;
+}
+
+operation called(relationClass : Input!EClass, annotation : String) : Input!EReference{
+	var reference = relationClass.eAllReferences.select(r|r.getEAnnotation(annotation) <>null).first();
+	var reference = relationClass.eAllReferences.select(r|r.getEAnnotation(annotation) <>null).first();
+	var reference = relationClass.eAllReferences.select(r|r.getEAnnotation(annotation) <>null).first();
+	var reference = relationClass.eAllReferences.select(r|r.getEAnnotation(annotation) <>null).first();
+	var reference = relationClass.eAllReferences.select(r|r.getEAnnotation(annotation) <>null).first();
+	var reference = relationClass.eAllReferences.select(r|r.getEAnnotation(annotation) <>null).first();
+	return reference;
+}
+
+/*
+* Nombre: addMeasure
+* Parametro: type -> Es el tipo de característica visual a modificar, measureName -> Es el nombre de la métrica, visualElement-> Es un element o un relationship conforme al metamodelo de visualization.
+* Descripción: 
+Este método se encarga de recibir una metaclase que contiene una anotación de tipo Relationship, a la cual se
+evaluará si contiene definiciones en el interior de la anotación para metricas. Si es así, agregará a la relationship
+una configuración de métrica para modificar su característica visual en las vistas generadas.
+*/
+operation addMeasure(type , measureName : String, visualElement : Data!MeasurableElement){
+	var measure = new Data!Measure();
+	measure.visualCharacteristic = type;
+	measure.measureName = measureName;
+	visualElement.measurements.add(measure);
+}
