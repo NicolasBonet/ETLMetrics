@@ -1,0 +1,187 @@
+pre {
+	var promoIterator = 1;
+	var mapIterator = 1;
+	var catalogIterator = 1;
+	var contactIterator = 1;
+}
+
+
+rule Marketplace2Application
+transform m:mp!MarketPlace
+to a:android!Application{
+
+a.name = m.nombre;
+a.activity = new android!Activity();
+a.activity.name = 'MainActivity';
+a.activity.fragments = m.paginas.equivalent();
+
+}
+
+
+
+@lazy
+rule Promocion2PromoFragment
+transform m:mp!Promocion
+to a:android!PromoFragment{
+
+	a.setTipoPresentacion(m);
+	
+	switch(m.eContainer().presentacion.name){
+		
+		case 'basico':
+			a.layout = android!Layout#horizontal;
+		break;
+		
+		case 'premium':		
+			a.layout = android!Layout#vertical;
+			a.objects.add(new android!FragmentObject);
+			a.objects.last().type = android!ObjectType#banner;
+		break;
+		
+		case 'gold':
+			a.layout = android!Layout#grid;	
+			a.objects.add(new android!FragmentObject);
+			a.objects.last().type = android!ObjectType#banner;
+		break;
+	
+	
+	}
+	
+	a.name = 'PromoFragment' + promoIterator;
+	promoIterator = promoIterator + 1;
+
+}
+
+@lazy
+rule Catalogo2CatalogFragment
+transform m:mp!Catalogo
+to a:android!CatalogFragment{
+
+	a.setTipoPresentacion(m);
+	
+	switch(m.eContainer().presentacion.name){
+		
+		case 'basico': 
+			a.layout = android!Layout#horizontal;
+			a.objects.add(new android!FragmentObject);
+			a.objects.last().type = android!ObjectType#banner;
+		break;
+		
+		case 'premium':		
+			a.layout = android!Layout#vertical;
+			a.objects.add(new android!FragmentObject);
+			a.objects.last().type = android!ObjectType#banner;
+			a.objects.add(new android!FragmentObject);
+			a.objects.last().type = android!ObjectType#price;
+		break;
+		
+		case 'gold':
+			a.layout = android!Layout#grid;	
+			a.objects.add(new android!FragmentObject);
+			a.objects.last().type = android!ObjectType#banner;
+			a.objects.add(new android!FragmentObject);
+			a.objects.last().type = android!ObjectType#price;
+			a.objects.add(new android!FragmentObject);
+			a.objects.last().type = android!ObjectType#description;
+		break;
+	
+	
+	}
+	
+	a.name = 'CatalogFragment' + catalogIterator;
+	catalogIterator = catalogIterator + 1;
+
+}
+
+@lazy
+rule Mapa2MapFragment
+transform m:mp!Mapa
+to a:android!MapFragment{
+
+	a.setTipoPresentacion(m);
+	
+	switch(m.eContainer().presentacion.name){
+		
+		case 'basico':
+		break;
+		
+		case 'premium':	
+			a.objects.add(new android!FragmentObject);
+			a.objects.last().type = android!ObjectType#currentUbication;	
+		break;
+		
+		case 'gold':	
+			a.objects.add(new android!FragmentObject);
+			a.objects.last().type = android!ObjectType#currentUbication;
+			a.objects.add(new android!FragmentObject);
+			a.objects.last().type = android!ObjectType#searchUbication;
+		break;
+	
+	
+	}
+	
+	a.name = 'MapFragment' + mapIterator;
+	mapIterator = mapIterator + 1;
+
+}
+
+@lazy
+rule Contacto2ContactFragment
+transform m:mp!Contacto
+to a:android!ContactoFragment{
+
+	a.setTipoPresentacion(m);
+	
+	switch(m.eContainer().presentacion.name){
+		
+		case 'basico':
+		break;
+		
+		case 'premium':		
+			a.objects.add(new android!FragmentObject);
+			a.objects.last().type = android!ObjectType#email;
+		break;
+		
+		case 'gold':	
+			a.objects.add(new android!FragmentObject);
+			a.objects.last().type = android!ObjectType#email;
+		break;
+	
+	
+	}
+	
+	a.name = 'ContactFragment' + contactIterator;
+	contactIterator = contactIterator + 1;
+
+}
+
+operation android!Fragment setTipoPresentacion(m:mp!Pagina){
+
+	switch(m.eContainer().estilo.name) {
+
+		case 'empresarial': 			
+			self.font = android!Color#black;
+			self.background = android!Color#gray;
+			self.imageSize = android!ImgSize#large;
+		break;
+		
+		case 'clasico':
+			self.font = android!Color#black;
+			self.background = android!Color#white;
+			self.imageSize = android!ImgSize#small;
+		break;
+		
+		case 'moderno':
+			self.font = android!Color#white;
+			self.background = android!Color#blue;
+			self.imageSize = android!ImgSize#small;
+		break;
+		
+		case 'profesional':
+			self.font = android!Color#gold;
+			self.background = android!Color#black;
+			self.imageSize = android!ImgSize#large;
+		break;
+	}
+
+}

@@ -1,0 +1,259 @@
+rule CSharpToAngular
+	transform cs : CS!CSharp
+	to ng : NG!Angular 
+	{
+		var controllerString = "Controller";
+		var dtoString = "DTO";
+		
+		var vistas = new List;
+		for(csClase in cs.getClasesPorTipo(dtoString) )
+		{
+			var formElements = new List;
+			for(csPropiedad in csClase.propiedades )
+			{
+				var atributos = csPropiedad.atributos; 
+				
+				// Ignorar si el atributo Hide existe 
+				if( atributos.is("Hide") )
+				{
+				}
+				else if( atributos.is("Textbox") )
+				{
+					var csAtributo = atributos.first("Textbox");
+										
+					var placeholder = "";
+					if( csAtributo.propiedades.is("Placeholder") )
+					{
+						placeholder = csAtributo.propiedades.first("Placeholder").valor;
+					}
+															
+					var ngInput = new NG!Input;
+					ngInput.nombre = csPropiedad.nombre;
+					ngInput.required = csAtributo.getPropiedadRequired();
+					ngInput.label = csPropiedad.getAtributoDisplay();
+					ngInput.id = "tb_" + csPropiedad.nombre.toLowerCase();
+					ngInput.tipo = csAtributo.getPropiedadType();
+					ngInput.placeholder = placeholder; 
+					
+					formElements.add(ngInput);
+				}
+				else if( atributos.is("Textarea") )
+				{
+					var csAtributo = atributos.first("Textarea");
+					
+					var filas = 3;
+					if( csAtributo.propiedades.is("Rows") )
+					{
+						filas = csAtributo.propiedades.first("Rows").valor;
+					}
+				
+					var ngTextarea = new NG!Textarea;
+					ngTextarea.nombre = csPropiedad.nombre;
+					ngTextarea.required = csAtributo.getPropiedadRequired();
+					ngTextarea.label = csPropiedad.getAtributoDisplay();
+					ngTextarea.id = "ta_" + csPropiedad.nombre.toLowerCase();
+					ngTextarea.tipo = csAtributo.getPropiedadType();
+					ngTextarea.filas = filas.asInteger(); 
+					
+					formElements.add(ngTextarea);
+				}
+				else if( atributos.is("Combobox") )
+				{
+					var csAtributo = atributos.first("Combobox");
+					
+					var ngFormGroup = new NG!FormGroup;
+					ngFormGroup.nombre = csPropiedad.nombre;
+					ngFormGroup.required = csAtributo.getPropiedadRequired();
+					ngFormGroup.label = csPropiedad.getAtributoDisplay();
+					ngFormGroup.id = "cb_" + csPropiedad.nombre.toLowerCase();
+					ngFormGroup.lista = "list" + csPropiedad.clase.nombre;
+					
+					formElements.add(ngFormGroup);
+				}
+				else if( csPropiedad.enum <> null )
+				{
+					var elements = new List;
+					for(csEnumLiteral in csPropiedad.enum.valores)
+					{
+						var ngRadioButton = new NG!RadioButton;
+						ngRadioButton.nombre = csEnumLiteral.nombre;
+						
+						elements.add(ngRadioButton);
+					}
+					
+					var ngFormGroup = new NG!FormGroup;
+					ngFormGroup.nombre = csPropiedad.nombre;
+					ngFormGroup.required = true;
+					ngFormGroup.label = csPropiedad.getAtributoDisplay();
+					ngFormGroup.id = "rb_" + csPropiedad.nombre.toLowerCase();
+					ngFormGroup.elements = elements;
+					
+					formElements.add(ngFormGroup);
+				}
+				else if( csPropiedad.tipo == "string" )
+				{															
+					var ngInput = new NG!Input;
+					ngInput.nombre = csPropiedad.nombre;
+					ngInput.required = true;
+					ngInput.label = csPropiedad.getAtributoDisplay();
+					ngInput.id = "tb_" + csPropiedad.nombre.toLowerCase();
+					ngInput.tipo = "text";
+					ngInput.placeholder = ""; 
+					
+					formElements.add(ngInput);
+				}
+				else if( csPropiedad.tipo == "bool" )
+				{															
+					var ngInput = new NG!Input;
+					ngInput.nombre = csPropiedad.nombre;
+					ngInput.required = false;
+					ngInput.label = csPropiedad.getAtributoDisplay();
+					ngInput.id = "chb_" + csPropiedad.nombre.toLowerCase();
+					ngInput.tipo = "check";
+					ngInput.placeholder = ""; 
+					
+					formElements.add(ngInput);
+				}
+			}	
+			
+			var ngVista = new NG!Vista;
+			ngVista.nombre = csClase.nombre.replace(dtoString, "");
+			ngVista.dto = csClase.nombre;
+			ngVista.formElements = formElements;
+			vistas.add(ngVista);
+		}
+		
+		var servicios = new List;
+		var controladores = new List;
+		for(csClase in cs.getClasesPorTipo(controllerString) )
+		{
+			// NombreClaseController => NombreClase 
+			var csClaseNombre = csClase.nombre.replace(controllerString, "");
+			
+			// http://localhost:12345/
+			var dominio = csClase.getValorAtributo("Domain");
+			
+			// api/NombreClase
+			var rutaClase = csClase.getValorAtributo("RoutePrefix");
+
+			var servicio = new NG!Service;					
+			var metodos = new List;
+			for(csMetodo in csClase.metodos)
+			{
+				// NombreMetodo
+				var rutaMetodo = csMetodo.getValorAtributo("Route");
+				
+				// En C# el nombre de la ruta de la clase no se coloca con '/'
+				// al final, por lo que se debe colocar entre la ruta de la clase
+				// y la ruta del método
+				var rutaCompleta = dominio + rutaClase + "/" + rutaMetodo;
+			
+				var parametros = new List;
+				for(csParametro in csMetodo.parametros)
+				{
+					var ngParametro = new NG!Parametro;
+					ngParametro.nombre = csParametro.nombre;
+					
+					parametros.add(ngParametro);
+				}
+				
+				var ngMetodo = new NG!Metodo;
+				ngMetodo.nombre = csMetodo.nombre;
+				ngMetodo.service = servicio;
+				ngMetodo.ruta = rutaCompleta;
+				ngMetodo.verbo = csMetodo.getVerbo();
+				ngMetodo.parametros = parametros;
+				
+				metodos.add(ngMetodo);
+								
+
+				if( csMetodo.atributos.exists( x | x.nombre == "ViewType") )
+				{
+					var parametroTipo = csMetodo.parametros.first().clase.nombre;
+					
+					
+					var ngController = new NG!Controller;
+					ngController.nombre = csClaseNombre + csMetodo.nombre + controllerString;
+					ngController.vista = vistas.selectOne( x | x.dto == parametroTipo);
+					ngController.submit = ngMetodo;
+					ngController.titulo = csMetodo.atributos.selectOne( x | x.nombre == "Title").valor;
+					
+					
+					if(csMetodo.atributos.selectOne( x | x.nombre == "ViewType").valor == "Update")
+					{
+						var obtenerPorId = csMetodo.atributos.selectOne( x | x.nombre == "GetId").valor;
+						ngController.obtenerPorId = metodos.selectOne( x | x.nombre == obtenerPorId);	
+					}
+					controladores.add(ngController);	
+				}
+			}
+			
+			var ngServicio = servicio;
+			ngServicio.nombre = csClaseNombre;
+			ngServicio.metodos = metodos;
+			
+			servicios.add(ngServicio);
+		}
+		
+		ng.vistas = vistas;
+		ng.services = servicios;
+		ng.controllers = controladores;
+		
+		for(ngController in ng.controllers)
+		{
+			ngController.services = ng.services;
+		}
+	}
+
+operation CS!Propiedad getAtributoDisplay() : String {
+	if( self.atributos.is("Display") )
+	{
+		return self.atributos.first("Display").propiedades.first("Name").valor;
+	}
+	return self.nombre;
+}
+
+operation CS!Atributo getPropiedadType() : String {
+	if( self.propiedades.is("Type") )
+	{
+		return self.propiedades.first("Type").valor;
+	}
+	return "text";
+}
+
+operation CS!Atributo getPropiedadRequired() : Boolean {
+	if( self.propiedades.is("Required") )
+	{
+		return self.propiedades.first("Required").valor == true;
+	}
+	return true;
+}
+
+operation Any is(tipo : String) : Boolean {
+	return self.exists( x | x.nombre == tipo);
+}
+
+operation Any first(tipo : String) : CS!Object {
+	return self.selectOne( x | x.nombre == tipo);
+}
+
+operation Any getClasesPorTipo(tipo : String) : Collection {
+	return self.clases.select( x | x.nombre.endsWith(tipo) );
+}
+
+operation Any getValorAtributo(nombre : String) : String {
+	return self.atributos.selectOne( x | x.nombre == nombre ).valor;
+}
+
+operation Any getVerbo() : String {
+	var httpString = "Http";
+	
+	// Tomar atributo que comienze por Http (HttpGet, HttpPost, HttpPut, HttpDelete)
+	var httpAttribute = self.atributos.selectOne( x | x.nombre.startsWith(httpString) );
+	
+	// Obtener el nombre y remover la palabra Http
+	var verbo = httpAttribute.nombre.replace(httpString, "");
+
+	// Para Angular los verbos deben ser en minuscula
+	return verbo.firstToLowerCase();
+}

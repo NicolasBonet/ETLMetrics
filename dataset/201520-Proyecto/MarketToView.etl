@@ -1,0 +1,235 @@
+
+
+rule Market2Design
+transform m:mp!MarketPlace
+to v:view!Design{
+v.name=m.nombre;
+m.paginas.equivalent().println();
+
+v.views=m.paginas.equivalent();
+
+}
+
+rule Promocion2View
+transform m:mp!Promocion
+to v:view!Layout{
+
+
+v.name=m.nombre;
+v.page=m.estilo.name;
+
+v.tipoPagina=m.eClass().name;
+v.setDesignPromo(m);
+v.name.println();
+v.tipo.println();
+}
+rule Catalogo2View
+transform m:mp!Catalogo
+to v:view!Layout{
+
+v.name=m.nombre;
+v.page=m.estilo.name;
+v.tipoPagina=m.eClass().name;
+v.setDesignCatalogo(m);
+v.name.println();
+}
+
+rule Contacto2View
+transform m:mp!Contacto
+to v:view!Layout{
+
+v.name=m.nombre;
+v.page=m.estilo.name;
+v.setDesignContacto(m);
+v.tipoPagina=m.eClass().name;
+v.name.println();
+}
+
+rule Mapa2View
+transform m:mp!Mapa
+to v:view!Layout{
+
+v.name=m.nombre;
+v.page=m.estilo.name;
+v.setDesignMapa(m);
+v.tipoPagina=m.eClass().name;
+v.name.println();
+}
+
+operation view!Layout setDesignPromo(f:mp!Promocion){
+	switch(f.estilo.name){
+		case 'empresarial':
+		  
+			self.background=view!Color#gray;
+			self.font=view!Color#black;
+			self.image=view!ImgSize#large;
+			self.tipo=f.eContainer().presentacion.name;
+			
+			self.setLayout(3,4);
+
+		case 'moderno':
+	
+			self.background=view!Color#white;
+			self.font=view!Color#black;
+			self.image=view!ImgSize#large;
+			self.tipo=f.eContainer().presentacion.name;
+			
+			self.setLayout(5,2);
+			
+		case 'clasico':
+		
+			self.background=view!Color#white;
+			self.font=view!Color#gray;
+			self.image=view!ImgSize#large;
+			self.tipo=f.eContainer().presentacion.name;
+			self.setLayout(1,8);
+		
+		case 'profesional':
+	
+			self.background=view!Color#black;
+			self.font=view!Color#white;
+			self.image=view!ImgSize#small;
+			self.tipo=f.eContainer().presentacion.name;
+			self.setLayout(3,4);
+		
+		
+	}
+}
+operation view!Layout setDesignCatalogo(f:mp!Catalogo){
+	switch(f.estilo.name){
+		case 'empresarial':
+		  
+			self.background=view!Color#gray;
+			self.font=view!Color#black;
+			self.image=view!ImgSize#large;
+			self.tipo=f.eContainer().presentacion.name;
+			
+			self.setLayout(3,4);
+
+		case 'moderno':
+	
+			self.background=view!Color#white;
+			self.font=view!Color#black;
+			self.image=view!ImgSize#large;
+			self.tipo=f.eContainer().presentacion.name;
+			
+			self.setLayout(5,2);
+			
+		case 'clasico':
+		
+			self.background=view!Color#white;
+			self.font=view!Color#gray;
+			self.image=view!ImgSize#large;
+			self.tipo=f.eContainer().presentacion.name;
+			self.setLayout(1,8);
+		
+		case 'profesional':
+	
+			self.background=view!Color#black;
+			self.font=view!Color#white;
+			self.image=view!ImgSize#small;
+			self.tipo=f.eContainer().presentacion.name;
+			self.setLayout(3,4);
+		
+		
+	}
+}
+
+
+operation view!Layout setDesignContacto(f:mp!Contacto){
+	switch(f.estilo.name){
+		case 'empresarial':
+		  
+			self.background=view!Color#gray;
+			self.font=view!Color#black;
+			self.image=view!ImgSize#large;
+			self.tipo=f.eContainer().presentacion.name;
+			
+			
+
+		case 'moderno':
+	
+			self.background=view!Color#white;
+			self.font=view!Color#black;
+			self.image=view!ImgSize#large;
+			self.tipo=f.eContainer().presentacion.name;
+			
+			
+			
+		case 'clasico':
+		
+			self.background=view!Color#white;
+			self.font=view!Color#gray;
+			self.image=view!ImgSize#large;
+			self.tipo=f.eContainer().presentacion.name;
+			
+		
+		case 'profesional':
+	
+			self.background=view!Color#black;
+			self.font=view!Color#white;
+			self.image=view!ImgSize#small;
+			self.tipo=f.eContainer().presentacion.name;
+			
+		
+		
+	}
+}
+operation view!Layout setDesignMapa(f:mp!Mapa){
+	switch(f.estilo.name){
+		case 'empresarial':
+		  
+			self.background=view!Color#gray;
+			self.font=view!Color#black;
+			self.image=view!ImgSize#large;
+			self.tipo=f.eContainer().presentacion.name;
+			
+			
+
+		case 'moderno':
+	
+			self.background=view!Color#white;
+			self.font=view!Color#black;
+			self.image=view!ImgSize#large;
+			self.tipo=f.eContainer().presentacion.name;
+			
+			
+			
+		case 'clasico':
+		
+			self.background=view!Color#white;
+			self.font=view!Color#gray;
+			self.image=view!ImgSize#large;
+			self.tipo=f.eContainer().presentacion.name;
+			
+		
+		case 'profesional':
+	
+			self.background=view!Color#black;
+			self.font=view!Color#white;
+			self.image=view!ImgSize#small;
+			self.tipo=f.eContainer().presentacion.name;
+			
+		
+		
+	}
+}
+
+
+
+
+operation view!Layout setLayout(rows:Integer,col:Integer){
+	var r=0;
+	var c;
+	
+	while(r<rows){
+		c=0;
+		self.filas.add(new view!Row);
+		while(c<col){
+			self.filas.last().columnas.add(new view!Column);
+			c=c+1;
+			}
+			r=r+1;
+			}
+
+}

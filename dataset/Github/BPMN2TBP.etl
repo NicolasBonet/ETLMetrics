@@ -1,0 +1,240 @@
+// Creation of the main task, the one that represents the overall process
+rule Process2MainTask
+	transform process : BPMN!Process
+	to task : TBP!Task {
+	
+		task.name = process.id;
+		task.text = process.name;
+		task.actor = "The system";
+		
+		// This task is the parent of all the tasks without a parent
+		task.sequentialChildren.addAll(process.flowElements
+			// We select the flow elements in the diagram that can origin a task
+			.select(elem : BPMN!FlowElement | elem.isKindOf(BPMN!Task) or elem.isKindOf(BPMN!ExclusiveGateway))
+			// We obtain those generated tasks
+			.collect(elem : BPMN!FlowElement | elem.equivalents()).flatten()
+			// We keep the ones without a parent
+			.select(elem : TBP!NamedElement | elem.isKindOf(TBP!Task) 
+				and elem.sequentialParent.isUndefined() and elem.alternativeParent.isUndefined()));	
+	}
+
+
+
+
+@greedy
+rule Task2Task
+    transform taskBPMN : BPMN!Task
+	to taskTBP : TBP!Task { 		
+			
+		taskTBP.name = taskBPMN.id;
+		taskTBP.text = taskBPMN.name;
+		taskTBP.actor = taskBPMN.lanes.first().name;
+		
+		/* ARTIFACTS */
+		
+		if (not taskBPMN.dataInputAssociations.isEmpty())
+		taskTBP.artifactsUsed.addAll(taskBPMN.dataInputAssociations.collect(input : BPMN!DataAssociation | input.sourceRef.first().equivalent()));
+		taskTBP.artifactsUsed.addAll(taskBPMN.dataOutputAssociations.targetRef.equivalent());
+		
+		
+		/* PRECONDITION */
+		
+		// We search for a labeled flow coming from an exclusive gateway
+		taskTBP.preconditions ::= taskBPMN.incoming
+			.select(flow : BPMN!SequenceFlow | flow.sourceRef.isKindOf(BPMN!ExclusiveGateway) and flow.name.asString().length()>0);			
+				
+		
+		/* EVENTS */
+		
+		// Previous event
+		taskTBP.previousEvent = taskBPMN.incoming
+			// As long as it is not a blank start event (with no definitions)
+			.select(flow : BPMN!SequenceFlow | flow.sourceRef.isKindOf(BPMN!Event)
+				and not (flow.sourceRef.isKindOf(BPMN!StartEvent) and flow.sourceRef.eventDefinitions.isEmpty()))
+			.collect(flow : BPMN!SequenceFlow | flow.sourceRef.equivalent())
+			.first();
+			
+		// During events
+		taskTBP.duringEvents ::= taskBPMN.boundaryEventRefs;
+		taskTBP.alternativeChildren ::= taskBPMN.boundaryEventRefs.collect(event : BoundaryEvent | event.outgoing.first().targetRef);
+		
+		// Following event
+		taskTBP.followingEvent = taskBPMN.outgoing
+			// As long as it is not a blank finish event (with no definitions)
+			.select(flow : BPMN!SequenceFlow | flow.targetRef.isKindOf(BPMN!Event)
+				and not (flow.targetRef.isKindOf(BPMN!EndEvent) and flow.targetRef.eventDefinitions.isEmpty()))
+			.collect(flow : BPMN!SequenceFlow | flow.targetRef.equivalent())
+			.first();	
+		
+	}
+
+
+@greedy
+@primary
+rule Task2ParentTask
+    transform taskBPMN : BPMN!Task
+	to taskTBP : TBP!Task { 	
+	guard : 
+		// First task after a gateway or event (at least from one of the task's incoming sequence flows)
+		(taskBPMN.incoming.exists(flow : BPMN!SequenceFlow | flow.sourceRef.isKindOf(BPMN!Gateway) or flow.sourceRef.isKindOf(BPMN!Event)))
+		and
+		// First task of a sequence of tasks 
+		// We consider a task only has one outgoing sequence flow
+		// The tasks must be in the same lane
+		(taskBPMN.outgoing.first().targetRef.isKindOf(BPMN!Task) and taskBPMN.outgoing.first().targetRef.lanes.first() == taskBPMN.lanes.first())
+					
+		// We create the generic parent task
+		taskTBP.name = "Parent" + taskBPMN.id;		
+		taskTBP.actor = taskBPMN.lanes.first().name;
+		// We set the default text for sequential parent tasks
+		taskTBP.text = "Perform the following tasks";			
+		
+		// We search for sequential tasks (starting from the current one)
+		var nextTaskBPMN = taskBPMN;
+		// The search ends when it finds something different from a task or a task from a different lane
+		while (nextTaskBPMN.isKindOf(BPMN!Task) and nextTaskBPMN.lanes.first() == taskBPMN.lanes.first()) {
+			// We obtain the generated TBP task
+			var nextTaskTBP = nextTaskBPMN.equivalents("Task2Task").first();
+			// We add it to the collection of sequential children					
+			taskTBP.sequentialChildren.add(nextTaskTBP);
+			
+			nextTaskBPMN = nextTaskBPMN.outgoing.first().targetRef;
+		}		
+	} 
+	
+
+@lazy
+rule SequenceFlow2Precondition
+	transform flow : BPMN!SequenceFlow
+	to precondition : TBP!Precondition {
+	
+		precondition.text = flow.name;
+	}
+	
+@lazy
+rule ExclusiveGateway2Task
+	transform gate : BPMN!ExclusiveGateway
+	to task : TBP!Task {			
+		guard {
+			// Only diverging gateways
+			if (gate.gatewayDirection <> BPMN!GatewayDirection#Diverging) return false;
+			
+			// Every flow going from the gateway must contain only one or more tasks ending in the same converging gateway
+			var endingNodes = new Set;
+			for (flow : BPMN!SequenceFlow in gate.outgoing) {
+				var node = flow.targetRef;
+				// We go through the flow as long as we find tasks
+				while (node.isKindOf(BPMN!Task))
+					node = node.outgoing.first().targetRef;
+				// And we keep the node ending the sequence of tasks
+				endingNodes.add(node);
+			}
+			// There must be only one ending node for all the flows: the same converging exclusive gateway
+			return endingNodes.size() == 1 and 
+				endingNodes.forAll(node : BPMN!FlowNode | node.isKindOf(BPMN!ExclusiveGateway) 
+					and node.gatewayDirection == BPMN!GatewayDirection#Converging);	
+		}
+			
+	
+		task.name = gate.id;
+		task.text = gate.name;
+		task.actor = gate.lanes.first().name;
+		
+		// We set the children
+		for (flow : BPMN!SequenceFlow in gate.outgoing) {
+			task.alternativeChildren.add(flow.targetRef.equivalent());
+		}
+		
+		// We can also have a precondition or a previous event here
+		
+		// PRECONDITION
+		// We search for a labeled flow coming from an exclusive gateway
+		task.preconditions ::= gate.incoming
+			.select(flow : BPMN!SequenceFlow | flow.sourceRef.isKindOf(BPMN!ExclusiveGateway) and flow.name.asString().length()>0);			
+				
+		
+		// PREVIOUS EVENT
+		task.previousEvent = gate.incoming
+			// As long as it is not a blank start event (with no definitions)
+			.select(flow : BPMN!SequenceFlow | flow.sourceRef.isKindOf(BPMN!Event)
+				and not (flow.sourceRef.isKindOf(BPMN!StartEvent) and flow.sourceRef.eventDefinitions.isEmpty()))
+			.collect(flow : BPMN!SequenceFlow | flow.sourceRef.equivalent())
+			.first();
+	}
+	
+
+@abstract
+rule Event2Event
+    transform eventBPMN : BPMN!Event
+	to eventTBP : TBP!Event { 		
+			
+		eventTBP.name = eventBPMN.id;
+		eventTBP.text = eventBPMN.name;
+		
+		if (eventBPMN.isKindOf(BPMN!BoundaryEvent))
+			eventTBP.interrupting = eventBPMN.cancelActivity;
+	}
+
+@greedy
+rule Event2MessageEvent
+    transform eventBPMN : BPMN!Event
+	to eventTBP : TBP!MessageEvent 
+	extends Event2Event { 	
+		guard: eventBPMN.eventDefinitions.first().isTypeOf(BPMN!MessageEventDefinition)
+	}
+	
+@greedy
+rule Event2SignalEvent
+    transform eventBPMN : BPMN!Event
+	to eventTBP : TBP!SignalEvent 
+	extends Event2Event { 	
+		guard: eventBPMN.eventDefinitions.first().isTypeOf(BPMN!SignalEventDefinition)
+	}
+	
+@greedy
+rule Event2TimerEvent
+    transform eventBPMN : BPMN!Event
+	to eventTBP : TBP!TimerEvent 
+	extends Event2Event { 	
+		guard: eventBPMN.eventDefinitions.first().isTypeOf(BPMN!TimerEventDefinition)
+	}
+	
+@greedy
+rule Event2ConditionalEvent
+    transform eventBPMN : BPMN!Event
+	to eventTBP : TBP!ConditionalEvent 
+	extends Event2Event { 	
+		guard: eventBPMN.eventDefinitions.first().isTypeOf(BPMN!ConditionalEventDefinition)
+	}
+	
+@greedy
+rule Event2ErrorEvent
+    transform eventBPMN : BPMN!Event
+	to eventTBP : TBP!ErrorEvent 
+	extends Event2Event { 	
+		guard: eventBPMN.eventDefinitions.first().isTypeOf(BPMN!ErrorEventDefinition)
+	}
+	
+@greedy
+rule Event2CompensateEvent
+    transform eventBPMN : BPMN!Event
+	to eventTBP : TBP!CompensateEvent 
+	extends Event2Event { 	
+		guard: eventBPMN.eventDefinitions.first().isTypeOf(BPMN!CompensateEventDefinition)
+	}
+
+rule DataObject2DataObject
+	transform objBPMN : BPMN!DataObject
+	to objTBP : TBP!DataObject {
+	
+		objTBP.name = objBPMN.id;
+		objTBP.text = objBPMN.name;
+	}
+	
+rule DataStoreRef2DataStore
+	transform storeBPMN : BPMN!DataStoreReference
+	to storeTBP : TBP!DataStore {
+	
+		storeTBP.name = storeBPMN.id;
+		storeTBP.text = storeBPMN.name;
+	}

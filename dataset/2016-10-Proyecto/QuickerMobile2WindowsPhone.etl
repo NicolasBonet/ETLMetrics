@@ -1,0 +1,121 @@
+
+rule Basic2WinPhone
+	transform
+		s:bs!QuickerApp
+	to 
+	t:wp!Application{
+		t.Name=s.name;
+		t.Font=s.fonts.toString();
+		t.FontSize=s.fontSizes.toString().replace("px","").asInteger();
+		for (iterator in s.interestAreas) { 
+			t.file.Add(iterator.getXaml(s.fonts.toString(),s.fontSizes.toString().replace("px","").asInteger()));
+		}
+	} 
+
+operation bs!InterestArea getXaml(fontFamily:String,fontSize:Integer):wp!Xaml
+	{
+		var xaml= new wp!Xaml();
+		xaml.Name=self.name;
+		xaml.class=new wp!Class();
+		xaml.class.Name=self.Name;
+		xaml.graphicElements.add(self.getGraphics(fontFamily,fontSize));
+		return xaml;
+	}
+
+operation bs!InterestArea getGraphics(fontFamily:String,fontSize:Integer):wp!GraphicElement
+	{
+		var Grid =new wp!Grid();
+		var Pivot= new wp!Pivot();
+		
+		Pivot.fontFamily=fontFamily;
+		Pivot.fontSize=fontSize;
+		Pivot.title=self.name;
+		
+		var PivotItem= new wp!PivotItem();
+		var ScrollViewer= new wp!ScrollViewer();
+		var StackPanel= new wp!StackPanel();
+		var Image= new wp!Image;
+		
+		Image.Source=self.image;
+		
+		StackPanel.subGraphicElement.Add(Image);
+		
+		for (iterator in self.subInterestAreas) { 
+			var button= new wp!Button();
+			button=iterator.GetMyButton(fontFamily,fontSize);
+			StackPanel.subGraphicElement.Add(button);
+		}
+		
+		for (iterator in self.articles) { 
+			var button= new wp!Button();
+			button=iterator.GetMyArticleButton(fontFamily,fontSize);
+			StackPanel.subGraphicElement.Add(button);
+		}
+		
+		ScrollViewer.subGraphicElement.Add(StackPanel);
+		PivotItem.subGraphicElement.Add(ScrollViewer);
+		Pivot.subGraphicElement.Add(PivotItem);
+		Grid.subGraphicElement.Add(Pivot);
+		
+		return Grid;
+	}
+
+
+
+operation bs!InterestArea GetMyButton(fontFamily:String,fontSize:Integer):wp!Button
+	{
+		var button = new wp!Button();
+		button.Content=self.name;
+		button.navigationTo=self.getXaml(fontFamily,fontSize);
+		button.FontFamily=fontFamily;
+		button.FontSize=fontSize;
+		return  button;
+	}
+
+operation bs!Article GetMyArticleButton(fontFamily:String,fontSize:Integer):wp!Button 
+	{
+		var button = new wp!Button();
+		button.Content=self.title;
+		button.navigationTo=self.GetArticleXaml(fontFamily,fontSize);
+		button.FontFamily=fontFamily;
+		button.FontSize=fontSize;
+		return  button;
+	}
+
+operation bs!Article GetArticleXaml(fontFamily:String,fontSize:Integer):wp!Xaml
+	{
+		var xaml= new wp!Xaml();
+		xaml.Name=self.title;
+		xaml.graphicElements.add(self.getGraphicsArticle(fontFamily,fontSize));
+		var class= new wp!Class();
+		class.Name=xaml.Name;
+		xaml.class=class;
+		return xaml;
+	}
+
+operation bs!Article getGraphicsArticle(fontFamily:String,fontSize:Integer):wp!GraphicElement
+	{
+		var titulo= new wp!TextBlock;
+		var image = new wp!Image;
+		var contenido= new wp!TextBlock;
+		var scroll= new wp!ScrollViewer;
+		var stack= new wp!StackPanel;
+		
+		titulo.Text=self.title.toUpperCase();
+		titulo.FontFamily=fontFamily;
+		titulo.FontSize=fontSize;
+		
+		image.Source=self.ImagePortrait;
+		
+		contenido.Text=self.content;
+		contenido.FontFamily=fontFamily;
+		contenido.FontSize=fontSize;	
+		
+		stack.subGraphicElement.Add(titulo);
+		stack.subGraphicElement.Add(image);
+		stack.subGraphicElement.Add(contenido);
+		
+		scroll.subGraphicElement.Add(stack);
+		
+		return scroll;
+	}

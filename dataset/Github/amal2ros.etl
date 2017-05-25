@@ -1,0 +1,76 @@
+import "amalstate2rosstate.etl";
+
+rule amal2ros
+	transform t : robotmodel!System
+	to apackage : rosmodel!Package {
+	apackage.name = t.name;
+	apackage.author = t.author;
+	apackage.author_email = t.author_email;
+	apackage.description = t.description;
+	apackage.depends = t.depends;
+	for (comp in t.component ) { 
+		var nd : rosmodel!Node = new rosmodel!Node;
+		nd.name = comp.name;
+		for (aProperty_list in comp.property_list) { 
+			if (aProperty_list.name='required') {
+				nd.frequency = (aProperty_list.property->select(p|p.name='frequency'))->first().value.asDouble();
+			}
+		}
+		//Creating Publisher and Subscriber from Component Ports
+		for (aport in comp.port) { 
+			if (aport.role.name='Publisher') {
+				var pb = new rosmodel!Publisher;
+				pb.name = aport.name;	
+				pb.queue_size = 100;//tbd	
+				//setting the msg						
+				var msg_name = aport.role.eContainer().property_list->select(p|p.name='required')->first().property.select(p|p.name='msg')->first().value;
+				pb.msg = msg_name;
+				
+				
+				var topic_name = aport.role.eContainer().property_list->select(p|p.name='required')->first().property.select(p|p.name='topic')->first().value;
+				//checking if topic already exists
+				if (not apackage.topic->one(t|t.name=topic_name)) {
+					var atopic = new rosmodel!Topic;
+					atopic.name = topic_name;
+					apackage.topic.add(atopic);
+					pb.target = atopic;
+					} else //topic already exist, just add reference to it
+					{
+					pb.target = apackage.topic->select(t|t.name=topic_name)->first();
+					}
+				nd.publisher.add(pb);
+				
+			} 
+			else if (aport.role.name='Subscriber') {
+				var sb = new rosmodel!Subscriber;
+				sb.name = aport.name;
+				sb.queue_size = 100;//tbd	
+				
+				//setting the msg 
+				var msg_name = aport.role.eContainer().property_list->select(p|p.name='required')->first().property.select(p|p.name='msg')->first().value;
+				sb.msg = msg_name;	
+				
+				var topic_name = aport.role.eContainer().property_list->select(p|p.name='required')->first().property.select(p|p.name='topic')->first().value;
+				//checking if topic already exists
+				if (not apackage.topic->one(t|t.name=topic_name)) {
+					var atopic = new rosmodel!Topic;
+					atopic.name = topic_name;
+					apackage.topic.add(atopic);
+					sb.source = atopic;
+					} else //topic already exist, just add reference to it
+					{
+					sb.source = apackage.topic->select(t|t.name=topic_name)->first();
+					}
+				nd.subscriber.add(sb);
+				
+			}
+		}	
+		nd.state.addAll(comp.state.equivalent());
+		nd.event.addAll(comp.event.equivalent());
+		nd.action.addAll(comp.action.equivalent());
+		nd.transition.addAll(comp.transition.equivalent());
+
+		apackage.node.add(nd);
+		}	
+	} 
+	

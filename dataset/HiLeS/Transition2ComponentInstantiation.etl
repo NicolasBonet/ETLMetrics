@@ -1,0 +1,169 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: TransitionComponentInstance.etl 459 2011-10-26 23:39:45Z carcos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+ @lazy
+rule Transition2ComponentInstantiation
+	transform t : HiLeS!Transition
+	to ci : Vhdl!ComponentInstantiation {
+	
+		//t.name.println("TransitionComponentInstance: ");
+		ci.identifier = t.name;
+		ci.instantiatedUnit = new Vhdl!EntityInstance;
+		ci.instantiatedUnit.entityName = "work.PetriTransition";
+		ci.instantiatedUnit.architecture = "Behavior";
+		/* Generic Map
+		generic(	nb_entrees   : natural:= 3;
+              		nb_sorties   : natural:= 3);*/
+		
+		ci.genericMap = new Vhdl!GenericAssociation;
+		var nb_entrees = new Vhdl!AssociationElement;
+		nb_entrees.formalPart = new Vhdl!FormalPart;
+		nb_entrees.formalPart.designator = "nb_entrees";
+		nb_entrees.actualPart = new Vhdl!ActualPart;
+		// The number of entrees depends on the number of input arcs that are
+		// not connected to points
+		nb_entrees.actualPart.expression = HiLeS!PetriNet.all().selectOne(pn
+				| pn.element.includes(t)
+				).element.select(a : HiLeS!Arc
+				| ( (a.toNode = t   and (not a.fromPoint.isDefined())) or
+				(a.toNode = t and a.fromPoint.isDefined() and not a.fromPoint.owner.isTypeOf(HiLeS!Functional)
+				and not a.fromPoint.owner.isTypeOf(HiLeS!Decision)
+				
+				))/*and not a.fromPoint.isDefined()*/
+				).size().asString();
+		ci.genericMap.element.add(nb_entrees);
+		
+		var nb_sorties = new Vhdl!AssociationElement;
+		nb_sorties.formalPart = new Vhdl!FormalPart;
+		nb_sorties.formalPart.designator = "nb_sorties";
+		nb_sorties.actualPart = new Vhdl!ActualPart;
+		nb_sorties.actualPart.expression = HiLeS!PetriNet.all().selectOne(pn
+				| pn.element.includes(t)
+				).element.select(a : HiLeS!Arc
+				//| (a.fromNode = t and (not a.toPoint.isDefined())) or
+				//(a.fromNode = t and a.toPoint.isDefined() and  not a.toPoint.owner.isTypeOf(HiLeS!Functional)) /*and not a.toPoint.isDefined()*/
+				|a.fromNode = t 
+				).size().asString();
+		ci.genericMap.element.add(nb_sorties);
+        
+    	/*Portmap
+		 port (	c_t : in  STD_LOGIC;
+           		marque_tie : in  STD_LOGIC_VECTOR (nb_entrees-1 downto 0);
+           		ret_amont : out  STD_LOGIC_VECTOR (nb_entrees-1 downto 0);
+           		aj_aval : out  STD_LOGIC_VECTOR (nb_sorties-1 downto 0));*/
+		ci.portMap = new Vhdl!PortAssociation;
+		/* c_t */
+		var c_t = new Vhdl!AssociationElement;
+        c_t.formalPart = new Vhdl!FormalPart;
+        c_t.formalPart.designator = "c_t";
+        c_t.formalPart.designatorPosition = -1;
+		c_t.actualPart = new Vhdl!ActualPart;
+		// The c_t signal should be connected to the PetriNet's parent architecture
+        // parent block tr_cond port, unless the transition is the target of
+        // a functional block, in which case it must be connected to the 
+        // signal created to connect them
+        if(HiLeS!PetriNet.all().selectOne(pn
+				| pn.element.includes(t)
+				).element.one(a : HiLeS!Arc
+				| a.toNode = t and (a.fromPoint.isDefined() and (a.fromPoint.owner.isTypeOf(HiLeS!Functional) or a.fromPoint.owner.isTypeOf(HiLeS!Decision) ))//or a.fromPoint.owner.isTypeOf(HiLeS!Structural) ))
+				))
+		{
+			c_t.actualPart.designator = HiLeS!Arc.all().selectOne(a | a.toNode = t and a.fromPoint.isDefined()).equivalent().identifier;
+			c_t.actualPart.designatorPosition=-1;
+		}
+		else
+		{
+			 c_t.actualPart.designator = HiLeS!Structural.all().selectOne(b
+        		| b.innerArchitecture.petriNet.isDefined()
+        			and b.innerArchitecture.petriNet.element.includes(t)
+        		).equivalents().selectOne(u
+        				| u.isTypeOf(Vhdl!DesignUnit)
+        				).libraryUnit.selectOne(e
+        						| e.isTypeOf(Vhdl!Entity)
+        						).header.port.selectOne(port
+        								| port.identifier = "tr_cond").identifier;
+        	c_t.actualPart.designatorPosition=-1;
+		}
+        ci.portMap.element.add(c_t);
+        /* marque_tie, Connect each of the mark signals of the incoming ports
+		   ret_amont can be done in the same loop */
+		for(arc in HiLeS!PetriNet.all().selectOne(pn
+				| pn.element.includes(t)
+				).element.select(a : HiLeS!Arc
+				| (a.toNode = t and a.fromNode.isDefined() )or (a.toNode = t and a.fromPoint.isDefined() and not a.fromPoint.owner.isTypeOf(HiLeS!Decision) and not a.fromPoint.owner.isTypeOf(HiLeS!Functional))
+				))
+		{
+			if(arc.toNode = t and arc.fromNode.isDefined())
+			{
+			var marque_tie = new Vhdl!AssociationElement;
+		    marque_tie.formalPart = new Vhdl!FormalPart;
+		    //marque_tie.formalPart.designator = "marque_tie(" + (loopCount-1).asString() + ")";
+		    marque_tie.formalPart.designator = "marque_tie";
+		    marque_tie.formalPart.designatorPosition =(loopCount);
+			marque_tie.actualPart = new Vhdl!ActualPart;
+			marque_tie.actualPart.designator = arc.fromNode.equivalents().last().identifier;
+			marque_tie.actualPart.designatorPosition=-1;
+			ci.portMap.element.add(marque_tie);
+			
+			var ret_amont = new Vhdl!AssociationElement;
+		    ret_amont.formalPart = new Vhdl!FormalPart;
+		    //ret_amont.formalPart.designator = "ret_amont(" + (loopCount-1).asString() + ")";
+		    ret_amont.formalPart.designator = "ret_amont";
+		    ret_amont.formalPart.designatorPosition=(loopCount);
+			ret_amont.actualPart = new Vhdl!ActualPart;
+			ret_amont.actualPart.designator = arc.equivalent().identifier;
+			ret_amont.actualPart.designatorPosition=-1;
+			ci.portMap.element.add(ret_amont);
+			}
+			else{
+			var marque_tie = new Vhdl!AssociationElement;
+		    marque_tie.formalPart = new Vhdl!FormalPart;
+		    //marque_tie.formalPart.designator = "marque_tie(" + (loopCount-1).asString() + ")";
+		    marque_tie.formalPart.designator = "marque_tie";
+		    marque_tie.formalPart.designatorPosition =(loopCount);
+			marque_tie.actualPart = new Vhdl!ActualPart;
+			marque_tie.actualPart.designator = arc.equivalent().identifier;
+			marque_tie.actualPart.designatorPosition=-1;
+			ci.portMap.element.add(marque_tie);
+			
+			var ret_amont = new Vhdl!AssociationElement;
+		    ret_amont.formalPart = new Vhdl!FormalPart;
+		    //ret_amont.formalPart.designator = "ret_amont(" + (loopCount-1).asString() + ")";
+		    ret_amont.formalPart.designator = "ret_amont";
+		    ret_amont.formalPart.designatorPosition=(loopCount);
+			ret_amont.actualPart = new Vhdl!ActualPart;
+			ret_amont.actualPart.designator = arc.equivalent().identifier.replace("marque","retJetons");
+			ret_amont.actualPart.designatorPosition=-1;
+			ci.portMap.element.add(ret_amont);			
+			
+			
+			}
+		}
+		
+		/* aj_aval, connect the transition to the outgoing arcs */
+		for(arc in HiLeS!PetriNet.all().selectOne(pn
+				| pn.element.includes(t)
+				).element.select(a : HiLeS!Arc
+				| a.fromNode = t
+				))
+		{
+			var aj_aval = new Vhdl!AssociationElement;
+	        aj_aval.formalPart = new Vhdl!FormalPart;
+	        aj_aval.formalPart.designator = "aj_aval";
+	        aj_aval.formalPart.designatorPosition = (loopCount);
+	        aj_aval.actualPart = new Vhdl!ActualPart;
+	        aj_aval.actualPart.designator = arc.equivalent().identifier;
+	        aj_aval.actualPart.designatorPosition=-1;
+	        ci.portMap.element.add(aj_aval);
+		}
+		
+		
+	}	

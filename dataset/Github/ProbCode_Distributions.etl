@@ -1,0 +1,86 @@
+rule distributionEvaluation
+	transform nd : PVA!NamedDistribution 
+	to newRule : ProbLog!Rule {
+		newRule.~rootName = getUniqueName("d_"+nd.UUID.abs()+"_");
+		var atom = newRule.~rootName.asAtom();
+		newRule.lhs = List{atom.annotate()}.toLHS();
+		newRule.rhs = new ProbLog!RHS();
+		
+		var convertedDefinition = nd.definition->equivalent();
+		//convertedDefinition.println("Converting "+nd.definition.eClass().name+": ");
+		newRule.rhs.conjunction.add(convertedDefinition);
+}
+
+@abstract
+rule probabilityDefinition
+	transform def : PVA!ProbabilityDefinition
+	to tinst : ProbLog!TermInstance {
+		tinst.arguments = List{};	
+}
+	
+rule gammaDefinition
+	transform def : PVA!GammaCDF
+	to tinst : ProbLog!TermInstance 
+	extends probabilityDefinition {
+		var term = getTerm(const().~DISTRIBUTION_GAMMA,2);
+		tinst.template = term;
+		tinst.arguments.add(getAtom(def.alpha.asString()));
+		tinst.arguments.add(getAtom(def.beta.asString()));
+}
+
+rule bernoulliDefinition
+	transform def : PVA!Bernoulli
+	to tinst : ProbLog!TermInstance 
+	extends probabilityDefinition {
+		var term = getTerm(const().~DISTRIBUTION_BERNOULLI,1);
+		tinst.template = term;
+		tinst.arguments.add(
+			getAtom(def.probability.asString())
+		);
+}
+
+rule logNormalDefinition
+	transform def : PVA!LogNormalCDF
+	to tinst : ProbLog!TermInstance 
+	extends probabilityDefinition {
+		var term = getTerm(const().~DISTRIBUTION_LOGNORMAL,2);
+		tinst.template = term;
+		tinst.arguments.add(getAtom(def.mu.asString()));
+		tinst.arguments.add(getAtom(def.sigma.asString()));
+}
+
+rule normalDefinition
+	transform def : PVA!NormalPDF
+	to tinst : ProbLog!TermInstance 
+	extends probabilityDefinition {
+		var term = getTerm(const().~DISTRIBUTION_NORMAL,2);
+		tinst.template = term;
+		tinst.arguments.add(getAtom(def.mu.asString()));
+		tinst.arguments.add(getAtom(def.sigma.asString()));
+}
+
+rule exponentialDefinition
+	transform def : PVA!ExponentialCDF
+	to tinst : ProbLog!TermInstance 
+	extends probabilityDefinition {
+		var term = getTerm(const().~DISTRIBUTION_EXPONENTIALCDF,1);
+		tinst.template = term;
+		tinst.arguments.add(getAtom(def.lambda.asString()));
+}
+
+rule linearApproximationDefinition
+	transform def : PVA!LinearApproximation
+	to tinst : ProbLog!TermInstance 
+	extends probabilityDefinition {
+		var term = getTerm(const().~DISTRIBUTION_LINEAR,1);
+		tinst.template = term;
+		var tuples = def.approximationpoints->collect(point | 
+			createTuple(List{
+				getAtom(point.x.asString()),
+				getAtom(point.y.asString())
+			})
+		);
+		tinst.arguments.add(
+			createList(tuples)
+		);
+}

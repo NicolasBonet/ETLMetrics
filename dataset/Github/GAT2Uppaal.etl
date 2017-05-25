@@ -1,0 +1,450 @@
+pre {
+  	"Running ETL {General Attack Tree into UPPAAL-model}".println();
+  	var channels : Sequence;
+  
+  	var ElementId2LeafId : Map;
+  	var LeafId2ElementId : Map;
+  
+  	var domain2type : Map;
+  	var domain2initValue : Map;
+  	var domain2details : Map;
+  	initDomainInformation();
+
+  	var definitions : Sequence;
+  	var automata : Sequence;
+  	var domains : Sequence;
+  
+}
+
+// Rule for registering Leaves
+@primary
+rule registerLeaves
+	transform r : AT!ATNode
+	to f : UPPAAL!t_node {
+	
+	r.Name = r.Name.replaceAll("\\s+","_");
+	if (r.Children.size() == 0) {
+	
+		ElementId2LeafId.put(r.Name, ElementId2LeafId.size());
+		LeafId2ElementId.put(LeafId2ElementId.size(), r.Name);
+	}
+}
+
+// Rule for the Leaves
+rule ATLeaf	
+	transform r : AT!ATNode
+	to f : UPPAAL!t_node {
+	
+	guard : (r.Children.size() == 0)
+	
+	channels.add("succes_" + r.Name);
+	
+	definitions.add(r.Name + " = BE(succes_" + r.Name + ", 11, 12, 9, 0.25);\n");
+	automata.add(r.Name);
+	
+	"Leaf detected".println;
+}
+
+// Rule for the domains
+rule ATDomain	
+	transform r : AT!Domain
+	to f : UPPAAL!t_domain {
+
+	domains.add(r.ID.replaceAll("\\d",""));
+	
+	"Domain detected".println;
+}
+
+// Rule for the OR
+rule ATOR 	
+	transform r : AT!ATNode
+	to f : UPPAAL!t_node {
+	
+	guard : (r.Children.size() <> 0 and r.Type == AT!ATType#OR) 
+	
+	channels.add("succes_" + r.Name);
+	
+	var definition = r.Name + " = OR" + r.Children.size() + "(succes_" + r.Name + ", ";
+	for (child in r.Children){
+		definition = definition + "succes_" + child.Name + ", ";
+	}
+	definition = definition.substring(0,definition.length()-2) + ");\n";
+	definitions.add(definition);
+	automata.add(r.Name);
+	
+	"OR detected".println;
+}
+
+// Rule for the AND
+rule ATAND 	
+	transform r : AT!ATNode
+	to f : UPPAAL!t_node {
+	
+	guard : (r.Children.size() <> 0 and r.Type == AT!ATType#AND) 
+	
+	channels.add("succes_" + r.Name);
+	
+	var definition = r.Name + " = AND" + r.Children.size() + "(succes_" + r.Name + ", ";
+	for (child in r.Children){
+		definition = definition + "succes_" + child.Name + ", ";
+	}
+	definition = definition.substring(0,definition.length()-2) + ");\n";
+	definitions.add(definition);
+	automata.add(r.Name);
+	
+	"AND detected".println;
+}
+
+post {
+  	UPPAAL.root = new UPPAAL!t_nta;
+  	UPPAAL.root.appendChild(getDeclaration());
+  	UPPAAL.root.appendChild(getBETemplate());
+  	UPPAAL.root.appendChild(getORTemplate(2));
+  	UPPAAL.root.appendChild(getORTemplate(4));
+  	UPPAAL.root.appendChild(getAND2Template());
+  	UPPAAL.root.appendChild(getAND3Template());
+ 	getAND4Template();
+  	UPPAAL.root.appendChild(getSystemTag());
+ 	"Done".println();
+}
+
+// Return the Declaration tag
+operation Any getDeclaration() : UPPAAL!t_declaration{
+	var declaration = new UPPAAL!t_declaration;
+	var text = "broadcast chan ";
+	
+	for(c in channels) {
+		text = text + c + ", ";
+	}
+	text = text.substring(0, text.length()-2) + ";";
+	
+	text = text + "\nbool investment_frozen = false;\n";
+	text = text + "bool system_done = false;\n\n";
+	
+	text = text + "bool f = false;\nbool t = true;\n";
+	
+	for ( d in domains ) {
+		if (not domain2type.containsKey(d) ) ("Couldn't match domain ["+d+"]").println;
+		else { 
+			text = text + domain2type.get(d);
+			text = text + " result_" + d + " = " + domain2initValue.get(d) + ";\n";  
+		}
+	}
+	
+	for ( d in domains ) {
+		if (not domain2type.containsKey(d) ) ("Couldn't match domain ["+d+"]").println;
+		else text = text + domain2type.get(d);
+		text = text + " " + d + "[" + LeafId2ElementId.size() + "] = {";
+		
+		for( key in LeafId2ElementId.keySet() ) {
+		key.println;
+		LeafId2ElementId.get(key).println;
+			for ( att in (getATNode(LeafId2ElementId.get(key))).Attributes){
+			att.println;
+				if ((att.Key).replaceAll("\\d","").equals(d)) text = text + att.Value + ", ";
+			}
+		}
+		
+		text = text.substring(0, text.length()-2) + "};\n"; 
+	}
+	
+	declaration.text = text;
+	
+	return declaration;
+}
+
+// Returns an ATNode, based on its label
+operation Any getATNode(target : String) : AT!ATNode {
+	var nodes = AT!ATNode.allInstances.select(n|n.Children.size() == 0);
+	for(node in nodes) {
+		if(target.equals(node.Name)) return node;
+	}
+	return null;
+}
+
+
+// Return the BE-template
+operation Any getBETemplate() : UPPAAL!t_template{
+	var template = new UPPAAL!t_template;
+	
+	var name = new UPPAAL!t_name;
+	name.text = "BE";
+	var parameter = new UPPAAL!t_parameter;
+	parameter.text = "broadcast chan &a, int b, int c, int d, double e";
+	var declaration = new UPPAAL!t_declaration;
+	declaration.text = "clock x;";
+	
+	template.appendChild(name);
+	template.appendChild(parameter);
+	template.appendChild(declaration);
+	
+	template.appendChild(getLocation("id0", "activated", "0", "0", false, "e"));
+	template.appendChild(getLocation("id1", "end", "400", "0", false, ""));
+	
+	var init = new UPPAAL!t_init;
+	init.a_ref = "id0";
+	template.appendChild(init);
+	
+	template.appendChild(getTransition("id0", "id1", "not system_done", "a!","200","15", new Collection));
+	
+	return template;	
+}
+
+// Return the OR-template
+operation Any getORTemplate(i : Integer) : UPPAAL!t_template{
+	var template = new UPPAAL!t_template;
+	
+	var name = new UPPAAL!t_name;
+	name.text = "OR"+i;
+	var parameter = new UPPAAL!t_parameter;
+	var abc = "abcdefghijklmnopqrstuvwxyz";
+	var text = "broadcast chan &a, ";
+	var j = 1;
+	while (j <= i) {
+		text = text + "broadcast chan &" + abc.charAt(j) + ", ";
+		j = j + 1;
+	}
+	
+	parameter.text = text.substring(0, text.length()-2);
+
+	template.appendChild(name);
+	template.appendChild(parameter);
+	
+	template.appendChild(getLocation("id0", "", "0", "0", false, ""));
+	template.appendChild(getLocation("id1", "", "300", "0", true, ""));
+	template.appendChild(getLocation("id2", "end", "400", "0", false, ""));
+	
+	var init = new UPPAAL!t_init;
+	init.a_ref = "id0";
+	template.appendChild(init);
+	j = 1;
+	var nails : Sequence;
+	while (j <= i) {
+		nails.clear();
+		nails.add(getNail("40",""+30*(j-1)));
+		nails.add(getNail("260",""+30*(j-1)));
+		template.appendChild(getTransition("id0", "id1", "", abc.charAt(j)+"?","200",""+((30*j)-45), nails));
+		j = j + 1;
+	}
+	
+	
+	template.appendChild(getTransition("id1", "id2", "", "a!", "", "", new Collection));
+	
+	return template;	
+}
+
+// Return the AND2-template
+operation Any getAND2Template() : UPPAAL!t_template{
+	var template = new UPPAAL!t_template;
+	
+	var name = new UPPAAL!t_name;
+	name.text = "AND2";
+	var parameter = new UPPAAL!t_parameter;
+	parameter.text = "broadcast chan &a, broadcast chan &b, broadcast chan &c";
+
+	template.appendChild(name);
+	template.appendChild(parameter);
+	
+	template.appendChild(getLocation("id0", "", "0", "0", false, ""));
+	template.appendChild(getLocation("id1", "", "100", "-100", false, ""));
+	template.appendChild(getLocation("id2", "", "100", "100", false, ""));
+	template.appendChild(getLocation("id3", "", "200", "0", true, ""));
+	template.appendChild(getLocation("id4", "end", "300", "0", false, ""));
+	
+	var init = new UPPAAL!t_init;
+	init.a_ref = "id0";
+	template.appendChild(init);
+	
+	template.appendChild(getTransition("id0", "id1", "", "a?", "", "", new Collection));
+	template.appendChild(getTransition("id0", "id2", "", "b?", "", "", new Collection));
+	template.appendChild(getTransition("id2", "id3", "", "a?", "", "", new Collection));
+	template.appendChild(getTransition("id1", "id3", "", "b?", "", "", new Collection));
+	template.appendChild(getTransition("id3", "id4", "", "c!", "", "", new Collection));
+	
+	return template;	
+}
+
+// Return the AND3-template
+operation Any getAND3Template() : UPPAAL!t_template{
+	var template = new UPPAAL!t_template;
+	
+	var name = new UPPAAL!t_name;
+	name.text = "AND3";
+	var parameter = new UPPAAL!t_parameter;
+	parameter.text = "broadcast chan &a, broadcast chan &b, broadcast chan &c, broadcast chan &d";
+
+	template.appendChild(name);
+	template.appendChild(parameter);
+	
+	template.appendChild(getLocation("id0", "", "0", "0", false, ""));
+	template.appendChild(getLocation("id1", "", "100", "-200", false, ""));
+	template.appendChild(getLocation("id2", "", "100", "0", false, ""));
+	template.appendChild(getLocation("id3", "", "100", "200", false, ""));
+	template.appendChild(getLocation("id4", "", "200", "-200", false, ""));
+	template.appendChild(getLocation("id5", "", "200", "0", false, ""));
+	template.appendChild(getLocation("id6", "", "200", "200", false, ""));
+	template.appendChild(getLocation("id7", "", "300", "0", true, ""));
+	template.appendChild(getLocation("id8", "end", "400", "0", false, ""));
+	
+	var init = new UPPAAL!t_init;
+	init.a_ref = "id0";
+	template.appendChild(init);
+	
+	template.appendChild(getTransition("id0", "id1", "", "b?", "", "", new Collection));
+	template.appendChild(getTransition("id0", "id2", "", "c?", "", "", new Collection));
+	template.appendChild(getTransition("id0", "id3", "", "d?", "", "", new Collection));
+	
+	template.appendChild(getTransition("id1", "id5", "", "c?", "", "", new Collection));
+	template.appendChild(getTransition("id2", "id6", "", "d?", "", "", new Collection));
+	template.appendChild(getTransition("id3", "id4", "", "b?", "", "", new Collection));
+	template.appendChild(getTransition("id1", "id4", "", "d?", "", "", new Collection));
+	template.appendChild(getTransition("id2", "id5", "", "b?", "", "", new Collection));
+	template.appendChild(getTransition("id3", "id6", "", "c?", "", "", new Collection));	
+	
+	template.appendChild(getTransition("id4", "id7", "", "c?", "", "", new Collection));
+	template.appendChild(getTransition("id5", "id7", "", "d?", "", "", new Collection));
+	template.appendChild(getTransition("id6", "id7", "", "b?", "", "", new Collection));
+	
+	template.appendChild(getTransition("id7", "id8", "", "a!", "", "", new Collection));
+	
+	return template;	
+}
+
+// Return the AND4-template
+operation Any getAND4Template() : UPPAAL!t_template{
+	
+}
+
+// Returns a location tag
+operation Any getLocation(id : String, name : String, x : String, y : String, urgent : Boolean, exp : String) : UPPAAL!t_location{
+	var location = new UPPAAL!t_location;
+	location.a_id = id;
+	location.a_x = x;
+	location.a_y = y;
+	if (urgent) location.appendChild(new UPPAAL!t_urgent);
+	if(not name.equals("")) {
+		var name_tag = new UPPAAL!t_name;
+		name_tag.text = name;
+		location.appendChild(name_tag);
+	}
+	// exponential rate
+	if (not exp.equals("")) {
+		var exp_tag = new UPPAAL!t_label;
+		exp_tag.a_kind = "exponentialrate";
+		exp_tag.text = exp;
+		location.appendChild(exp_tag);
+	}
+	
+	return location;
+}
+
+// 
+operation Any getSystemTag () : UPPAAL!t_system {
+	var system = new UPPAAL!t_system;
+	var text = "";
+	for(d in definitions) {
+		text = text + d;
+	}
+	text = text + "system ";
+	for(a in automata) {
+		text = text + a + ", ";
+	}
+	text = text.substring(0, text.length()-2);
+	system.text = text + ";";
+	
+	return system;
+}
+
+// Returns a transition tag
+operation Any getTransition(source : String, target : String, guard_text: String,synch : String, x : String, y : String, nails : Sequence) : UPPAAL!t_transition{
+	var transition = new UPPAAL!t_transition;
+	
+	var source_tag = new UPPAAL!t_source;
+	source_tag.a_ref = source;
+	transition.appendChild(source_tag);
+	
+	var target_tag = new UPPAAL!t_target;
+	target_tag.a_ref = target;
+	transition.appendChild(target_tag);
+
+	// Guard
+	if (not guard_text.equals("")){
+		var guard_tag = new UPPAAL!t_label;
+		guard_tag.a_kind = "guard";
+		guard_tag.text = guard_text;
+		transition.appendChild(guard_tag);
+	}
+	
+	// Synchronisation
+	if (not synch.equals("")) {
+		var synch_tag = new UPPAAL!t_label;
+		synch_tag.a_kind = "synchronisation";
+		synch_tag.a_x = x;
+		synch_tag.a_y = y;
+		synch_tag.text = synch;
+		transition.appendChild(synch_tag);
+	}
+	if (nails <> null) {
+		for ( nail in nails) {
+			transition.appendChild(nail);
+		}
+	}
+	
+	return transition;
+}
+
+// Return a nail tag
+operation Any getNail(x : String, y : String) : UPPAAL!t_nail{
+	var nail_tag = new UPPAAL!t_nail;
+	
+	nail_tag.a_x = x;
+	nail_tag.a_y = y;	
+	
+	return nail_tag;
+}
+
+// Domain Information
+operation Any initDomainInformation() {
+  	domain2type.put("DiffLMH","int");
+  	domain2type.put("DiffLMHE","int");
+  	domain2type.put("MinCost","double");
+  	domain2type.put("MinSkill","double");
+  	domain2type.put("MinTimePar","double");
+  	domain2type.put("MinTimeSeq","double");
+  	domain2type.put("PowerCons","double");
+  	domain2type.put("ProbSucc","double");
+  	domain2type.put("ReachPar","int");
+  	domain2type.put("ReachSeq","int");
+  	domain2type.put("SatOpp","bool");
+  	domain2type.put("SatProp","bool");
+  	domain2type.put("SatScenario","bool");
+  	
+  	domain2initValue.put("DiffLMH",1);
+  	domain2initValue.put("DiffLMHE",1);
+  	domain2initValue.put("MinCost",0.0);
+  	domain2initValue.put("MinSkill",0.0);
+  	domain2initValue.put("MinTimePar",0.0);
+  	domain2initValue.put("MinTimeSeq",0.0);
+  	domain2initValue.put("PowerCons",0.0);
+  	domain2initValue.put("ProbSucc",1.0);
+  	domain2initValue.put("ReachPar",0.0);
+  	domain2initValue.put("ReachSeq",0.0);
+  	domain2initValue.put("SatOpp","false");
+  	domain2initValue.put("SatProp","false");
+  	domain2initValue.put("SatScenario","false");
+  	
+  	domain2details.put("DiffLMH","scale");
+  	domain2details.put("DiffLMHE","scale");
+  	domain2details.put("MinCost","addition");
+  	domain2details.put("MinSkill","addition");
+  	domain2details.put("MinTimePar","min_value");
+  	domain2details.put("MinTimeSeq","addition");
+  	domain2details.put("PowerCons",0.0);
+  	domain2details.put("ProbSucc","probability");
+  	domain2details.put("ReachPar",0.0);
+  	domain2details.put("ReachSeq",0.0);
+  	domain2details.put("SatOpp","satisfiability");
+  	domain2details.put("SatProp","satisfiability");
+  	domain2details.put("SatScenario","satisfiability");
+  	
+}

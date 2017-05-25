@@ -1,0 +1,105 @@
+pre {
+  	"Running ETL".println();
+	// Start a recursive XML Teardown to determine parent/children relations.
+	// (Operation instead of rules, as rules did not seem suitable)
+	ADTool.root.e_node.recursiveXMLTeardown(true, null);
+}
+
+post {
+  "Done".println();
+}
+
+// Transform all domains and set several attributes by obtaining 
+// info from attributes and child nodes
+rule ADToolDomain2GATDomain
+	transform ad : ADTool!t_domain
+	to gad : AT!Domain {
+	
+	gad.ID = ad.a_id;
+	gad.Class = ad.e_class.text;
+	gad.Tool = ad.e_tool.text;
+} 
+
+// Recursive XML Teardown operation. Called on XML node and will call method on all child nodes
+// Creates an ATNode, sets its parameters and sets parent/child relation to child ATNodes.
+operation ADTool!t_node recursiveXMLTeardown(role : Boolean, parent : AT!ATNode) : AT!ATNode{
+	var children = self.c_node;
+	var parameters = self.c_parameter;
+	var result = new AT!ATNode();
+	
+	result.Name = self.e_label.text;
+	result.Type = self.findType();
+	
+	// If there is a parent, add it.
+	if(parent<>null){
+		result.Parents.add(parent);
+	}
+	
+	// Reverse roles if node contains switchRole attribute
+	if(("yes").equals(self.a_switchRole)){
+		role = not role;
+	}
+	
+	// Set the correct role as an attribute
+	if (role) {
+		result.Role = AT!ATRole#Attack;
+	} else {
+		result.Role =  AT!ATRole#Defense;
+	}
+	 
+	// If node has any childeren, call method recursively and add references to results.
+	if(children.size()>0){
+		for(c in children){
+	  		result.Children.add(c.recursiveXMLTeardown(role, result));
+	 	}
+	
+	// If there are not any childeren, there can be paramters. Add 
+	} else {
+		for(p in parameters){
+			var param = new AT!ATAttribute();
+			param.Key = p.a_domainId;
+			param.Value = p.text;
+			param.DomainID = p.a_domainId;
+			result.Attributes.add(param);
+		}
+	}
+
+return result;
+}
+
+operation Any countChildren(c : Collection) {
+	c.size().println();
+}
+
+operation ADTool!t_node findType(){
+	if(self.a_refinement.equals("disjunctive")){
+		return (AT!ATType#OR);
+	} else {
+		return (AT!ATType#AND);
+	}
+	
+}
+
+/*
+rule ADTool2GAT 
+	transform r : ADTool!t_node
+	to f : AT!ATNode {
+	
+	// Guard assures that rule is only called for root node of ADtree
+	guard : (r.parentNode.tagName.equals("adtree"))
+	
+	f.Name = r.e_label.text;
+	f.Type = r.findType();
+	f.Role = AT!ATRole#Attack;
+
+	// Get collection of all direct children with label 'node'
+	var children = r.c_node;
+	
+	if(children.size()>0){
+ 		for(c in children){
+  		f.Children.add(c.handleChildren(true, f));
+ 		}
+	}
+	f.countChildren(r.c_node);
+}
+*/

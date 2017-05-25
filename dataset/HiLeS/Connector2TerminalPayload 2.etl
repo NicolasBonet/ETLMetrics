@@ -1,0 +1,101 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: Connector2TerminalPayload.etl 807 2012-06-08 21:09:51Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+import "Connector2Payload.etl";
+
+/****r* Connector2Payload/Connector2TerminalPayload
+ * SUMMARY
+ * 	 Transform a SysML:Connector into a HiLeS:Payload, only if the connector is
+ * between two atomic Flow Ports or between a Flow Port and a nonatomic Flow
+ * Port and if non of its ends are inout and one of the ends is typed by a 
+ * PrimitiveType that is a generalization of the HiLeS!Terminal type
+ * ($Rev: 807 $).
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *   These rules extends Connector2Payload and assigns the correct type to the 
+ * payload. Both ends having the same type is part of the sysml validation so
+ * we can ask if only one has the specified type. This way the rules also are
+ * good for conectors between atomic and nonatomic FlowPorts. The role of one 
+ * of the ends must have a type that isTypeOf(HiLeS!Terminal). This type is defined
+ * in the HiLeS uml library. Since there are PrimitiveTypes that inherit from
+ * Terminal, the guard validates that the role.type is a generalization of Terminal.
+ *
+ * DERIVED FROM
+ * 	* Connector2Payload
+ * DOMAIN
+ *	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 	* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule Connector2TerminalPayload
+	transform connector : SysML!Connector
+	to payload : HiLeS!TerminalPayload
+	extends Connector2Payload
+	{
+
+		guard : connector.end.collect(e | e.role).flatten().exists(role
+				| role.type.generalization.one(g
+					| g.general.name = "Terminal"
+					)
+				)
+
+		//connector.name.println("For Terminal Connector ");
+		payload.type = connector.end.collect(e | e.role).flatten().collect(role | role.type).first().name;
+		// TODO: Terminals may be defined by the user. If the role.type's name is not a primitiveType
+		// of the HiLeS Library, then the across and through values must be extracted and assigned
+		// to the payload.
+	}
+
+/****r* Connector2Payload/ConnectorInout2TerminalPayload
+ * SUMMARY
+ * 	 Transform a SysML:Connector into two HiLeS:Payload, only if the connector is
+ * between two atomic Flow Ports or between a Flow Port and a nonatomic Flow
+ * Port and if both its ends are inout and one of the ends is typed by a 
+ * PrimitiveType that is a generalization of the HiLeS!Terminal type
+ * ($Rev: 807 $).
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *   These rules extends ConnectorInout2Payload and assigns the correct type to the 
+ * payload. Both ends having the same type is part of the sysml validation so
+ * we can ask if only one has the specified type. This way the rules also are
+ * good for conectors between atomic and nonatomic FlowPorts. The role of one 
+ * of the ends must have a type that isTypeOf(HiLeS!Terminal). This type is defined
+ * in the HiLeS uml library. Since there are PrimitiveTypes that inherit from
+ * Terminal, the guard validates that the role.type is a generalization of Terminal.
+ *
+ * DERIVED FROM
+ * 	* ConnectorInout2Payload
+ * DOMAIN
+ *	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 	* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule ConnectorInout2TerminalPayload
+	transform connector : SysML!Connector
+	to payloadIn : HiLeS!TerminalPayload, payloadOut : HiLeS!TerminalPayload
+	extends ConnectorInout2Payload
+	{
+	
+		guard : connector.end.collect(e | e.role).flatten().forAll(role
+				| role.type.generalization.one(g | g.general.name = "Terminal")
+				)
+
+		//connector.name.println("ConnectorInoutForTerminals");
+		payloadIn.type = connector.end.collect(e | e.role).flatten().collect(role | role.type).first().name;
+		payloadOut.type = payloadIn.type;
+		// TODO: Terminals may be defined by the user. If the role.type's name is not a primitiveType
+		// of the HiLeS Library, then the across and through values must be extracted and assigned
+		// to the payload.
+	}

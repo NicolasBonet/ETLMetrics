@@ -1,0 +1,74 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: Payload.etl 163 2011-09-13 14:20:08Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+
+/****r* HiLeSToVDHLAMS/ArcFromTransition2Signal
+ * SUMMARY
+ *   Transform a HiLeS:Port into a Vhdl:Port. The specific type of port would
+ *  depend on the type of the payload that connects to the port. ($Rev: 829 $)
+ * DESCRIPTION 
+ *   // Arcs that come from transitions to places/ports (structural blocks)
+* transform into a signal for putting tokens in the target: aj_aval. The arc 
+ * can not go from a trasition to the block's HcnOut port
+ * SEE ALSO
+ *
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *   	* Vhdl   - http://hiles.uniandes.edu.co/1.1/vhdl-ams
+ *
+ *****
+ */
+
+rule ArcToTransition2Signal
+	transform arc : HiLeS!Arc
+	to ret_jetons : Vhdl!Signal {
+		
+		guard : (arc.toNode.isDefined() and arc.toNode.isTypeOf(HiLeS!Transition))
+			and arc.fromNode.isDefined() //or (arc.fromPoint.isDefined() and not "HcnOut".isSubstringOf(arc.fromPoint.name))
+		
+		if(arc.fromNode.isDefined())
+		{
+			ret_jetons.identifier = "retJetons_" + arc.fromNode.name +  "_" + arc.toNode.name;
+		}
+		if(arc.fromPoint.isDefined())
+		{
+			ret_jetons.identifier = "retJetons_" + arc.fromPoint.name +  "_" + arc.toNode.name;
+		}
+		ret_jetons.subtype = new Vhdl!Subtype;
+		ret_jetons.subtype.type = Vhdl!Types#std_logic;
+		
+	}
+
+rule ArcToTransitionFromFunctional2Signal
+	transform arc : HiLeS!Arc
+	to cT : Vhdl!Signal {
+		
+		guard : (arc.toNode.isDefined() and arc.toNode.isTypeOf(HiLeS!Transition))
+			and (arc.fromPoint.isDefined()and (not(arc.fromPoint.owner.isTypeOf(HiLeS!Structural))) and "HcnOut".isSubstringOf(arc.fromPoint.name))
+		
+		cT.identifier = "cT_" + arc.fromPoint.name +  "_" + arc.toNode.name;
+		cT.subtype = new Vhdl!Subtype;
+		cT.subtype.type = Vhdl!Types#std_logic;
+		
+	}
+	
+rule ArcToTransitionFromStructural2Signal
+	transform arc : HiLeS!Arc
+	to cT : Vhdl!Signal {
+		
+		guard : (arc.toNode.isDefined() and arc.toNode.isTypeOf(HiLeS!Transition))
+			and (arc.fromPoint.isDefined()and arc.fromPoint.owner.isTypeOf(HiLeS!Structural) and "HcnOut".isSubstringOf(arc.fromPoint.name))
+		
+		cT.identifier =  arc.fromPoint.name +  "_" + arc.toNode.name;
+		cT.subtype = new Vhdl!Subtype;
+		cT.subtype.type = Vhdl!Types#std_logic;
+		
+	}

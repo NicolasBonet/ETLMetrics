@@ -1,0 +1,80 @@
+pre {
+	var dataTypes = new Sequence;
+	dataTypes.add(new ModelMM!String);
+	
+	PilaValidationsMM!PilaValidations.all.collect(t|t.getArchitecture());
+}
+
+operation PilaValidationsMM!PilaValidations getArchitecture () : ModelMM!Architecture {
+	var architecture = new ModelMM!Architecture;
+	
+	var businessModel = new ModelMM!BusinessModel;
+	businessModel.entities = self.getEntities();
+	businessModel.dataTypes = dataTypes;
+	
+	architecture.businessModel = businessModel;
+	
+	return architecture;
+}
+
+operation PilaValidationsMM!PilaValidations getEntities () : Sequence {
+	var entities = new Sequence;
+	
+	if (not self.pagadorpensiones.isEmpty()) {
+		var entity = new ModelMM!Entity;
+		entity.name = self.pagadorpensiones.get(0).eClass.name;
+			
+		var attribute = new ModelMM!Attribute;
+		attribute.name = 'descripcion';
+		attribute.attType = dataTypes[0];
+			
+		entity.attributes.add(attribute);
+		entities.add(entity);
+	}
+	
+	if (not self.tipopensionado.isEmpty()) {
+		var entity = new ModelMM!Entity;
+		entity.name = self.tipopensionado.get(0).eClass.name;
+			
+		var attribute = new ModelMM!Attribute;
+		attribute.name = 'descripcion';
+		attribute.attType = dataTypes[0];
+			
+		entity.attributes.add(attribute);
+		entities.add(entity);
+	}
+	
+	if (not self.tipopension.isEmpty()) {
+		var entity = new ModelMM!Entity;
+		entity.name = self.tipopension.get(0).eClass.name;
+			
+		var attribute = new ModelMM!Attribute;
+		attribute.name = 'descripcion';
+		attribute.attType = dataTypes[0];
+			
+		entity.attributes.add(attribute);
+		entities.add(entity);
+	}
+	
+	if (not self.tipopensionado.get(0).pagadorpensiones.isEmpty()) {
+		var entity = new ModelMM!Entity;
+		var nombre = self.tipopensionado.get(0).eClass.name + 
+		self.tipopensionado.get(0).pagadorpensiones.get(0).eClass.name;
+		entity.name = nombre;
+			
+		var attribute1 = new ModelMM!Attribute;
+		attribute1.name = 'tipo_pensionado';
+			
+		entity.attributes.add(attribute1);
+		
+		var attribute2 = new ModelMM!Attribute;
+		attribute2.name = 'pagador_pensiones';
+		
+		entity.attributes.add(attribute2);
+		
+		entities.add(entity);
+	}
+	
+	return entities;
+}
+

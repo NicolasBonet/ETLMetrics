@@ -1,0 +1,317 @@
+pre {
+  "Step 2 -  Transformation -> SubKDM to SubKDM+SDM\n".println();
+  "Description:\n".println();
+  "The transformation uses a SubKDM model and adds SDM Model to this SubKDM model..".println();
+  "Input: SubKDM Model".println();
+  "Output: SubKDM+SDM Model\n".println();
+}
+
+post {
+	"Transformation Finished".println();
+}
+
+rule SubKDM2SimplifiedDecisionMetrics 
+	transform microModel : sourcemodel!Segment
+	to sdm : sourcemodel!SimplifiedDecisionMetrics {
+	"Transformation Begins\n".println();
+	"- Define Measures".println();
+	sdm.measures = microModel.defineMeasures();
+	"- Initialize Observations List".println();
+	sdm.observations = new List();
+	"- Generate Observations".println();
+	var observation = new sourcemodel!Observation();
+	observation.whenObserved = new Native('java.util.Date');
+	"- Calcule Measurements".println();
+	observation.measurements = calculateMeasurements();
+	"- Add Measurements and Observations to SubKDM model".println();
+	sdm.observations.add(observation);
+}
+
+operation sourcemodel!Segment defineMeasures () : List {
+	var resp = new List();
+	
+	if(sourcemodel!ClassLevelRelation.allInstances().size() > 0)
+	{
+		var cbo = new sourcemodel!CouplingBetweenObjectsMeasure();
+		cbo.name = "CBO Coupling between Object Classes";
+		cbo.description = "Two classes are coupled when methods declared in one class use methods or instance variables defined by the other class. The uses relationship can go either way: both uses and used-by relationships are taken into account, but only once.";
+		resp.add(cbo);
+	}
+	
+	if(sourcemodel!ClassUnit.allInstances().size() > 0)
+	{
+		var wmc = new sourcemodel!WeightedMethodsPerClassMeasure();
+		wmc.name = "WMC Weighted Methods Per Class";
+		wmc.description = "WMC is simply the method count for a class";
+		resp.add(wmc);
+		
+		var nol = new sourcemodel!NumberOfLinesMeasure();
+		nol.name = "NOL Number of Lines";
+		nol.description = "Number of lines contained in the object";
+		resp.add(nol);
+	}
+	
+	if(sourcemodel!ClassLevelRelation.allInstances().size() > 0)
+	{	
+		var nou = new sourcemodel!NumberOfUsesMeasure();
+		nou.name = "NOU Number Of Uses";
+		nou.description = "Number of uses inside the class level relation object";
+		resp.add(nou);
+		
+		var noc = new sourcemodel!NumberOfContainmentsMeasure();
+		noc.name = "NOC Number Of Containments";
+		noc.description = "Number of containments inside the class level relation object";
+		resp.add(noc);
+		
+		var cc = new sourcemodel!CalculatedCouplingMeasure();
+		cc.name = "CC Calculated Coupling";
+		cc.description = "Calculation based on containments and uses";
+		resp.add(cc);
+	}
+	
+	if(sourcemodel!Cluster.allInstances().size() > 0 or sourcemodel!ClusterRelation.allInstances().size() > 0)
+	{
+		var noc = new sourcemodel!NumberOfClassesMeasure();
+		noc.name = "NOC Number of Classes";
+		noc.description = "Number of Classes";
+		resp.add(noc);
+		
+		var crcp = new sourcemodel!ClusterRelationConflictPercentageMeasure();
+		crcp.name = "CRCP Cluster Relation Conflict Percentage";
+		crcp.description = "Cluster Relation Conflict Percentage is the value of total classes from the cluster conflicted divided by total classes on cluster";
+		resp.add(crcp);
+	}
+	
+	return resp;
+}
+
+operation calculateMeasurements () : List {
+	var resp = new List();
+	var cbos = sourcemodel!CouplingBetweenObjectsMeasure.allInstances();
+	if(cbos.size() > 0)
+	{
+		calculateCouplingBetweenObjects(resp, cbos.get(0));
+	}
+	var wmcs = sourcemodel!WeightedMethodsPerClassMeasure.allInstances();
+	if(wmcs.size() > 0)
+	{
+		calculateWeightedMethodsPerClass(resp, wmcs.get(0));
+	}
+	
+	var nol = sourcemodel!NumberOfLinesMeasure.allInstances();
+	if(nol.size() > 0)
+	{
+		calculateNumberOfLines(resp, nol.get(0));
+	}
+	
+	var nou = sourcemodel!NumberOfUsesMeasure.allInstances();
+	var noc = sourcemodel!NumberOfContainmentsMeasure.allInstances();
+	var cc = sourcemodel!CalculatedCouplingMeasure.allInstances();
+	
+	if(nou.size() > 0 and noc.size() > 0 and cc.size() > 0)
+	{
+		calculateNumberOfUsesAndContainmentMeasure(resp, nou.get(0), noc.get(0), cc.get(0));
+	}
+	
+	var noc = sourcemodel!NumberOfClassesMeasure.allInstances();
+	if(noc.size() > 0)
+	{
+		calculateNumberOfClassesMeasure(resp, noc.get(0));
+	}
+	
+	var crcp = sourcemodel!ClusterRelationConflictPercentageMeasure.allInstances();
+	if(crcp.size() > 0)
+	{
+		calculateClusterRelationConflictPercentage(resp, crcp.get(0));
+	}
+	
+	return resp;
+}
+
+operation calculateCouplingBetweenObjects(measurements : List, cbo : sourcemodel!CouplingBetweenObjectsMeasure) {
+	for(dataType in sourcemodel!DataType.allInstances())
+	{
+		var value = 0.0;
+		value = sourcemodel!ClassLevelRelation.allInstances().select( clr | clr.from = dataType or clr.`to` = dataType).size;
+		--if(value > 0)
+		--{
+		var measurement = new DimensionalMeasurement();
+		measurement.measurant = getMofElementFromModelElement(dataType);
+		measurement.measure = cbo;
+		measurement.value = value.asDouble();
+		measurements.add(measurement);
+		--}
+	}
+}
+
+operation calculateWeightedMethodsPerClass(measurements: List, wmc: sourcemodel!WeightedMethodsPerClassMeasure)
+{
+	for(class in sourcemodel!ClassUnit.allInstances())
+	{
+		var value = 0.0;
+		value = class.codeElement.select( ce | ce.isTypeOf(sourcemodel!MethodUnit) and ce.codeElement.size() == 1).size;
+		if(value > 0)
+		{
+			var measurement = new DimensionalMeasurement();
+			measurement.measurant = getMofElementFromModelElement(class);
+			measurement.measure = wmc;
+			measurement.value = value.asDouble();
+			measurements.add(measurement);
+		}
+	}
+}
+
+operation calculateNumberOfUsesAndContainmentMeasure(measurements: List, nou: sourcemodel!NumberOfUsesMeasure, noc: sourcemodel!NumberOfContainmentsMeasure, cc: CalculatedCouplingMeasure)
+{
+	var usesMultiplicator = 1.0;
+	var containmentMultiplicator = 2.0;
+		
+	var str = System.User.promptInteger("Complexity value for USE relation", usesMultiplicator.asInteger());
+	usesMultiplicator = str.asDouble();
+		
+	var str = System.User.promptInteger("Complexity value for CONTAINMENT relation", containmentMultiplicator.asInteger());
+	containmentMultiplicator = str.asDouble();
+	
+	for(class in sourcemodel!ClassLevelRelation.allInstances())
+	{
+		var valueNou = 0.0;
+		valueNou = class.typeRelations.select( ce | ce.name.equalsIgnoreCase("Uses") ).size;
+		var measurement = new DimensionalMeasurement();
+		var mof = getMofElementFromModelElement(class);
+		measurement.measurant = mof;
+		measurement.measure = nou;
+		measurement.value = valueNou.asDouble();
+		measurements.add(measurement);
+		
+		var valueNoc = 0.0;
+		valueNoc = class.typeRelations.select( ce | ce.name.equalsIgnoreCase("Containment") ).size;
+		var measurement = new DimensionalMeasurement();
+		measurement.measurant = mof;
+		measurement.measure = noc;
+		measurement.value = valueNoc.asDouble();
+		measurements.add(measurement);
+		
+		var measurement = new DimensionalMeasurement();
+		measurement.measurant = mof;
+		measurement.measure = cc;
+		var value = (usesMultiplicator * valueNou) + (containmentMultiplicator * valueNoc);
+		measurement.value = value.asDouble();
+		measurements.add(measurement);
+	}
+}
+
+operation calculateNumberOfClassesMeasure(measurements: List, noc: sourcemodel!NumberOfClassesMeasure)
+{
+	for(cluster in sourcemodel!Cluster.allInstances())
+	{
+		var value = cluster.codeElement.size();
+		
+		var measurement = new DimensionalMeasurement();
+		measurement.measurant = getMofElementFromModelElement(cluster);
+		measurement.measure = noc;
+		measurement.value = value.asDouble();
+		measurements.add(measurement);
+	}
+	
+	for(clusterRelation in sourcemodel!ClusterRelation.allInstances())
+	{
+		var value = clusterRelation.codeElement.size();
+		
+		var measurement = new DimensionalMeasurement();
+		measurement.measurant = getMofElementFromModelElement(clusterRelation);
+		measurement.measure = noc;
+		measurement.value = value.asDouble();
+		measurements.add(measurement);
+	}
+}
+
+operation calculateNumberOfLines(measurements: List, nol: sourcemodel!NumberOfLinesMeasure)
+{
+	for(class in sourcemodel!DataType.allInstances().select(object| object.isTypeOf(sourcemodel!ClassUnit) or object.isTypeOf(sourcemodel!InterfaceUnit) or object.isTypeOf(sourcemodel!TemplateUnit)))
+	{
+		var value = 0.0;
+		var list = class.codeElement;
+		value = value + class.codeElement.size();
+		
+		var controlElements = list.select(ce | ce.isTypeOf(sourcemodel!ControlElement));
+		for(elements in controlElements)
+		{
+			value = value + elements.codeElement.size();
+		}
+		
+		var measurement = new DimensionalMeasurement();
+		measurement.measurant = getMofElementFromModelElement(class);
+		measurement.measure = nol;
+		measurement.value = value.asDouble();
+		measurements.add(measurement);
+	}
+	
+	--# of lines for cluster based on classes
+	for(cluster in sourcemodel!Cluster.allInstances())
+	{
+		var value = 0.0;
+		
+		for(codeElement in cluster.codeElement)
+		{
+			var dimensionMeasurant = getMofElementFromModelElement(codeElement).measurant.select(ce | ce.measure.isTypeOf(sourcemodel!NumberOfLinesMeasure));
+			value = value + dimensionMeasurant.first().value;
+		}
+		
+		var measurement = new DimensionalMeasurement();
+		measurement.measurant = getMofElementFromModelElement(cluster);
+		measurement.measure = nol;
+		measurement.value = value.asDouble();
+		measurements.add(measurement);
+	}
+	
+	--# of lines for cluster relations based on classes
+	for(clusterRelation in sourcemodel!ClusterRelation.allInstances())
+	{
+		var value = 0.0;
+		
+		for(codeElement in clusterRelation.codeElement)
+		{
+			var dimensionMeasurant = getMofElementFromModelElement(codeElement).measurant.select(ce | ce.measure.isTypeOf(sourcemodel!NumberOfLinesMeasure));
+			value = value + dimensionMeasurant.first().value;
+		}
+		
+		var measurement = new DimensionalMeasurement();
+		measurement.measurant = getMofElementFromModelElement(clusterRelation);
+		measurement.measure = nol;
+		measurement.value = value.asDouble();
+		measurements.add(measurement);
+	}
+}
+
+operation calculateClusterRelationConflictPercentage(measurements: List, crcp: sourcemodel!ClusterRelationConflictPercentageMeasure)
+{
+	for(clusterRelation in sourcemodel!ClusterRelation.allInstances())
+	{
+		var value = (clusterRelation.codeElement.size().asDouble() / clusterRelation.`to`.codeElement.size().asDouble());
+		var measurement = new DimensionalToObjectMeasurement();
+		measurement.measurant = getMofElementFromModelElement(clusterRelation);
+		measurement.measure = crcp;
+		measurement.object = clusterRelation.`to`;
+		measurement.value = value.asDouble();
+		measurements.add(measurement);
+		
+		var value = (clusterRelation.codeElement.size().asDouble() / clusterRelation.`from`.codeElement.size().asDouble());
+		var measurement = new DimensionalToObjectMeasurement();
+		measurement.measurant = getMofElementFromModelElement(clusterRelation);
+		measurement.measure = crcp;
+		measurement.object = clusterRelation.`from`;
+		measurement.value = value.asDouble();
+		measurements.add(measurement);
+	}
+}
+
+operation getMofElementFromModelElement(modelElement : sourcemodel!ModelElement) : sourcemodel!MofElement
+{
+	var mof = sourcemodel!MofElement.allInstances().selectOne( x | x.element = modelElement);
+	if(mof = null)
+	{
+		mof = new sourcemodel!MofElement();
+		mof.element = modelElement;
+	}
+	return mof;
+}

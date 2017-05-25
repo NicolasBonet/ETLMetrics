@@ -1,0 +1,214 @@
+import "../lib/convert-cnf.eol";
+import "../lib/simplify-cnf.eol";
+
+pre {
+	"Converting expresions in a CSP to CNF".println();
+}
+
+rule problem
+	transform inProblem : IN!Problem
+	to outProblem : OUT!Problem {
+
+	outProblem.domains 		::= inProblem.domains;
+	outProblem.variables	::= inProblem.variables;
+	outProblem.constraint	::= inProblem.constraint;
+	outProblem.goals		::= inProblem.goals; 	
+}
+
+rule integerDomain
+	transform inIntegerDomain : IN!IntegerDomain
+	to outIntegerDomain : OUT!IntegerDomain {
+	
+	outIntegerDomain.minValue	= inProblem.minValue;
+	outIntegerDomain.maxValue	=	inProblem.maxValue;
+}
+
+rule variable
+	transform inVariable : IN!Variable
+	to outVariable : OUT!Variable {
+
+	outVariable.name			= inVariable.name;
+	outVariable.description		= inVariable.description;
+	outVariable.type			= inVariable.type;
+	outVariable.domain			::= inVariable.domain;
+}
+
+rule constraint
+	transform inConstraint : IN!Constraint
+	to outConstraint : OUT!Constraint {
+	
+	outConstraint.name			= inConstraint.name;
+	outConstraint.exp			::= inConstraint.exp;
+} 
+
+rule copyNot 
+	transform inNot : IN!Not
+	to outNot : OUT!Not{
+	
+	outNot.exp		::= inNot.exp;
+}
+
+rule copyAnd 
+	transform inAnd : IN!And
+	to outAnd : OUT!And {
+
+	outAnd.leftExp 	::= inAnd.leftExp;
+	outAnd.rightExp	::= inAnd.rightExp;	
+}
+
+rule copyOr 
+	transform inOr : IN!Or
+	to outOr : OUT!Or {
+
+	outOr.leftExp 	::= inOr.leftExp;
+	outOr.rightExp	::= inOr.rightExp;	
+}
+
+rule copyImplies 
+	transform inImplies : IN!Implies
+	to outImplies : OUT!Implies {
+
+	outImplies.leftExp 	::= inImplies.leftExp;
+	outImplies.rightExp	::= inImplies.rightExp;	
+}
+
+rule copyEqual 
+	transform inEqual : IN!Equal
+	to outEqual : OUT!Equal {
+
+	outEqual.leftExp 	::= inEqual.leftExp;
+	outEqual.rightExp	::= inEqual.rightExp;	
+}
+
+rule copyUnEqual 
+	transform inUnEqual : IN!UnEqual
+	to outUnEqual : OUT!UnEqual {
+
+	outUnEqual.leftExp 	::= inUnEqual.leftExp;
+	outUnEqual.rightExp	::= inUnEqual.rightExp;	
+}
+
+rule copyLess 
+	transform inLess : IN!Less
+	to outLess : OUT!Less {
+
+	outLess.leftExp 	::= inLess.leftExp;
+	outLess.rightExp	::= inLess.rightExp;	
+}
+
+rule copyLessEqual 
+	transform inLessEqual : IN!LessEqual
+	to outLessEqual : OUT!LessEqual {
+
+	outLessEqual.leftExp 	::= inLessEqual.leftExp;
+	outLessEqual.rightExp	::= inLessEqual.rightExp;	
+}
+
+rule copyGreater 
+	transform inGreater : IN!Greater
+	to outGreater : OUT!Greater {
+
+	outGreater.leftExp 	::= inGreater.leftExp;
+	outGreater.rightExp	::= inGreater.rightExp;	
+}
+
+rule copyGreaterEqual 
+	transform inGreaterEqual : IN!GreaterEqual
+	to outGreaterEqual : OUT!GreaterEqual {
+
+	outGreaterEqual.leftExp 	::= inGreaterEqual.leftExp;
+	outGreaterEqual.rightExp	::= inGreaterEqual.rightExp;	
+}
+
+rule copyMinus 
+	transform inMinus : IN!Minus
+	to outMinus : OUT!Minus {
+
+	outMinus.leftExp 	::= inMinus.leftExp;
+	outMinus.rightExp	::= inMinus.rightExp;	
+}
+
+rule copyPlus 
+	transform inPlus : IN!Plus
+	to outPlus : OUT!Plus {
+
+	outPlus.leftExp 	::= inPlus.leftExp;
+	outPlus.rightExp	::= inPlus.rightExp;	
+}
+
+rule copyTimes 
+	transform inTimes : IN!Times
+	to outTimes : OUT!Times {
+
+	outTimes.leftExp 	::= inTimes.leftExp;
+	outTimes.rightExp	::= inTimes.rightExp;	
+}
+
+rule copyPower 
+	transform inPower : IN!Power
+	to outPower : OUT!Power {
+
+	outPower.leftExp 	::= inPower.leftExp;
+	outPower.rightExp	::= inPower.rightExp;	
+}
+
+rule copySum 
+	transform inSum : IN!Sum
+	to outSum : OUT!Sum {
+
+	outSum.exps	::= inSum.exps;
+}
+
+rule copyMin 
+	transform inMin : IN!Min
+	to outMin : OUT!Min {
+
+	outMin.exps	::= inMin.exps;
+}
+
+rule copyMax 
+	transform inMax : IN!Max
+	to outMax : OUT!Max {
+
+	outMax.exps	::= inMax.exps;
+}
+
+rule copyVarOccurrence
+	transform inVarOccurence : IN!VarOccurence 
+	to outVarOccurence : OUT!VarOccurence {
+
+	outVarOccurence.variable 	::= inVarOccurence.variable;
+}
+
+rule trueValue 
+	transform inTrue : IN!TrueValue
+	to outTrue : OUT!TrueValue {
+}
+
+rule falseValue 
+	transform inTrue : IN!FalseValue
+	to outTrue : OUT!FalseValue {
+}
+
+rule maximizeGoal 
+	transform inMaximizeGoal : IN!MaximizeGoal
+	to outMaximizeGoal : OUT!MaximizeGoal {
+	
+	outMaximizeGoal.exp		::= inMaximizeGoal.exp;
+}
+
+rule minimizeGoal 
+	transform inMinimizeGoal : IN!MinimizeGoal
+	to outMinimizeGoal : OUT!MinimizeGoal {
+	
+	outMinimizeGoal.exp		::= inMinimizeGoal.exp;
+}
+
+post {
+
+	for( c in OUT!Constraint.all ) {
+		c.exp = c.exp.convertToCNF();
+	}
+
+	"Done".println();
+}

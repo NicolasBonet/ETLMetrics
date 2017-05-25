@@ -1,0 +1,117 @@
+import "uppaalVarious.eol";
+import "uppaalDeclarations.eol";
+import "uppaalExpressions-0_4_1.eol";
+import "uppaalStatements.eol";
+import "general.eol";
+
+rule Nta2Nta
+		transform ntaIn: In!NTA
+		to root: Out!DocumentRoot, ntaOut: Out!NtaType {
+	ntaOut.declaration ::= ntaIn.globalDeclarations;
+	ntaOut.system ::= ntaIn.systemDeclarations;
+	ntaOut.template ::= ntaIn.template;
+	root.nta = ntaOut;
+}
+
+rule LocalDeclarations2Declaration
+		transform declIn: In!LocalDeclarations
+		to declOut: Out!DeclarationType {
+	declOut.addText(declIn.toText());
+}
+
+rule GlobalDeclarations2Declaration
+		transform declIn: In!GlobalDeclarations
+		to declOut: Out!DeclarationType {
+	declOut.addText(declIn.toText());
+}
+
+rule SystemDeclarations2System
+		transform sysIn: In!SystemDeclarations
+		to sysOut: Out!SystemType {
+	sysOut.addText(sysIn.toText());	
+}
+
+rule Template2Template
+		transform tIn: In!Template
+		to tOut: Out!TemplateType {
+	tOut.name = new Out!NameType;
+	tOut.name.addText(tIn.name);
+	var outPars : List = new List;
+	for (pIn : In!Parameter in tIn.parameter) {
+		outPars.add(pIn.toText());
+	}
+	tOut.parameter = new Out!ParameterType;
+	tOut.parameter.addText(outPars.concat(", "));
+	tOut.init = new Out!InitType;
+	tOut.init.ref = tIn.init.equivalent().id;
+	tOut.declaration ::= tIn.declarations;
+	tOut.location ::= tIn.location;
+	tOut.transition ::= tIn.edge;
+}
+
+rule LocalDeclaration2Declaration
+		transform declIn: In!LocalDeclarations
+		to declOut: Out!DeclarationType {
+	declOut.addText(declIn.toText());
+}
+
+rule Location2Location
+		transform lIn: In!Location
+		to lOut : Out!LocationType {
+	lOut.id = lIn.name + "_" + lIn.parentTemplate.name;
+	lOut.color = lIn.color.toString();
+	lOut.name = new Out!NameType;
+	lOut.name.addText(lIn.name);
+	if (lIn.invariant.isDefined()) {
+		var invLabel = new Out!LabelType;
+		invLabel.kind = "invariant";
+		invLabel.addText(lIn.invariant.toText());
+		lOut.label.add(invLabel);
+		//lOut.label.add(lIn.invariant.equivalent());
+	}
+	switch (lIn.locationTimeKind) {
+	case In!LocationKind#COMMITED : lOut.committed = ""; 
+	case In!LocationKind#URGENT : lOut.urgent = ""; 
+	}
+}
+
+rule Edge2Transition
+		transform eIn: In!Edge
+		to tOut: Out!TransitionType {
+	tOut.source = new Out!SourceType;
+	tOut.source.ref = eIn.source.equivalent().id;
+	tOut.target = new Out!TargetType;
+	tOut.target.ref = eIn.target.equivalent().id;
+	if (eIn.`guard`.isDefined()) {
+		var label = new Out!LabelType;
+		label.kind = "guard";
+		label.addText(eIn.`guard`.toText());
+		tOut.label.add(label);
+	}
+	if (eIn.synchronization.isDefined()) {
+		var label = new Out!LabelType;
+		label.kind = "synchronisation";
+		label.addText(eIn.synchronization.toText());
+		tOut.label.add(label);
+	}
+	if (not eIn.selection.isEmpty()) {
+		var list = new List;
+		for (select in eIn.selection) {
+			list.add(select.toText());
+		}
+		var label = new Out!LabelType;
+		label.kind = "select";
+		label.addText(list.concat(",\n"));
+		tOut.label.add(label);
+	}
+	if (not eIn.update.isEmpty()) {
+		var list = new List;
+		for (update in eIn.update) {
+			list.add(update.toText());
+		}
+		var label = new Out!LabelType;
+		label.kind = "assignment";
+		label.addText(list.concat(",\n"));
+		tOut.label.add(label);
+	}
+}

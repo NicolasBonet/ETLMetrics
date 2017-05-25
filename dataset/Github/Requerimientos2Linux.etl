@@ -1,0 +1,153 @@
+pre{
+	"Inicia proceso de transformaci—n: Transformacion -> Linux".println();
+}
+post{
+	"Fin del proceso de transformaci—n: Transformacion -> Linux".println();
+}
+
+rule Requerimientos2Linux
+transform RequerimientoM : RequerimientosMM!Configuracion
+to Linux : LinuxMM!Gesco
+{	
+	
+	RequerimientoM.sistemaOperativo.println();
+	Linux.script = RequerimientoM.getLinuxMModel();	
+	
+}
+
+//Obtiene el modelo general de la transformaci—n.
+operation RequerimientosMM!Configuracion getLinuxMModel() : LinuxMM!Script{
+	
+	var linux : new LinuxMM!Script;
+	var so : RequerimientosMM!SistemaOperativo;
+	
+	for(sos : RequerimientosMM!SistemaOperativo in self.sistemaOperativo){
+		if(sos.name == "Linux"){
+			so = sos;
+		}
+	}
+	
+	linux.version = so.version;
+	linux.descripcion = so.descripcion;
+	//linux.arquitectura = so.arquitectura;
+	linux.repositorios = so.getLineasRepositorio();
+	linux.aplicaciones = so.getLineasAplicaciones();
+	
+	return linux;
+}
+
+//Obtiene las lineas de comando requeridas para los repositorio
+operation RequerimientosMM!SistemaOperativo getLineasRepositorio() : Set{
+	
+	var lnRepositorio : OrderedSet;
+	
+	for(f : RequerimientosMM!Fuentes in self.fuentes){
+		
+		var linea : new LinuxMM!LineaComando;
+		
+		linea.id = f.name;
+		linea.descripcion = "Autor: " + f.autor + ". Fuente: " + f.fuente;
+		linea.rutaDestino = "";
+		linea.gestor = f.tipoFuente;
+		linea.aplicacion = f.fuente;
+		
+		lnRepositorio.add(linea);
+	}
+	
+	return lnRepositorio;
+}
+
+
+//Genera la lista de linea de comando, para la instalaci—n de las distintas aplicaciones
+
+operation RequerimientosMM!SistemaOperativo getLineasAplicaciones() : Set{
+
+	var base : Set = self.requerimientos;
+	var lnApps : OrderedSet;
+	var log : OrderedSet;
+	var cola : OrderedSet;
+	var completado : Boolean = false;
+	
+	for(s : RequerimientosMM!Software in base){
+		
+		if(s.dependencia.isEmpty()){
+			lnApps.add(crearLinea(s));
+			log.add(s);
+		}
+		else{
+			var aCola : Boolean = false;
+			for(d : RequerimientosMM!Software in s.dependencia){
+				if(log.includes(d) == false){
+					aCola=true;
+				}
+			}
+			if(aCola){
+				cola.add(s);
+			}
+			else{
+				lnApps.add(crearLinea(s));
+				log.add(s);
+			}
+		}
+	}
+	
+	while(completado){
+		
+		var cola2 : Set;
+		
+		for(s : RequerimientosMM!Software in cola){
+		
+			var aCola : Boolean = false;
+			for(d : RequerimientosMM!Software in s.dependencia){
+				if(log.includes(d) == false){
+					aCola=true;
+				}
+			}
+			if(aCola){
+				cola2.add(s);
+			}
+			else{
+				lnApps.add(crearLinea(s));
+				log.add(s);
+			}
+		}	
+		if(cola2.isEmpty()){
+			completado=true;
+		}
+		else{
+			cola = cola2;
+		}
+	}
+
+	return lnApps;
+}
+
+//Crea una linea de Comando con base a un requerimiento de software.
+operation crearLinea(software : RequerimientosMM!Software) : LinuxMM!LineaComando{
+	var linea : new LinuxMM!LineaComando;
+	var parametros : Set;
+	linea.parametros = parametros;
+		
+	linea.id = software.name;
+	linea.descripcion = "Descripcion: " + software.descripcion;
+		
+	if(software.version <> null){
+		linea.descripcion = linea.descripcion + ". Version: " + software.version;
+		var parametro : new LinuxMM!Parametro;
+		parametro.nombre = "version";
+		parametro.valor = software.version;
+		linea.parametros.add(parametro);
+	}
+	if(software.origen.isEmpty() <> true){
+		var f : RequerimientosMM!Fuentes = software.origen.first();
+		linea.gestor = f.tipoFuente;
+	}
+	else{
+		linea.gestor = "Default";
+	}
+	linea.descripcion = linea.descripcion + ". Arquitectura: " + software.arquitectura;
+	linea.rutaDestino = software.rutaDestino;
+	linea.aplicacion = software.name;
+	
+	return linea;
+}

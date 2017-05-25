@@ -1,0 +1,361 @@
+import "ProbCode_Distributions.etl";
+
+//Adds the implementation of properties to the problog program
+rule propertiesWithImplementation
+	transform property : PVA!ProbabilisticProperty
+	to rules : List<ProbLog!Rule> {
+		guard : property.implementation <> null
+		
+		var owner = findPropertyOwnerFromExpression(property);
+		rules.~rootName = getUniqueName("property_");
+		var codeSource = property.implementation;
+		var result = codeSource.expression->equivalent(); 
+		rules.addAll(result);
+		
+		//rootname(Context) :- resultRootName(Context).
+		rules.add(createRule(List{
+				getTerm(rules.~rootName,1).getInstance(List{
+					createInstanceDefinition(owner)
+				})
+			},
+			List{
+				getTerm(result.~rootName,1).getInstance(List{
+					createInstanceDefinition(owner)
+				})
+			}
+		));
+}
+
+
+//Default behaviour for attack step is that it always succeeds
+//N.B. for CySeMoL v2.3, only one unreferenced attack step satisfies this condition (BypassDetectionSystems))
+rule attackStepSucceededNoImpl
+	transform property : PVA!ProbabilisticProperty
+	to rules : List<ProbLog!Rule> {
+		guard : property.implementation == null
+					and property.eContainer().isKindOf(PVA!AttackStepType)
+		rules.~rootName = getUniqueName("attackStepSucceededProperty_");
+		rules.add(createRule(List{
+			getTerm(rules.~rootName,1).getInstance(List{
+				getVariable("Context")
+			})
+		}));
+}
+
+//Default behaviour for defence is 50% probability of being enabled
+rule defenceFunctioningNoImpl
+	transform property : PVA!ProbabilisticProperty
+	to rules : List<ProbLog!Rule> {
+		guard : property.implementation == null
+					and property.eContainer().isKindOf(PVA!DefenceType)
+		var owner = findPropertyOwnerFromExpression(property);
+		rules.~rootName = getUniqueName("defenceProperty_");
+		var newRule = new ProbLog!Rule();
+		var property = getTerm(rules.~rootName,1).getInstance(List{
+			createInstanceDefinition(owner)
+		}).annotate();
+		property.setProbability(1,2);
+		newRule.lhs = List{property}.toLHS();
+		rules.add(newRule);
+}
+
+
+@abstract
+rule genericExpressionTransformation
+	transform expr : PVA!ProbabilisticExpression 
+	to out : List<ProbLog!Rule> {} 
+
+rule plNot
+	transform exnot : PVA!Not
+	to out : List<ProbLog!Rule> extends genericExpressionTransformation {
+		var name = getUniqueName("not_");
+		var owner = findPropertyOwnerFromExpression(exnot);		
+		var child = exnot.child->equivalent();
+		var newRule = createRule(
+			List{
+				getTerm(name,1).getInstance(
+					createInstanceDefinition(owner)
+				)
+			},
+			List{
+				getNot().getInstance(
+					getTerm(child.~rootName,1).getInstance(
+						createInstanceDefinition(owner)
+					)
+				)	
+			}
+		);		
+		out.~rootName = name;
+		out.add(newRule);
+		out.addAll(child);
+}
+	
+rule plAnd
+	transform exand : PVA!And
+	to out : List<ProbLog!Rule> extends genericExpressionTransformation {
+		var owner = findPropertyOwnerFromExpression(exand);
+	
+		var name = getUniqueName("and_");
+		var left = exand.children[0]->equivalent();
+		var right = exand.children[1]->equivalent();
+		var newRule = createRule(List{
+				getTerm(name,1).getInstance(
+					createInstanceDefinition(owner)
+				)
+			},
+			List{
+				getTerm(left.~rootName,1).getInstance(
+					createInstanceDefinition(owner)		
+				),
+				getTerm(right.~rootName,1).getInstance(
+					createInstanceDefinition(owner)
+				)		
+			}
+		);		
+		out.~rootName = name;
+		out.add(newRule);
+		out.addAll(left);
+		out.addAll(right);	
+}
+
+rule plOr
+	transform exor : PVA!Or
+	to out : List<ProbLog!Rule> extends genericExpressionTransformation {
+		var owner = findPropertyOwnerFromExpression(exor);
+		var name = getUniqueName("or_");
+		out.~rootName = name;
+		var left = exor.children[0]->equivalent();
+		var right = exor.children[1]->equivalent();
+		var leftRule = createRule(List{
+				getTerm(name,1).getInstance(
+					createInstanceDefinition(owner)
+				)
+			},
+			List{
+				getTerm(left.~rootName,1).getInstance(
+					createInstanceDefinition(owner)		
+				)		
+			}
+		);		
+		out.add(leftRule);
+		var rightRule = createRule(List{
+				getTerm(name,1).getInstance(
+					createInstanceDefinition(owner)
+				)
+			},
+			List{
+				getTerm(right.~rootName,1).getInstance(
+					createInstanceDefinition(owner)		
+				)		
+			}
+		);		
+		out.add(rightRule);
+		out.addAll(left);
+		out.addAll(right);	
+}
+	
+rule plIfThenElse
+	transform expr : PVA!IfThenElse
+	to out : List<ProbLog!Rule> 
+	extends genericExpressionTransformation {
+		var owner = findPropertyOwnerFromExpression(expr);
+		out.~rootName = getUniqueName("ite_");
+		var rootTerm = getTerm(out.~rootName,1); 
+		
+		//first evaluate all children
+		var conditionCode = expr.condition.equivalent();
+		var trueCode = expr.`true`.equivalent();
+		var falseCode = expr.`false`.equivalent();
+		
+		//rootName :- true, condition.
+		var trueRule = new ProbLog!Rule();
+		trueRule.lhs = List{
+			rootTerm.getInstance(List{
+				createInstanceDefinition(owner)
+			}).annotate()
+		}.toLHS();
+		trueRule.rhs = new ProbLog!RHS();
+		trueRule.rhs.conjunction.addAll(List{
+			getTerm(trueCode.~rootName,1).getInstance(List{
+				createInstanceDefinition(owner)
+			}),
+			getTerm(conditionCode.~rootName,1).getInstance(List{
+				createInstanceDefinition(owner)
+			})
+		});
+		
+		//rootName :- false, \+ condition.
+		var falseRule = new ProbLog!Rule();
+		falseRule.lhs = List{
+			rootTerm.getInstance(List{
+				createInstanceDefinition(owner)
+			}).annotate()
+		}.toLHS();
+		falseRule.rhs = new ProbLog!RHS();
+		falseRule.rhs.conjunction.add(
+			getTerm(falseCode.~rootName,1).getInstance(List{
+				createInstanceDefinition(owner)
+			})
+		);
+		//Optimize double negations
+		if(expr.condition->isKindOf(PVA!Not)){
+			var conditionChildCode = expr.condition.child->equivalent();
+			falseRule.rhs.conjunction.add(	
+				getTerm(conditionChildCode.~rootName,1).getInstance(List{
+					createInstanceDefinition(owner)
+				})
+			);
+		}else{
+			falseRule.rhs.conjunction.add(
+				getNot().getInstance(List{
+					getTerm(conditionCode.~rootName,1).getInstance(List{
+						createInstanceDefinition(owner)
+					})
+				})						
+			);
+		}
+		out.add(trueRule);
+		out.add(falseRule);
+		out.addAll(conditionCode);
+		out.addAll(trueCode);
+		out.addAll(falseCode);		 
+}
+
+rule constants
+	transform expr : PVA!Constant
+	to out : List<ProbLog!Rule>
+	extends genericExpressionTransformation {
+		var const = getConstant(expr.value);
+		out.addAll(const);
+		out.~rootName = const.~rootName;
+}
+
+rule plDefenceOperational
+	transform exdef : PVA!DefenceOperational
+	to out : List<ProbLog!Rule> extends genericExpressionTransformation {
+		var owner = findPropertyOwnerFromExpression(exdef);
+		var ownerClassName = owner.eClass().name.prologize();
+		var ownerName = owner.name.prologize();	
+		out.~rootName = getUniqueName("checkDefenceWorking");
+		var defenceName = exdef.type.name.prologize();
+		var referenceChain = exdef.referenceChain->collect(c | "("+c.label.prologize() + ", "+c.target.name.prologize() + ")");
+		cheat(out.~rootName+"(instance("+ ownerClassName +",SourceID,"+ ownerName + ",SourceTI))" +
+		" :- \n" +
+		"\t instance("+ ownerClassName +",SourceID,"+ ownerName +",SourceTI), \n" +
+		"\t checkDefenceWorking(instance("+ ownerClassName +",SourceID,"+ ownerName + ",SourceTI), "+ defenceName + ", " +
+			"["+referenceChain.joinToString(", ")+"]" +
+		")" +
+		".");
+		
+		//TODO verify that all paths can be followed
+		//cheat("testPath().");
+}
+
+//checkAttackStepSucceeded(instance(SourceKind,SourceID,SourceType,SourceTI)) :-
+//	instance(SourceKind,SourceID,SourceType,SourceTI),
+//	checkAttackStepSucceeded(instance(SourceKind,SourceID,SourceType,SourceTI),<Type>,<Path>)
+rule plAttackStepSuccess
+	transform exas : PVA!AttackStepSucceeded
+	to out : List<ProbLog!Rule> extends genericExpressionTransformation {
+		var owner = findPropertyOwnerFromExpression(exas);
+		var ownerClassName = owner.eClass().name.prologize();
+		var ownerName = owner.name.prologize();	
+		
+		out.~rootName = getUniqueName("checkAttackStepSucceeded_");
+		var attackStepName = exas.type.name.prologize();
+		var referenceChain = exas.referenceChain->collect(c | "("+c.label.prologize() + ", "+c.target.name.prologize() + ")");
+		cheat(out.~rootName+"(instance("+ ownerClassName +",SourceID,"+ ownerName +",SourceTI))" +
+		" :- \n" +
+		"\t instance("+ ownerClassName +",SourceID,"+ ownerName +",SourceTI), \n" +
+		"\t checkAttackStepSucceeded(instance("+ ownerClassName +",SourceID,"+ ownerName +",SourceTI), "+ attackStepName + ", " +
+			"["+referenceChain.joinToString(", ")+"]" +
+		")" +
+		".");
+		
+		//TODO verify that all paths can be followed
+		//cheat("testPath().");
+}
+
+//invoke checkConnectionExists(instance(SourceKind,SourceID,SourceType,SourceTI),AssetType,Path)
+//checkConnectionExists(instance(SourceKind,SourceID,SourceType,SourceTI)) :-
+//	instance(SourceKind,SourceID,SourceType,SourceTI),
+//	checkConnectionExists(instance(SourceKind,SourceID,SourceType,SourceTI),<Type>,<Path>)
+rule plConnectionAvailable
+	transform exas : PVA!ConnectionAvailable
+	to out : List<ProbLog!Rule> extends genericExpressionTransformation {
+		var owner = findPropertyOwnerFromExpression(exas);
+		var ownerClassName = owner.eClass().name.prologize();
+		var ownerName = owner.name.prologize();	
+		
+		out.~rootName = getUniqueName("checkConnectionExists_");
+		var assetName = exas.type.name.prologize();
+		var referenceChain = exas.referenceChain->collect(c | "("+c.label.prologize() + ", "+c.target.name.prologize() + ")");
+		cheat(out.~rootName+"(instance("+ ownerClassName +",SourceID,"+ ownerName +",SourceTI))" +
+		" :- \n" +
+		"\t instance("+ ownerClassName +",SourceID,"+ ownerName +",SourceTI), \n" +
+		"\t checkConnectionExists(instance("+ ownerClassName +",SourceID,"+ ownerName +",SourceTI), "+ assetName + ", " +
+			"["+referenceChain.joinToString(", ")+"]" +
+		")" +
+		".");
+}	
+
+
+rule plProbabilityReference
+	transform exprobref : PVA!ProbabilityReference
+	to out : List<ProbLog!Rule> extends genericExpressionTransformation {
+		var owner = findPropertyOwnerFromExpression(exprobref);
+		out.~rootName = getUniqueName("dRef_");
+		var distributionRule = exprobref.refersTo->equivalent();
+		var newRule = createRule(
+			List{
+				getTerm(out.~rootName,1).getInstance(
+					createInstanceDefinition(owner)
+				)
+			},
+			List{
+				getAtom(distributionRule.~rootName)
+			}
+		);
+		out.add(newRule);	
+		out.add(distributionRule);
+}
+
+
+//
+// auxiliary operations
+//
+
+//Implements a cache for names to constant values
+operation getConstant(value : Real) : List<Rule> {
+	//Test existence of map extension property
+	if(program().~constantids == null){
+		program().~constantids = Map{};
+	}
+	if(not program().~constantids.containsKey(value)){
+		//Cache miss,		
+		//construct rule
+		var newRule = new ProbLog!Rule();
+		var newName = getUniqueName("const_");
+		var tinst = getTerm(newName,1).getInstance(List{getVariable("Context")});
+		var annotation = tinst.annotate();
+		newRule.lhs = List{annotation}.toLHS();
+		if(value == 0){
+			newRule.rhs = new ProbLog!RHS();
+			newRule.rhs.conjunction.add(getAtom("false"));
+		} else if(value == 1){
+			newRule.rhs = new ProbLog!RHS();
+			newRule.rhs.conjunction.add(getAtom("true"));
+		} else {
+			annotation.setProbability(value);
+		}
+		
+		//Store rule
+		var result = List{newRule};
+		result.~rootName = newName;
+		program().statements.addAll(result);
+		
+		//Add rule to the program
+		program().~constantids.put(value,result);
+	}
+	return program().~constantids.get(value);
+}

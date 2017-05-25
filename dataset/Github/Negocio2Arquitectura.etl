@@ -1,0 +1,839 @@
+pre {
+ estilos!RootSistema.all().at(0).iniciarTransformacion();
+}
+
+operation estilos!RootSistema iniciarTransformacion() : arquitectura!RootSistema {
+ 	var rootArquitectura = new arquitectura!RootSistema;
+ 	rootArquitectura.presentaciones = self.vistas.collect(v | v.vistaToCapaPresentacion());
+ 	rootArquitectura.capaServicio = self.getCapaServicio();
+ 	rootArquitectura.capaLogicaNegocio = self.getCapaLogicaNegocio();
+ 	rootArquitectura.capaAccesoDatos = self.getCapaAccesoDatos();
+ 	rootArquitectura.capaPersistencia = self.getCapaPersistencia();
+ 	return rootArquitectura;
+}
+
+operation estilos!Vista vistaToCapaPresentacion() : arquitectura!CapaPresentacion {
+ 	var capaPresentacion : new arquitectura!CapaPresentacion;
+ 	
+ 	var vistaCategorias = new arquitectura!Vista;
+ 	vistaCategorias.titulo = 'Categorias';
+ 	vistaCategorias.colorFondo = self.colorFondo;
+ 	
+ 	var vistaProductos = new arquitectura!Vista;
+ 	vistaProductos.titulo = 'Productos';
+ 	vistaProductos.colorFondo = self.colorFondo;
+ 	
+ 	var vistaDetalleProducto = new arquitectura!Vista;
+ 	vistaDetalleProducto.titulo = 'Detalle del Producto';
+ 	vistaDetalleProducto.colorFondo = self.colorFondo;
+ 	
+ 	var vistaContactanos = new arquitectura!Vista;
+ 	vistaContactanos.titulo = 'Contactanos';
+ 	vistaContactanos.colorFondo = self.colorFondo;
+ 	
+ 	var vistaAcercaDe = new arquitectura!Vista;
+ 	vistaAcercaDe.titulo = 'Acerca de';
+ 	vistaAcercaDe.colorFondo = self.colorFondo;
+ 	
+ 	if(self.tecnologia = estilos!Tecnologia#android){
+ 		capaPresentacion.tecnologia = arquitectura!Tecnologia#android;
+ 	}else if(self.tecnologia = estilos!Tecnologia#iOS){
+ 		capaPresentacion.tecnologia = arquitectura!Tecnologia#iOS;
+ 	}else if(self.tecnologia = estilos!Tecnologia#web){
+ 		capaPresentacion.tecnologia = arquitectura!Tecnologia#web;
+ 	}
+ 	
+	 	
+ 	vistaCategorias.letra = self.letra.estiloLetraToArquitecturaLetra(capaPresentacion); 
+	vistaProductos.letra = self.letra.estiloLetraToArquitecturaLetra(capaPresentacion);
+	vistaDetalleProducto.letra = self.letra.estiloLetraToArquitecturaLetra(capaPresentacion);
+	vistaContactanos.letra = self.letra.estiloLetraToArquitecturaLetra(capaPresentacion);
+	vistaAcercaDe.letra = self.letra.estiloLetraToArquitecturaLetra(capaPresentacion);
+ 	
+ 	capaPresentacion.vistas = capaPresentacion.vistas.including(vistaCategorias)
+ 						   .including(vistaProductos)
+ 						   .including(vistaDetalleProducto)
+ 						   .including(vistaContactanos)
+ 						   .including(vistaAcercaDe);
+ 	
+ 	capaPresentacion.controladores = self.getControladores();
+ 	capaPresentacion.comunicacionesHttp = self.getComunicacionesHttp();
+ 	capaPresentacion.entidades = self.getEntidadesPresentacion();
+ 	
+ 	return capaPresentacion;
+}
+
+operation estilos!Letra estiloLetraToArquitecturaLetra(capa : arquitectura!CapaPresentacion) : arquitectura!Letra {
+	var letra = new arquitectura!Letra;
+	letra.color = self.colorLetra;
+	letra.fuente = self.fuente;
+	
+	if(capa.tecnologia = arquitectura!Tecnologia#android){
+	
+		if(self.tamano = estilos!TamanoLetra#small){
+			letra.tamano = '@dimen/small';	
+		}else if(self.tamano = estilos!TamanoLetra#medium){
+			letra.tamano = '@dimen/medium';
+		}else if(self.tamano = estilos!TamanoLetra#large){
+			letra.tamano = '@dimen/large';
+		}
+ 		
+ 	}else if(capa.tecnologia = arquitectura!Tecnologia#iOS){
+ 		
+		if(self.tamano = estilos!TamanoLetra#small){
+			letra.tamano = '13';	
+		}else if(self.tamano = estilos!TamanoLetra#medium){
+			letra.tamano = '16';
+		}else if(self.tamano = estilos!TamanoLetra#large){
+			letra.tamano = '20';
+		}
+
+ 	}else if(capa.tecnologia = arquitectura!Tecnologia#web){
+ 		
+ 		if(self.tamano = estilos!TamanoLetra#small){
+			letra.tamano = '14px';	
+		}else if(self.tamano = estilos!TamanoLetra#medium){
+			letra.tamano = '18px';
+		}else if(self.tamano = estilos!TamanoLetra#large){
+			letra.tamano = '22px';
+		}
+		
+ 	}
+ 	
+ 	return letra;
+}
+
+operation estilos!Letra estiloLetraToArquitecturaLetra(capa : arquitectura!CapaPresentacion) : arquitectura!Letra {
+	var letra = new arquitectura!Letra;
+	letra.color = self.colorLetra;
+	letra.fuente = self.fuente;
+	
+	if(capa.tecnologia = arquitectura!Tecnologia#android){
+	
+		if(self.tamano = estilos!TamanoLetra#small){
+			letra.tamano = '@dimen/small';	
+		}else if(self.tamano = estilos!TamanoLetra#medium){
+			letra.tamano = '@dimen/medium';
+		}else if(self.tamano = estilos!TamanoLetra#large){
+			letra.tamano = '@dimen/large';
+		}
+ 		
+ 	}else if(capa.tecnologia = arquitectura!Tecnologia#iOS){
+ 		
+		if(self.tamano = estilos!TamanoLetra#small){
+			letra.tamano = '13';	
+		}else if(self.tamano = estilos!TamanoLetra#medium){
+			letra.tamano = '16';
+		}else if(self.tamano = estilos!TamanoLetra#large){
+			letra.tamano = '20';
+		}
+
+ 	}else if(capa.tecnologia = arquitectura!Tecnologia#web){
+ 		
+ 		if(self.tamano = estilos!TamanoLetra#small){
+			letra.tamano = '14px';	
+		}else if(self.tamano = estilos!TamanoLetra#medium){
+			letra.tamano = '18px';
+		}else if(self.tamano = estilos!TamanoLetra#large){
+			letra.tamano = '22px';
+		}
+		
+ 	}
+ 	
+ 	return letra;
+}
+
+operation estilos!Vista getControladores() : Sequence(arquitectura!Controlador) {
+	
+	var controladores = new Sequence;
+	
+	if(self.tecnologia = estilos!Tecnologia#android){
+	    var mainActivity = new arquitectura!Controlador;
+	    mainActivity.nombre = 'MainActivity';
+	    
+	    var fragmentCategorias = new arquitectura!Controlador;
+	    fragmentCategorias.nombre = 'FragmentCategorias';
+	    
+	    var fragmentProductos = new arquitectura!Controlador;
+	    fragmentProductos.nombre = 'FragmentProductos';
+	    
+	    var fragmentDetalle = new arquitectura!Controlador;
+	    fragmentDetalle.nombre = 'FragmentDetalle';
+	    
+	    var fragmentAcerdaDe = new arquitectura!Controlador;
+	    fragmentAcerdaDe.nombre = 'FragmentAcerdaDe';
+	    
+	    var fragmentContactanos = new arquitectura!Controlador;
+	    fragmentContactanos.nombre = 'FragmentContactanos';
+	    
+	    
+		controladores = controladores.including(mainActivity)
+ 									  .including(fragmentCategorias)
+ 									  .including(fragmentProductos)
+ 									  .including(fragmentDetalle)
+ 									  .including(fragmentAcerdaDe)
+ 									  .including(fragmentContactanos);
+ 									  
+ 	}else if(self.tecnologia = estilos!Tecnologia#iOS){
+ 	
+ 		var ViewController = new arquitectura!Controlador;
+	    ViewController.nombre = 'ViewController';
+	    
+	    var CategoriasViewController = new arquitectura!Controlador;
+	    CategoriasViewController.nombre = 'CategoriasViewController';
+	    
+	    var ProductosViewController = new arquitectura!Controlador;
+	    ProductosViewController.nombre = 'ProductosViewController';
+	    
+	    var DetalleViewController = new arquitectura!Controlador;
+	    DetalleViewController.nombre = 'DetalleViewController';
+	    
+	    var AboutViewController = new arquitectura!Controlador;
+	    AboutViewController.nombre = 'AboutViewController';
+	    
+	    var ContactanosViewController = new arquitectura!Controlador;
+	    ContactanosViewController.nombre = 'ContactanosViewController';
+	    
+ 		controladores = controladores.including(ViewController)
+ 									  .including(CategoriasViewController)
+ 									  .including(ProductosViewController)
+ 									  .including(DetalleViewController)
+ 									  .including(AboutViewController)
+ 									  .including(ContactanosViewController);
+	
+ 	}else if(self.tecnologia = estilos!Tecnologia#web){
+ 		
+ 		var logicaJS = new arquitectura!Controlador;
+	    logicaJS.nombre = 'logica.js';
+	    
+ 		controladores = controladores.including(logicaJS);
+ 	}
+ 	return controladores;
+}
+
+
+operation estilos!Vista getComunicacionesHttp() : Sequence(arquitectura!ComunicacionHttp) {
+	var comunicacionesHttp = new Sequence;
+	
+	var empresa = new arquitectura!ComunicacionHttp;
+	empresa.url = '/empresa';
+	
+	var categorias = new arquitectura!ComunicacionHttp;
+	categorias.url = '/categoria';
+	
+	var productos = new arquitectura!ComunicacionHttp;
+	productos.url = '/productos/{categoria}';
+	
+	if(self.tecnologia = estilos!Tecnologia#android){
+	
+		empresa.nombre = 'EmpresaAsyncTask';
+		categorias.nombre = 'CategoriasAsyncTask';
+		productos.nombre = 'ProductosAsyncTask';    
+ 									  
+ 	}else if(self.tecnologia = estilos!Tecnologia#iOS){
+ 	
+ 		empresa.nombre = 'AFNetworkingEmpresa';
+		categorias.nombre = 'AFNetworkingCategorias';
+		productos.nombre = 'AFNetworkingProductos';
+ 		
+ 	}else if(self.tecnologia = estilos!Tecnologia#web){
+ 	
+ 		empresa.nombre = 'XmlHttpRequest';
+		categorias.nombre = 'XmlHttpRequest';
+		productos.nombre = 'XmlHttpRequest';
+		
+ 	}
+ 	
+ 	comunicacionesHttp = comunicacionesHttp.including(empresa)
+ 									       .including(categorias)
+ 									       .including(productos);
+	
+	
+ 	return comunicacionesHttp;	
+}
+
+operation estilos!Vista getEntidadesPresentacion() : Sequence(arquitectura!EntidadPresentacion) {
+	var catalogoRoot = catalogo!RootSistema.all().at(0);
+	var entidades = new Sequence;
+	
+	var empresa = catalogoRoot.empresa.empresaToEntidadPresentacion();
+	var catalogo = catalogoRoot.empresa.catalogo.catalogoToEntidadPresentacion();
+	var categoria = catalogoRoot.empresa.catalogo.categorias.at(0).categoriaToEntidadPresentacion();
+	var producto = catalogoRoot.empresa.catalogo.categorias.at(0).productos.at(0).productoToEntidadPresentacion();
+	
+	entidades = entidades.including(empresa)
+						 .including(catalogo)
+						 .including(categoria)
+						 .including(producto);
+							 
+	return entidades; 		
+}
+
+operation catalogo!Empresa empresaToEntidadPresentacion() : arquitectura!EntidadPresentacion {
+	var entidad = new arquitectura!EntidadPresentacion;
+	entidad.nombre = 'Empresa';
+	
+	var nombre = new arquitectura!Atributo;
+	nombre.nombre = 'nombre';
+	nombre.tipoDato = 'String'; 
+	
+	var direccion = new arquitectura!Atributo;
+	direccion.nombre = 'direccion';
+	direccion.tipoDato = 'String';
+	
+	var email = new arquitectura!Atributo;
+	email.nombre = 'email';
+	email.tipoDato = 'String';
+	
+	var telefono = new arquitectura!Atributo;
+	telefono.nombre = 'telefono';
+	telefono.tipoDato = 'String';
+	
+	var descripcion = new arquitectura!Atributo;
+	descripcion.nombre = 'descripcion';
+	descripcion.tipoDato = 'String';
+	
+	var urlImagen = new arquitectura!Atributo;
+	urlImagen.nombre = 'urlImagen';
+	urlImagen.tipoDato = 'String';
+	
+	entidad.atributos = entidad.atributos.including(nombre)
+										 .including(direccion)
+										 .including(email)
+										 .including(telefono)
+										 .including(descripcion)
+										 .including(urlImagen); 
+	return entidad;
+}
+
+operation catalogo!Catalogo catalogoToEntidadPresentacion() : arquitectura!EntidadPresentacion {
+	var entidad = new arquitectura!EntidadPresentacion;
+	entidad.nombre = 'Catalogo';
+	
+	var nombre = new arquitectura!Atributo;
+	nombre.nombre = 'nombre';
+	nombre.tipoDato = 'String'; 
+	
+	entidad.atributos = entidad.atributos.including(nombre);
+	 
+	return entidad;
+}
+
+operation catalogo!Categoria categoriaToEntidadPresentacion() : arquitectura!EntidadPresentacion {
+	var entidad = new arquitectura!EntidadPresentacion;
+	entidad.nombre = 'Categoria';
+	
+	var id = new arquitectura!Atributo;
+	id.nombre = 'id';
+	id.tipoDato = 'long';
+	
+	var nombre = new arquitectura!Atributo;
+	nombre.nombre = 'nombre';
+	nombre.tipoDato = 'String'; 
+	
+	entidad.atributos = entidad.atributos.including(id)
+										 .including(nombre);
+	 
+	return entidad;
+}
+
+operation catalogo!Producto productoToEntidadPresentacion() : arquitectura!EntidadPresentacion {
+	var entidad = new arquitectura!EntidadPresentacion;
+	entidad.nombre = 'Producto';
+	
+	var nombreAtributo = new arquitectura!Atributo;
+	nombreAtributo.nombre = 'nombre';
+	nombreAtributo.tipoDato = 'String';
+	
+	entidad.atributos = entidad.atributos.including(nombreAtributo);
+	
+	for(catalogoAtributo in self.atributos){
+		var atributo = new arquitectura!Atributo;
+		atributo.nombre = catalogoAtributo.nombreAtributo;
+		atributo.tipoDato = catalogoAtributo.tipoDato;
+		
+		entidad.atributos = entidad.atributos.including(atributo);	
+	}
+	 
+	return entidad;
+}
+
+operation estilos!RootSistema getCapaServicio() : arquitectura!CapaServicio {
+	var capaServicio = new arquitectura!CapaServicio;
+	
+	var servicio = new arquitectura!Servicio;
+	servicio.path = '/catalogo-service/rest/services';
+	
+	var metodoEmpresas = new arquitectura!Metodo;
+	metodoEmpresas.path = '/empresa';
+	metodoEmpresas.tipoRetorno = 'List<EmpresaJson>';
+	
+	var metodoEmpresaPorId = new arquitectura!Metodo;
+	metodoEmpresaPorId.path = '/empresa/:id';
+	metodoEmpresaPorId.tipoRetorno = 'EmpresaJson';
+	
+	var metodoCatalogos = new arquitectura!Metodo;
+	metodoCatalogos.path = '/catalogo';
+	metodoCatalogos.tipoRetorno = 'List<CatalogoJson>';
+	
+	var metodoCatalogoPorId = new arquitectura!Metodo;
+	metodoCatalogoPorId.path = '/catalogo/:id';
+	metodoCatalogoPorId.tipoRetorno = 'CatalogoJson';
+	
+	var metodoCategorias = new arquitectura!Metodo;
+	metodoCategorias.path = '/categoria';
+	metodoCategorias.tipoRetorno = 'List<CategoriaJson>';
+	
+	var metodoCategoriaPorId = new arquitectura!Metodo;
+	metodoCategoriaPorId.path = '/categoria/:id';
+	metodoCategoriaPorId.tipoRetorno = 'CategoriaJson'; 
+	
+	var metodoProductos = new arquitectura!Metodo;
+	metodoProductos.path = '/producto';
+	metodoProductos.tipoRetorno = 'List<ProductoJson>';
+	
+	var metodoProductoPorId = new arquitectura!Metodo;
+	metodoProductoPorId.path = '/producto/:id';
+	metodoProductoPorId.tipoRetorno = 'ProductoJson';
+
+	servicio.metodos = servicio.metodos.including(metodoEmpresas)
+									   .including(metodoEmpresaPorId)
+									   .including(metodoCatalogos)
+									   .including(metodoCatalogoPorId)
+									   .including(metodoCategorias)
+									   .including(metodoCategoriaPorId)
+									   .including(metodoProductos)
+									   .including(metodoProductoPorId);
+									   
+	capaServicio.servicios = capaServicio.servicios.including(servicio);
+	
+	return capaServicio;
+}
+
+operation estilos!RootSistema getCapaLogicaNegocio() : arquitectura!CapaLogicaNegocio {
+	var capaLogicaNegocio = new arquitectura!CapaLogicaNegocio;
+	
+	var interfaceCatalogo = new arquitectura!InterfaceNegocio;
+	interfaceCatalogo.nombre = 'ICatalogo';
+	
+	var metodoEmpresas = new arquitectura!Metodo;
+	metodoEmpresas.path = '/empresa';
+	metodoEmpresas.tipoRetorno = 'List<EmpresaJson>';
+	
+	var metodoEmpresaPorId = new arquitectura!Metodo;
+	metodoEmpresaPorId.path = '/empresa/:id';
+	metodoEmpresaPorId.tipoRetorno = 'EmpresaJson';
+	
+	var metodoCatalogos = new arquitectura!Metodo;
+	metodoCatalogos.path = '/catalogo';
+	metodoCatalogos.tipoRetorno = 'List<CatalogoJson>';
+	
+	var metodoCatalogoPorId = new arquitectura!Metodo;
+	metodoCatalogoPorId.path = '/catalogo/:id';
+	metodoCatalogoPorId.tipoRetorno = 'CatalogoJson';
+	
+	var metodoCategorias = new arquitectura!Metodo;
+	metodoCategorias.path = '/categoria';
+	metodoCategorias.tipoRetorno = 'List<CategoriaJson>';
+	
+	var metodoCategoriaPorId = new arquitectura!Metodo;
+	metodoCategoriaPorId.path = '/categoria/:id';
+	metodoCategoriaPorId.tipoRetorno = 'CategoriaJson'; 
+	
+	var metodoProductos = new arquitectura!Metodo;
+	metodoProductos.path = '/producto';
+	metodoProductos.tipoRetorno = 'List<ProductoJson>';
+	
+	var metodoProductoPorId = new arquitectura!Metodo;
+	metodoProductoPorId.path = '/producto/:id';
+	metodoProductoPorId.tipoRetorno = 'ProductoJson';
+	
+	interfaceCatalogo.metodos = interfaceCatalogo.metodos.including(metodoEmpresas)
+									   					 .including(metodoEmpresaPorId)
+									   					 .including(metodoCatalogos)
+									   					 .including(metodoCatalogoPorId)
+									   					 .including(metodoCategorias)
+									   					 .including(metodoCategoriaPorId)
+									   					 .including(metodoProductos)
+									   					 .including(metodoProductoPorId);
+									   					  
+	capaLogicaNegocio.interfaces = capaLogicaNegocio.interfaces.including(interfaceCatalogo);
+	
+	var beanNegocioCatalogo = new arquitectura!BeanNegocio;
+	beanNegocioCatalogo.nombre = 'CatalogoBean';
+	beanNegocioCatalogo.implementa = interfaceCatalogo;
+	
+	capaLogicaNegocio.beans = capaLogicaNegocio.beans.including(beanNegocioCatalogo);
+	
+	var catalogoRoot = catalogo!RootSistema.all().at(0);
+	
+	var empresaJsonDTO = catalogoRoot.empresa.empresaToJsonDTO();
+	var catalogoJsonDTO = catalogoRoot.empresa.catalogo.catalogoToJsonDTO();
+	var categoriaJsonDTO = catalogoRoot.empresa.catalogo.categorias.at(0).categoriaToJsonDTO();
+	var productoJsonDTO = catalogoRoot.empresa.catalogo.categorias.at(0).productos.at(0).productoToJsonDTO(); 
+
+	capaLogicaNegocio.jsonsDTO = capaLogicaNegocio.jsonsDTO.including(empresaJsonDTO)
+													       .including(catalogoJsonDTO)
+														   .including(categoriaJsonDTO)
+														   .including(productoJsonDTO);
+														   
+	var mapperEmpresa = new arquitectura!Mapper;
+	mapperEmpresa.nombre = 'EmpresaJsonMapper';
+	var metodoEmpresaToJson = new arquitectura!Metodo;
+	metodoEmpresaToJson.argumentos = 'Empresa e';
+	metodoEmpresaToJson.tipoRetorno = 'EmpresaJson';
+	mapperEmpresa.metodos = mapperEmpresa.metodos.including(metodoEmpresaToJson);
+	 
+	var mapperCatalogo = new arquitectura!Mapper;
+	mapperCatalogo.nombre = 'CatalogoJsonMapper';
+	var metodoCatalogoToJson = new arquitectura!Metodo;
+	metodoCatalogoToJson.argumentos = 'Catalogo c';
+	metodoCatalogoToJson.tipoRetorno = 'CatalogoJson';
+	mapperCatalogo.metodos = mapperCatalogo.metodos.including(metodoCatalogoToJson);
+	
+	var mapperCategoria = new arquitectura!Mapper;
+	mapperCategoria.nombre = 'CategoriaJsonMapper';
+	var metodoCategoriaToJson = new arquitectura!Metodo;
+	metodoCategoriaToJson.argumentos = 'Categoria c';
+	metodoCategoriaToJson.tipoRetorno = 'CategoriaJson';
+	mapperCategoria.metodos = mapperCategoria.metodos.including(metodoCategoriaToJson);
+	
+	var mapperProducto = new arquitectura!Mapper;
+	mapperProducto.nombre = 'ProductoJsonMapper';
+	var metodoProductoToJson = new arquitectura!Metodo;
+	metodoProductoToJson.argumentos = 'Producto p';
+	metodoProductoToJson.tipoRetorno = 'ProductoJson';
+	mapperProducto.metodos = mapperProducto.metodos.including(metodoProductoToJson);
+	
+	capaLogicaNegocio.mappers = capaLogicaNegocio.mappers.including(mapperEmpresa)
+													     .including(mapperCatalogo)
+													     .including(mapperCategoria)
+													     .including(mapperProducto);
+	
+	return capaLogicaNegocio;
+}
+
+operation catalogo!Empresa empresaToJsonDTO() : arquitectura!JsonDTO{
+    var jsonDTO = new arquitectura!JsonDTO;
+	jsonDTO.nombre = 'Empresa';
+	
+	var nombre = new arquitectura!Atributo;
+	nombre.nombre = 'nombre';
+	nombre.tipoDato = 'String'; 
+	
+	var direccion = new arquitectura!Atributo;
+	direccion.nombre = 'direccion';
+	direccion.tipoDato = 'String';
+	
+	var email = new arquitectura!Atributo;
+	email.nombre = 'email';
+	email.tipoDato = 'String';
+	
+	var telefono = new arquitectura!Atributo;
+	telefono.nombre = 'telefono';
+	telefono.tipoDato = 'String';
+	
+	var descripcion = new arquitectura!Atributo;
+	descripcion.nombre = 'descripcion';
+	descripcion.tipoDato = 'String';
+	
+	var urlImagen = new arquitectura!Atributo;
+	urlImagen.nombre = 'urlImagen';
+	urlImagen.tipoDato = 'String';
+	
+	jsonDTO.atributos = jsonDTO.atributos.including(nombre)
+										 .including(direccion)
+										 .including(email)
+										 .including(telefono)
+										 .including(descripcion)
+										 .including(urlImagen);
+										 
+	return jsonDTO;
+}
+
+operation catalogo!Catalogo catalogoToJsonDTO() : arquitectura!JsonDTO{
+	var jsonDTO = new arquitectura!JsonDTO;
+	jsonDTO.nombre = 'Catalogo';
+	
+	var nombre = new arquitectura!Atributo;
+	nombre.nombre = 'nombre';
+	nombre.tipoDato = 'String'; 
+	
+	jsonDTO.atributos = jsonDTO.atributos.including(nombre);
+	 
+	return jsonDTO;
+	
+}
+
+operation catalogo!Categoria categoriaToJsonDTO() : arquitectura!JsonDTO{
+	var jsonDTO = new arquitectura!JsonDTO;
+	jsonDTO.nombre = 'Categoria';
+	
+	var id = new arquitectura!Atributo;
+	id.nombre = 'id';
+	id.tipoDato = 'long';
+	
+	var nombre = new arquitectura!Atributo;
+	nombre.nombre = 'nombre';
+	nombre.tipoDato = 'String'; 
+	
+	jsonDTO.atributos = jsonDTO.atributos.including(id)
+										 .including(nombre);
+	 
+	return jsonDTO;
+}
+
+operation catalogo!Producto productoToJsonDTO() : arquitectura!JsonDTO{
+	var JsonDTO = new arquitectura!JsonDTO;
+	JsonDTO.nombre = 'Producto';
+	
+	var nombreAtributo = new arquitectura!Atributo;
+	nombreAtributo.nombre = 'nombre';
+	nombreAtributo.tipoDato = 'String';
+	
+	JsonDTO.atributos = JsonDTO.atributos.including(nombreAtributo);
+	
+	for(catalogoAtributo in self.atributos){
+		var atributo = new arquitectura!Atributo;
+		atributo.nombre = catalogoAtributo.nombreAtributo;
+		atributo.tipoDato = catalogoAtributo.tipoDato;
+		
+		JsonDTO.atributos = JsonDTO.atributos.including(atributo);	
+	}
+	 
+	return JsonDTO;
+} 
+
+operation estilos!RootSistema getCapaAccesoDatos() : arquitectura!CapaAccesoDatos{
+	var capaAccesoDatos = new arquitectura!CapaAccesoDatos;
+	
+	var interfaceEmpresaDAO = new arquitectura!InterfaceDAO;
+	interfaceEmpresaDAO.nombre = 'IEmpresaDAO';
+	var metodoEmpresa = new arquitectura!Metodo;
+	metodoEmpresa.tipoRetorno = 'Empresa';
+	interfaceEmpresaDAO.metodos = interfaceEmpresaDAO.metodos.including(metodoEmpresa);
+	 
+	var interfaceCatalogoDAO = new arquitectura!InterfaceDAO;
+	interfaceCatalogoDAO.nombre = 'ICatalogoDAO';
+	var metodoCatalogo = new arquitectura!Metodo;
+	metodoCatalogo.tipoRetorno = 'Catalogo';
+	interfaceCatalogoDAO.metodos = interfaceCatalogoDAO.metodos.including(metodoCatalogo);
+	 
+	var interfaceCategoriaDAO = new arquitectura!InterfaceDAO;
+	interfaceCategoriaDAO.nombre = 'ICategoriaDAO';
+	var metodoCategoria = new arquitectura!Metodo;
+	metodoCategoria.tipoRetorno = 'Categoria';
+	interfaceCategoriaDAO.metodos = interfaceCategoriaDAO.metodos.including(metodoCategoria);
+	 
+	var interfaceProductoDAO = new arquitectura!InterfaceDAO;
+	interfaceProductoDAO.nombre = 'IProductoDAO';
+	var metodoProducto = new arquitectura!Metodo;
+	metodoProducto.tipoRetorno = 'Producto';
+	interfaceProductoDAO.metodos = interfaceProductoDAO.metodos.including(metodoProducto); 
+	
+	capaAccesoDatos.interfaces = capaAccesoDatos.interfaces.including(interfaceEmpresaDAO)
+										        .including(interfaceCatalogoDAO)
+											    .including(interfaceCategoriaDAO)
+												.including(interfaceProductoDAO); 
+												
+	var beanEmpresaDAO = new arquitectura!BeanDAO;
+	beanEmpresaDAO.nombre = 'EmpresaDAO';
+	beanEmpresaDAO.implementa = interfaceEmpresaDAO;
+	
+	var beanCatalogoDAO = new arquitectura!BeanDAO;
+	beanCatalogoDAO.nombre = 'CatalogoDAO';
+	beanCatalogoDAO.implementa = interfaceCatalogoDAO;
+	
+	var beanCategoriaDAO = new arquitectura!BeanDAO;
+	beanCategoriaDAO.nombre = 'CategoriaDAO';
+	beanCategoriaDAO.implementa = interfaceCategoriaDAO;
+	
+	var beanProductoDAO = new arquitectura!BeanDAO;
+	beanProductoDAO.nombre = 'ProductoDAO';
+	beanProductoDAO.implementa = interfaceProductoDAO;
+	
+	capaAccesoDatos.beans = capaAccesoDatos.beans.including(beanEmpresaDAO)
+										         .including(beanCatalogoDAO)
+											     .including(beanCategoriaDAO)
+												 .including(beanProductoDAO);
+													
+	return capaAccesoDatos;
+}
+
+operation estilos!RootSistema getCapaPersistencia() : arquitectura!CapaPersistencia{
+	var capaPersistencia = new arquitectura!CapaPersistencia;
+	
+	var catalogoRoot = catalogo!RootSistema.all().at(0);
+	var entidades = new Sequence;
+	
+	var empresa = catalogoRoot.empresa.empresaToEntidadPersistencia();
+	var catalogo = catalogoRoot.empresa.catalogo.catalogoToEntidadPersistencia();
+	var categoria = catalogoRoot.empresa.catalogo.categorias.at(0).categoriaToEntidadPersistencia();
+	var producto = catalogoRoot.empresa.catalogo.categorias.at(0).productos.at(0).productoToEntidadPersistencia();
+	
+	capaPersistencia.entidades = capaPersistencia.entidades.including(empresa)
+						 							       .including(catalogo)
+						 								   .including(categoria)
+						 								   .including(producto);
+						 				
+	var empresa = catalogoRoot.empresa;
+	var insertEmpresa = new arquitectura!Insert;
+	insertEmpresa.table = 'Empresa';
+	insertEmpresa.values = "1,'"
+	                      +empresa.nombre+"','"
+	                      +empresa.direccion+"','"
+	                      +empresa.email+"','"
+	                      +empresa.telefono+"','"
+	                      +empresa.descripcion+"','"
+	                      +empresa.urlImagen+"'";
+	
+	capaPersistencia.inserts = capaPersistencia.inserts.including(insertEmpresa);
+	
+	var catalogo = empresa.catalogo;  	                      
+	var insertCatalogo = new arquitectura!Insert;
+	insertCatalogo.table = 'Catalogo';
+	insertCatalogo.values = catalogo.idCatalogo+",'"
+	                        +catalogo.nombre+"'";
+	                        
+	capaPersistencia.inserts = capaPersistencia.inserts.including(insertCatalogo);
+	
+	for(c in catalogo.categorias){
+		var insertCategoria = new arquitectura!Insert;
+		insertCategoria.table = 'Categoria';
+		insertCategoria.values = c.idCategoria+",'"
+	                             +c.nombre+"'";
+		
+		capaPersistencia.inserts = capaPersistencia.inserts.including(insertCategoria);
+		
+		for(p in c.productos){
+			var insertProducto = new arquitectura!Insert;
+			var finalStringValue = p.idProducto+",'"
+	                              +p.nombre+"',";
+			
+			
+			for(a in p.atributos){
+				if(a.tipoDato.contains("String")){
+					finalStringValue = finalStringValue + "'"+a.valorAtributo+"'";
+				}else{
+					finalStringValue = finalStringValue + a.valorAtributo;
+				}
+				
+				if(a <> p.atributos.last()){
+					finalStringValue = finalStringValue + ",";
+				}
+				
+			}
+			
+			insertProducto.table = 'Producto';
+			insertProducto.values = finalStringValue;
+		
+			capaPersistencia.inserts = capaPersistencia.inserts.including(insertProducto);
+		}			                             
+	}
+	                      						 
+	return capaPersistencia;
+}
+
+operation catalogo!Empresa empresaToEntidadPersistencia() : arquitectura!EntidadPersistencia {
+	var entidad = new arquitectura!EntidadPersistencia;
+	entidad.nombre = 'Empresa';
+	
+	var id = new arquitectura!Atributo;
+	id.nombre = 'id';
+	id.tipoDato = 'Long';
+	
+	var nombre = new arquitectura!Atributo;
+	nombre.nombre = 'nombre';
+	nombre.tipoDato = 'String'; 
+	
+	var direccion = new arquitectura!Atributo;
+	direccion.nombre = 'direccion';
+	direccion.tipoDato = 'String';
+	
+	var email = new arquitectura!Atributo;
+	email.nombre = 'email';
+	email.tipoDato = 'String';
+	
+	var telefono = new arquitectura!Atributo;
+	telefono.nombre = 'telefono';
+	telefono.tipoDato = 'String';
+	
+	var descripcion = new arquitectura!Atributo;
+	descripcion.nombre = 'descripcion';
+	descripcion.tipoDato = 'String';
+	
+	var urlImagen = new arquitectura!Atributo;
+	urlImagen.nombre = 'urlImagen';
+	urlImagen.tipoDato = 'String';
+	
+	entidad.atributos = entidad.atributos.including(id)
+										 .including(nombre)
+										 .including(direccion)
+										 .including(email)
+										 .including(telefono)
+										 .including(descripcion)
+										 .including(urlImagen); 
+	return entidad;
+}
+
+operation catalogo!Catalogo catalogoToEntidadPersistencia() : arquitectura!EntidadPersistencia {
+	var entidad = new arquitectura!EntidadPersistencia;
+	entidad.nombre = 'Catalogo';
+	
+	var id = new arquitectura!Atributo;
+	id.nombre = 'id';
+	id.tipoDato = 'Long'; 
+	
+	var nombre = new arquitectura!Atributo;
+	nombre.nombre = 'nombre';
+	nombre.tipoDato = 'String'; 
+	
+	entidad.atributos = entidad.atributos.including(id)
+									     .including(nombre);
+	 
+	return entidad;
+}
+
+operation catalogo!Categoria categoriaToEntidadPersistencia() : arquitectura!EntidadPersistencia {
+	var entidad = new arquitectura!EntidadPersistencia;
+	entidad.nombre = 'Categoria';
+	
+	var id = new arquitectura!Atributo;
+	id.nombre = 'id';
+	id.tipoDato = 'Long';
+	
+	var nombre = new arquitectura!Atributo;
+	nombre.nombre = 'nombre';
+	nombre.tipoDato = 'String'; 
+	
+	entidad.atributos = entidad.atributos.including(id)
+										 .including(nombre);
+	 
+	return entidad;
+}
+
+operation catalogo!Producto productoToEntidadPersistencia() : arquitectura!EntidadPersistencia {
+	var entidad = new arquitectura!EntidadPersistencia;
+	entidad.nombre = 'Producto';
+	
+	var idAtributo = new arquitectura!Atributo;
+	idAtributo.nombre = 'id';
+	idAtributo.tipoDato = 'Long';
+	
+	var nombreAtributo = new arquitectura!Atributo;
+	nombreAtributo.nombre = 'nombre';
+	nombreAtributo.tipoDato = 'String';
+	
+	entidad.atributos = entidad.atributos.including(idAtributo)
+										 .including(nombreAtributo);
+	
+	for(catalogoAtributo in self.atributos){
+		var atributo = new arquitectura!Atributo;
+		atributo.nombre = catalogoAtributo.nombreAtributo;
+		atributo.tipoDato = catalogoAtributo.tipoDato;
+		
+		entidad.atributos = entidad.atributos.including(atributo);	
+	}
+	 
+	return entidad;
+}

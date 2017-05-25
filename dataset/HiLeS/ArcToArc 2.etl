@@ -1,0 +1,123 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: ArcToArc.etl 823 2012-06-22 16:50:00Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+ 
+/****r* HiLeS2TimePetriNet/ArcToArc
+ * SUMMARY
+ *   Transform a HiLeS Arc to a TPN Arc ($Rev: 823 $)
+ * DESCRIPTION
+ *   Create a TPN Arc equivalent to the HiLeS Arc. The transformation takes into
+ *  account the hierarchy of the HiLeS Control Net. Thus, arcs conencted to 
+ *  Functional blocks ports are ignored beacuse Functional blocks are not
+ *  transformed into Petr Net elements. For the case of Arcs conencted to/from
+ *  Structural blocks' ports or to/from Services, the hierarchy of the Control
+ *  Net must be removed. Thus, the next place or transition in the hierarchy is
+ *  searched to connect the TPN Arc.
+ * SEE ALSO
+ *		* 
+ *
+ * DOMAIN
+ * 		* HiLeS	 	- http://hiles.uniandes.edu.co/1.1/HiLeS
+ * 		* tpn		- http://hiles.uniandes.edu.co/1.0/TimePetriNet
+ * SPECIFICATION
+		relation ArcToArc
+   		{
+    		checkonly domain HiLeS ha:Arc {
+				fromPoint = hafp,
+				toPoint = hatp,
+				fromNode = hafn,
+				toNode = hatn, 
+			}
+			enforce domain tpn a:Arc {
+				weight = aw,
+				source = as,
+				target = at,
+			}
+			when {
+				hafp->notEmpty() and not hafp.owner->isTypeOf(Functional);
+				hatp->notEmpty() and not hatp.owner->isTypeOf(Functional);
+			}
+			where {
+				aw = 1;
+				if hafn->notEmpty() and hafn->isTypeOf(Transition) then
+					TransitionToTransition(hafn, as)
+				endif
+				if hafn->notEmpty() and hafn->isTypeOf(Place) then
+					PlaceToPlace(hafn, as)
+				endif
+				if hatn->notEmpty() and hatn->isTypeOf(Transition) then
+					TransitionToTransition(hatn, at)
+				endif
+				if hatn->notEmpty() and hatn->isTypeOf(Place) then
+					PlaceToPlace(hatn, at)
+				endif
+				if hafp->notEmpty() and hafp->isTypeOf(Service) then
+					if hafp.owner.owner.paretArchitecture.petriNet.elements->
+							select(a : Arc | a.toPoint = hafp.owner.owner.ports->select(p | p.name = hafp.name))
+							.fromNode->isTypeOf(Transition) then
+						TransitionToTransition(hafp, select(a : Arc |
+									a.toPoint = hafp.owner.owner.ports->select(p | p.name = hafp.name)).fromNode )
+						...
+				endif
+			}
+ *		
+ ******
+ */
+ rule ArcToArc
+ 	transform ha : HiLeS!Arc
+ 	to a :tpn!Arc {
+ 		/* Como se van a transformar los que entran a los ports de los bloques,
+           que se eliminan con los que van de los servcios correspondientes para
+		   eliminar la jerarquía, filtrar los arcos conectados a servicios.
+		   Los arcos a bloques funcionales tambien se van.
+ 		*/
+ 		guard {
+ 				if(ha.fromPoint.isDefined()) {
+ 					return not ha.fromPoint.owner.isKindOf(HiLeS!Functional)
+ 							and not ha.fromPoint.isTypeOf(HiLeS!Service);
+ 				}
+ 				if(ha.toPoint.isDefined()) {
+ 					return not ha.toPoint.owner.isKindOf(HiLeS!Functional)
+ 						and not ha.toPoint.isTypeOf(HiLeS!Service);
+ 				} 
+ 				return true;
+ 			}
+ 		
+ 		a.weight = 1;
+ 		if(ha.fromNode.isDefined()) {
+ 			a.source ::= ha.fromNode; 
+ 		}
+ 		if(ha.toNode.isDefined()) {
+ 			a.target ::= ha.toNode;
+ 		}
+ 		if(ha.toPoint.isDefined()) {
+ 			if(ha.toPoint.isTypeOf(HiLeS!Port)) {
+ 				// El arco que entra a un bloque
+ 				var matchArc = ha.toPoint.owner.innerArchitecture.petriNet.element.select(arc : HiLeS!Arc | 
+ 								arc.fromPoint.isDefined() and (arc.fromPoint.name = ha.toPoint.name)).first();
+				if(matchArc.isDefined()) {
+ 					a.target ::= matchArc.toNode;
+ 				}
+ 				 
+ 			}
+ 			 
+ 		}
+ 		if(ha.fromPoint.isDefined()) {
+ 			if(ha.fromPoint.isTypeOf(HiLeS!Port)) {
+ 				// El arco que sale de un bloque
+ 				var matchArc = ha.fromPoint.owner.innerArchitecture.petriNet.element.select(arc : HiLeS!Arc | 
+ 								arc.toPoint.isDefined() and (arc.toPoint.name = ha.fromPoint.name)).first();
+ 				if(matchArc.isDefined()) {
+ 					a.source ::= matchArc.fromNode;
+ 				} 
+ 			}
+ 		}
+ 	}

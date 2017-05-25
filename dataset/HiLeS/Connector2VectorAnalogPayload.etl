@@ -1,0 +1,126 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: Connector2VectorAnalogPayload.etl 807 2012-06-08 21:09:51Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+import "Connector2Payload.etl";
+ 
+/****r* Connector2Payload/Connector2VectorAnalogPayload
+ * SUMMARY
+ * 	 Transform a SysML:Connector into a HiLeS:Payload, only if the connector is
+ * between two atomic Flow Ports or between a Flow Port and a nonatomic Flow
+ * Port and if non of its ends are inout and one of the ends is typed by a 
+ * PrimitiveType that is a generalization of the HiLeS!AnalogVector type
+ * ($Rev: 807 $).
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *   These rules extends Connector2Payload, assigns the correct type to the 
+ * payload and sets the correct payload size according to the connctor type 
+ * vector size. Both ends having the same type is part of the sysml validation
+ * so we can ask if only one has the specified type. This way the rules also are
+ * good for conectors between atomic and nonatomic FlowPorts. The role of one 
+ * of the ends must have a type that isTypeOf(HiLeS!AnalogVector). This type is
+ * defined in the HiLeS uml library. Since there are PrimitiveTypes that inherit
+ * from AnalogVector, the guard validates that the role.type is a generalization
+ * of AnalogVector. The AnalogVector type should have property that subsets the
+ * "slot" property and that defines the size and the specific type of the
+ * payload.
+ *
+ * DERIVED FROM
+ * 	* Connector2Payload
+ * DOMAIN
+ *	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 	* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule Connector2VectorAnalogPayload
+	transform connector : SysML!Connector
+	to payload : HiLeS!AnalogPayload
+	extends Connector2Payload
+	{
+
+		guard : connector.end.collect(e | e.role).flatten().exists(role
+				| role.type.generalization.collect(g | g.general).exists(grl
+					| grl.name = "AnalogVector"
+					)
+				)
+
+		//connector.name.println("For AnalogVector Connector ");
+		payload.type = connector.end.collect(e | e.role).flatten().collect(role | role.type).first().ownedAttribute.selectOne(oa
+					| oa.subsettedProperty.exists(sp
+						| sp.name = "slot"
+						)
+					).type.name;
+		payload.size = connector.end.collect(e | e.role).flatten().collect(role | role.type).first().ownedAttribute.selectOne(oa
+					| oa.subsettedProperty.exists(sp
+						| sp.name = "slot"
+						)
+					).upperValue.value;
+
+	}
+
+/****r* Connector2Payload/ConnectorInOut2VectorAnalogPayload
+ * SUMMARY
+ * 	 Transform a SysML:Connector into two HiLeS:Payload, only if the connector is
+ * between two atomic Flow Ports or between a Flow Port and a nonatomic Flow
+ * Port and if non of its ends are inout and one of the ends is typed by a 
+ * PrimitiveType that is a generalization of the HiLeS!AnalogVector type
+ * ($Rev: 807 $).
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *   These rules extends Connector2Payload, assigns the correct type to the 
+ * payload and sets the correct payload size according to the connctor type 
+ * vector size. Both ends having the same type is part of the sysml validation
+ * so we can ask if only one has the specified type. This way the rules also are
+ * good for conectors between atomic and nonatomic FlowPorts. The role of one 
+ * of the ends must have a type that isTypeOf(HiLeS!AnalogVector). This type is
+ * defined in the HiLeS uml library. Since there are PrimitiveTypes that inherit
+ * from AnalogVector, the guard validates that the role.type is a generalization
+ * of AnalogVector. The AnalogVector type should have property that subsets the
+ * "slot" property and that defines the size and the specific type of the
+ * payload.
+ *
+ * DERIVED FROM
+ * 	* ConnectorInout2Payload
+ * DOMAIN
+ *	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 	* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule ConnectorInOut2VectorAnalogPayload
+	transform connector : SysML!Connector
+	to payloadIn : HiLeS!AnalogPayload, payloadOut : HiLeS!AnalogPayload
+	extends Connector2Payload
+	{
+
+		guard : connector.end.collect(e | e.role).flatten().forAll(role
+				| role.type.generalization.collect(g | g.general).exists(grl
+					| grl.name = "AnalogVector"
+					)
+				)
+
+		//connector.name.println("ConnectorInoutAnalogVector ");
+		payload.type = connector.end.collect(e | e.role).flatten().collect(role | role.type).first().ownedAttribute.selectOne(oa
+				| oa.subsettedProperty.exists(sp
+					| sp.name = "slot"
+					)
+				).type.name;
+		payload.size = connector.end.collect(e | e.role).flatten().collect(role | role.type).first().ownedAttribute.selectOne(oa
+				| oa.subsettedProperty.exists(sp
+					| sp.name = "slot"
+					)
+				).upperValue.value;
+		payloadOut.size = payloadIn.size;
+		payloadOut.type = payloadIn.type;
+
+	}

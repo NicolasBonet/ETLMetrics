@@ -1,0 +1,156 @@
+pre {
+	var machine = new StateMachine!StateMachine;
+	
+	Class.all.size.println("Classes: ");
+	IdentifierReference.all.size.println("IdentifierReferences: ");
+}
+
+rule Class2State
+	transform c : Java!Class
+	to s : StateMachine!State {
+	
+	guard: c.isState()
+	
+	s.name = c.name;
+	machine.states.add(s);
+	
+	var irs = c.members.select(m : Method | true).collect(m|m.eAllContents.select(e:IdentifierReference|true)).flatten();
+	
+	for (ir in irs.select(ir|ir.isTransition())) {
+		var t = new StateMachine!Transition;
+
+		t.src = ir.getClass().equivalent();
+		t.dst = ir.getTargetClass().equivalent();
+		
+		t.trigger = ir.getTrigger();
+		t.action  = ir.getAction();
+					
+		machine.transitions.add(t);
+	}
+}
+
+@cached
+operation IdentifierReference isTransition() : Boolean {
+	return self.getClass().isState() and 
+	       self.next.isDefined() and self.next.target.name == "Instance" and
+	       self.next.next.isDefined() and self.next.next.target.name == "activate";
+}
+
+@cached
+operation IdentifierReference getClass() : Class {
+	var class = self;
+	
+	while (not class.isKindOf(Class)) {
+		class = class.eContainer();
+	}
+	
+	return class;
+}
+
+@cached
+operation IdentifierReference getTargetClass() : Class {
+	return Java!Class.all.selectOne(c|c.name == self.target.name);
+}
+
+@cached
+operation IdentifierReference getTrigger() : String {
+	if (self.getContainingMethod().name <> "run") {
+		return self.getContainingMethod().name;
+	
+	} else if (self.getContainingStatementListContainer().isKindOf(NormalSwitchCase)) {
+		return self.getContainingStatementListContainer().condition.target.name;
+	
+	} else if (self.getContainingStatementListContainer().isKindOf(CatchBlock)) {
+		return self.getContainingStatementListContainer().parameter.typeReference.classifierReferences.first.target.name;
+	
+	} else {
+		return "--";
+	}
+}
+
+@cached
+operation IdentifierReference getContainingMethod() : String {
+	var method = self;
+	
+	while (not method.isKindOf(Method)) {
+		method = method.eContainer();
+	}
+	
+	return method;
+}
+
+@cached
+operation IdentifierReference getAction() : String {
+	var send = self.getContainingStatementListContainer().getSendMethod();
+	
+	if (send.isDefined()) {
+		return send.arguments.first.next.target.name;
+	} else {
+		return "--";
+	}
+}
+
+@cached
+operation IdentifierReference getContainingStatementListContainer() : StatementListContainer {
+	return self.eContainer().eContainer();
+}
+
+@cached
+operation StatementListContainer getSendMethod() : MethodCall {
+	var statementContainingSendMethod = self.statements.selectOne(s:ExpressionStatement|s.expression.isKindOf(MethodCall));
+	
+	if (statementContainingSendMethod.isDefined()) {
+		return statementContainingSendMethod.expression;
+	}
+}
+
+@cached
+operation Class isState() : Boolean {
+	return self.isConcrete() and self.anySuperTypesIsState();
+}
+
+@cached
+operation Class isConcrete() : Boolean {
+	return not self.annotationsAndModifiers.exists(m|m.isKindOf(Abstract));
+}
+
+@cached
+operation Class anySuperTypesIsState() : Boolean {
+	if (self.getSuperType().isDefined()) {
+		if (self.getSuperType().name == "State") {
+			return true;
+		} else {
+			return self.getSuperType().anySuperTypesIsState();
+		}
+	}
+	
+	return false;
+}
+
+@cached
+operation Class getSuperType() : Class {
+	var supertype : Class = null;
+	
+	if (self.`extends`.isDefined() and self.`extends`.getClassifier() <> self) {
+		supertype = self.`extends`.getClassifier();
+	}
+	
+	return supertype;
+}
+
+@cached
+operation NamespaceClassifierReference getClassifier() {
+	return self.classifierReferences.first.getClassifier();
+}
+
+@cached
+operation ClassifierReference getClassifier() {
+	var classifier = null;
+	
+	// some classes aren't contained in this model, e.g. Throwable
+	if (self.target.isDefined() and Java.owns(self.target)) {
+		classifier = self.target;
+	}
+	
+	return classifier;
+}

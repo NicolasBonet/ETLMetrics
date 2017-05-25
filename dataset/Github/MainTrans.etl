@@ -1,0 +1,1643 @@
+//---------------Comments-----------------------------------------------------------------------------------------------------
+//!!!for test
+//problem : not resolved
+//warning: need to think about
+//TBD: To be discussed
+//---------------Comments-----------------------------------------------------------------------------------------------------
+
+//Transformation from UML to LQN
+pre {
+	"Starting transformation from UML model to LQN model".println();	
+}
+post {
+	// Store traceability links in custom model
+	var trace : new Trace!Trace;
+	for (t in transTrace.transformations) { 
+	   //for (r in transformRule)
+		var link : new Trace!TraceLink;
+		link.description = "Transformed by " + t.getRule().name;
+		link.sources= ""+t.getSource().name;
+		link.targets = ""+t.getTargets().first().name;
+        trace.links.add(link);		
+	}   
+}
+
+//Root rule: 
+rule Model2Lqnmodel
+	transform umlModel : UML!Model
+	to lqnModel : lqnmodel!lqnmodel{
+	guard: not isImportedPackage(umlModel)
+		
+	"Beginning of Model2lqnmodel rule...".println();	
+	//Attribute: UML model's name -> Lqn model's name
+	lqnModel.name= umlModel.name + " To lqn";		
+	"created lqnmodel!lqnmodel From UML!Model : ".println();
+	"Source is : ".print() + umlModel.println();
+	"Targer is : ".print() + lqnModel.println();
+	
+	//Obtain the ExecutionEnvironment	
+	 var executionEnvironments : Collection = umlModel.getExecutionEnvironment().first();
+	 "Getting the Collection of ExecutionEnvironments: ".print() + executionEnvironments.println();
+	 
+	//Obtain all Devices
+	var devicesSequence : Sequence;
+	for(umlExecutionEnvironment in executionEnvironments){
+		devicesSequence.add(umlExecutionEnvironment.getDevice());
+	}	 
+	 var numberofDevice : Integer =0;
+	 var devices:Sequence;
+	 //Create processor(s) for lqnmodel
+	 var lqnProcessor: lqnmodel!processor;
+	 for(devices in devicesSequence){
+	 //Traversal all Devices
+	    for(umlDevice:Device in devices){	 		
+	      numberofDevice = numberofDevice + 1;		
+		 "Execution Device : ".print() + numberofDevice.print() + " ".print() + umlDevice.println();
+		  //Element: UML Device -> Lqn processor
+		  lqnModel.processor.add(umlDevice.equivalent());
+		}		
+	 }
+}
+
+//Device -> Processor
+@lazy
+rule Device2processor
+	transform umlDevice : UML!Device
+	to lqnProcessor : lqnmodel!processor {
+	 
+	 "Beginning of Device2processor rule...".println();
+	 //Attribute: Device's name -> processor's name
+	 lqnProcessor.name = umlDevice.name;	 
+	"created lqnmodel!processor from UML!Device : ".println();
+	"Source is : ".print() + umlDevice.println();
+	"Targer is : ".print() + lqnProcessor.println();
+	
+	//TBD: Attribute: Device's schedPolicy -> processor's scheduling (Scheduling policy)
+	var schedpolicy:String;
+	schedpolicy = getStereotypeOfDevice(umlDevice);
+	if (schedpolicy <> null){
+		lqnProcessor.scheduling = checkPSchedulerType(schedpolicy);
+	}else{
+	//TBD: Setting Default value is FIFO
+		lqnProcessor.scheduling = lqnmodel!PSchedulerType#fcfs;
+	}
+	"Device2processor Rule/ p.scheduling is : ".print() + lqnProcessor.scheduling.name.println();
+
+	//Attribute: Device's resMult -> processor's multiplicity (cores)
+	var multiplicity:Integer;
+	multiplicity = getMultiplicityOfDevice(umlDevice);
+	if ((multiplicity == 0) or (multiplicity = null)){
+		lqnProcessor.multiplicity = 1;
+	} else{
+		lqnProcessor.multiplicity = multiplicity;
+	}
+	"umlDevice2processor Rule/ p.multiplicity is : ".print() + lqnProcessor.multiplicity.println();
+	
+	//---------------------Starting artifact to task transformation-------------------
+	//Obtain all artifacts from deployment diagram    
+	var umlArtifactforTaskCollection : Collection = umlDevice.getArtifact();
+	"Getting the Collection of Artifacts: ".print() + umlArtifactforTaskCollection.println();	
+	
+	//Element: UML Artifact -> Lqn task
+	var umlArtifactNumber : Integer =0;
+	for(umlArtifactforTask:Artifact in umlArtifactforTaskCollection){		
+		umlArtifactNumber = umlArtifactNumber + 1;		
+		"Artifact: ".print() + umlArtifactNumber.print() + umlArtifactforTask.println();	
+		lqnProcessor.task.add(umlArtifactforTask.equivalent());		
+	}
+			
+	"Devic2processor :end rule".println();		
+}
+
+//Artifact -> task
+//@lazy
+rule Artifact2task
+	transform umlArtifact : UML!Artifact
+	to lqnTask : lqnmodel!task{
+	
+    "Beginning of Artifact2task rule...".println();
+    //Attribute: Artifact's name -> task's name
+	lqnTask.name= umlArtifact.name;
+	
+	"created lqnmodel!task from UML!Artifact : ".println();
+	"Source is : ".print() + umlArtifact.println();
+	"Targer is : ".print() + lqnTask.println();
+	
+	//Problem: Attribute: Artifact's otherSchedPolicy -> Task's scheduling (no such attribute at this moment)		
+	var schedpolicy:String;
+	schedpolicy = getStereotypeOfArtifact(umlArtifact);	
+	if (schedpolicy <> null){
+		lqnTask.scheduling = checkTSchedulerType(schedpolicy);
+	}else{
+	//TBD: Setting Default value is RoundRobin
+		lqnTask.scheduling = lqnmodel!TSchedulerType#fcfs;
+	}	
+	"artifact2task Rule/ t.scheduling is : ".print() + lqnTask.scheduling.println();
+	 
+	 //Problem: Attribute: Artifact's resMult -> Task's multiplicity 
+	var multiplicity:Integer;
+	multiplicity = getMultiplicityOfArtifact(umlArtifact);
+	if ((multiplicity == 0) or (multiplicity = null)){
+		lqnTask.multiplicity = 1;
+	} else{
+		lqnTask.multiplicity = multiplicity;
+	}
+	"artifact2task Rule/ t.multiplicity  is : ".print() + lqnTask.multiplicity.println();	
+	
+	//---------------Retrieving the activity partitions for each task to building corresponding Entry or Taskactivites--------
+	//Obtain activity Partitions of the current artifact
+	var activitypartitions : Collection = getActivityPartitions(umlArtifact.name);
+	"activitypartitions are :".print() + activitypartitions.println();
+	
+	//In fact, there is only one activity partition for the current artifact which has the same name
+	for(p in activitypartitions){
+		"Current activity partition is: ".print() + p.println();
+   		//Obtain all the activity nodes within the current activity partition  		 
+   		var nodes:Collection = getactivitynodes(p);
+   		"Activity nodes are: ".print() + nodes.println();
+   		
+   		//Creating a temp parameter for storing the current activity partition
+   		var partition:ActivityPartition = p;
+   		  
+	    //Check if there is an initialNode or AcceptEventAction in this partition as the entry element (Problem: one task can have many entries but what kind of the node can be transformered to Entry except the initial node and accetpeventAction)
+	  	if(nodes.one(n|n.isTypeOf(InitialNode))){
+	  		//If it is an InitialNode, it is a reference task 
+	  		var innode:Any = nodes.selectOne(n|n.isTypeOf(InitialNode));
+	  		"InitialNode is found, this is a reference task : ".print() + innode.println();
+	  		var innodeOutgoing:Any = innode.outgoing.first();
+	  		"intial node outgoing is ".print() + innodeOutgoing.println();
+	  		"innodeTarget is ".print() + innodeOutgoing.Target.println();
+	  		//TBD: !!!for test, Chen changes it to fcfs for task
+	  		if(lqnTask.scheduling = lqnmodel!TSchedulerType#ref){
+	  			var vblockT:Real;
+	  			//Obtain the think time for the Initialnode (Problem: add "schedule" stereotype for artifact)
+	  			vblockT = getBlockTOfOpAction(innodeOutgoing.Target);
+	  			"blockT Value".print() + vblockT.type().println();
+	  			lqnTask.thinktime = vblockT;
+	  			"think time is".print() + lqnTask.thinktime.println();
+	  		}	  		
+	       "Reference task is :".print() + lqnTask.name.println();
+	       //Transformation from the initial node -> Entry
+	       EntryFunctionOperation(innode,lqnTask,partition);
+	     //Problem: add "AcceptEventAction" in UML model, needs more example for testing
+	     }else if(nodes.exists(n|n.isTypeOf(AcceptEventAction))){
+	     	var accepteventactionCollection : Collection = nodes.select(n|n.isTypeOf(AcceptEventAction));
+	    	"Accept Event Action nodes are: ".print() + accepteventactionCollection.println();	  
+	      	for(item in accepteventactionCollection){
+	      	    //Transformation from the AcceptEventAction -> Entry
+	      		EntryFunctionOperation(item,lqnTask,partition);	  
+	       	}
+     	 }
+	}	
+    "Artifact2Task :end rule".println();	
+}
+
+//InitialNode -> Entry (type is Ph1 and Ph2)
+//@lazy
+rule InitialNode2entryPh1Ph2
+	transform umlInitialNode : UML!InitialNode
+	to lqnEntry : lqnmodel!entry{
+	guard: not isNONEPattern(umlInitialNode.outgoing.first())	 
+	
+	"Beginning of InitialNode2entryPh1Ph2 rule...".println();
+	lqnEntry.name=umlInitialNode.name;
+	lqnEntry.type=lqnmodel!EntryType#PH1PH2;
+	"created lqnmodel!entry from UML!AcceptEventAction: ".println();
+	"Source is : ".print() + umlInitialNode.println();
+	"Targer is : ".print() + lqnEntry.println();          
+	"InitialNode2entryPh1Ph2 :end rule".println();			
+}
+
+//InitialNode -> Entry (type is None)
+//@lazy
+rule InitialNode2entryNone
+	transform umlInitialNode : UML!InitialNode
+	to lqnEntry : lqnmodel!entry{
+	guard: isNONEPattern(umlInitialNode.outgoing.first())
+		
+	"Beginning of InitialNode2entryNone rule...".println();
+	//Attribute: uml Initial Node name -> lqn entry name		
+	lqnEntry.name = umlInitialNode.name;
+	//Attribute: lqn entry type -> NONE
+	lqnEntry.type = lqnmodel!EntryType#NONE;
+	
+	"created lqnmodel!entry from UML!AcceptEventAction: ".println();
+	"Source is : ".print() + umlInitialNode.println();
+	"Targer is : ".print() + lqnEntry.println();	
+	"InitialNode2entryNone :end rule".println();			
+}
+
+//OpaqueAction -> Activity
+//@lazy
+rule OpaqueAction2Activity
+	transform action : UML!OpaqueAction
+	to activity : lqnmodel!activity{
+	
+    "Beginning of OpaqueAction2Activity rule...".println();
+    //Attribute: OpaqueAction name -> activity name 		
+	activity.name = action.name;
+	"created lqnmodel!activity from UML!OpaqueAction: ".println();
+	
+	var stereotype:Any = action.getAppliedStereotypes();
+	"stereotypes are : ".print() + stereotype.println(); 
+	if(stereotype.isDefined()){   
+	  for(s in stereotype){	  	  	    
+	    if((s.name="GaStep")){	    	   
+	    	   "Stereotypes is : ".print()+s.println();
+	    	   "Selected Attributes are :".print() + s.getAllAttributes().name.println();           
+	          	           
+	           if(s.getAllAttributes().selectOne(a|a.name="hostDemand").isDefined()){
+	                 "value of hostDemand  is : ".print() + action.getValue(s,"hostDemand").first().asReal().println();
+	                 "Type of the value of hostDemand  is : ".print()+action.getValue(s,"hostDemand").first().asReal().type().println();
+	                 activity.hostdemandmean=action.getValue(s,"hostDemand").first().asReal();
+	                 " activity.hostDemand is : ".print()+activity.hostdemandmean.println();
+	                 " activity.hostDemand type is : ".print()+activity.hostdemandmean.type().println();     
+	           }	    	 
+	           if(s.getAllAttributes().selectOne(a|a.name="rep").isDefined() and s.getAllAttributes().selectOne(a|a.name="prob").isDefined() ){
+	                 "value of rep  is : ".print()+action.getValue(s,"rep").asReal().println();
+	                 "Type of the value of rep  is : ".print() + action.getValue(s,"rep").asReal().type().println();
+	                 "value of prob  is : ".print()+action.getValue(s,"prob").asReal().println();
+	                 "Type of the value of prob  is : ".print() + action.getValue(s,"prob").asReal().type().println();
+	           }
+	    }
+	 }
+   }   
+	
+   "OpaqueAction2Activity :end rule".println();	
+}
+
+//uml ForkNode -> lqn Precedence
+//@lazy
+rule ForkNode2Precedence
+	transform umlForkNode : UML!ForkNode
+	to lqnPrecedence : lqnmodel!precedence {
+	
+		"Beginning of ForkNode2Precedence rule...".println();
+		"umlForkNode.incoming is ".print() + umlForkNode.incoming.println();
+		"umlForkNode.outgoing is ".print() + umlForkNode.outgoing.println();
+		"umlForkNode.pre is".print() + lqnPrecedence.`pre`.println();
+		
+	    var lqnPre : new lqnmodel!`pre`;
+	    var lqnPostand : new lqnmodel!`postand`;
+		
+		"lqnPre is ".print() + lqnPre.println();  
+
+		lqnPrecedence.postand = lqnPostand;	
+		lqnPrecedence.`pre`= lqnPre;
+		      
+		var actForPre : lqnmodel!activity;
+		for(i in umlForkNode.incoming){
+	         var activityRPre : new lqnmodel!activityR;
+	         //Only one pre activity
+		     lqnPre.activityRPre = activityRPre;
+	           
+	         "i.source is :".print() + i.source.println();
+	         //Generate pre activity 
+	         actForPre = i.source.equivalent();
+	         actForPre.println();
+	         activityRPre.name = actForPre.name;
+	         //Reason?   
+	         lqnPrecedence.`pre` = lqnPre;
+	     }
+	          
+	     var actForPost : lqnmodel!activity;
+	     for(i in umlForkNode.outgoing){
+	     
+	         var activityRPostAnd: new lqnmodel!activityR;	
+	         //Several post activities         
+	         lqnPostand.activityRPostAnd.add(activityRPostAnd);
+	           
+	         "i.target is :".print() + i.target.println();
+	         //Generate post activities 
+	         actForPost = i.target.equivalent();
+	         actForPost.println();
+	         activityRPostAnd.name = actForPost.name;
+	         lqnPrecedence.postand = lqnPostand;          
+	     }
+	    "created lqnmodel!precedence from UML!ForkNode: ".println();
+	    "Source is : ".print() + umlForkNode.println();
+	    "Targer is : ".print() + lqnPrecedence.println();
+	    
+	    "ForkNode2 :end rule".println();		
+}
+
+//uml JoinNode -> lqn Precedence
+//@lazy
+rule JoinNode2Precedence
+	transform umlJoinNode : UML!JoinNode
+	to lqnPrecedence : lqnmodel!precedence {
+	
+		"Beginning of JoinNode2Precedence rule...".println();
+	    var posti : new lqnmodel!`post`;
+		"posti is ".print() + posti.println();
+		var preand : new lqnmodel!`preand`;
+		"umlJoinNode.incoming is ".print() + umlJoinNode.incoming.println();
+		"umlJoinNode.outgoing is ".print() + umlJoinNode.outgoing.println();
+		//Assign the pre and post enelements to joinnode 
+		lqnPrecedence.`post`=posti;	
+		lqnPrecedence.preand=preand;
+		   
+		var act1 : lqnmodel!activity;
+		for(i in umlJoinNode.incoming){
+			var activityRPreAnd: new lqnmodel!activityR;
+
+	        preand.activityRPreAnd.add(activityRPreAnd);
+	        "i.source is :".print() + i.source.println();
+	        //Generate several pre activities for joinNode
+	        act1 = i.source.equivalent();  
+	        act1.println();
+	        activityRPreAnd.name = act1.name;
+	        lqnPrecedence.preand = preand;
+	     }
+	          
+	     var act : lqnmodel!activity;
+	     for(i in umlJoinNode.outgoing){
+	     	 "i.target is :".print() + i.target.println();
+	     	 if (not i.target.isTypeOf(ActivityFinalNode)){
+	         	var activityRPost: new lqnmodel!activityR;
+		     	posti.activityRPost = activityRPost;	         
+	        	//Generate post activities for joinNode
+	         	act=i.target.equivalent();  
+	         	act.println();	            
+	         	activityRPost.name = act.name; 
+	         	lqnPrecedence.`post`=posti;
+	         }
+	      }	
+	   
+	    "created lqnmodel!precedence  from UML!JoinNode: ".println();
+	    "Source is : ".print() + umlJoinNode.println();
+	    "Targer is : ".print() + lqnPrecedence.println();	    
+	    "JoinNode2Precedence :end rule".println();	
+}
+
+//AcceptEventAction -> Entry (type is Ph1Ph2)
+//@lazy
+rule AcceptEventAction2entryPh1Ph2
+	transform umlAcceptEventAction : UML!AcceptEventAction
+	to umlEntry : lqnmodel!entry{
+	guard: not isNONEPattern(umlAcceptEventAction.outgoing.first())
+	
+	"Beginning of AcceptEventAction2entryPh1Ph2 rule...".println();
+	//Attribute: uml AcceptEventAction's name -> lqn Entry's name
+	umlEntry.name = umlAcceptEventAction.name;
+	//Attribute: uml AcceptEventAction's type -> lqn Entry's type
+	umlEntry.type = lqnmodel!EntryType#PH1PH2;
+	
+	"created lqnmodel!entry from UML!AcceptEventAction: ".println();
+	"Source is : ".print() + umlAcceptEventAction.println();
+	"Targer is : ".print() + umlEntry.println();
+	
+    "AcceptEventAction2entry :end rule".println();			
+}
+
+//AcceptEventAction -> Entry (type is None)
+//@lazy
+rule AcceptEventAction2entryNone
+	transform umlAcceptEventAction : UML!AcceptEventAction
+	to lqnEntry : lqnmodel!entry{	
+	guard: isNONEPattern(umlAcceptEventAction.outgoing.first())
+	
+	"Beginning of AcceptEventAction2entryNone rule...".println();
+	//Attribute: uml AcceptEventAction's name -> lqn Entry's name
+	lqnEntry.name = umlAcceptEventAction.name;
+	//Attribute: uml AcceptEventAction's type -> lqn Entry's type
+	lqnEntry.type = lqnmodel!EntryType#NONE;
+	"created lqnmodel!entry from UML!AcceptEventAction: ".println();
+	"Source is : ".print() + umlAcceptEventAction.println();
+	"Targer is : ".print() + lqnEntry.println();
+	
+	"AcceptEventAction2entry :end rule".println();			
+}
+
+//uml Decision Node -> lqn Precedence
+//@lazy
+rule DecisionNode2Precedence
+	transform umlDecisionNode : UML!DecisionNode
+	to lqnPrecedence : lqnmodel!precedence{
+	
+	"Beginning of DecisionNode2Precedence rule...".println();
+	"umlDecisionNode.incoming is ".print() + umlDecisionNode.incoming.println();
+	"umlDecisionNode.outgoing is ".print() + umlDecisionNode.outgoing.println();
+	
+	var pr : new lqnmodel!`pre`;
+	"pr is ".print() + pr.println();
+	var po : new lqnmodel!`postor`;
+	"lqnPrecedence.preP is".print() + lqnPrecedence.`pre`.println();
+	//Assign the pre and post enelements to joinnode 	
+	lqnPrecedence.postor=po;	
+	lqnPrecedence.`pre`=pr;
+
+	var act1 : lqnmodel!activity;
+	for(i in umlDecisionNode.incoming){
+		
+		var activityRPre : new lqnmodel!activityR;
+		pr.activityRPre=activityRPre;
+	    "i.source is :".print()+i.source.println();
+	    //Generate pre activities for decision node
+	    act1=i.source.equivalent();  
+	    act1.println(); 
+	    activityRPre.name = act1.name;
+	    "activityRPre.name is: ".print()+activityRPre.name.println();
+	 }
+	   
+	 var act : lqnmodel!activity;
+	 for(i in umlDecisionNode.outgoing){
+	 	var activityRPostOr: new lqnmodel!activityR;
+	    po.activityRPostOr.add(activityRPostOr);
+	           
+	    "i.target is :".print()+i.target.println();
+	    //Obtain the probability of the decision
+	    var decsionNodeProbability:Real; 
+	    decsionNodeProbability = ReturnProbability(i.target);
+	    "DecisionNode2Precedence ruel/ probability is  : ".print() + decsionNodeProbability.println();
+	    //Generate post activities for decision node
+	    act=i.target.equivalent();  
+	    act.println();
+	    activityRPostOr.name = act.name;
+	    "activityRPostOr.name is: ".print()+activityRPostOr.name.println();
+	    //Attribute: uml desision node probility -> lqn activity's prob
+	    activityRPostOr.prob = decsionNodeProbability;
+	    "activityRPostOr.prob is: ".print()+activityRPostOr.prob.println();
+	    "lqnPrecedence.postorP is".print() + lqnPrecedence.postor.println();
+	  }
+	      
+	  "created lqnmodel!precedence from UML!DecisionNode: ".println();
+	  "Source is : ".print() + umlDecisionNode.println();
+	  "Targer is : ".print() + lqnPrecedence.println();
+	    
+	  "DecisionNode2Precedence :end rule".println();
+}
+
+//uml Merge Node -> lqn Precedence
+//@lazy
+rule MergeNode2Precedence
+	transform umlMergeNode : UML!MergeNode
+	to lqnPrecedence : lqnmodel!precedence {
+	
+	"Beginning of MergeNode2Precedence rule...".println();
+	
+	"umlMergeNode.incoming is ".print() + umlMergeNode.incoming.println();
+	"umlMergeNode.outgoing is ".print() + umlMergeNode.outgoing.println();
+	
+	var posti : new lqnmodel!`post`;
+	"posti is ".print() + posti.println();
+	var preor : new lqnmodel!`preor`;
+	
+	lqnPrecedence.`post`=posti;	
+	lqnPrecedence.preor=preor;
+		      
+	var act1 : lqnmodel!activity;
+	for(i in umlMergeNode.incoming){
+		var activityRPreOr: new lqnmodel!activityR;
+	    preor.activityRPreOr.add(activityRPreOr);
+		       
+	    "i.source is :".print()+i.source.println();
+	    //Generate pre activities for merge node
+	    act1=i.source.equivalent();  
+	    act1.println();
+	    activityRPreOr.name=act1.name;
+	    lqnPrecedence.preor=preor;
+	}
+	          
+	var act : lqnmodel!activity;
+	for(i in umlMergeNode.outgoing){
+		var activityRPost: new lqnmodel!activityR;
+		posti.activityRPost=activityRPost;
+		       
+	    "i.target is :".print()+i.target.println();
+	    //Generate post activities for merge node
+	    act=i.target.equivalent();  
+	    act.println();
+	    if(act.isDefined()){
+	    	activityRPost.name=act.name; 
+        }
+	    lqnPrecedence.`post`=posti;
+	 }
+	 
+	 "created lqnmodel!precedence from UML!MergeNode: ".println();
+	 "Source is : ".print() + umlMergeNode.println();
+	 "Targer is : ".print() + lqnPrecedence.println();
+	    
+	 "MergeNode2Precedence :end rule".println();
+}
+
+//uml ControlFlow -> lqn Precedence
+//@lazy
+rule ControlFlow2Precedence
+	transform flow : UML!ControlFlow
+	to seq : lqnmodel!precedence{	
+	guard:guardForControlFlowToPrecedence(flow)
+	                                    
+	"Beginning of ControlFlow2Precedence rule...".println();
+	
+	var pr : new lqnmodel!`pre`;	
+	"pr is ".print() + pr.println();
+	var po : new lqnmodel!`post`;
+		    
+	var activityRPre : new lqnmodel!activityR;
+	var activityRPost: new lqnmodel!activityR;
+	pr.activityRPre = activityRPre;
+	po.activityRPost = activityRPost;
+	
+	"pr.activityRPre is : ".print() + pr.activityRPre.println();
+	"seq.pre is".print() + seq.`pre`.println();
+	seq.`pre` = pr;
+	seq.`post` = po;	
+	
+	pr.precedence1 = seq;
+	"seq is:".print() + seq.println();
+	"seq.preP is".print() + seq.`pre`.println();
+		
+	var act1 : lqnmodel!activity;
+	"flow.source is :".print() + flow.source.println();
+	//Generate pre activities for control flow
+	act1 = flow.source.equivalent();  
+	act1.println();
+	"act1.name is:".print() + act1.name.println();
+	activityRPre.name = act1.name;
+	"activityRPre.name is: ".print() + activityRPre.name.println();
+	
+	var act : lqnmodel!activity;
+	"flow.target is :".print() + flow.target.println();
+	//Generate post activities for control flow
+	act = flow.target.equivalent();  
+	act.println();
+	"act.name is: ".print()+act.name.println();	            
+	activityRPost.name = act.name;
+	"activityRPost.name is: ".print() + activityRPost.name.println();
+	 
+	"created lqnmodel!precedence from UML!ControlFlow: ".println();
+	"Source is : ".print() + flow.println();
+	"Targer is : ".print() + seq.println();
+	    
+	"ControlFlow2Precedence :end rule".println();
+}
+
+//uml callOperationAction -> lqn activity
+//@lazy
+rule CallOperationAction2Activity
+	transform action : UML!CallOperationAction
+	to activity : lqnmodel!activity{
+	
+	"Beginning of CallOperationAction2Activity rule...".println();
+	
+	//Attribute: uml CallOperationAction's name -> lqn activity's name	
+	activity.name = action.name;
+		
+	var meanCall:Real;
+	var Probability:Real;
+	var Repetition:Real;
+		
+    var stereotype:Any = action.getAppliedStereotypes();
+	"stereotypes are : ".print()+stereotype.println(); 
+	if(stereotype.isDefined()){   
+	  for(s in stereotype){
+	  	if(s.name="GaStep"){
+	  		"GaStep isfound".println();
+	    	"stereotypes is : ".print() + s.println();
+	    	"Selected Attributes are :".print() + s.getAllAttributes().name.println();
+	    	if(s.getAllAttributeS().selectOne(a|a.name = "hostDemand").isDefined()){
+	    		 "value of hostDemand  is : ".print()+action.getValue(s,"hostDemand").first().asReal().println();
+	             "Type of the value of hostDemand  is : ".print()+action.getValue(s,"hostDemand").first().asReal().type().println();
+	             activity.hostdemandmean=action.getValue(s,"hostDemand").first().asReal();
+	             "activity.hostDemand is : ".print()+activity.hostdemandmean.println();
+	             "activity.hostDemand type is : ".print()+activity.hostdemandmean.type().println();   
+	            }
+	        
+	        if(s.getAllAttributes().selectOne(a|a.name="rep").isDefined() and s.getAllAttributes().selectOne(a|a.name="prob").isDefined() ){
+	        	"value of rep  is : ".print() + action.getValue(s,"rep").asReal().println();
+	            "Type of the value of rep  is : ".print() + action.getValue(s,"rep").asReal().type().println();
+	                 
+	            "value of prob  is : ".print() + action.getValue(s,"prob").asReal().println();
+	            "Type of the value of prob  is : ".print() + action.getValue(s,"prob").asReal().type().println();
+	            //Calculation for meanCall    
+	            Probability=action.getValue(s,"prob").asReal();
+		        Repetition=action.getValue(s,"rep").asReal();
+		        meanCall = Probability*Repetition;
+		             
+		        "Probability is : ".print() + Probability.print()+" Repetition is :".print() + Repetition.println();
+		        "calls-mean is : ".print() + meanCall.println();
+		     }
+		 }//end if stereotype is GaStep
+	  }//end for loop
+   }//end if stereotype is defined
+   	
+   	//Checking if the target of Calloperationaction is Accepteventaction     
+	var umlControlFlow:ControlFlow = getoutgoingofthisCallOperationActionwhichTargetIsAcceptEventAction(action);
+	//Checking if the controlflow is the SyncCall   
+	if(umlControlFlow.isDefined() and controlflowProcessingforSyncCall(umlControlFlow)){
+		"This is going to be a SynchCall ".println();
+        "umlControlFlow is :".print() + umlControlFlow.println();
+        "activity.synchcall is ".print() + activity.synchcall.println();
+        //Element: uml ControlFlow -> lqn activity's synchcal
+	    activity.synchcall.add(umlControlFlow.equivalent());
+	    //Attribute: calculated meanCall -> lqn activity's synchcal's meanCall
+	    umlControlFlow.equivalent().callsmean = meanCall;
+	    "ForSynch/umlControlFlow.equivalent().callsmean is :".print() + umlControlFlow.equivalent().callsmean.println();
+	//Checking if the controlflow is the AsyncCall
+	}else if(umlControlFlow.isDefined() and controlflowProcessingforASyncCall(umlControlFlow)){
+		"This is going to be a ASynchCall ".println();
+        "umlControlFlow is :".print() + umlControlFlow.println();
+        "activity.asynchcall is ".print() + activity.synchcall.println();
+        //Element: uml ControlFlow -> lqn activity's asynchcal
+	    activity.asynchcall.add(umlControlFlow.equivalent());
+	    umlControlFlow.equivalent().callsmean = meanCall; 
+	    "ForASynch/umlControlFlow.equivalent().callsmean is :".print() + umlControlFlow.equivalent().callsmean.println();
+	}	
+	"CallOperationAction2Activity :end rule".println();	
+}
+
+//uml sendSignalAction -> lqn Activity
+//@lazy
+rule SendSignalAction2Activity
+	transform action : UML!SendSignalAction
+	to activity : lqnmodel!activity{
+	guard:guardForSendSignalAction2Activity(action.incoming.first()) 
+	
+	"Beginning of SendSignalAction2Activity rule...".println();
+	//Attribute: uml SendSignalAction's name -> lqn Activity's name
+	activity.name = action.name;
+	"created LQN!Activity from UML!SendSignalAction: ".println();
+	"Source is : ".print() + action.println();
+	"Targer is : ".print() + activity.println();
+   
+	var stereotype:Any = action.getAppliedStereotypes();
+	"stereotypes are : ".print() + stereotype.println(); 
+	if(stereotype.isDefined()){   
+	  for(s in stereotype){ 
+	    if(s.name="GaStep"){
+	    	"GaStep isfound".println();
+	    	"stereotypes is : ".print() + s.println();
+	    	"Selected Attributes are :".print() + s.getAllAttributes().name.println();
+	    	 
+	           if(s.getAllAttributes().selectOne(a|a.name="hostDemand").isDefined()){
+	                 "value of hostDemand  is : ".print()+action.getValue(s,"hostDemand").first().asReal().println();
+	                 "Type of the value of hostDemand  is : ".print()+action.getValue(s,"hostDemand").first().asReal().type().println();
+	                 activity.hostdemandmean=action.getValue(s,"hostDemand").first().asReal();
+	                 "activity.hostDemand is : ".print()+activity.hostdemandmean.println();
+	                 "activity.hostDemand type is : ".print()+activity.hostdemandmean.type().println();   	
+	             }
+	           
+	           if(s.getAllAttributes().selectOne(a|a.name="rep").isDefined() and s.getAllAttributes().selectOne(a|a.name="prob").isDefined() ){
+	           		"value of rep  is : ".print() + action.getValue(s,"rep").asReal().println();
+	                "Type of the value of rep  is : ".print() + action.getValue(s,"rep").asReal().type().println();
+	                "value of prob  is : ".print() + action.getValue(s,"prob").asReal().println();
+	                "Type of the value of prob  is : ".print() + action.getValue(s,"prob").asReal().type().println();
+	                //activity.prob=action.getValue(s,"prob").asReal();
+	           }
+	      }
+	   }
+	}
+  	   
+	"SendSignalAction2Activity :end rule".println();
+}
+
+//uml ControlFlow -> lqn Synchcall
+//@lazy
+rule ControlFlow2synchcall
+	transform flow : UML!ControlFlow
+	to call : lqnmodel!synchcall{
+	guard : controlflowProcessingforSyncCall(flow)
+	
+	"Beginning of ControlFlow2synchcall rule...".println();
+	//Attribute: uml controlflow's target name -> lqn synchcall's dest name
+	call.dest=flow.target.name;
+	
+	"ControlFlow2synchcall :end rule".println();
+}
+
+//uml ControlFlow -> lqn Asynchcall
+//@lazy
+rule ControlFlow2asynchcall
+	transform flow : UML!ControlFlow
+	to call : lqnmodel!asynchcall{
+	guard : controlflowProcessingforASyncCall(flow)
+	
+	"Beginning of ControlFlow2asynchcall rule...".println();
+	//Attribute: uml controlflow's target name -> lqn synchcall's dest name
+	call.dest=flow.target.name;
+
+	"ControlFlow2asynchcall :end rule".println();
+}
+
+//-----------------------------------------Operations for Model---------------------------------------------------------------------------------//
+//Delete duplicated UML Models
+operation isImportedPackage(Model:UML!Model):Boolean{	
+
+		if ((Model.URI <> null) or (Model.name <> Model.qualifiedName)){
+			return true;
+		}
+		return false;
+}
+//-----------------------------------------Operations for Processor---------------------------------------------------------------------------------//
+//Obtain artifacts with PaLogicalResource stereotype from Model
+operation Model getExecutionEnvironment():Collection  {	
+	var umlDevices:Collection = Device.all.select(d|d.namespace=self and d.hasStereotype1("DdsmVMsCluster"));
+	"111".print()+ umlDevices.println();
+	var umlExecutionEnvironment:Sequence;
+	for (i in umlDevices){
+		umlExecutionEnvironment.add(i.nestedClassifier.select(a|a.isTypeOf(ExecutionEnvironment) and a.hasStereotype1("DdsmStormCluster")));
+	}
+	return umlExecutionEnvironment;
+}
+
+//Obtain Devices
+operation ExecutionEnvironment getDevice():Collection  {	
+
+		return Device.all.select(d|d.namespace=self and d.hasStereotype1("GaExecHost"));	
+}
+
+//TBD: Obtain Artifacts from Device/nestNode/deployedArtifact
+//operation Device getArtifact():Collection  {
+//	var umlArtifacts:Collection;
+//	for (i in self.nestedNode){
+//		if (not i.deployment.isEmpty()){
+//			umlArtifacts = i.deployment.deployedArtifact.first().select(a|a.isTypeOf(Artifact));
+//	    }
+//	}
+//	return umlArtifacts;
+//}
+
+//Check the stereotype of Artifact if it has PalogicalResource stereotype or not (This operation will be reused when we check the artifact for task)
+operation UML!Artifact hasStereotype(name:String):Boolean {
+	    
+	"hasStrereotype Method is running now.".println();
+	
+	var appliedStereotypes: Sequence;
+	appliedStereotypes = self.getAppliedStereotypes(); // Sequence of Stereotypes	
+	for(s:Stereotype in appliedStereotypes){	
+		s.name.println();
+		//Check if current artifact has a stereotype which equals to the input stereotype 
+		if(s.name = name){
+			self.name.print()+" Found ".println();
+			return true;		
+		}
+	}	
+	self.name.print()+" not Found".println();
+	return false;
+}
+
+//Get Stereotype of Device
+operation getStereotypeOfDevice(a:UML!Device):String{
+
+	"operation getStereotypeOfDevice(a:UML!Device) is running now".println();
+	var stereotype:Any = a.getAppliedStereotypes();
+	"stereotypes are : ".print() + stereotype.println(); 
+     if(stereotype.isDefined()){   
+	         for(s in stereotype){
+	            if(s.name = "GaExecHost"){
+	              "GaExecHost is found".println();
+	    	      "stereotypes is : ".print() + s.println();
+	    	      "Selected Attributes are :".print() + s.getAllAttributes().name.println();
+	              if(s.getAllAttributes().selectOne(a|a.name = "schedPolicy").isDefined() ){
+	                   "value of other Sched Policy  is : ".print() + a.getValue(s,"schedPolicy").asString().println();
+	                   "Type of the value of other Sched Policy is : ".print() + a.getValue(s,"schedPolicy").asString().type().println();
+	                   return a.getValue(s,"schedPolicy").asString();                      
+                   }
+                 }
+               }
+          }
+}
+
+//Check the stereotype of scheduling for processor
+operation checkPSchedulerType(s:String){
+
+	if(s="FIFO"){	
+	
+		return lqnmodel!PSchedulerType#fcfs; 
+	}else if(s="hol"){
+	
+		return lqnmodel!PSchedulerType#hol; 
+	}else if(s="pp"){
+	
+		return lqnmodel!PSchedulerType#pp; 
+	}else if(s="rand"){
+		return lqnmodel!PSchedulerType#rand; 
+	
+	}else if(s="inf"){
+	
+		return lqnmodel!PSchedulerType#inf;
+	}else if(s="pshol"){
+	
+		return lqnmodel!PSchedulerType#pshol;
+	
+	}else if(s="pspp"){
+		return lqnmodel!PSchedulerType#pspp;
+	
+	}else if(s="RoundRobin"){
+	
+		return lqnmodel!PSchedulerType#cfs;
+	}else if(s="ref"){
+	
+		return lqnmodel!PSchedulerType#ref;
+	}else if(s="pri"){
+	
+		return lqnmodel!PSchedulerType#pri;
+	}else if(s="burst"){
+	
+		return lqnmodel!PSchedulerType#burst;
+	
+	}else if(s="poll"){
+	
+		return lqnmodel!PSchedulerType#poll;
+	
+	}else if(s="semaphore"){
+	
+		return lqnmodel!PSchedulerType#semaphore;
+	}	
+}
+
+//Obtain the multiplicity from Device
+operation getMultiplicityOfDevice(a:UML!Device):Integer{
+
+	"operation getMultiplicityOfDevice(a:UML!Device) is running now ".println();
+	var stereotype:Any = a.getAppliedStereotypes();
+	"stereotypes are : ".print() + stereotype.println();
+	if(stereotype.isDefined()){   
+	   for(s in stereotype){           
+	       if(s.name="GaExecHost"){
+	          "GaExecHost is found".println();
+	    	  "stereotypes is : ".print() + s.println();
+	    	  "Selected Attributes are :".print() + s.getAllAttributes().name.println();	            
+	          if(s.getAllAttributes().selectOne(a|a.name="resMult").isDefined() ){
+	            var resMultInt:Integer = a.getValue(s,"resMult").asInteger();
+	            //for resMult within tag
+	            //var resMultString = a.getValue(s,"resMult");
+	            //var resMultInt:Integer = resMultString.substring(resMultString.indexOf("=")+1,resMultString.indexOf(")")).asInteger().println();
+	            "value of reMult  is : ".print() + resMultInt.println();
+	            "Type of the value of resMult  is : ".print() + resMultInt.asInteger().type().println();	                   
+	            return resMultInt;                     
+              }
+            }
+        }
+    }	 
+}
+
+//-----------------------------------------Operations for Task--------------------------------------------------//
+
+//Obtain Artifacts
+operation Device getArtifact():Collection  {
+
+		 return Artifact.all.select(a|a.namespace=self);
+
+}
+
+//Obtain the scheduling from the Artifact
+operation getStereotypeOfArtifact(a:UML!Artifact):String{
+	"operation getStereotypeOfArtifact(a:UML!Artifact)  is running now ".println();
+	var stereotype:Any = a.getAppliedStereotypes();
+	"stereotypes are : ".print()+stereotype.println(); 
+     if(stereotype.isDefined()){   
+	    for(s in stereotype){
+	    //Problem: Add "Scheduler" stereotype at current model     
+	        if(s.name = "Scheduler"){
+	    	  "Scheduler is found".println();
+	    	  "stereotypes is : ".print() + s.println();
+	    	  "Selected Attributes are :".print()+s.getAllAttributes().name.println();	    	 
+	          if(s.getAllAttributes().selectOne(a|a.name="otherSchedPolicy").isDefined() ){
+	            "value of other Sched Policy  is : ".print()+a.getValue(s,"otherSchedPolicy").asString().println();
+	            "Type of the value of other Sched Policy  is : ".print()+a.getValue(s,"otherSchedPolicy").asString().type().println();
+	            return a.getValue(s,"otherSchedPolicy").asString();                     
+              }
+            }
+         }
+     }
+}
+
+//Obtain Activity Partitions for specific Artifact 
+operation getActivityPartitions(Artifactname:String):Collection{
+		  //Warning: The diagram should define the same name for artifact (without PaLogicalResource stereotype) and activity partition
+		  return ActivityPartition.all.select(a|a.name = Artifactname);
+}
+
+//Check the stereotype of scheduling for task
+operation checkTSchedulerType(s:String){
+
+	if(s="ref"){
+		return lqnmodel!TSchedulerType#ref;
+	
+	}else if(s="fcfs"){
+	
+		return lqnmodel!TSchedulerType#fcfs;
+	}else if(s="hol"){
+	
+		return lqnmodel!TSchedulerType#hol;
+	
+	}else if(s="pri"){
+	
+		return lqnmodel!TSchedulerType#pri;
+	}else if(s="inf"){
+		
+		return lqnmodel!TSchedulerType#inf;	
+	}else if(s="burst"){
+	
+		return lqnmodel!TSchedulerType#burst;
+	}else if(s="poll"){
+	
+		return lqnmodel!TSchedulerType#poll;
+	}else if(s="semaphore"){
+		return lqnmodel!TSchedulerType#semaphore;
+	
+	}
+}
+
+//Obtain the multiplicity from Artifact
+operation getMultiplicityOfArtifact(a:UML!Artifact):Integer{
+
+	"operation getMultiplicityOfArtifact(a:UML!Artifact) is running now ".println();
+	var stereotype:Any = a.getAppliedStereotypes();
+	"stereotypes are : ".print()+stereotype.println();
+	if(stereotype.isDefined()){   
+	  for(s in stereotype){
+	  //TBD: need stereotype for Artifact at current model
+	  //	  if(s.name="Scheduler"){	  	  	
+	  //	  	if (s.getAllAttributes().selectOne(i|i.name="otherSchedPolicy").isDefined()){
+	  //	  		"value of otherSchedPolicy is : ".print() + a.getValue(s,"otherSchedPolicy").println();
+	  //	  		if (a.getValue(s,"otherSchedPolicy") = "ref"){
+	  //	  			var InitialNodeWithRef:UML!InitialNode = InitialNode.all.selectOne(n|n.inPartition.name.first() = a.name);
+	  //	  			var initialNodeStereotype:Any = InitialNodeWithRef.getAppliedStereotypes();
+	  //	  			if(initialNodeStereotype.isDefined()){
+	  //	  				for(iniSterotype in initialNodeStereotype){
+	  //	  					if(iniSterotype.name="GaWorkloadEvent"){
+	  //	  						if (iniSterotype.getAllAttributes().selectOne(k|k.name="pattern").isDefined()){
+	  //	  							"value of pattern is : ".print() + InitialNodeWithRef.getValue(iniSterotype,"pattern").println();
+	  //	  							var isOpen = InitialNodeWithRef.getValue(iniSterotype,"pattern").indexOf("open");
+	  //	  							if (isOpen >= 0){
+	  //	  								var hostdemandstring.substring(hostdemandstring.indexOf("=")+1,hostdemandstring.indexOf(",")).asReal().println()
+	  //	  							}
+	  //	  						}
+	  //	  					}
+	  //	  				}
+	  //	  			}
+	  //	  		}
+	  //	  	}
+	  //	  }   
+	      if((s.name="StormSpout") or (s.name="StormBolt")){
+	         "Threads are found".println();
+	    	 "stereotypes is : ".print()+s.println();
+	    	 "Selected Attributes are :".print()+s.getAllAttributes().name.println();	              
+	         if(s.getAllAttributes().selectOne(a|a.name="parallelism").isDefined() ){
+	           "value of parallelism is : ".print()+a.getValue(s,"parallelism").asInteger().println();
+	           "Type of the value of parallelism is : ".print()+a.getValue(s,"parallelism").asInteger().type().println();	                   
+	           return a.getValue(s,"parallelism").asInteger();                      
+             }
+          }
+       }
+    }	 
+}
+
+//Obtain the Think Time for the reference task
+operation getBlockTOfOpAction(a:UML!OpaqueAction):Real{	
+	"Operation getBlockTOfOpAction  is running now ".println();
+	var stereotype:Any = a.getAppliedStereotypes();
+	"stereotypes are : ".print() + stereotype.println();
+	if(stereotype.isDefined()){
+		for(s in stereotype){
+		//TBD: ref should comes from the StormSpout stereotypes
+			if(s.name="GaStep"){
+	    	   "stereotypes is : ".print() + s.println();
+	    	   "Selected Attributes are :".print() + s.getAllAttributes().name.println();	            
+	           if(s.getAllAttributes().selectOne(a|a.name="blockT").isDefined() ){
+	             "value of Blockt  is : ".print() + a.getValue(s,"blockT").asReal().println();
+	             "Type of the value of capacity  is : ".print()+a.getValue(s,"blockT").asReal().type().println();      
+	             return a.getValue(s,"blockT").asReal(); 
+               }
+            }
+         }
+     }	 
+}
+
+//-----------------------------------------Operations for Entry--------------------------------------------------//
+//Obtain the activity node without Partition Information
+operation getactivitynodes(umlActivityPartition:UML!ActivityPartition):Collection{
+			return umlActivityPartition.node.select(n|n.isKindOf(ActivityNode));
+}
+
+//Operations for Initial Node or AcceptEventAction -> Entry 
+operation EntryFunctionOperation(innode:Any,lqnTask:lqnmodel!task,partition:UML!ActivityPartition){
+
+	      "InitialNodeOP operation is running".println();	      
+	      "Item is :".print()+innode.println();	      
+	      
+	      //Obtain outgoing controlFlow from InitialNode or AcceptEventAction
+	      var cflow:UML!ControlFlow = innode.outgoing.first();
+	      
+	      //Collecting edges and controlNodes (Starting from InitialNode or AcceptEventAction)	      
+	      var collectEdges:Sequence;
+	      var collectControlnodes:Sequence;
+	      //Add outgoing controlFlow from the InitialNode or AcceptEventAction
+	      collectEdges.add(cflow);
+	      "collect Edges seq including this edge outgoing from InitialNode or AcceptEventAction".print() + collectEdges.println();
+	      
+	      //Col is a collection for storing all activity nodes
+	      var col:Sequence;	 
+	 	  var lqnEntry : lqnmodel!entry;
+	 	  //Element: Initial Node or AccepteventAction -> Entry
+	 	  lqnEntry = innode.equivalent();
+	 	  //Element: Add entry element to task
+          lqnTask.entry.add(lqnEntry);
+		 
+		 //Check if the Entry Type is NONE
+         if(lqnEntry.type = lqnmodel!EntryType#NONE){
+         	"Entry is : ".print() + lqnEntry.name.println();
+         
+             //Traveling the current partition to find all activitiy nodes 
+             col.TraverseTheGraphForwardToTheEnd(cflow,partition,collectEdges,collectControlnodes);
+             "The activity nodes in current partition are: ".print() + col.println();
+            //Warning: duplicated edges inside the collectEdges 
+            "Show collectEdges in EntryFunctionOperation".print() + collectEdges.println();
+          	"Type of this entry is None, so this task needs to have taskactivities block".println();
+          	          	
+          	var taskactivity :new lqnmodel!taskactivities;
+          	"This taskactivity is ".print() + taskactivity.println();
+          	//Element: add taskactivities to Lqn task
+          	lqnTask.taskactivities.add(taskactivity);
+          	"lqnTask.taskactivities is : ".print()+ lqnTask.taskactivities.println();
+          	//Element: transformer the activity nodes (in current partitions) to lqn activities in current taskactivity 
+           	taskactivity.activity.addAll(col.equivalent());
+
+          	"taskactivity.activity".print() + taskactivity.activity.println();
+            //Obtain the first item of this collection
+            "The current taskactivity's first item is : ".print() + taskactivity.activity.first().println();
+            //Attribute: lqn Entry's name -> name of the first activity of the taskactivity
+            taskactivity.activity.first().boundtoentry = lqnEntry.name;         
+            
+            //Check if there is a SendSignalAction
+            if(col.exists(i|i.isTypeOf(SendSignalAction))){
+            	
+            	var replyentry: new lqnmodel!replyentry;
+            	"This is replyentry ".print() + replyentry.println();
+            	//Attribute: lqn Entry's name -> lqn replyentry's name
+               	replyentry.name = lqnEntry.name;
+                "replyentry name is ".print() + replyentry.name.println();
+                //Element: add replyentry to taskactivity
+                 taskactivity.replyentry.add(replyentry);
+                 "Taskactivity.taskActivityR replyEntry is ".print() + taskactivity.replyentry.println();
+                 
+                 var replyactivity: new lqnmodel!replyactivity;
+                 "This is replyactivity ".print() + replyactivity.println();
+                 //There should be one SendSignalAction in this collection
+                 var sendsignal:UML!SendSignalAction = col.selectOne(d|d.isTypeOf(SendSignalAction));
+                 "This sendsignal is :".print() + sendsignal.println();
+                 //Attribute: uml sendsignal's name -> lqn replyactivity's name
+                 replyactivity.name = sendsignal.name;
+                 //Element: add replyactivity to replyentry
+                 replyentry.replyactivity.add(replyactivity);
+                  
+                 "replyentry.replyActivity is : ".print() + replyentry.replyactivity.println();
+             }
+          	for(c in collectEdges){
+				 "This is a Control Flow of this partition : ".print() + c.println();
+				 "This is source of this controlflow : ".print() + c.source.println();
+			     "This is target of this controlflow : ".print() + c.target.println();
+			     //Check if the current coltrol flow connects Operactions (Sequential means: first,entry is none, second, control flow connects two OperaActions not control nodes)
+			     if(isSequential(c)) {
+			     	"This edge is transformed".print() + c.println();
+			     	//Check if the current activity nodes collection includes the source node of current control flow
+			     	if(col.includes(c.source)){
+			     		//Element: uml control flow -> lqn precedence
+			     		taskactivity.precedence.add(c.equivalent());
+			            "Taskactivity.precedence : ".print() + taskactivity.precedence.println();
+			        }
+			      }else if(controlflowProcessingforBranch(c)){//Checking if the target of control flow is decision node
+			         "This edge is transformed".print() + c.println();
+			         var d : UML!DecisionNode;
+			         d = c.target;
+			         if(col.includes(c.source)){
+			         	//Element: uml decision node -> lqn precedence 
+			         	taskactivity.precedence.add(d.equivalent());
+			            "Taskactivity.precedence : ".print() + taskactivity.precedence.println();
+			         }
+			      }else if(controlflowProcessingforMerge(c)){//Checking if the target of control flow is merge node
+				     "this edge is transformed".print() + c.println(); 
+			         var m : UML!MergeNode ;
+			         m = c.source;
+			         if(col.includes(c.source)){
+			         	//Element: uml merge node -> lqn precedence 
+			         	taskactivity.precedence.add(m.equivalent());
+			         }
+			      }else if(controlflowProcessingforFork(c)){//Checking if the target of control flow is fork node
+			         "This edge is transformed".print()+c.println(); 
+			         var f : UML!ForkNode ;
+			         f = c.target;
+			         if(col.includes(c.source)){
+			         	//Element: uml fork node -> lqn precedence   
+			         	taskactivity.precedence.add(f.equivalent());
+			            "e.precedence : ".print() + taskactivity.precedence.println();
+			         }  
+			       }else if(controlflowProcessingforJoin(c)){//Checking if the target of control flow is join node
+			          "This edge is transformed".print()+c.println(); 
+			          var j : UML!JoinNode ;
+			          j = c.source;
+			          if(col.includes(c.source)){
+			          	//Element: uml join node -> lqn precedence
+			          	taskactivity.precedence.add(j.equivalent());
+			            "Taskactivity.precedence : ".print() + taskactivity.precedence.println();
+			          }
+			       }
+			   }
+           }else if(lqnEntry.type=lqnmodel!EntryType#PH1PH2){//Check if the Entry Type is PH1PH2
+              "Entry is : ".print() + lqnEntry.name.println();
+          	
+          	  //Traveling the current partition to find all activitiy nodes
+              col.TraverseTheGraphForwardToTheEnd(cflow,partition,collectEdges,collectControlnodes);
+              "col is :".print() + col.println();
+             
+              var col1:Sequence;
+              //Exclude sendsignalaction and activityfinalnode from this collection before transforming to activity
+		      col1 = col.select(a|a.isTypeOf(SendSignalAction) or a.isTypeOf(ActivityFinalNode));
+		      "col1 is :".print() + col1.println();
+		      //collection without SendsignalAction and ActivityFinalNode
+		      col.removeAll(col1);
+		      "col before becoming orderset is : ".print() + col.println();
+		      
+		      var colset:OrderedSet;
+		      colset.addAll(col);		   
+		      "EntryFunctionOperation/PH1PH2/col is : ".print() + colset.println();
+		      "EntryFunctionOperation/PH1PH2/col is : ".print() + colset.size().println();
+		      
+		      "Type of this entry is not None, so this entry needs to have entry-phase-activities block".println();
+          	  var entryphaseactivities :new lqnmodel!entryphaseactivities;
+              //e.entryphaseactivities.add(entryphaseactivities);
+              //Element: add entryphaseactivities to lqn Entry
+              lqnEntry.entryphaseactivities = entryphaseactivities;
+              //Element: uml activity node -> lqn activity
+              entryphaseactivities.activity1.addAll(colset.equivalent());
+              //Check: only allowed to have three activities
+              var k:Integer=0;   
+			  for(i in colset){
+			  	k=k+1;
+				if(i.isDefined()){
+					i.equivalent().phase = k;
+					"Colset.equivalent activity phase is : ".print() + i.equivalent().phase.println();
+					//if(k=1){
+						//Attribute: 1 -> lqn activity phase
+				    	//i.equivalent().phase = 1;
+				        //"Colset.equivalent activity phase 1 is : ".print() + i.equivalent().phase.println();
+				    //}else if(k=2){
+				    	//Attribute: 2 -> lqn activity phase
+				     	//i.equivalent().phase = 2;
+				        //"Colset.equivalent activity phase 2 is : ".print() + i.equivalent().phase.println();
+				    //}else if(k=3){
+				    	//Attribute: 3 -> lqn activity phase
+				        //i.equivalent().phase = 3;
+				        //"Colset.equivalent activity phase 3 is : ".print() + i.equivalent().phase.println();
+				    //}
+				}
+			  } 
+          }
+}
+
+//Check if the current controlFlow is included in NONE entry
+//@lazy
+operation isNONEPattern(flow:UML!ControlFlow):Boolean{
+ 
+		"Operation isNONEPathern is running ".println();
+ 		"flow is : ".print() + flow.println();
+ 
+	    //Check the partition of the current flow
+		var itspartition:UML!ActivityPartition;
+		if (not IsCrossPartition(flow)){
+			itspartition=CFPartition(flow);			
+		}
+		"itsPartition is : ".println() + itspartition.println();
+		
+		//Create collection for storing the InitialNode or AcceptEventAction
+		var col:Sequence;
+		//Obtain the origin of the flow 
+		col.FindInitialNodeOrAcceptEventActionBackwardsInTheFlow(flow,itspartition);
+		//The collection should have just one element; either InitialNode or AcceptEventAction
+		"Collection for InitialNode or AcceptEventAction here is : ".print()+col.println();
+		
+		if(col.first().isDefined()){
+			"First element of this collection is : ".print() + col.first().println();		 
+			//Obtain the first outgoing control flow of this first element
+		   	var cflow:UML!ControlFlow = col.first().outgoing.first();
+		   	"cflow is : ".print() + cflow.println();
+		   	//Check if current controlflow is cross partitions		   
+		   	var cflowpartition:UML!ActivityPartition;		   
+		   	if (not IsCrossPartition(flow)){
+				cflowpartition = CFPartition(flow);			
+			}
+		   "cflowPartition is : ".print() + cflowpartition.println();
+		   
+		   var col1:Sequence;
+		   var col3:Sequence;
+		   var collectEdges:Sequence;
+		   //Add the first controlflow to the collectEdges collection
+		   collectEdges.add(cflow);
+	      "collectEdges seq includes this edge outgoing from either AcceptEventAction or initialNode ".print() + collectEdges.println();
+		   var collectControlnodes:Sequence;
+		   //Obtain the activity nodes by traveling control flow from start to end (it might have duplicated nodes)
+		   col1.TraverseTheGraphForwardToTheEnd(cflow,cflowpartition,collectEdges,collectControlnodes);
+		   //Exclude sendsignalaction and activityfinalnode from activity nodes collection to have the size correctly
+		   col3 = col1.select(a|a.isTypeOf(SendSignalAction) or a.isTypeOf(ActivityFinalNode));
+		   col1.removeAll(col3);
+		   //Make col1 a set to get rid of redundant elements.
+		   var col1set: Set;
+		   col1set.addAll(col1);
+		   "NONEPattern/col1 is : ".print() + col1.println();
+		   "NONEPattern/col1 size is : ".print() + col1.size().println();		    
+		   "NONEPattern/col1set is : ".print() + col1set.println();
+		   "NONEPattern/col1set size is : ".print() + col1set.size().println();		    
+		    
+		   //Obtain InitialNode and ActivityFinalNode from collectControlnodes collection
+		   var col2:Sequence;
+		   col2 = collectControlnodes.select(a|a.isTypeOf(InitialNode) or a.isTypeOf(ActivityFinalNode));
+		   "NONEPattern/col2 is : ".print() + col2.println();		    
+		   //Exclude InitialNode and ActivityFinalNode from collectControlnodes collection
+		   collectControlnodes.removeAll(col2);
+		   //Make collectControlnodes a set to get rid of redundant elements.
+		   var collectControlnodesSet: Set;
+		   collectControlnodesSet.addAll(collectControlnodes);
+		   
+		   //Now Print collectControlnodes
+		   " collectControlnodes is : ".print()+collectControlnodes.println();
+		   " collectControlnodes size is : ".print()+collectControlnodes.size().println();
+		   " collectControlnodesSet is : ".print()+collectControlnodesSet.println();
+		   " collectControlnodesSet size is : ".print()+collectControlnodesSet.size().println();
+		     
+		   if(collectControlnodesSet.exists(c|c.isKindOf(ControlNode))){
+				return true;
+		   }else if(col1set.size()>20){		       
+		       	return true;
+		   }else{
+		        return false;
+		   }
+	    }
+		return false;
+}
+
+//Check the ControlFlow crosses Partition
+operation IsCrossPartition(c:UML!ControlFlow):Boolean{
+
+		if(c.source.inPartition.first()<>c.target.inPartition.first()){	
+			return true;
+		}else{	
+			return false;
+		}
+}
+
+//Return the control flow's inpartition if control flow is not crossPartition
+operation CFPartition(c:UML!ControlFlow):ActivityPartition{
+
+		"c is ".print() + c.println();
+		"source partition ".print() + c.source.inPartition.first().println();
+		"target partition ".print() + c.target.inPartition.first().println();
+		if(c.source.inPartition.first() = c.target.inPartition.first()){
+			return c.source.inPartition.first();
+		}
+}
+
+//Traversing backwards the activity graph in the partition of cf until reaching the beginning (either InitialNode or AcceptEventAction)
+operation Sequence FindInitialNodeOrAcceptEventActionBackwardsInTheFlow(edge:UML!ControlFlow,partition:UML!ActivityPartition):Sequence{
+	
+		"Beginning Of Method FindInitialNodeOrAcceptEventActionBackwardsInTheFlow".println();
+		"Partition is : ".print() + partition.println();
+		
+		if(edge.source.isTypeOf(InitialNode) or edge.source.isTypeOf(AcceptEventAction)){		   
+			"The InitialNode or AcceptEvenetAction is reached, return it: ".print() + edge.source.println();
+		    self.add(edge.source);
+		    "Size of Sequence is : ".print() + self.size().println();
+	        "Collection has this value of InitialNode or AcceptEventAction: ".print() + self.println();		       
+		    return self ; 
+		}else if((edge.source).incoming.isDefined()){		   
+			"Edge.source.incoming : ".print() + edge.source.incoming.println();
+		    for(c in edge.source.incoming){
+		   		if(partition.IsThisEdgeInThisPartition(c)){
+		   			"This is the controlflow which will be passed to FindInitialNodeOrAcceptEventActionBackwardsInTheFlow again recursively :".print()+c.println();
+				    self.FindInitialNodeOrAcceptEventActionBackwardsInTheFlow(c,partition);
+				}
+            }
+        }   
+}
+
+//Check if this edge is in the Partition
+operation ActivityPartition IsThisEdgeInThisPartition(edge:UML!ControlFlow):Boolean{
+			
+		var flow:ControlFlow = self.edge.selectOne(e|e.name = edge.name);			
+		if(flow.isDefined()){	
+			return true;
+		}	
+		return false;
+}
+
+//This operation is traversing the graph forward all branches until reaching the end of each branch;
+//The end is (ActivityFinalNode) or an Activity of AnyType which does not have an outgoing edge to another activity in the same partition
+//(exclude reply edges from SendSignalAction) While traversing the graph, collect the following collections:
+//all activity nodes
+//all controlFlow edges
+//all control Nodes
+operation Sequence TraverseTheGraphForwardToTheEnd(edge:UML!ControlFlow,partition:UML!ActivityPartition,collectEdges:Sequence,collectControlnodes:Sequence):Sequence{
+
+		"Beginning Of Method TraverseTheGraphForwardToTheEnd".println();	
+		//Collect all the ActivityNodes
+		self.add(edge.target);
+		"Collection After adding Activity to it: ".print() + self.println();
+		"size is: ".print() + self.size().println();	           
+	    if(edge.target.isKindOf(ControlNode)){
+	    	//Add ControlNodes like,Initial,Final,Fork,Join,Merge,Decision to this collection 
+	        collectControlnodes.add(edge.target);   		
+	    }        
+	    if(edge.target.isTypeOf(ActivityFinalNode) or edge.target.outgoing.isUndefined()){       
+			"Return the Collection:Sequence now: ".println();
+		    //Return all the activityNodes
+		    return self;
+		}else if((edge.target).outgoing.isDefined()){
+            "edge.target.outgoing : ".print() + edge.target.outgoing.println();
+		   	for(c in edge.target.outgoing){        
+		   		"c flow  is : ".print() + c.println();
+		   	    "partition is :".print() + partition.println();
+		   	    //Check if this outgoing control flow is in the same partition		   	        
+		   	    if(partition.IsThisEdgeInThisPartition(c)){  	           
+		   	    	//Add the edge to the collectEdges collection
+		   	        collectEdges.add(c);
+					self.TraverseTheGraphForwardToTheEnd(c,partition,collectEdges,collectControlnodes);
+				}
+            }
+        }        
+}
+
+//Check if there is a sequence control flow within the NONE entry
+operation isSequential(edge:UML!ControlFlow):Boolean{
+	
+		"Operation isSequential is running ".println();
+		"Edge is : ".println() + edge.println();
+		var cflowpartition:UML!ActivityPartition;
+		if (not IsCrossPartition(edge)){
+			cflowpartition = CFPartition(edge);	
+		}
+	
+		"cflowPartition is : ".println()+cflowpartition.println();
+	
+		//The source and target of the control flow has not to be control nodes
+		if(edge.target.isTypeOf(MergeNode) or edge.target.isTypeOf(JoinNode) or edge.target.isTypeOf(DecisionNode) or edge.target.isTypeOf(ForkNode) or edge.target.isTypeOf(ActivityFinalNode) ){
+			return false;
+		}else if(edge.source.isTypeOf(MergeNode) or edge.source.isTypeOf(JoinNode) or edge.source.isTypeOf(DecisionNode) or edge.source.isTypeOf(ForkNode) or edge.source.isTypeOf(InitialNode) or edge.source.isTypeOf(AcceptEventAction)){
+			return false;
+		}else{
+	
+			var col1:Sequence;
+			var col2:Sequence;
+			//Obtain the outgoing of source of current control flow which is in this partition
+		    var cflow1:Collection = edge.source.outgoing;
+		    for(i in cflow1){
+		    	if(cflowpartition.IsThisEdgeInThisPartition(i)){
+		        	//collect the edges which inPartition attribute is set 
+		        	col1.add(i);
+		        }
+		   		     
+		    }	            
+	        "col1 contains ".print() + col1.println();
+	        
+	        //Obtain the incoming of target of current control flow which is in this partition    
+	        var cflow2:Collection=edge.target.incoming;
+		    for(a in cflow2){
+		    	if(cflowpartition.IsThisEdgeInThisPartition(a)){
+		        	//collect the edges which inPartition attribute is set 
+		        	col2.add(a);
+		        }     
+		    }
+			"col2 contains ".print() + col2.println();
+			
+		    //Check if the control flow is the only edge between the source node and target node    
+		    if((col1.size()=1) and (col2.size()=1)){
+				return true;
+		    }else{
+		        return false;
+		    }
+	}	
+}
+
+//Check if the target of controlFlow is DecisionNode
+operation controlflowProcessingforBranch(edge:UML!ControlFlow):Boolean{
+		
+		if(edge.target.isTypeOf(DecisionNode)){
+			return true;
+		}
+		return false;
+}
+
+//Check if the target of controlFlow is MergeNode
+operation controlflowProcessingforMerge(edge:UML!ControlFlow):Boolean{
+
+		if(edge.source.isTypeOf(MergeNode)){
+			return true;
+		}
+		return false;
+}
+
+//Check if the target of controlFlow is ForkNode
+operation controlflowProcessingforFork(edge:UML!ControlFlow):Boolean{
+		
+		if(edge.target.isTypeOf(ForkNode)){
+			return true;
+		}
+		return false;
+}
+
+//Check if the target of controlFlow is JoinNode
+operation controlflowProcessingforJoin(edge:UML!ControlFlow):Boolean{
+		if(edge.source.isTypeOf(JoinNode)){
+			return true;
+		}
+		return false;
+}
+
+//Obtain the return probability for decision node
+operation ReturnProbability(action:UML!Action):Real{
+
+		"Operation ReturnProbability(action:UML!Action) is running now ".println();
+		var stereotype:Any = action.getAppliedStereotypes();
+		"stereotypes are : ".print() + stereotype.println(); 
+     	if(stereotype.isDefined()){   
+	    	for(s in stereotype){      
+				if((s.name="GaStep")){
+	    	    	"Stereotypes is : ".print() + s.println();
+	    	      	"Selected Attributes are :".print() + s.getAllAttributes().name.println();
+	    	 
+	              	if(s.getAllAttributes().selectOne(a|a.name = "prob").isDefined() ){
+	                	"value of prob  is : ".print() + action.getValue(s,"prob").asReal().println();
+	                   	"Type of the value of prob  is : ".print() + action.getValue(s,"prob").asReal().type().println();
+		             	//return the probability;
+                     	return action.getValue(s,"prob").asReal();
+                   	}
+                 }
+			}
+		}                
+}
+
+//For SendSignalAction 
+operation guardForSendSignalAction2Activity(edge:UML!ControlFlow):Boolean{
+
+		"Operation guardForSendSignalAction2Activity is running ".println();
+ 		"Edge is : ".print() + edge.println();
+ 		
+		var itspartition:UML!ActivityPartition;
+		if (not IsCrossPartition(edge)){
+			itspartition=CFPartition(edge);	
+		}
+ 		
+ 		if(itspartition.isDefined()){
+			"Partition is : ".println() + itspartition.println();
+	         //If it is not NONEPattern, means that it is PH1PH2 and there is sendsignal action in this flow, we do not need to transform it 
+	         if(isNONEPattern(edge)){
+	        	return true;
+	        }else{
+	        	return false;
+	        }
+	    }else{
+			return false;
+	    }
+		return false;
+}
+
+//For ControlFlow to Precedence
+operation guardForControlFlowToPrecedence(edge:UML!ControlFlow):Boolean{
+
+		"Operation  guardForControlFlowToPrecedence is running ".println();
+	    var itspartition:UML!ActivityPartition;
+		if (not IsCrossPartition(edge)){
+			itspartition = CFPartition(edge);
+		}
+	      
+	    if(itspartition.isDefined()){
+	    	"Partition is : ".println()+itspartition.println();
+	    	//Check if the edge within NONE entry and it is sequential
+	        if(isNONEPattern(edge) and isSequential(edge) ){
+	        	return true;
+	        }else{ 
+	        	return false;
+	        }      
+		}else{	      
+			return false;
+	    }
+	    
+		return false;
+}
+
+//Check if the target of the calloperationaction is accepteventaction
+operation getoutgoingofthisCallOperationActionwhichTargetIsAcceptEventAction(c:UML!CallOperationAction):ControlFlow{
+
+		"Operation:getoutgoingofthisCallOperationActionwhichTargetIsAcceptEventAction".println();
+		"c is :".print() + c.println();
+		return c.outgoing.selectOne(a|a.target.isTypeOf(AcceptEventAction));    
+}
+
+//Obtain the return of the sendsignalaction
+operation Sequence ToFindAndReturnSendSignalAction(edge:UML!ControlFlow,partition:UML!ActivityPartition):Sequence{
+	
+		//Traverses the path from AcceptEventAction inPartition partition until reaching sendsignalaction and return the collection containing sendsignalaction object
+		//It assumes that sendsignalaction is always present in the path contained in that partition
+		"Beginning Of Method ToFindAndReturnSendSignalAction ".println();
+		if(edge.target.isDefined()){
+			if(edge.target.isTypeOf(SendSignalAction)){
+				"The SendsignalAction is reached, return it  : ".print() + edge.target.println();
+		        self.add(edge.target);
+	           
+	            "Collection After: ".print() + self.println(); 
+		    	return self ;
+			}else if((edge.target).outgoing.isDefined()){
+		   
+				"Call Operation ToFindAndReturnSendSignalAction called again, recursion : ".println();
+
+		   		"Edge.target.outgoing : ".print() + edge.target.outgoing.println();
+		   	    for(c in edge.target.outgoing){
+		   	    	if(partition.IsThisEdgeInThisPartition(c)){
+		   		    	"This is controlflow which will be passed to ToFindAndReturnSendSignalAction again recursively :".print() + c.println();
+				        self.ToFindAndReturnSendSignalAction(c,partition);
+				    }
+                }
+        	}
+      
+      	}   
+}
+
+//ControlFlow: AsyncCall
+operation controlflowProcessingforASyncCall(edge:UML!ControlFlow):Boolean{
+
+		"ControlflowProcessingforASyncCall method ".println();	
+		if(edge.source.isTypeOf(CallOperationAction) and edge.target.isTypeOf(AcceptEventAction) ){
+			
+			var cflow:UML!ControlFlow = edge.target.outgoing.first();
+			"Mainflow is : ".print() + cflow.println();
+			var cflowpartition:UML!ActivityPartition;
+				
+		    if (not IsCrossPartition(cflow)){
+				cflowpartition=CFPartition(cflow);
+			}
+		
+			"itsPartition is : ".println() + cflowpartition.println();
+				
+		   var col1:Sequence;
+		   var collectEdges:Sequence;
+		   //Add the first cflow the the collectEdges collection
+		   collectEdges.add(cflow);
+	      "CollectEdges seq includes this edge outgoing from either AcceptEventAction or initialNode ".print()+collectEdges.println();
+		   var collectControlnodes:Sequence;
+		   col1.TraverseTheGraphForwardToTheEnd(cflow,cflowpartition,collectEdges,collectControlnodes);
+		   //Exclude sendsignalaction and activityfinalnode from this collection to have the size correctly
+		   //Make col1 a set to get rid of redundant elements.
+		   var col1set: Set;
+		   col1set.addAll(col1);
+		   "controlflowProcessingforASyncCall/col1 is : ".print() + col1.name.println();
+		   "controlflowProcessingforASyncCall/col1 size is : ".print() + col1.size().println();
+		    
+		   "controlflowProcessingforASyncCall/col1set is : ".print() + col1set.name.println();
+		   "controlflowProcessingforASyncCall/col1set size is : ".print() + col1set.size().println();
+		    if(not col1set.exists(i|i.isTypeOf(SendSignalAction))){
+				return true;
+		    }
+		}
+	
+		return false;
+}
+
+//ControlFlow: SyncCall (sendSignalAction)
+operation controlflowProcessingforSyncCall(edge:UML!ControlFlow):Boolean{
+			
+		"controlflowProcessingforSyncCall method ".println();
+			
+		if(edge.source.isTypeOf(CallOperationAction) and edge.target.isTypeOf(AcceptEventAction) ){
+			
+			var mainflow:UML!ControlFlow = edge.target.outgoing.first();
+			"Mainflow is : ".print() + mainflow.println();
+			"Mmainflows source and target".print() + " source ".print() + mainflow.source.print() + " target ".print() + mainflow.target.println();
+			var itspartition:UML!ActivityPartition;
+			if (not IsCrossPartition(mainflow)){
+				itspartition=CFPartition(mainflow);
+			}
+			"itsPartition is : ".print() + itspartition.name.println();
+				
+		var col:Sequence;
+		col.ToFindAndReturnSendSignalAction(mainflow,itspartition);
+		var col1:Set;
+		col1.addAll(col);			    
+		"ControlflowProcessingforSyncCall/col1 is: ".print() + col1.name.println(); 
+				
+		if(col1.one(a|a.isTypeOf(SendSignalAction))){
+			"collection of ActivityNode is : ".print() + col.println();
+			"last element of collection is :  ".print() + col.last().println();
+			"its outgoing is + its outgoing target is : ".print() + col.last().outgoing.first().print() + col.last().outgoing.first().target.println();
+			for(i in col.last().outgoing){// outgoing collection of SendSignalAction
+				if(i.target = edge.source){
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+//Check if it has specific stereotyoe for UML Class
+operation UML!Class hasStereotype1(name:String):Boolean {
+	    
+		var c: Sequence;
+		c = self.getAppliedStereotypes(); // Sequence of Stereotypes
+		for(s:Stereotype in c){
+			if(s.name = name){
+				return true;
+			}
+		}
+		return false;
+}

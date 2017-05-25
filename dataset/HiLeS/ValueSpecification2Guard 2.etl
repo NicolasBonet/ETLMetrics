@@ -1,0 +1,83 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: ValueSpecification2Guard.etl 1003 2015-05-03 00:30:47Z kd.sanchez21@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+
+/****r* Behavior/LiteralString2Guard
+ * SUMMARY
+ *   Transfotrm a SysML ValueSpecification into a HiLeS guard. Contorl Flows
+ *  comming from a decision node have a ValueSpecification guard. ($Rev: 1003 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *   This rule creates the Guard element that contains the information of the
+ * value of the guard defined by the control flow.
+ *
+ * SEE ALSO
+ *  * LiteralBoolean2Guard
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+
+ ******
+ */
+@lazy
+rule LiteralString2Guard
+ 	transform vs : SysML!LiteralString
+ 	to g : HiLeS!Guard
+ 	{
+ 		
+ 		// The Value specification is the guard of a ControlFlow
+ 		guard : SysML!ControlFlow.all().exists(cf | cf.`guard` = vs) and
+ 			vs.owner.source.isTypeOf(SysML!DecisionNode)
+ 		println("LiteralString2Guard");
+ 		g.value = vs.value;
+ 		if (vs.value = "else") {
+ 			g.isDefault = true;
+ 		}
+ 		g.guardPort = vs.owner.equivalents().selectOne(p | p.isTypeOf(HiLeS!Port));
+ 		println("EndLiteralString2Guard");
+ 	}
+
+/****r* Behavior/LiteralBoolean2Guard
+ * SUMMARY
+ *   Transfotrm a SysML ValueSpecification into a HiLeS guard. Contorl Flows
+ *  comming from a decision node have a ValueSpecification guard. ($Rev: 1003 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *   This rule creates the Guard element that contains the information of the
+ * value of the guard defined by the control flow.
+ *
+ * SEE ALSO
+ *  * LiteralString2Guard
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+
+ ******
+ */
+@lazy
+rule LiteralBoolean2Guard
+ 	transform vs : SysML!LiteralBoolean
+ 	to g : HiLeS!Guard
+ 	{
+ 		
+ 		// The Value specification is the guard of a ControlFlow
+ 		guard : SysML!ControlFlow.all().exists(cf | cf.`guard` = vs) and
+ 			vs.owner.source.isTypeOf(SysML!DecisionNode)
+ 		println("LiteralBoolean2Guard");
+ 		g.value = vs.value.asString();
+ 		g.guardPort = vs.owner.equivalents().selectOne(p | p.isTypeOf(HiLeS!Port));
+ 		println("EndLiteralBoolean2Guard");
+ 		// To match the guard name with the port name, set the name after
+ 		// assigning the port
+ 		//g.name = g.guardPort.name.substring(6);
+ 	}

@@ -1,0 +1,189 @@
+pre {
+	"Running ETL".println();
+	var kspace : new nosql!KeySpace;
+	kspace.name="Test";
+	kspace.replicationFactor=1;	
+}
+
+
+//5.3 Class transformation (clase con algun atributo clave)
+rule Class2ColumnFamilyWithID
+	transform uml : UML!Class
+	to cfamily : nosql!StaticColumnFamily {	
+	guard:  uml.ownedAttribute.exists(p|p.isID)
+	
+	//asignamos el keyspace correspondiente a la column family
+	cfamily.keyspace=kspace;
+	cfamily.name = uml.name;
+	kspace.columnFamilies.add(cfamily);
+}
+
+//5.3 Class transformation (clase sin algun atributo clave)
+rule Class2ColumnFamilyWithoutID
+	transform uml : UML!Class
+	to cfamily : nosql!StaticColumnFamily {	
+	guard: not uml.ownedAttribute.exists(p|p.isID)
+	
+	//asignamos el keyspace correspondiente a la column family
+	cfamily.keyspace=kspace;
+	cfamily.name = uml.name;
+	kspace.columnFamilies.add(cfamily);
+	
+	//creamos la columna clave de la column family
+	var col : new nosql!Column;
+	var type : new nosql!PrimitiveType;
+	col.name=cfamily.name+"_ID";
+	type.kind="uuid";
+	col.type=type;
+	cfamily.columns.add(col);
+	cfamily.primaryKey.add(col);
+}
+
+
+//5.5 Attribute with primitive type transformation
+//Nota: Para prevenir aadir columnas que estan fuera del modelo de datos se aade una guarda 
+//(truco sucio pues por alguna extraa razon attribute.qualifiedName.contains("XXX") no funciona)
+//guard: attribute.type.isKindOf(UML!PrimitiveType)->att
+rule Attribute2Column
+	transform attribute : UML!Property
+	to column : nosql!Column {
+	guard: ((""+attribute.qualifiedName).contains("Data::") and attribute.type.isKindOf(UML!PrimitiveType))
+	
+	//filtramos para evitar aadir columnas ajenas al modelo de datos
+	for(cfamily in kspace.columnFamilies){	
+		if(attribute.qualifiedName=="Data::"+cfamily.name+"::"+attribute.name){
+			if(attribute.upper=1){ //5.5 Attribute with primitive type transformation->Attributes with upper bound = 1
+				//transformacion del atributo en una columna basica
+				var type : new nosql!PrimitiveType;
+				type.kind=umlType2modelType(attribute.type.name);
+				column.type=type;
+			}
+			else if(attribute.upper<>0){ //5.5 Attribute with primitive type transformation->Attributes with upper bound > 1
+				//transformacion del atributo en un set o list
+				var ctype : new nosql!CollectionType;
+				
+				if(attribute.isUnique and not attribute.isOrdered)//set
+					ctype.kind=nosql!CollectionTypeType#set;
+				else//list
+					ctype.kind=nosql!CollectionTypeType#list;
+
+				ctype.keyType=umlType2modelType(attribute.type.name);
+				column.type=ctype;
+			}
+			column.name=attribute.name;			
+			cfamily.columns.add(column);		
+				
+			//5.1 Assignment of keys to classes
+			if(attribute.isID)
+				cfamily.primaryKey.add(column);
+			
+		}
+
+	}
+}
+
+
+//5.6 Association Transformation
+//problema tipo, key
+//guard: attribute.type.isKindOf(UML!Class)->asociacion
+rule ClassAttribute2Column
+	transform attribute : UML!Property
+	to column : nosql!Column {
+	guard: ((""+attribute.qualifiedName).contains("Data::") and attribute.type.isKindOf(UML!Class))
+	var colKeyName: new String;
+	var colKeyType: new String;
+	var colFamilyName: new String;
+	var colType : new nosql!PrimitiveType;
+
+	if(attribute.upper=1){ //5.7 Association ends with upper bound = 1
+		//primero sacamos el tipo de la key 
+		for(cfamily in kspace.columnFamilies){ 
+			if(cfamily.name=attribute.type.name){ //source de la relacion
+				colKeyName=cfamily.primaryKey.first().name;
+				colKeyType=cfamily.primaryKey.first().type.kind;	
+			}	
+		}
+		//asignamos a la c.family correspondiente ese atributo de tipo key
+		for(cfamily in kspace.columnFamilies){
+			if(cfamily.name=attribute.owner.name){ //target name
+				colType.kind=colKeyType;
+				column.name=attribute.name+"_"+colKeyName;
+				column.type=colType;
+				cfamily.columns.add(column);
+			}
+		}
+		
+	}
+	else{ //5.8 Association ends with upper bound > 1
+		//creamos la dinamycColumnFamily
+		var dcf: new nosql!DynamicColumnFamily;
+		dcf.name=attribute.owner.name+"_"+attribute.name;
+		dcf.keyspace=kspace;
+		kspace.columnFamilies.add(dcf);
+		//a continuacion tenemos que crear dos atributos clave de cada asociacion
+
+		//Primer atributo: nombre_clase+nombre_pk; tipoPK		
+		for(cfamily in kspace.columnFamilies){
+			if(cfamily.name=attribute.owner.name){
+				colFamilyName=cfamily.name;
+				colKeyName=cfamily.primaryKey.first().name;
+				colKeyType=cfamily.primaryKey.first().type.kind;	
+			}	
+		}
+		colType.kind=colKeyType;
+		column.name=colFamilyName+"_"+colKeyName;
+		column.type=colType;
+		dcf.columns.add(column);
+		
+		//Segundo atributo
+		//This second column will play the role of foreign 
+		//key to the target class of the association end.
+		var secondAtt : new nosql!Column;
+		var colKeyName2 : new String;
+		var colKeyType2 : new String;
+		var colType2 : new nosql!PrimitiveType; //Nota: No se pueden reutilizar las variables anteriores
+		//sacamos la primary key de la fuente de la asociacion
+		for(cfamily in kspace.columnFamilies){
+			if(cfamily.name=attribute.type.name){
+				colKeyName2=cfamily.primaryKey.first().name;
+				colKeyType2=cfamily.primaryKey.first().type.kind;
+			}	
+		}		
+		colType2.kind=colKeyType2;
+		secondAtt.name=colKeyName2;
+		secondAtt.type=colType2;
+		dcf.columns.add(secondAtt); 
+		
+		//Finalmente aadimos el primer atributo como primaryKey y como partitionKey
+		//el segundo atributo primaryKey
+		
+		dcf.primaryKey.add(column);
+		dcf.primaryKey.add(secondAtt);
+		dcf.partitionKey.add(column);
+	}
+}
+
+
+//5.4 Primitive Type Correspondences
+operation umlType2modelType(base : String) : String {
+	var type : new String;
+	if(base=="String")
+		type="text";
+	else if(base=="Integer" or base=="int")
+		type="int";
+	else if(base=="date")
+		type="timestamp";
+	else if(base=="uuid")
+		type="uuid";
+	else if(base=="float")
+		type="float";
+	else if(base=="double")
+		type="double";
+	else if(base=="Boolean" or base=="boolean")
+		type="boolean";
+	else if(base=="char")
+		type="varchar";
+	else //revisar por si faltan mas
+		type="text";
+	return type;
+}

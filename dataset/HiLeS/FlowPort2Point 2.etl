@@ -1,0 +1,130 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: FlowPort2Point.etl 856 2012-07-03 16:35:05Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+ 
+// ============================= IN/OUT PORTS =================================
+/****r* Structure/FlowPort2Point
+ * SUMMARY
+ *   Transform a SysML:FlowPort to a HiLeS:Point. ($Rev: 856 $)
+ * DESCRIPTION
+ *	|html <B>@abstract</B>
+ *   Copies the name and id form the sysml FlowPort. The port direction depends
+ * on the FlowPort direction. For ports that have a DataType that extends
+ * LogicVector or AnalogVector (in the HiLeS UML Library) the size of the point
+ * depends on the multiplicity of the DataType property that subsets the "slot"
+ * property of the LogicVector or AnalogVector DataTypes.
+ * These rules are for atomic FlowPorts. Non-atomic flowports are SysML!Ports
+ * that have a type attribute that points to the FlowSpecification
+ * (uml!Interface) that defines the actual ports in the non-atomic port. In this
+ * case the ports are generated using the FlowProperty2Point (and its
+ * derivatives) rules.
+ * 
+ * DERIVED BY
+ *  * FlowPort2Port
+ *  * FlowPort2Service
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ * SEE
+ *  * FlowProperty2Point
+ * SPECIFICATION
+ 		relation Ports
+   		{
+    		checkonly domain SysML fp:FlowPort {
+				owner = sysmlb:Block{},
+				name = fpn,
+				id = id,
+				direction = fpdir:FlowDirection,
+			}
+      		enforce domain HiLeS p:Port {
+				owner = hilesb:Block{},
+				name = fpn,
+				id = id,
+				direction = pdir:PointDirection,
+			}
+			enforce domain HiLeS s:Service {
+				owner = arch:Architecture{},
+				name = fpn,
+				id = id,
+				direction = sdir:PointDirection,
+			}
+ 			when {
+         		StructuralBlock(sysmlb, hilesb);
+      		}
+ 			where {
+         		if(fpdir = FlowDirection::in) then
+					pdir = PointDirection::input;
+					sdir = PointDirection::from;
+				else
+					if(fpdir = FlowDirection::out) then
+						pdir = PointDirection::output;
+						sdir = PointDirection::to;
+					endif
+				endif
+			endif
+      		}
+   		}
+ *
+ ******
+ */
+ // These rules are the same that for FlowProperties, i.e. modifications should be done
+// in both
+@abstract
+rule FlowPort2Point
+	transform flowPort : SysML!FlowPort
+	to point : HileS!Point {
+		
+		guard : flowPort.isAtomic and not (flowPort.direction = SysML!FlowDirection#inout)
+		
+		point.name = flowPort.base_Port.name.toCamelCase("\\s");
+	}
+
+//=============================== INOUT PORTS ==================================
+/****r* Structure/FlowPortInout2Point
+ * SUMMARY
+ *   Transform a SysML:FlowPort to two HiLeS:Point. ($Rev: 856 $)
+ * DESCRIPTION
+ *	|html <B>@abstract</B>
+ *  Since HiLeS does not support inout ports, these type of ports must be 
+ * transforned into two HiLeS!Ports, on input and one otput. Copies the name and
+ * id form the sysml FlowPort. The port direction depends on the FlowPort
+ * direction. For ports that have a DataType that extends LogicVector or
+ * AnalogVector (in the HiLeS UML Library) the size of the point depends on the
+ * multiplicity of the DataType property that subsets the "slot" property of the
+ * LogicVector or AnalogVector DataTypes. 
+ * These rules are for atomic FlowPorts. Non-atomic flowports are SysML!Ports
+ * that have a type attribute that points to the FlowSpecification
+ * (uml!Interface) that defines the actual ports in the non-atomic port. In this
+ * case the ports are generated using the FlowProperty2Point (and its
+ * derivatives) rules.
+ * 
+ * DERIVED BY
+ *  * FlowPortInout2Port
+ *  * FlowPortInout2Service
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ * SEE
+ *  FlowPropertyInout2Point
+ *
+ ******
+ */
+@abstract
+rule FlowPortInout2Point
+	transform flowPort : SysML!FlowPort
+	to pointIn : HileS!Point, pointOut : HileS!Point {
+		
+		guard : flowPort.isAtomic and (flowPort.direction = SysML!FlowDirection#inout)
+		
+		pointIn.name = flowPort.base_Port.name.toCamelCase("\\s");
+		pointOut.name = flowPort.base_Port.name.toCamelCase("\\s");
+	}
+	

@@ -1,0 +1,176 @@
+@abstract
+rule NamedElement
+  transform s : source!NamedElement
+  to t: target!NamedElement {
+  	t.name := s.name;
+}
+
+rule Ecosystem
+  transform s : source!Ecosystem
+  to t : target!Ecosystem {
+  	t.libraries ::= s.libraries;
+  	t.devices ::= s.devices;
+  	t.mediaSources ::= s.mediaSources;
+}
+
+rule Library
+  transform s : source!Library
+  to t : target!Library 
+  extends NamedElement {
+  	t.collections ::= s.collections;
+  	if (System.user.confirm("Create smart collection of all Ebooks in library?")) {
+  		var libraryEbooks = s.collections.members.flatten().select(x | x.isTypeOf(source!Ebook));
+  		// don't create new collection if there are no ebooks
+  		if (libraryEbooks.size() > 0) {
+  			// create new collection
+  			// leave host/syncedDevices blank for user to specify
+  			// (will fail validation)
+  			var newCollection = new target!MediaCollection;
+  			newCollection.name = "Smart Collection: Ebooks";
+	  		// create a copy of each ebook
+	  		for (ebook in libraryEbooks) {
+	  			var newBook = new target!Ebook;
+	  			newBook.origin ::= ebook.origin; 
+	  			newBook.name := ebook.name;
+	  			newCollection.members.add(newBook);
+	  		}
+	  		// add collection to library
+	  		t.collections.add(newCollection);	  		
+  		}
+  	}
+  	
+  	if (System.user.confirm("Create smart collection of all short videos?")) {
+  		// all videos that are shorter than 15 minutes
+  		var shortVideos = s.collections.members.flatten().select(x | x.isTypeOf(source!Video) and x.duration < 900000);
+  		// don't create new collection if there are no ebooks
+  		if (shortVideos.size() > 0) {
+  			// create new collection
+  			// leave host/syncedDevices blank for user to specify
+  			// (will fail validation)
+  			var newCollection = new target!MediaCollection;
+  			newCollection.name = "Smart Collection: Short Videos";
+	  		// create a copy of each ebook
+	  		for (video in shortVideos) {
+	  			var newVideo = new target!Video;
+	  			newVideo.origin ::= video.origin; 
+	  			newVideo.name := video.name;
+	  			newCollection.members.add(newVideo);
+	  		}
+	  		// add collection to library
+	  		t.collections.add(newCollection);	  		
+  		}
+  	}
+}
+
+rule MediaCollection
+  transform s : source!MediaCollection
+  to t : target!MediaCollection 
+  extends NamedElement {
+  	t.members ::= s.members;
+  	t.host ::= s.host;
+  	t.syncedDevices ::= s.syncedDevices;
+  	t.name := s.name;
+}
+
+
+@abstract
+rule Device
+  transform s : source!Device
+  to t : target!Device
+  extends NamedElement {
+  	t.hostOf ::= s.hostOf;
+  	t.collections ::= s.collections;
+}
+
+rule Tablet
+  transform s : source!Tablet
+  to t : target!Tablet
+  extends Device {
+}
+
+rule Computer
+  transform s : source!Computer
+  to t : target!Computer
+	extends Device {
+}
+
+rule Smartphone
+  transform s : source!Smartphone
+  to t : target!Smartphone
+  extends Device {
+}
+
+rule EReader
+  transform s : source!EReader
+  to t : target!EReader
+  extends Device {
+  	t.videoEnabled := s.videoEnabled;
+  	t.audioEnabled := s.audioEnabled;
+}
+
+@abstract
+rule Artifact
+  transform s : source!Artifact
+  to t : target!Artifact
+  extends NamedElement {
+  	t.origin ::= s.origin;
+}
+
+@abstract
+rule DurationArtifact
+  transform s : source!DurationArtifact
+  to t : target!DurationArtifact
+  extends Artifact {
+  	t.duration := s.duration;
+}
+
+rule Image
+  transform s : source!Image
+  to t : target!Image
+  extends Artifact {
+}
+
+rule Ebook
+  transform s : source!Ebook
+  to t : target!Ebook
+  extends Artifact {
+}
+
+rule AudioBook
+  transform s : source!AudioBook
+  to t : target!AudioBook
+  extends DurationArtifact {
+}
+
+rule MusicTrack
+  transform s : source!MusicTrack
+  to t : target!MusicTrack
+  extends DurationArtifact {
+}
+
+rule Video
+  transform s : source!Video
+  to t : target!Video
+  extends DurationArtifact {
+}
+
+@abstract
+rule MediaSource
+  transform s : source!MediaSource
+  to t : target!MediaSource
+  extends NamedElement {
+  	t.contents ::= s.contents;
+}
+
+rule ExternalSource
+  transform s : source!ExternalSource
+  to t : target!ExternalSource 
+  extends MediaSource {
+  	t.sourceType := s.sourceType;
+}
+
+rule Store
+  transform s : source!Store
+  to t : target!Store 
+  extends MediaSource {
+}

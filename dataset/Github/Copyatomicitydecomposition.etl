@@ -1,0 +1,160 @@
+rule CopyFlowDiagram
+	transform s : Source!`FlowDiagram`
+	to t : Target!`FlowDiagram` {
+	
+ 
+	t.`internalId` := s.`internalId`;    //t.`reference` := s.`reference`;
+ 
+	t.`generated` := s.`generated`;
+ 
+	t.`localGenerated` := s.`localGenerated`;
+ 
+	t.`extensionId` := s.`extensionId`;
+ 
+	t.`name` := s.`name`;
+	
+	t.`sw` := s.`sw`;
+ 
+	t.`copy` := s.`copy`;
+ 
+	//t.`abstract` := s.`abstract`;
+ 
+	t.`annotations` ::= s.`annotations`;
+ 
+	t.`extensions` ::= s.`extensions`;
+ 
+	t.`attributes` ::= s.`attributes`;
+ 
+	t.`parameters` ::= s.`parameters`;
+ 
+	//t.`refine` ::= s.`refine`;
+	t.`refine` = s.refine.equivalent().select(s|s.isKindOf(Target!Child));
+}
+rule CopyParameterInputExpression
+	transform s : Source!`TypedParameterExpression`
+	to t : Target!`TypedParameterExpression` {
+ 
+	t.`internalId` := s.`internalId`; //t.`reference` := s.`reference`;
+ 
+	t.`generated` := s.`generated`;
+ 
+	t.`localGenerated` := s.`localGenerated`;
+ 
+	t.`comment` := s.`comment`;
+ 
+	t.`name` := s.`name`;
+ 
+	t.`type` := s.`type`;
+ 
+	t.`annotations` ::= s.`annotations`;
+ 
+	t.`extensions` ::= s.`extensions`;
+ 
+	t.`attributes` ::= s.`attributes`;
+	
+	t.`InputExpression` := s.`InputExpression`;
+}
+
+rule CopyLeaf
+	transform s : Source!`Leaf`
+	to t : Target!`Leaf` {
+ 
+	t.`ref` := s.`ref`;
+ 
+	t.`name` := s.`name`;
+    
+	//t.`FlowDiagram` ::= s.`FlowDiagram`;
+	t.`decompose` = s.decompose.equivalent().select(s|s.isKindOf(Target!FlowDiagram));
+}
+rule CopyAnd
+	transform s : Source!`And`
+	to t : Target!`And` {
+	
+ 
+	t.`ref` := s.`ref`;
+ 
+	//t.`andLink` ::= s.`andLink`;
+	t.`andLink` = s.andLink.equivalent().select(s|s.isKindOf(Target!Leaf));
+}
+rule CopyLoop
+	transform s : Source!`Loop`
+	to t : Target!`Loop` {
+	
+ 
+	t.`ref` := s.`ref`;
+ 
+	//t.`loopLink` ::= s.`loopLink`;
+	t.`loopLink` = s.loopLink.equivalent();//.select(s|s.isKindOf(Target!Leaf));
+}
+rule CopyAll
+	transform s : Source!`All`
+	to t : Target!`All` {
+	
+ 
+	t.`ref` := s.`ref`;
+ 
+	//t.`allLink` ::= s.`allLink`;
+	t.`allLink` = s.allLink.equivalent();//.select(s|s.isKindOf(Target!Leaf));
+ 
+	t.`newParameter` ::= s.`newParameter`;
+}
+rule CopyPar
+	transform s : Source!`Par`
+	to t : Target!`Par` {
+	
+ 
+	t.`ref` := s.`ref`;
+ 
+	t.`parLink` = s.parLink.equivalent();
+ 
+	t.`newParameter` ::= s.`newParameter`;
+}
+rule CopySome
+	transform s : Source!`Some`
+	to t : Target!`Some` {
+	
+ 
+	t.`ref` := s.`ref`;
+ 
+	//t.`someLink` ::= s.`someLink`;
+ 
+	//t.`newParameter` ::= s.`newParameter`;
+	
+	t.`someLink` = s.someLink.equivalent();//.select(s|s.isKindOf(Target!CLeaf));
+ 
+	t.`newParameter` = s.newParameter.equivalent();//.select(s|s.isKindOf(Target!TypedParameter));
+}
+rule CopyOr
+	transform s : Source!`Or`
+	to t : Target!`Or` {
+	
+ 
+	t.`ref` := s.`ref`;
+ 
+	//t.`orLink` ::= s.`orLink`;
+	t.`orLink` = s.orLink.equivalent().select(s|s.isKindOf(Target!Leaf));
+}
+rule CopyXor
+	transform s : Source!`Xor`
+	to t : Target!`Xor` {
+	
+ 
+	t.`ref` := s.`ref`;
+ 
+	//t.`xorLink` ::= s.`xorLink`;
+	t.`xorLink` = s.xorLink.equivalent().select(s|s.isKindOf(Target!Leaf));
+}
+rule CopyOne
+	transform s : Source!`One`
+	to t : Target!`One` {
+	
+ 
+	t.`ref` := s.`ref`;
+ 
+	//t.`oneLink` ::= s.`oneLink`;
+ 
+	//t.`newParameter` ::= s.`newParameter`;
+	t.`oneLink` = s.oneLink.equivalent();//.select(s|s.isKindOf(Target!Leaf));
+ 
+	t.`newParameter` = s.newParameter.equivalent();//.select(s|s.isKindOf(Target!TypedParameter));
+}

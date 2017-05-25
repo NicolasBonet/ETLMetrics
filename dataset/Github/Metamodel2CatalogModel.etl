@@ -1,0 +1,104 @@
+pre {
+  "Creating catalog model...".println();
+  
+  for (m in CatalogModel!CatalogModel.all) {
+  	delete m;
+  }
+  
+  var catalogModel = new CatalogModel!CatalogModel;
+  
+}
+
+
+rule EClass2TypeCatalog
+  transform eIn : Metamodel!EClass
+  to eOut : CatalogModel!TypeCatalog{
+
+	eOut.name = eIn.name;
+	
+	catalogModel.types.add(eOut);
+	
+	// for each inherited attribute we create an attribute catalog
+	for (eAttribute in getAllAttributesIncludingInherited(eIn)){
+		var newAttributeCatalog = new CatalogModel!AttributeCatalog;
+		newAttributeCatalog.name = eAttribute.name;
+		eOut.attributes.add(newAttributeCatalog);
+	}
+	
+	// for each comination of subtype --> subtype we create a reference catalog
+	for (ereference in eIn.eStructuralFeatures.select(feature | feature.isKindOf(Metamodel!EReference))) {
+		for (subTypeSourceEClass in getAllSubTypes(eIn)){
+			var targetEClass = ereference.eType;
+			for (subTypeTargetEClass in getAllSubTypes(targetEClass)) {
+				var newReferenceCatalog = new CatalogModel!ReferenceCatalog;
+				newReferenceCatalog.name = ereference.name;
+				catalogModel.references.add(newReferenceCatalog);
+				newReferenceCatalog.source = subTypeSourceEClass.equivalent();
+				newReferenceCatalog.target = subTypeTargetEClass.equivalent();
+			}
+		}
+	}
+	
+	eOut.super = eIn.eSuperTypes.equivalent();
+}
+
+/*
+rule EAttribute2AttributeCatalog
+  transform eIn : Metamodel!EAttribute
+  to eOut : CatalogModel!AttributeCatalog{
+
+	eOut.name = eIn.name;
+	
+}
+*/
+
+/*
+rule EReference2ReferenceCatalog
+  transform eIn : Metamodel!EReference
+  to eOut : CatalogModel!ReferenceCatalog{
+
+	eOut.name = eIn.name;
+	
+	eOut.target = eIn.eType.equivalent(); 
+	
+	catalogModel.references.add(eOut);
+}
+*/
+
+
+operation getAllAttributesIncludingInherited(eclass) {
+	var result = new Set;
+	for (superType in eclass.eSuperTypes) {
+		result.addAll(getAllAttributesIncludingInherited(superType));
+	}
+	result.addAll(getAllAttributes(eclass));
+	return result;
+}
+
+
+operation getAllAttributes(eclass) {
+	return eclass.eStructuralFeatures.select(attr: Metamodel!EAttribute | true);
+}
+
+operation getAllSubTypes(eclass) {
+	return Metamodel!EClass.all.select(class | isSubTypeOf(class, eclass));
+}
+
+operation isSubTypeOf(sclass, eclass) {
+	if (eclass==sclass) {
+		return true; // WE consider that an element is a subtype of itself.
+	} else if (sclass.eSuperTypes.includes(eclass)) {
+		//("sclass direct: " + sclass).println();
+		//("eclass direct: " + eclass).println();
+		return true;
+	} else {
+		//("sclass transitive: " + sclass).println();
+		//("eclass transitive: " + eclass).println();
+		return sclass.eSuperTypes.exists(ssclass | isSubTypeOf(ssclass, eclass));
+	}
+}
+
+
+post {
+  "Creating catalog model... DONE".println();
+}

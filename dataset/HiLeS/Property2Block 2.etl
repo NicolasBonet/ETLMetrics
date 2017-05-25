@@ -1,0 +1,260 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: Property2Block.etl 856 2012-07-03 16:35:05Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+ 
+ /****r* Structure/BlockStructural
+ * SUMMARY
+ *   Transform a SysML:Block into a HiLeS:Structural block with the required
+ *   ports and inner architecture. ($Rev: 856 $)
+ * GUARD
+ * 	 Only blocks which are lineal descendants of the MainBlock and that are not
+ *   Functional Blocks (i.e. the block's base_Class does not have the
+ *   <<Functional>> stereotype applied)
+ * DESCRIPTION 
+ *   Copies the name and id values from the sysml block and adds all the block
+ *   ports. For each of the Composite Associations on the SysML:Block a
+ *	 Strucutural or Functional HiLeS:Block is added to the block's inner
+ *   architecture. Payloads are added to the block's architecture to represent connectors
+ *   between the block's child blocks. Services are added to the architecture to
+ *   match the block ports.
+ * SEE ALSO
+ *		* BlockFunctional
+ *		* Ports
+ *		* Services
+ *		* Payloads
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ * SPECIFICATION
+ 		top relation Block
+   		{
+    		domain SysML b:Block {
+				namespace = p:Package{},
+				name = bn,
+				id = bid;
+				attributes = at:ownedAttribute{},
+				connectors = con:ownedConnector{},
+			}
+      		domain HiLeS hilesb:Structural {
+				architecture = arch:Architecture{},
+				name = bn,
+				id = id,
+				parentArchitecture = arch,
+				ports = pt:Port{},
+				innerArchitecture = iArch:Architecture{},
+			}
+ 			when {
+         		InitialArchitecture(p, arch);
+      		}
+ 			where {
+         		Ports(fp, pt);
+				Services(fp,iArch.services);
+				let children : Block{} =  b.getChildrenBlocks() in
+					children->iterate(ch | if(ch.hasChildren()) {
+									StructuralBlock(ch,iArch.blocks)
+								} else {
+									FunctionalBlock(ch,iArch.blocks)
+								}endif )
+				Payloads(con,iArch.payloads);
+      		}
+   		}
+ *
+ ******
+ */
+@abstract
+rule Property2Block
+	transform property : SysML!Property
+	to	block : HiLeS!block
+	{
+		
+		guard : SysML!Block.all().exists(b | b.base_Class = property.type)  // The property is a block
+		
+		block.name = property.name.toCamelCase("\\s");
+		//block.name.println("Block ");
+		// Clone the ports in case the property is type by a class that
+		// types 2 or more properties (each property should generate a separate
+		// set of ports ad services)
+		var ports = new Set;
+		// Since he flow port may have been cloned previously, make sure that
+		// we only clone the correct flow ports.
+		var flowPorts = new Set(SysML!FlowPort);
+		for (a in property.type.ownedAttribute.select(oa | oa.isTypeOf(SysML!Port)))
+		{
+			flowPorts.add(SysML!FlowPort.all().selectOne(fp | fp.base_Port = a));
+		}
+		for (port in flowPorts)
+		{
+			var cp = new SysML!FlowPort;
+			cp.base_Port = port.base_Port;
+			//cp.isAtomic = port.isAtomic;  // isAtomic is derived
+			cp.isConjugated = port.isConjugated;
+			cp.direction = port.direction;
+			cp.~partWithPort = property;
+			ports.add(cp);
+		}
+		property.~port = ports;
+		// Add HiLeS!Ports for non-atomic flowports
+		block.port.addAll(property.~port.equivalent("FlowPort2PortSingle",
+							 "FlowPort2PortVector",
+							 "FlowPortInout2PortSingle",
+							 "FlowPortInout2PortVector").select(p | p.isTypeOf(HiLeS!Port)));
+		/* Ports form FlowSpecifications (i.e. interfaces). A FlowPort that has a type that
+		 * points to a FlowSpecification must be transformed into a port for each of the
+		 * FlowProperties of the FlowSpecification. But since many FlowPorts may
+		 * share the same FlowSpecification, waht we do is clone the FlowProoperties
+ 		 * of the FlowSpecification and add them as "extended properties" to the 
+		 * FlowPort and then transform  them. 
+		*/
+		for(port in property.~port.select(fp | not fp.isAtomic))
+		{
+			var clonedProperties : Set;
+			for(pr in SysML!FlowProperty.all.select(fp |
+					port.base_Port.type.ownedAttribute.includes(fp.base_Property)
+					))
+			{
+				// Since the flow property may have been cloned before, verify
+				// that we only add it once (i.e. there is not another flow
+				// property with the same base_Property)
+				if (clonedProperties.isDefined() and not clonedProperties.collect(p | p.base_Property).flatten().includes(pr.base_Property))
+				{
+					var cp = new SysML!FlowProperty;
+					cp.base_Property = pr.base_property;
+					cp.direction = pr.direction;
+					clonedProperties.add(cp);
+				}
+			}
+			port.~property = clonedProperties;
+			if (port.isConjugated)
+			{
+				block.port.addAll(port.~property.equivalent("FlowPropertyConjugated2PortSingle",
+														  "FlowPropertyConjugated2PortVector",
+														  "FlowPropertyInout2PortSingle",
+														  "FlowPropertyInout2PortVector"));
+			}
+			else
+			{
+				block.port.addAll(port.~property.equivalent("FlowProperty2PortSingle",
+														  "FlowProperty2PortVector",
+														  "FlowPropertyInout2PortSingle",
+														  "FlowPropertyInout2PortVector"));
+			}
+		}
+	}
+
+@lazy
+rule Property2Functional
+	transform property : SysML!Property
+	to	block : HiLeS!Functional
+	extends Property2Block
+	{
+		guard : SysML!HiLeS::FunctionalBlock.all().exists(fb
+				| fb.base_Class = property.type)
+		
+		//block.name.println("End Functional Block ");
+	}
+
+
+@lazy
+rule Property2Structural
+	transform  property : SysML!Property
+	to structural : HiLeS!Structural
+	extends Property2Block
+	{
+		guard : not SysML!HiLeS::FunctionalBlock.all().exists(fb
+				| fb.base_Class = property.type)
+		
+		// The difference with functional blocks is that structural bocks have
+		// an architecture
+		var arch = new HiLeS!Architecture;
+		arch.name = structural.name;
+		arch.service.addAll(property.~port.equivalent("FlowPort2ServiceSingle", 
+							  "FlowPort2ServiceLogicVector",
+							  "FlowPortInout2ServiceSingle",
+							  "FlowPortInout2ServiceLogicVector").select(p | p.isTypeOf(HiLeS!Service)));
+		// Services from FlowSpecifications
+		for(port in property.~port.select(fp | not fp.isAtomic)) {
+			if (port.isConjugated) {
+				arch.service.addAll(port.~property.equivalent("FlowPropertyConjugated2ServceSingle",
+														  "FlowPropertyConjugated2ServiceVector",
+														  "FlowPropertyInout2ServiceSingle",
+														  "FlowPropertyInout2ServiceVector"));
+			}
+			else
+			{
+				arch.service.addAll(port.~property.equivalent("FlowProperty2ServiceSingle",
+														  "FlowProperty2ServiceVector",
+														  "FlowPropertyInout2ServiceSingle",
+														  "FlowPropertyInout2ServiceVector"));
+			}
+		}
+		arch.block.addAll(property.type.ownedAttribute.select(oa
+					| oa.type.isTypeOf(SysML!Class)
+						and(oa.aggregation = SysML!AggregationKind#composite)
+					).equivalent("Property2Structural"));
+		arch.block.addAll(property.type.ownedAttribute.select(oa
+					| oa.type.isTypeOf(SysML!Class)
+						and(oa.aggregation = SysML!AggregationKind#composite)
+					).equivalent("Property2Functional"));
+		// Give connectors a chance to get all ends resolved, as with ports clone
+		// them
+		// Clone the conenctors in case the property is type by a class that
+		// types 2 or more properties (each property should generate a separate
+		// set of payloads)
+		property.~connector = new Set(SysML!Connector);
+		for (con in property.type.ownedConnector)
+		{
+			var cc = new SysML!Connector;
+			cc.type = con.type;
+			cc.redefinedConnector.add(con);		// The cloned connector can't resolve its owner, use the redifined connector attribute to keep a reference to the original connector and its owner
+			for (end in con.end)
+			{
+				var ce = new SysML!ConnectorEnd;
+				ce.role = end.role;
+				ce.partWithPort = end.partWithPort;
+				// From MultiplicityElement
+				ce.isOrdered = end.isOrdered;
+				ce.isUnique = end.isUnique;
+				ce.upper = end.upper;
+				ce.lower = end.lower;
+				ce.upperValue = end.upperValue;
+				ce.lowerValue = end.lowerValue;				
+				cc.end.add(ce);
+			}
+			cc.kind = con.kind;
+			cc.contract = con.contract;
+			// From feature
+			cc.isStatic = con.isStatic;
+			// From RedefinableElement
+			cc.isLeaf = con.isLeaf;
+			// From NamedElement
+			cc.name = con.name;
+			cc.visibility = con.visibility;
+			cc.clientDependency = con.clientDependency;
+			cc.nameExpression = con.nameExpression;
+			property.~connector.add(cc);
+		}
+		arch.payload.addAll(property.~connector.equivalent());
+		/* Connectors that have both ends with a FlowPort that has a FlowSpecification
+		 * type will transform into more than 1 payload. This has to be done with a helper
+		 * beacuse contrary to FlowPorts the cloning method does not work.
+		*/
+		for(c in property.~connector.select(oc
+				| oc.end.forAll(e
+					| e.role.type.isTypeOf(SysML!Interface)
+					)
+				))
+		{
+			arch.payload.addAll(c.createInterfacePayloads());
+		}
+		structural.innerArchitecture = arch;
+		//structural.name.println("End Structural Block ");
+	}

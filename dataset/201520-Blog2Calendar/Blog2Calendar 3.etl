@@ -1,0 +1,32 @@
+//regla general
+rule Blog2Calendar 
+	transform blog : Blog!Blog
+	to calendar : Calendar!Calendar {
+		
+		calendar.name = blog.name;
+	   	for (article in Blog!Article.all) { 
+				 var event =  new Calendar!Event();
+				 event.event = article.summary;
+			    
+			    var last =  article.tags.last();
+			   
+				for (tag in article.tags) { 
+				if(last.tag <> tag.tag)
+					 event.tags =  event.tags + tag.tag + ',';
+					else
+					 event.tags =  event.tags + tag.tag;
+				}
+				
+				 event.owner = article.author.name; 
+				 event.day = new Calendar!Day();
+				 event.day.day = article.date.split('/')[0].asInteger();
+				 event.day.month = new Calendar!Month();
+				 event.day.month.month =  article.date.split('/')[1].asInteger();
+				 event.day.month.year = new Calendar!Year();
+				 event.day.month.year.year = article.date.split('/')[2].asInteger();
+				 event.day.events.add(event);
+				 event.day.month.days.add(event.day);
+				 event.day.month.year.months.add(event.day.month);
+				 calendar.years.add(event.day.month.year);
+		}
+}

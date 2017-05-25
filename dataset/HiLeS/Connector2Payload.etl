@@ -1,0 +1,544 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: Connector2Payload.etl 856 2012-07-03 16:35:05Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+
+/****r* Structure/Connector2Payload
+ * SUMMARY
+ *   Transform a SysML:Connector into a HiLeS:Payload, only if the connector is
+ * between two atomic Flow Ports or between a Flow Port and a nonatomic Flow
+ * Port and if non of its ends are inout ($Rev: 856 $)
+ * DESCRIPTION
+ * |html <B>@abstract</B>
+ *   Craete the Payloads and assing their source and target points (Ports or
+ *  Services). The Payload type depends on the type of the connector end that is
+ * an atomic FlowPort (this works if both ends are atomic or if one is atomic
+ * and the other not). The source and target points depend on: a. if the
+ * connector is assembly or delegation; b) The direction of the Flow Port
+ * (atomic) and/or the direction of the Flow Property (nonatomic) at the
+ * connector end.
+ * Separate extended rules filter the connector's ends type to define the 
+ * appropriate Payload type. In the case of connectors between nonatomic flow
+ * ports, since the number of needed connectors is unknown at design time, these
+ * payloads are craeted with the createInterfacePayloads opeartion.
+ * Assembly vs. delegation connectors
+ *      end1				end2				source	target
+ *		owner	direction	owner	direction
+ * 		same	in			same	out			service	service
+ *		same	in			other	in			service	port
+ *		same	out			other	out			port	service
+ *		other	out			other	in			port	port
+ * All other combinations are not allowed
+ * DERIVED BY
+ *	* Connector2DigitalPayload
+ *  * Connector2NodePayload
+ *  * Connector2TerminalPayload
+ *  * Connector2VectorAnalogPayload
+ *  * Connector2VectorDigitalPayload 
+ * SEE ALSO
+ * 	* createInterfacePayloads
+ *  * FlowPort2Point
+ *  * FlowProperty2Point
+ * DOMAIN
+ *	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 	* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+// ============================= IN/OUT ENDS =================================
+@abstract
+rule Connector2Payload
+	transform connector : SysML!Connector
+	to payload : HiLeS!Payload
+	{
+
+		// Conditions to transform the connector:
+		//  - Have 2 ends
+		//  - If the connector is between two FlowPorts (i.e. no between two 
+		//    FlowSpecifications - all roles of the ends are not Interfaces) the
+		//    FlowPorts can't be inout
+		//  - The conector or is between a Flow Port and a Flow Specification
+		guard : connector.end.size() = 2
+			and (connector.end.collect(e | e.role).flatten().one(role
+						| role.type.isTypeOf(SysML!Interface)
+						)
+				or (
+					not connector.end.collect(e | e.role).flatten().forAll(role
+							| role.type.isTypeOf(SysML!Interface)
+							)
+					and not SysML!FlowPort.all.select(fp
+							| connector.end.collect(e | e.role).flatten().includes(fp.base_Port)
+							).exists(fp
+								| fp.direction = SysML!FlowDirection#inout
+								)
+				)
+			)
+
+		payload.name = connector.name.toCamelCase("\\s");
+		payload.size = 1;
+		/* Logic to define the end points of the payload
+		end1				end2				source	target
+ 		owner	direction	owner	direction
+ 		same	in			other	in			service	port		// Delegation
+ 		same	out			other	out			port	service		// Delegation
+ 		other	out			other	in			port	port		// Assembly
+ 		*/
+ 		// If the end has no "partWithPort" attribute, it has the same owner as
+ 		// the connector
+ 		// TODO Como se resuelven el sorce y target si el payload va de un FlowPort
+ 		// a un FlowSpecification?
+ 		
+ 		// Dependiendo de si el end es un flow port o un flow specification
+		// se puede hacer la resolucion de los equivalents: si es un flow port
+		// se ace con los equivalents del flow port; si es un flow specification
+		// toca buscar el equivalent del flow property que se conecta con el
+		// puerto
+		for (end in connector.end)
+		{
+			if(end.role.type.isTypeOf(SysML!Interface))
+			{
+				var fp;
+		 		var fps = SysML!FlowPort.all().select(fp
+ 						|  fp.base_Port = end.role
+ 						);
+ 				if (fps.size() = 1)
+		 		{
+		 			fp = fps.first();
+				}
+				if(end.partWithPort.isDefined())	// El end pertenece a un part, source/target es un port
+		 		{	
+		 			if(fp = null)		// fps.size() > 1
+		 			{
+		 				fp = fps.selectOne(fp
+		 					| fp.~partWithPort = end.partWithPort
+		 					);
+		 			}
+		 			/* Como saber cual es el property que va conectado con el puerto
+						en el otro extremo del conector?
+						1. Mismo tipo
+						2. Misma dirección
+						3. Si hay mas de uno con mismo tipo y direccion, buscar por nombre	
+					*/
+		 			var fpp;		 						
+		 			var properties =  fp.~property.select(p
+		 					| p.base_Property.type = connector.end.excluding(end).first().role.type and
+		 					  SysML!FlowPort.all().exists(fp
+		 						| fp.base_Port = connector.end.excluding(end).first().role and
+		 						  fp.direction = p.direction
+		 						)
+		 					);
+		 			var fpp;
+		 			if(properties.size() = 1)
+		 			{
+		 				fpp = properties.first();
+		 			}
+		 			else
+		 			{
+		 				fpp = properties.selectOne(p | p.base_Property.name = connector.name);
+		 			}
+		 			var point = fpp.equivalent("FlowProperty2PPortSingle",
+											   "FlowProperty2PortVector");
+					
+		 			if(fp.isConjugated)  // If the FlowPort is conjugated, the payload direction is opposite 
+		 			{
+		 				if (fpp.direction = SysML!FlowDirection#`in`)
+						{
+							payload.source = point;
+						}
+						else // if (fpp.direction = SysML!FlowDirection#`in`)
+						{
+							payload.target = point;
+						}
+		 			}
+		 			else		// if(fp.isConjugated) 
+		 			{
+		 				if (fpp.direction = SysML!FlowDirection#`in`)
+						{
+							payload.target = point;
+						}
+						else // if (fpp.direction = SysML!FlowDirection#`in`)
+						{
+							payload.source = point;
+						}
+		 			}
+					
+				}
+				else	 	//if(end.partWithPort.isDefined())
+				{	
+					// El end pertenece al mismo block q el conector, source/target es un Service
+					if(fp = null)
+		 			{
+		 					fp = fps.selectOne(p
+	 						| p.~partWithPort.isDefined()
+	 							and p.base_Port.owner = connector.redefinedConnector.first().owner
+	 						);	
+		 			}
+		 			/* Como saber cual es el property que va conectado con el puerto
+						en el otro extremo del conector?
+						1. Mismo tipo
+						2. Misma dirección
+						3. Si hay mas de uno con mismo tipo y direccion, buscar por nombre	
+					*/
+		 			var fpp;		 						
+		 			var properties =  fp.~property.select(p
+		 					| p.base_Property.type = connector.end.excluding(end).first().role.type and
+		 					  SysML!FlowPort.all().exists(fp
+		 						| fp.base_Port = connector.end.excluding(end).first().role and
+		 						  fp.direction = p.direction
+		 						)
+		 					);
+		 			var fpp;
+		 			if(properties.size() = 1)
+		 			{
+		 				fpp = properties.first();
+		 			}
+		 			else
+		 			{
+		 				fpp = properties.selectOne(p | p.base_Property.name = connector.name);
+		 			}
+		 			if(fp.isConjugated)  // If the FlowPort is conjugated, the payload direction is opposite 
+		 			{
+		 				if (fpp.direction = SysML!FlowDirection#`in`)
+						{
+							payload.source = fpp.equivalent("FlowProperty2ServiceSingle",
+														  "FlowProperty2ServiceVector");
+						}
+						else // if (fpp.direction = SysML!FlowDirection#`in`)
+						{
+							payload.target = fpp.equivalent("FlowProperty2ServiceSingle",
+														  "FlowProperty2ServiceVector");
+						}
+		 			}
+		 			else		// if(fp.isConjugated) 
+		 			{
+		 				if (fpp.direction = SysML!FlowDirection#`in`)
+						{
+							payload.source = fpp.equivalent("FlowProperty2ServiceSingle",
+														  "FlowProperty2ServiceVector");
+						}
+						else // if (fpp.direction = SysML!FlowDirection#`in`)
+						{
+							payload.target = fpp.equivalent("FlowProperty2ServiceSingle",
+														  "FlowProperty2ServiceVector");
+						}
+		 			}
+				}	
+			}
+			else		// if(end.role.type.isTypeOf(SysML!Interface))
+			{
+				// Since the FlowPort can be cloned, there can be 1 or more flowports
+				// related to the end. If there is only 1, it has not been cloned.
+				// If there is more than one:
+				//		a. if the end's partWithPort is defined, the correct FlowPort is the
+				//      one that has the same partWithPort (~partWithPortAdded when 
+				//      the FlowPort was clonned)
+				// 		b. else, the correct FlowPort is the one for which the base_Port
+				//		has the same owner as the connector's redifinedConnector owner
+				//		(the redifned connecter is set when the connector is cloned)
+				var fp;
+	 			var fps = SysML!FlowPort.all().select(fp
+	 						| end.role = fp.base_Port
+	 						);
+	 			if (fps.size() = 1)
+	 			{
+	 				fp = fps.first();
+	 			}
+				if(end.partWithPort.isDefined())	// El end pertenece a un part
+				{
+					if(fp = null)
+		 			{
+		 				fp = fps.selectOne(p | p.~partWithPort = end.partWithPort );
+		 			}
+		 			if (fp.direction = SysML!FlowDirection#`in`)
+					{
+						payload.target = fp.equivalents("FlowPort2PortSingle",
+									 "FlowPort2PortVector").selectOne(s
+								| s.isTypeOf(HiLeS!Port));
+					}
+					else		// if (fp.direction = SysML!FlowDirection#`in`)
+					{
+						payload.source = fp.equivalents("FlowPort2PortSingle",
+									 "FlowPort2PortVector").selectOne(s
+								| s.isTypeOf(HiLeS!Port));
+					}
+				}
+				else 	//if(end.partWithPort.isDefined())
+				{
+					if(fp = null)
+		 			{
+		 				fp = fps.selectOne(p
+	 						| p.~partWithPort.isDefined()
+	 							and connector.redefinedConnector.exists(rc
+	 									| rc.owner = p.base_Port.owner) 
+	 						);
+		 			}
+		 			if (fp.direction = SysML!FlowDirection#`in`)
+					{
+						payload.source = fp.equivalents("FlowPort2ServiceSingle", 
+									  "FlowPort2ServiceLogicVector").selectOne(s
+								| s.isTypeOf(HiLeS!Service)
+								);
+					}
+					else		// if (fp.direction = SysML!FlowDirection#`in`)
+					{
+						payload.target = fp.equivalents("FlowPort2ServiceSingle", 
+									  "FlowPort2ServiceLogicVector").selectOne(s
+								| s.isTypeOf(HiLeS!Service)
+								);
+					}
+				}
+				
+			}
+		}
+	}
+
+/****r* Structure/ConnectorInout2Payload
+ * SUMMARY
+ *   Transform a SysML:Connector into two HiLeS:Payload, only if the connector is
+ * between two atomic Flow Ports or between a Flow Port and a nonatomic Flow
+ * Port and if both ends ends are inout. For inout ends two payloads are created
+ * since two ports/services where created for the Flow Port or Flow Property at
+ * the connector ends. ($Rev: 856 $)
+ * DESCRIPTION
+ * |html <B>@abstract</B>
+ *   Craete the Payloads and assing their source and target points (Ports or
+ *  Services). The Payload type depends on the type of the connector end that is
+ * an atomic FlowPort (this works if both ends are atomic or if one is atomic
+ * and the other not). The source and target points depend on: a. if the
+ * connector is assembly or delegation; b) The direction of the Flow Port
+ * (atomic) and/or the direction of the Flow Property (nonatomic) at the
+ * connector end. 
+ * Separate extended rules filter the connector's ends type to define the 
+ * appropriate Payload type. In the case of connectors between nonatomic flow
+ * ports, since the number of needed connectors is unknown at design time, these
+ * payloads are craeted with the createInterfacePayloads opeartion.
+ * Assembly vs. delegation connectors
+ *      end1				end2				source	target
+ *		owner	direction	owner	direction
+ * 		same	in			same	out			service	service
+ *		same	in			other	in			service	port
+ *		same	out			other	out			port	service
+ *		other	out			other	in			port	port
+ * All other combinations are not allowed
+ *
+ * DERIVED BY
+ *	* ConnectorInout2DigitalPayload
+ *  * ConnectorInout2NodePayload
+ *  * ConnectorInout2TerminalPayload
+ *  * ConnectorInout2VectorAnalogPayload
+ *  * ConnectorInout2VectorDigitalPayload 
+ * SEE ALSO
+ * 	* createInterfacePayloads
+ *  * FlowPortInout2Point
+ *  * FlowPropertyInout2Point
+ * DOMAIN
+ *	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 	* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@abstract
+rule ConnectorInout2Payload
+	transform connector : SysML!Connector
+	to payloadIn : HiLeS!Payload, payloadOut : HiLeS!Payload
+	{
+
+		// Conditions to transform the connector:
+		//  - Have 2 ends
+		//  - If the connector is between two FlowPorts (i.e. no between two 
+		//    FlowSpecifications - all roles of the ends are not Interfaces) the
+		//    FlowPorts are inout
+		//  - The conector or is between a Flow Port and a Flow Specification
+		guard : connector.end.size() = 2
+			and (connector.end.collect(e | e.role).flatten().one(role
+						| role.type.isTypeOf(SysML!Interface)
+						)
+				or (
+					not connector.end.collect(e | e.role).flatten().forAll(role
+							| role.type.isTypeOf(SysML!Interface)
+							)
+					and SysML!FlowPort.all.select(fp
+							| connector.end.collect(e | e.role).flatten().includes(fp.base_Port)
+							).exists(fp
+								| fp.direction = SysML!FlowDirection#inout
+								)
+				)
+			)
+
+		// One payload connects the In points and one connects the Out points
+		payloadIn.name = connector.name.toCamelCase("\\s") + "In";
+		payloadIn.size = 1;
+		// Out payload
+		payloadOut.name = connector.name.toCamelCase("\\s") + "Out";
+		payloadOut.size = 1;
+		/* Logic to define the end points of the payload
+		end1				end2				source	target
+ 		owner	direction	owner	direction
+  		same	in			same	out			service	service
+ 		same	in			other	in			service	port
+ 		same	out			other	out			port	service
+ 		other	out			other	in			port	port
+ 		*/
+ 		// If the end has no "partWithPort" attribute, it has the same owner as
+ 		// the connector
+ 		for (end in connector.end)
+		{
+			if(end.role.type.isTypeOf(SysML!Interface))
+			{
+				var fp;
+		 		var fps = SysML!FlowPort.all().select(fp
+ 						|  fp.base_Port = end.role
+ 						);
+ 				if (fps.size() = 1)
+		 		{
+		 			fp = fps.first();
+				}
+				if(end.partWithPort.isDefined())	// El end pertenece a un part, source/target es un port
+		 		{	
+		 			if(fp = null)		// fps.size() > 1
+		 			{
+		 				fp = fps.selectOne(fp
+		 					| fp.~partWithPort = end.partWithPort
+		 					);
+		 			}
+		 			/* Como saber cual es el property que va conectado con el puerto
+						en el otro extremo del conector?
+						1. Mismo tipo
+						2. Misma dirección
+						3. Si hay mas de uno con mismo tipo y direccion, buscar por nombre	
+					*/
+		 			var fpp;		 						
+		 			var properties =  fp.~property.select(p
+		 					| p.base_Property.type = connector.end.excluding(end).first().role.type and
+		 					  SysML!FlowPort.all().exists(fp
+		 						| fp.base_Port = connector.end.excluding(end).first().role and
+		 						  fp.direction = p.direction
+		 						)
+		 					);
+		 			var fpp;
+		 			if(properties.size() = 1)
+		 			{
+		 				fpp = properties.first();
+		 			}
+		 			else
+		 			{
+		 				fpp = properties.selectOne(p | p.base_Property.name = connector.name);
+		 			}
+		 			var points = fpp.equivalent("FlowPropertyInout2PortSingle",
+											   "FlowPropertyInout2PortVector");
+		 			//if(fp.isConjugated)  // If the FlowPort is conjugated, there is no difference
+					payloadIn.target = points.selectOne(s
+ 							| s.isTypeOf(HiLeS!Port) and s.name.endsWith("In")
+ 							);
+					payloadOut.source = points.selectOne(s
+ 							| s.isTypeOf(HiLeS!Port) and s.name.endsWith("Out")
+ 							);
+				}
+				else	 	//if(end.partWithPort.isDefined())
+				{	
+					// El end pertenece al mismo block q el conector, source/target es un Service
+					if(fp = null)
+		 			{
+	 					fp = fps.selectOne(p
+	 						| p.~partWithPort.isDefined()
+	 							and p.base_Port.owner = connector.redefinedConnector.first().owner
+	 						);	
+		 			}
+		 			/* Como saber cual es el property que va conectado con el puerto
+						en el otro extremo del conector?
+						1. Mismo tipo
+						2. Misma dirección
+						3. Si hay mas de uno con mismo tipo y direccion, buscar por nombre	
+					*/
+		 			var fpp;		 						
+		 			var properties =  fp.~property.select(p
+		 					| p.base_Property.type = connector.end.excluding(end).first().role.type and
+		 					  SysML!FlowPort.all().exists(fp
+		 						| fp.base_Port = connector.end.excluding(end).first().role and
+		 						  fp.direction = p.direction
+		 						)
+		 					);
+		 			var fpp;
+		 			if(properties.size() = 1)
+		 			{
+		 				fpp = properties.first();
+		 			}
+		 			else
+		 			{
+		 				fpp = properties.selectOne(p | p.base_Property.name = connector.name);
+		 			}
+		 			var points = fpp.equivalent("FlowPropertyInout2ServiceSingle",
+											   "FlowPropertyInout2ServiceVector");
+		 			//if(fp.isConjugated)  // If the FlowPort is conjugated, there is no difference
+					payloadIn.source = points.selectOne(s
+ 							| s.isTypeOf(HiLeS!Port) and s.name.endsWith("In")
+ 							);
+					payloadOut.target = points.selectOne(s
+ 							| s.isTypeOf(HiLeS!Port) and s.name.endsWith("Out")
+ 							);
+				}
+			}
+			else		// if(end.role.type.isTypeOf(SysML!Interface))
+			{
+				// Since the FlowPort can be cloned, there can be 1 or more flowports
+				// related to the end. If there is only 1, it has not been cloned.
+				// If there is more than one:
+				//		a. if the end's partWithPort is defined, the correct FlowPort is the
+				//      one that has the same partWithPort (~partWithPortAdded when 
+				//      the FlowPort was clonned)
+				// 		b. else, the correct FlowPort is the one for which the base_Port
+				//		has the same owner as the connector's redifinedConnector owner
+				//		(the redifned connecter is set when the connector is cloned)
+				var fp;
+	 			var fps = SysML!FlowPort.all().select(fp
+	 						| end.role = fp.base_Port
+	 						);
+	 			if (fps.size() = 1)
+	 			{
+	 				fp = fps.first();
+	 			}
+				if(end.partWithPort.isDefined())	// El end pertenece a un part
+				{
+					if(fp = null)
+		 			{
+		 				fp = fps.selectOne(p | p.~partWithPort = end.partWithPort );
+		 			}
+		 			//The payload goes to the service of the nested block architecture
+					payloadIn.target = fp.equivalents("FlowPortInout2ServiceSingle",
+									  "FlowPortInout2ServiceLogicVector").selectOne(s
+		 									| s.isTypeOf(HiLeS!Service) and s.name.endsWith("In")
+		 									);
+		 			payloadOut.source = fp.equivalents("FlowPortInout2ServiceSingle",
+									  "FlowPortInout2ServiceLogicVector").selectOne(s
+		 									| s.isTypeOf(HiLeS!Service) and s.name.endsWith("Out")
+		 									);
+				}
+				else 	//if(end.partWithPort.isDefined())
+				{
+					if(fp = null)
+		 			{
+		 				fp = fps.selectOne(p
+	 						| p.~partWithPort.isDefined()
+	 							and connector.redefinedConnector.exists(rc
+	 									| rc.owner = p.base_Port.owner) 
+	 						);
+		 			}
+		 			payloadIn.source = fp.equivalents("FlowPortInout2ServiceSingle",
+									  "FlowPortInout2ServiceLogicVector").selectOne(s
+		 									| s.isTypeOf(HiLeS!Service) and s.name.endsWith("In")
+		 									);
+		 			payloadOut.target = fp.equivalents("FlowPortInout2ServiceSingle",
+									  "FlowPortInout2ServiceLogicVector").selectOne(s
+		 									| s.isTypeOf(HiLeS!Service) and s.name.endsWith("Out")
+		 									);
+				}
+			}
+		}
+	}

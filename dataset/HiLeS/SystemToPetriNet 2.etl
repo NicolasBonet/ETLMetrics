@@ -1,0 +1,48 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: SystemToPetriNet.etl 823 2012-06-22 16:50:00Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+ 
+ /****r* HiLeS2TimePetriNet/SystemToPetriNet
+ * SUMMARY
+ *   Transform a HiLeS HilesSystem to a TPN Time Petri Net ($Rev: 823 $)
+ * DESCRIPTION
+ *   Create a TPN Time Petri Net to hold all the elements of the HiLeS
+ *  HilesSystem's ControlNet elements, with out the heirarchy. 
+ * SEE ALSO
+ *		* 
+ *
+ * DOMAIN
+ * 		* HiLeS	 	- http://hiles.uniandes.edu.co/1.1/HiLeS
+ * 		* tpn		- http://hiles.uniandes.edu.co/1.0/TimePetriNet
+ * SPECIFICATION
+		relation SystemToPetriNet
+   		{
+    		checkonly domain HiLeS s:HilesSystem {
+				name = sn,
+				initialArchitecture = sa:Architecture,
+			}
+			enforce domain tpn pn:PetriNet {
+				name = sn,
+				node = pnn:Node{},
+				arc = pna:Arc{}
+			}
+ *		
+ ******
+ */
+rule SystemToPetriNet
+	transform s : HiLeS!HilesSystem
+	to pn : tpn!PetriNet {
+	
+		pn.name = s.name;
+		pn.node.addAll(HiLeS!Transition.all().equivalent());
+		pn.node.addAll(HiLeS!Place.all().equivalent());
+		pn.arc.addAll(HiLeS!Arc.all().equivalent());
+	}

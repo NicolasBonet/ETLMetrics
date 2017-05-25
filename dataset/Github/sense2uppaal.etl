@@ -1,0 +1,281 @@
+// Get auxiliary operations
+import "sensedefs.eol";
+
+pre {
+	// Chosen action names
+	/** Name of the fire action of a channel. */
+	var FIRE : String = "fire";
+	/** Name of the end action of a channel. */
+	var END : String = "end";
+	
+	// Uppaal action input/output suffixes
+	/** Output suffix for an Uppaal action. */
+	var OUTPUT : String = "!";
+	/** Input suffix for an Uppaal action. */
+	var INPUT : String = "?";
+	
+	// Uppaal transition labels
+	/** Synchronisation label for an Uppaal transition. */
+	var SYNC : String = "synchronisation";
+	/** Assignment label for an Uppaal transition. */
+	var ASSIGN : String = "assignment";
+	/** Guard label for an Uppaal transition. */
+	var GUARD : String = "guard";
+	/** Invariant label for an Uppaal transition. */
+	var INV : String = "invariant";
+	/** Selection label for an Uppaal transition. */
+	var SELECT : String = "select";
+	/** Comment label for an Uppaal transition. */
+	var COMMENT : String = "comments";
+	
+	// Names
+	/** Local clock name. */
+	var CLOCK : String = "x";
+	/** Local process identifier. */
+	var PID : String = "p_id";
+	/** Process ids array. */
+	var IDS : String = "id_r";
+	/** SDF template. */
+	var SDF_TEMPL : String = "SDFG";
+	/** SDF process. */
+	var SDF_PROC : String = "SDF_Graph";
+	/** SDF start flag. */
+	var SDF_ACT : String = "flag_act";
+}
+
+rule Sense2Root
+		transform m: In!SenseModel
+		to root: Out!DocumentRoot, nta: Out!NtaType {
+	nta.declaration = m.equivalent("Sense2Declaration");
+	nta.system = m.equivalent("Sense2System");
+	nta.template := In!ProcessorType.all().equivalent("Processor2Template");
+	nta.template.add(m.equivalent("Sense2Template"));
+	root.nta = nta;
+}
+
+@lazy
+rule Sense2Declaration
+		transform m: In!SenseModel
+		to out: Out!DeclarationType {
+	var actorCount = In!Actor.all.size();
+	var processorCount = 0;
+	for (pt in In!ProcessorType) {
+		processorCount = processorCount + pt.count;
+	}
+	var bufSizes = "";
+	for (c in In!Channel) {
+		bufSizes = bufSizes + "int " + c.getBufferName() + " = " + c.initialTokens + ";\n";
+	}
+	var actorCounters = "";
+	for (a in In!Actor) {
+		actorCounters = actorCounters + "int " + a.getCounterName() +" = 0;\n";
+	}
+	var text = ""
+	+ "// Global Clock\n"
+	+ "clock global;\n"
+	+ "\n"
+	+ "// # of Processors\n"
+	+ "const int N = " + processorCount + ";\n"
+	+ "// # of Actors   \n"   
+	+ "const int M = " + actorCount + ";\n"	
+	+ "\n"
+	+ "// Task and Processors IDs\n"
+	+ "typedef int[0,N-1] " + IDS + ";\n"
+	+ "\n"
+	+ "// Channels\n"
+	+ "chan end[N][M], fire[N][M];\n"
+	+ "\n"
+	+ "// Buffer and Edge Sizes\n"
+	+ bufSizes
+	+ "\n"
+	+ "// Flag to check if SDFG has started\n"
+	+ "bool " + SDF_ACT + "=true;\n"
+	+ "\n"
+	+ "// Counter for each actor\n"
+	+ actorCounters
+	+ "\n"
+	+ "void produce(int &channel_tokens, int tokens) {\n"
+	+ "    channel_tokens+=tokens;\n"
+	+ "}\n"
+	+ "\n"
+	+ "void consume(int &channel_tokens, int tokens) {\n"
+	+ "    channel_tokens-=tokens;\n"
+	+ "}\n";	
+	out.addText(text);
+}
+
+@lazy
+rule Sense2System
+		transform m: In!SenseModel
+		to out: Out!SystemType {
+	var actorVars = new List;
+	var actorVarDecls = "";
+	for (a in In!Actor) {
+		actorVarDecls = actorVarDecls + "const int " + a.getVarName() + " = " + actorVars.size() + ";\n";
+		actorVars.add(a.getVarName());
+	}
+	var processDecls = "";
+	var processNameList = new List;
+	for (p in In!ProcessorType) {
+		// Instantiate the template as often as required
+		var pix = 0;
+		while (pix < p.count) {
+			// Collect the parameters of the template
+			var paramList = new List;
+			paramList.add(p.getVarName(pix));
+			for (a in p.capabilities.performs) {
+				paramList.add(a.getVarName());
+			}
+			processDecls = processDecls + "const int " + p.getVarName(pix) + " = " + processNameList.size() + ";\n";
+			var processName = p.getProcessName(pix);
+			processNameList.add(processName);
+			processDecls = processDecls + processName + " = " + p.getTemplateName() + "(" + paramList.concat(", ") + ");\n\n";
+			pix = pix + 1;
+		}
+	}
+	// Collect the parameters for the DSFG instantiation
+	var paramList = new List;
+	for (a in In!Actor) {
+		paramList.add(a.getVarName());
+	}
+	processDecls = processDecls + SDF_PROC + " = " + SDF_TEMPL + "(" + paramList.concat(", ") + ");\n\n";
+	var systemInstance = "system " + SDF_PROC + ", "+ processNameList.concat(", ") + ";\n";
+	var text = ""
+	+ "// Actors\n"
+	+ actorVarDecls
+	+ "\n// Templace instances\n"
+	+ processDecls
+	+ "\n// System instantiation\n"
+	+ systemInstance;
+	out.addText(text);
+}
+
+@lazy
+rule Sense2Template
+		transform m: In!SenseModel
+		to t: Out!TemplateType {
+	t.setName(SDF_TEMPL);
+	var paramList = new List;
+	for (a in In!Actor) {
+		paramList.add(a.getVarName());
+	}
+	t.parameter = new Out!ParameterType;
+	t.parameter.addText(paramList.concat("const int ", ", const int "));
+	var init = newLocation("Initial");
+	t.location.add(init);
+	t.init = new Out!InitType;
+	t.init.ref = init.id;
+	for (a in In!Actor) {
+		// Construct the fire transition for a
+		var fireTrans = new Out!TransitionType;
+		fireTrans.source = new Out!SourceType;
+		fireTrans.source.ref = init.id;
+		fireTrans.target = new Out!TargetType;
+		fireTrans.target.ref = init.id;
+		
+		var pid : String = "e";
+		fireTrans.label.add(newLabel(SELECT, pid + ":" + IDS));
+		fireTrans.label.add(newLabel(SYNC, a.getAction(FIRE, pid, OUTPUT)));
+		var guardList = new List;
+		var assignList = new List;
+		for (c in a.inChannels) {
+			var bufName = c.getBufferName();
+			guardList.add(bufName + ">=" + c.sourceRate);
+			assignList.add("consume(" + bufName + ", " + c.sourceRate + ")");
+		}
+		fireTrans.label.add(newLabel(GUARD, guardList.concat(" & ")));
+		fireTrans.label.add(newLabel(ASSIGN, assignList.concat(",\n")));
+		t.transition.add(fireTrans);
+		
+		// Construct the end transition for a
+		var endTrans = new Out!TransitionType;
+		endTrans.source = new Out!SourceType;
+		endTrans.source.ref = init.id;
+		endTrans.target = new Out!TargetType;
+		endTrans.target.ref = init.id;
+		endTrans.label.add(newLabel(SELECT, pid + ":" + IDS));
+		endTrans.label.add(newLabel(SYNC, a.getAction(END, pid, INPUT)));
+		var assignList = new List;
+		for (c in a.outChannels) {
+			assignList.add("produce(" + c.getBufferName() + ", " + c.targetRate + ")");
+		}
+		assignList.add(SDF_ACT + " := false");
+		assignList.add(a.getCounterName() + "++");
+		endTrans.label.add(newLabel(ASSIGN, assignList.concat(",\n")));
+		endTrans.label.add(newLabel(COMMENT, "Fire_" + a.name));
+		t.transition.add(endTrans);
+	}
+}
+
+rule Processor2Template
+		transform p: In!ProcessorType
+		to t: Out!TemplateType  {
+	t.setName(p.getTemplateName());
+	var init = p.equivalent("Processor2Location");
+	t.location.add(init);
+	t.init = new Out!InitType;
+	t.init.ref = init.id;
+	var paramList = new List;
+	paramList.add(PID);
+	for (a in p.capabilities.performs) {
+		paramList.add(a.getVarName());
+	}
+	t.parameter = new Out!ParameterType;
+	t.parameter.addText(paramList.concat("const int ", ", const int "));
+	t.declaration = new Out!DeclarationType;
+	t.declaration.addText("clock " + CLOCK + ";");
+}
+
+@lazy
+rule Processor2Location
+		transform p: In!ProcessorType
+		to init : Out!LocationType {
+	init.id = "Idle";
+	init.setName(init.id);
+}
+
+rule Capability2Location
+	transform e: In!Capability
+	to s: Out!LocationType, inT: Out!TransitionType, outT: Out!TransitionType {
+	var actor = e.performs;
+	var processor = e.processor;
+	// Construct actor state
+	s.id = actor.name;
+	s.setName(actor.getStateName());
+	s.label.add(newLabel(INV, CLOCK + " <= " + e.time));
+	// Construct incoming transition
+	inT.source = new Out!SourceType;
+	inT.source.ref = processor.equivalent("Processor2Location").id;
+	inT.target = new Out!TargetType;
+	inT.target.ref = s.id;
+	inT.label.add(newLabel(SYNC, actor.getAction(FIRE, PID, INPUT)));
+	inT.label.add(newLabel(ASSIGN, CLOCK + " := 0"));
+	// Construct outgoing transition
+	outT.source = new Out!SourceType;
+	outT.source.ref = s.id;
+	outT.target = new Out!TargetType;
+	outT.target.ref = processor.equivalents().second().id;
+	outT.label.add(newLabel(SYNC, actor.getAction(END, PID, OUTPUT)));
+	outT.label.add(newLabel(GUARD, CLOCK + " == " + e.time));
+	// Add all this to the processor template
+	var template = processor.equivalent();
+	template.location.add(s);
+	template.transition.add(inT);
+	template.transition.add(outT);
+}
+
+/** Creates a location with a given name, which is also used as ID. */
+operation newLocation(name) : Out!LocationType {
+	var loc = new Out!LocationType;
+	loc.id = name;
+	loc.setName(name);
+	return loc;
+}
+
+/** Creates a label of a given kind with a given text. */
+operation newLabel(kind, text) : Out!LabelType {
+	var result = new Out!LabelType;
+	result.kind = kind;
+	result.addText(text);
+	return result;
+}

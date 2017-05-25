@@ -1,0 +1,40 @@
+pre {
+	"Inicio de transformacion M2M Giu2Android".println();
+}
+
+rule Gui2WebApp
+transform g:gui!GUI
+to a:android!AndroidApplication{
+	a.name = g.forms.get(0).name;
+	a.activities = g.forms.get(0).layouts.equivalent();
+}
+
+@lazy
+rule Layout2Activity
+transform g:gui!Layout
+to  a:android!Activity{
+	a.name = g.name;
+	a.components = g.graphicalcomponent.equivalent();	
+}
+
+@lazy
+rule Field2TextField
+transform g:gui!Field
+to  a:android!TextField{	
+	var tipoDato = g.text.toLowerCase();
+	a.name = g.name.toLowerCase();
+	
+	if(tipoDato <> ""){
+		switch(tipoDato){
+			case "string":
+				a.type = android!TypeTextField#Text;
+			break;
+			case "double":
+				a.type = android!TypeTextField#Double;
+			break;
+			case "long":
+				a.type = android!TypeTextField#Number;
+			break;
+		}
+	}
+} 

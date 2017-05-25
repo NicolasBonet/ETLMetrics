@@ -1,0 +1,54 @@
+pre{
+	var cal = Calendar!Calendar;
+}
+rule Blog2Calendar
+	transform blog : Blog!Blog
+	to  calendar:  Calendar!Calendar
+	{
+	    calendar.name=blog.name;
+		for(categorias in blog.categories){
+				for(articulos in categorias.articles){
+				 	var year=articulos.date.split("/").at(2).asInteger();
+				 	if(calendar.years.size()>0){
+				 	var repeat = "no";
+				 	for(toadd in calendar.years){
+					if(toadd.year.equals(year)){
+					repeat = "yes";
+					}
+					}
+					if(repeat.equals("no")){
+					calendar.years.add(articulos.equivalent());
+					}		
+					}else{
+					calendar.years.add(articulos.equivalent());
+					}
+				}
+			}
+			cal = calendar;		
+	}
+@lazy
+rule Articles2Year
+	transform article:Blog!Article
+	to year: Calendar!Year{
+		//cal.println();
+		var yearBlog = article.date.split("/").at(2).asInteger();
+		year.year=yearBlog;
+		//year.year.println();
+		//cal.println();
+		var month= new Calendar!Month;
+		month.month=article.date.split("/").at(1).asInteger();
+		month.year=year;
+		year.months.add(month);
+		var day= new Calendar!Day;
+		day.day=article.date.split("/").at(0).asInteger();
+		day.month=month;
+		month.days.add(day);
+		var event=new Calendar!Event;
+		event.event=article.summary;
+		event.location="";
+		event.owner=article.author.name;
+		event.tags=article.tags.tag.concat(", ");
+		event.day=day;
+		day.events.add(event);
+	}
+	

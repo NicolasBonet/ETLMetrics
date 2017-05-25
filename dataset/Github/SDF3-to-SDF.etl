@@ -1,0 +1,86 @@
+pre {
+	// Mapping from actor name to the corresponding In!ActorType instance
+	var inActorMap;
+
+	Out.modelFileUri.println();
+	Out.metamodelUris.println();
+	var javaDateBegin = new Native("java.util.Date");
+	System.out.println("Code generation started on: "+ javaDateBegin);			
+}
+
+post
+{
+	var javaDateEnd = new Native("java.util.Date");
+	System.out.println("Code generation finished on: "+ javaDateEnd);
+	var elapsed = javaDateEnd.getTime() - javaDateBegin.getTime();
+	var minutes = elapsed / 60000;
+	if (elapsed <> 0) System.out.println( "| --------------------- |");
+	if (elapsed <> 0) System.out.println( "| Time elapsed: " +elapsed + " ms");
+	if (elapsed <> 0) System.out.println( "| --------------------- |");	
+}
+/** Transforms an SDF3 root element to an SDF root element. */
+rule SDFGraph2SDFModel transform 
+	gIn: In!Sdf3Type to mOut: Out!SynchronousDataflowRoot 
+{
+	mOut.actors ::= In!ActorType.all();
+	mOut.channels ::= In!ChannelType.all();
+}
+/** Transforms an SDF3 actor to an SDF actor. */
+rule Actor2Actor transform 
+	aIn: In!ActorType to aOut: Out!Actor 
+{
+	aOut.identifier = aIn.name;
+}
+/** Transforms an SDF3 channel to an SDF channel. */
+rule Channel2Channel transform 
+	cIn: In!ChannelType to cOut: Out!Channel 
+{
+	cOut.identifier = cIn.name;
+	if (cIn.initialTokens.isDefined()) 
+	{
+		cOut.initialTokens = cIn.initialTokens.asInteger();
+	}
+	// Assign source actor and rate
+	var srcActorIn : In!ActorType = getInActor(cIn.srcActor);
+	cOut.source ::= srcActorIn;
+	cOut.sourceRate = srcActorIn.getInPort(cIn.srcPort).rate.asInteger();
+	// Assign target actor and rate
+	var dstActorIn : In!ActorType = getInActor(cIn.dstActor);
+	cOut.target ::= dstActorIn;
+	cOut.targetRate = dstActorIn.getInPort(cIn.dstPort).rate.asInteger();
+	for (a in In!ActorType)
+	{
+		if (a.name == cIn.srcActor)
+		{
+		cOut.source.outgoingChannels.add(cOut);
+		}
+		else
+		{
+		cOut.target.incomingChannels.add(cOut);	
+		}
+	}
+}
+/** Returns the In!Actor instance with a given name. */
+operation getInActor(name: String) : In!ActorType {
+	if (inActorMap.isUndefined()) {
+		// create the map
+		inActorMap = new Map;
+		// fill the map
+		for (a in In!ActorType) {
+			inActorMap.put(a.name, a);
+		}
+	}
+	return inActorMap.get(name);
+}
+
+/** Returns the port of this actor type with a given name. */
+operation In!ActorType getInPort(name : String) : In!PortType {
+	if (self.~portMap.isUndefined()) {
+		// create the map
+		self.~portMap = new Map;
+		for (p in self.port) {
+			self.~portMap.put(p.name, p);
+		}
+	}
+	return self.~portMap.get(name);
+}

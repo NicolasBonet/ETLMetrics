@@ -1,0 +1,107 @@
+rule MetroSystem2Metro 
+	transform om : Othermetro!MetroSystem
+	to m : Metro!Metro {
+	m.city = om.name;
+
+	for(region in om.regions) {
+		var currentRegion = region.equivalent(); 
+		m.regions.add(currentRegion);
+		for(station in region.stations) {
+			var currentStation = station.equivalent();
+			m.stations.add(currentStation);
+			currentStation.region = currentRegion;
+		}
+	}
+	
+	for(line in om.lines) {
+		var currentLine = line.equivalent();
+		for(station in line.stations) {
+			currentLine.stations.add(station.equivalent());
+		}
+		m.lines.add(currentLine);
+		for(train in line.trains) {
+			var currentTrain = train.equivalent();
+			m.trains.add(currentTrain);
+			currentLine.trains.add(currentTrain);
+		}
+	}
+}
+
+rule Train2Train
+	transform omt : Othermetro!Train
+	to mt : Metro!Train {
+	
+	var i = 0;
+	for(carriage in omt.carriages) {
+		i = i + 1;
+		for(passenger in carriage.passengers) {
+			mt.persons.add(passenger.equivalent());
+		}
+	}
+	mt.carriages = i;
+	
+	for(passenger in omt.passengers) {
+		mt.persons.add(passenger.equivalent());
+	}
+}
+
+rule Passenger2Person
+	transform omp : Othermetro!Passenger
+	to mp : Metro!Person {
+	
+	switch(omp.shape) {
+		case Othermetro!Shape#STAR:
+			mp.shape = Metro!Shape#STAR;
+		case Othermetro!Shape#CIRCLE:
+			mp.shape = Metro!Shape#CIRCLE;
+		case Othermetro!Shape#SQUARE:
+			mp.shape = Metro!Shape#SQUARE;
+		case Othermetro!Shape#TRIANGLE:
+			mp.shape = Metro!Shape#TRIANGLE;
+		default:
+			mp.shape = Metro!Shape#CIRCLE;
+	}
+}
+
+rule Line2Line
+	transform oml : Othermetro!Line
+	to ml : Metro!Line {
+	
+	switch (oml.color) {
+		case Othermetro!Color#RED: 
+			ml.color = Metro!Color#RED;
+		case Othermetro!Color#GREEN: 
+			ml.color = Metro!Color#GREEN;
+		case Othermetro!Color#BLUE: 
+			ml.color = Metro!Color#BLUE;
+		default:
+			ml.color = Metro!Color#YELLOW;
+	}
+}
+
+rule Station2Station 
+	transform oms : Othermetro!Station
+	to ms : Metro!Station {
+	
+	switch(oms.shape) {
+		case Othermetro!Shape#STAR:
+			ms.shape = Metro!Shape#STAR;
+		case Othermetro!Shape#CIRCLE:
+			ms.shape = Metro!Shape#CIRCLE;
+		case Othermetro!Shape#SQUARE:
+			ms.shape = Metro!Shape#SQUARE;
+		case Othermetro!Shape#TRIANGLE:
+			ms.shape = Metro!Shape#TRIANGLE;
+		default:
+			ms.shape = Metro!Shape#CIRCLE;
+	}
+	
+	for(passenger in oms.passengers) {
+		ms.persons.add(passenger.equivalent());
+	}
+}
+
+rule Region2Region
+	transform omr : Othermetro!Region
+	to mr : Metro!Region {
+}

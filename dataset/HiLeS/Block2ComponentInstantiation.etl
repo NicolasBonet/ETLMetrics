@@ -1,0 +1,215 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: Block2DesignUnit.etl 866 2012-07-18 14:29:53Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+
+@abstract
+rule Block2ComponentInstantiation
+	transform block : HiLeS!Block
+	to ci : Vhdl!ComponentInstance {
+		
+		//block.name.println("Block2ComponentInstantiation ");
+		ci.identifier = block.name;
+		ci.instantiatedUnit = new Vhdl!EntityInstance;
+		ci.portMap = new Vhdl!PortAssociation;
+		/* Ports */
+		
+		for(port in block.port)
+		{
+			var assoc = new Vhdl!AssociationElement;
+			assoc.formalPart = new Vhdl!FormalPart;
+	        assoc.formalPart.designator = port.name;
+	        assoc.formalPart.designatorPosition=-1;
+	        if(not block.parentArchitecture.system.isDefined())	// Do it for all blocks except main one
+	        {
+	        	assoc.actualPart = new Vhdl!ActualPart;
+		        // If the port is connected to another port there is a signal that
+		        // will be the actual part designator. If the port is conencted
+		        // to a service, the designator is the vhdl port created from the
+		        // hiles port matched to the service in its owner block.
+		        var pl = block.parentArchitecture.payload.selectOne(pl
+						| (pl.target = port) or (pl.source = port)
+						);
+				if(pl.isDefined())
+				{
+					if(pl.target.isTypeOf(HiLeS!Port) and pl.source.isTypeOf(HiLeS!Port))
+					{
+						assoc.actualPart.designator = pl.equivalent().identifier;
+					}
+					else
+					{
+						if(pl.target = port)
+						{
+							assoc.actualPart.designator = pl.source.name;
+							assoc.actualPart.designatorPosition=-1;
+						}
+						else
+						{
+							assoc.actualPart.designator = pl.target.name;
+							assoc.actualPart.designatorPosition=-1;
+						}	
+					}
+				}
+				else
+				{
+					var a = block.parentArchitecture.petriNet.element.selectOne(a : HiLeS!Arc
+						| (a.fromPoint = port) or (a.toPoint = port)
+						);
+						
+					if(not a.equivalent().isDefined())
+					{
+					println('Bloque'+block.name);
+					}
+						
+					/*if(a.equivalent().isDefined())
+					{*/
+					assoc.actualPart.designator = a.equivalent().identifier;
+					assoc.actualPart.designatorPosition=-1;
+					/*}
+					else
+					{
+					
+					if(a.fromPoint.isDefined())
+					{
+					println('FromPoint ');
+					}
+					if(a.fromNode.isDefined())
+					{
+					println('FromNode ');
+					}
+					if(a.toPoint.isDefined())
+					{
+					println('ToPoint ');
+					}
+					if(a.toNode.isDefined())
+					{
+					println('ToNode ');
+					}
+					println(block.type().toString());
+					}*/
+				}
+	        }
+			ci.portMap.element.add(assoc);
+		}
+		
+		if(block.isTypeOf(HiLeS!Structural))
+		{
+		for(arc in HiLeS!Arc.all().select(a : HiLeS!Arc
+				| a.fromPoint.isDefined() and a.fromPoint.owner=block and a.toNode.isDefined() and a.toNode.isTypeOf(HiLeS!Transition)
+				))
+		{
+			if(arc.isDefined())
+			{
+			var assoc = new Vhdl!AssociationElement;
+			assoc.formalPart = new Vhdl!FormalPart;
+	        assoc.formalPart.designator = "ret_jeton_"+block.name+"_HcnOut";
+	        assoc.formalPart.designatorPosition=-1;
+	        assoc.actualPart = new Vhdl!ActualPart;
+	        assoc.actualPart.designator = "retJetons_"+block.name+"_HcnOut_"+arc.toNode.name;
+			assoc.actualPart.designatorPosition=-1;
+			ci.portMap.element.add(assoc);		
+	        }
+	        
+		}
+		}
+		
+	}
+	
+/****r* HiLeSToVDHLAMS/Block2DesignUnit
+ * SUMMARY
+ *   Transform a HiLeS:Block into a Vhdl:DesignUnit. The desing unit will
+ * contain the entity that defines the block's interface and an architecture
+ * that describes the behavior of the block. All HiLeS ports in the block
+ * are transformed into interfaces. ($Rev: 866 $).
+ * DESCRIPTION
+ * |html <B>@abstract</B>
+ * DERIVED BY
+ * 	* Structural2DesignUnit
+ * 	* Functional2DesignUnit
+ * 	* Decision2DesignUnit
+ *   
+ * SEE ALSO
+ *		* 
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *   	* Vhdl   - http://hiles.uniandes.edu.co/1.1/vhdl-ams
+ *
+ ******
+ */
+@lazy
+rule Structural2ComponentInstantiation
+	transform structural : HiLeS!Structural
+	to ci : Vhdl!ComponentInstantiation
+	extends Block2ComponentInstantiation {
+		
+		//ci.instantiatedUnit.entityName = "work." + "Structural" + structural.name;
+		ci.instantiatedUnit.entityName = "work." +   structural.name;
+		
+		// TODO Verificar cuando se haga la transformaciòn de la arq
+		ci.instantiatedUnit.architecture = structural.innerArchitecture.equivalent().identifier;
+		
+		/*Portmap
+		 port (	init_pl
+				tr_cond
+				mark_tr
+				ports);*/
+		
+		/* init_pl, connected to the parent block init_pl */
+		var init_pl = new Vhdl!AssociationElement;
+        init_pl.formalPart = new Vhdl!FormalPart;
+        init_pl.formalPart.designator = "init_pl";
+        init_pl.formalPart.designatorPosition=-1;
+		init_pl.actualPart = new Vhdl!ActualPart;
+		init_pl.actualPart.designator = "init_pl";
+		init_pl.actualPart.designatorPosition = -1;
+		ci.portMap.element.add(init_pl);
+		/* tr_cond, connected to the parent block tr_cond */
+		var tr_cond = new Vhdl!AssociationElement;
+        tr_cond.formalPart = new Vhdl!FormalPart;
+        tr_cond.formalPart.designator = "tr_cond";
+        tr_cond.formalPart.designatorPosition = -1;
+		tr_cond.actualPart = new Vhdl!ActualPart;
+		tr_cond.actualPart.designator = "tr_cond";
+		tr_cond.actualPart.designatorPosition = -1;
+		ci.portMap.element.add(tr_cond);
+		/* mark_tr, since this is a monitor/test port, conenct it
+			 to open */
+		for(place in structural.innerArchitecture.petriNet.element.select(n | n.isTypeOf(HiLeS!Place)))
+		{
+			var mark_tr = new Vhdl!AssociationElement;
+			mark_tr.formalPart = new Vhdl!FormalPart;
+	        mark_tr.formalPart.designator = "mark_tr";
+	        mark_tr.formalPart.designatorPosition = loopCount-1;
+			mark_tr.actualPart = new Vhdl!ActualPart;
+			mark_tr.actualPart.expression = "open";	
+			ci.portMap.element.add(mark_tr);
+		}
+	}
+
+@lazy
+@greedy
+rule Functional2ComponentInstantiation
+	transform functional : HiLeS!Functional
+	to ci : Vhdl!ComponentInstantiation
+	extends Block2ComponentInstantiation {
+		
+		//ci.instantiatedUnit.entityName = "work." + "Functional" + functional.name;
+		//Change because we want to instantiate the entity
+		ci.instantiatedUnit.entityName = "work." +  functional.name;
+		
+		// TODO Verificar cuando se haga la transformaciòn de la arq
+		ci.instantiatedUnit.architecture = "Behavior";
+		
+		/*Portmap
+		 port (	ports);
+		created in Block2ComponentInstantiation */
+	}
+	
+	

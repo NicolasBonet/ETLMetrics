@@ -1,0 +1,138 @@
+/**
+* Create an parsistence manager for all entities
+*/
+operation java!Package entityManager() : java!Class {
+	var entityManager = new java!Class;
+	entityManager.name = "MarketPlace";
+	entityManager.visibility = java!Visibility#public;
+	
+	// Add attributes
+	entityManager.addEntityManagerAttributes();
+	
+	// Add persistence methods
+	for (class : java!Class in self.classes) {
+	    var foundId = class.findId();
+	    if (class.attributes.size() > foundId.size()) {
+			entityManager.addEntityManagerMethods(class);
+		}
+	}
+	
+	// Register imports
+	entityManager.addMarketPlaceImports();
+	
+	return entityManager;
+}
+
+/**
+* This method add the attributes to the persistence manager class
+*/
+operation java!Class addEntityManagerAttributes() {
+	// Add constant attribute for persistence unit
+	var persistence = new java!Attribute;
+	persistence.name = "PERSISTENCE_UNIT_NAME";
+	persistence.visibility = java!Visibility#private;
+	persistence.modifier = java!Modifier#staticfinal;
+	persistence.value = "\"ManejadorPersistencia-Test\"";
+	persistence.datatypeAttribute = typeMap.get(sql!DataType#varchar);
+	self.attributes.add(persistence);
+	
+	// Add entity manager factory attribute
+	var entityManagerFactory = new java!Attribute;
+	entityManagerFactory.name = "emf";
+	entityManagerFactory.visibility = java!Visibility#private;
+	entityManagerFactory.modifier = java!Modifier#static;
+	entityManagerFactory.datatypeAttribute = typeMap.get(entityManagerFactory.name);
+	self.attributes.add(entityManagerFactory);
+	
+	// Add entity manager attribute
+	var entityManager = new java!Attribute;
+	entityManager.name = "em";
+	entityManager.visibility = java!Visibility#private;
+	entityManager.datatypeAttribute = typeMap.get(entityManager.name);
+	self.attributes.add(entityManager);
+}
+
+/**
+* Methods for entity manager
+*/
+operation java!Class addEntityManagerMethods(entity : java!Class) {
+	// Get entitiy object list
+	var getList = new java!Method;
+	getList.name = "get" + entity.name + "s";
+	getList.visibility = java!Visibility#public;
+	getList.datatypeReturn = typeMap.get(entity.name.firstToLowerCase() + "List");
+	self.methods.add(getList);
+	
+	// Add entitiy object 
+	var add = new java!Method;
+	add.name = "add" + entity.name;
+	add.visibility = java!Visibility#public;
+	// Add parameter 
+	var addParameter = new java!Parameter;
+	addParameter.name = entity.name.firstToLowerCase();
+	addParameter.datatypeParameter = typeMap.get(entity.name.firstToLowerCase());
+	add.methodParameters.add(addParameter);
+	self.methods.add(add);
+	
+	// Edit entity object
+	var edit = new java!Method;
+	edit.name = "edit" + entity.name;
+	edit.visibility = java!Visibility#public;
+	// Entity attributes as edit parameters
+	var order = 1;
+	for (attribute : java!Attribute in entity.attributes) {
+		if (attribute.datatypeAttribute.isTypeOf(java!ListType) <> true) {
+			var editParameter = new java!Parameter;
+			editParameter.name = attribute.name;
+			var isId = attribute.select(a|a.annotateAttribute.collect(i|i.name).contains("@Id")).size();
+			if (isId == 1) {
+				editParameter.order = 0;
+			} else {
+				editParameter.order = order;
+				order = order + 1;
+			}
+			editParameter.datatypeParameter = attribute.datatypeAttribute;
+			edit.methodParameters.add(editParameter);
+		} 
+	}
+	self.methods.add(edit);
+	
+	// Delete entity object
+	var del = new java!Method;
+	del.name = "delete" + entity.name;
+	del.visibility = java!Visibility#public;
+	for (attribute : java!Attribute in entity.findId()) {
+		var delParameter = new java!Parameter;
+		delParameter.name = attribute.name;
+		delParameter.datatypeParameter = attribute.datatypeAttribute;
+		del.methodParameters.add(delParameter);
+	}
+	self.methods.add(del);
+	
+	// Get just one entity
+	var get = new java!Method;
+	get.name = "get" + entity.name;
+	get.visibility = java!Visibility#public;
+	get.datatypeReturn = typeMap.get(entity.name.firstToLowerCase());
+	for (attribute : java!Attribute in entity.findId()) {
+		var getParameter = new java!Parameter;
+		getParameter.name = attribute.name;
+		getParameter.datatypeParameter = attribute.datatypeAttribute;
+		get.methodParameters.add(getParameter);
+	}
+	self.methods.add(get);
+}
+
+/**
+* Required imports  
+*/
+operation java!Class addMarketPlaceImports() {
+	// Add required imports
+	self.imports.add(getImport("java.util.List"));
+	self.imports.add(getImport("javax.persistence.EntityManager"));
+	self.imports.add(getImport("javax.persistence.EntityManagerFactory"));
+	self.imports.add(getImport("javax.persistence.Persistence"));
+	self.imports.add(getImport("javax.persistence.Query"));
+	self.imports.add(getImport("entities.*"));
+}
+

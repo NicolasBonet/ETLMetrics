@@ -1,0 +1,118 @@
+-- Debemos crear una unica base de datos para todos
+pre {
+	var db : new DB!Database;
+	var table;
+}
+
+-- Esta regla se encarga de todo!
+rule MarketPlace2Relacional
+	transform
+		c : mp!ClassUnit
+	to
+		t : DB!Table
+		{
+			--Se requiere que unicamente se mapeen las clases con @Entity
+			guard: c.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(b|b.`to`.name.equals("Entity")).size()>0
+			
+			-- Asignamos la tabla creada a la base de datos inicializada al comienzo y le ponemos el nombre de la clase sin el Entity
+		   	t.name = c.name.replace("Entity", "");
+		   	t.database = db;
+		   	
+		   	var elementosPadre = new Bag();
+		   	if(c.codeRelation.select(a|a.isTypeOf(mp!Extends)).size()>0){
+		   		elementosPadre = c.codeRelation.selectOne(b|b.isTypeOf(mp!Extends)).`to`.codeElement.select(b|b.isTypeOf(mp!StorableUnit));
+		   	}
+		   	var elementos = c.eContents.select(e|e.isTypeOf(mp!StorableUnit)); 
+		   	elementos.addAll(elementosPadre);
+		   	
+		   	for(s in elementos){
+		   	
+		   		var isPk = false;
+		   		var isFk = false;
+		   	
+		   		for(pks in s.codeRelation.select(b|b.isTypeOf(mp!HasValue))) {
+		   			
+		   			if(pks.`to`.name.equals("Id")) {
+		   				
+		   				isPk = true;
+		   			
+	    			}
+	    			
+	    			if(pks.`to`.name.equals("PrimaryKeyJoinColumn")) {
+		   				
+		   				isFk = true;
+		   			
+	    			}
+	    			
+		   		}
+		   		
+		   		if(isPk) {
+		   		
+		   			t.primaryKeys.add(new DB!Column);
+		   			t.primaryKeys.last.name = s.name;
+		   			t.primaryKeys.last.notNull = true;
+		   				
+		   			if(s.type.select(a|a.isTypeOf(mp!InterfaceUnit)).size() > 0){
+		   				
+	    				switch(s.type.selectOne(a|a.isTypeOf(mp!InterfaceUnit)).name){
+	    	
+	    					case "Long" : t.primaryKeys.last.type = DB!DataType#int; break;
+	    					case "Integer" : t.primaryKeys.last.type = DB!DataType#int; break;
+	    					case "int" : t.primaryKeys.last.type = DB!DataType#int; break;
+	    					case "String" : t.primaryKeys.last.type = DB!DataType#varchar; break;
+	    					default : t.primaryKeys.last.type = DB!DataType#unknown; break;
+	    	
+	    				}
+	    	
+	    			} else {
+	    				 t.primaryKeys.last.type = DB!DataType#unknown;
+	    			}
+	    		
+	    		} else {
+	    			
+	    			t.columns.add(new DB!Column);
+		   			t.columns.last.name = s.name;
+		   			t.columns.last.notNull = false;
+		   				
+		   			if(s.type.select(a|a.isTypeOf(mp!InterfaceUnit)).size() > 0){
+		   			
+	    				switch(s.type.selectOne(a|a.isTypeOf(mp!InterfaceUnit)).name){
+	    	
+	    					case "Long" : t.columns.last.type = DB!DataType#int; break;
+	    					case "Integer" : t.columns.last.type = DB!DataType#int; break;
+	    					case "int" : t.columns.last.type = DB!DataType#int; break;
+	    					case "String" : t.columns.last.type = DB!DataType#varchar; break;
+	    					default : t.columns.last.type = DB!DataType#unknown; break;
+	    	
+	    				}
+	    	
+	    			} else {
+	    				 t.columns.last.type = DB!DataType#unknown;
+	    			}
+	    			
+	    		}
+	    		
+	    		
+		   		if(isFk) {
+		   			
+		   			db.contents.add(new DB!ForeignKey);
+		   			db.contents.last().name = s.name;
+		   			
+		   			--Se agrega la info de isMany
+	    			if(s.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.`to`.name.equals("ManyToOne")).size() > 0){
+	    				db.contents.last().isMany = true;
+	    			} else {
+	    				db.contents.last().isMany = false;
+	    			}
+	    			
+	    			db.contents.last().parent = t.primaryKeys.first();
+	    			db.contents.last().child = t.columns.last();
+		   		}
+		   		
+		   		
+		   	}
+		   	
+	    }
+	
+
+	    

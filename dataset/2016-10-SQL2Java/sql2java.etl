@@ -1,0 +1,261 @@
+rule SQL2Java 
+	transform s : sql!Model
+	to j : javaM!Program {
+		j.primitiveTypes.addAll(getPrimitiveTypes());
+		
+		
+		var d: sql!Database = s.database.get(0);
+		
+		var entities = d.getEntities();
+		var marketplacePackage = d.getSourcePackage(entities);
+		j.packages.add(marketplacePackage);
+		
+		var dao = new javaM!DAOClass();
+		dao.name = "MarketPlace";
+		dao.entities.addAll(entities);
+		marketplacePackage.classes.add(dao);
+		
+		j.containerTypes.addAll(getListTypes());
+		d.setEntitiesRealationships();
+		
+		
+		j.packages.add(d.getTestPackage(dao, entities));
+	}
+	
+	
+operation sql!Database getSourcePackage(entities: List): javaM!Package{
+	var sourceP = new javaM!Package();
+	sourceP.name = "marketplace";
+	
+	sourceP.classes.addAll(entities);
+	return sourceP;
+}
+
+operation sql!Database getEntities(): List{
+	var entities = new List();
+	for(t in self.tables){
+		
+		var e = new javaM!EntityClass();
+		e.name = t.name;
+		
+		
+		//Pk estandar para todas las clases
+		var pk = new javaM!Attribute();
+		pk.name = 'id';
+		pk.type = string2PrimitiveType('int'); 
+		var a = new javaM!Annotation();
+		a.type="Id";
+		pk.annotations.add(a);	
+		e.attributes.add(pk);
+		
+		
+		var mSimple = t.getSimpleVars();
+		for(myVar in mSimple.keySet()) 
+		{
+			var pk = new javaM!Attribute();
+			pk.name = mSimple.get(myVar).get('name');
+			pk.type = string2PrimitiveType(mSimple.get(myVar).get('type')); 
+			e.attributes.add(pk);
+		}
+		
+		entities.add(e);
+	}
+	return entities;
+}
+
+operation sql!Database setEntitiesRealationships(){
+	for(t in self.tables){
+		var e: javaM!Class = geEntityByName(t.name);
+		var mFk = t.getFKVars();
+		for(myVar in mFk.keySet()) 
+		{
+			var pk = new javaM!Attribute();
+			pk.name = mFk.get(myVar).get('name');
+			pk.type = geEntityByName(mFk.get(myVar).get('type')); 
+			
+			var a = new javaM!Annotation();
+			a.type="ManyToOne";
+			a.content = "(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)";
+			pk.annotations.add(a);
+			
+			var a = new javaM!Annotation();
+			a.type="PrimaryKeyJoinColumn";
+			pk.annotations.add(a);
+			
+			var a = new javaM!Annotation();
+			a.type="PodamExclude";
+			pk.annotations.add(a);
+			
+			e.attributes.add(pk);
+		}
+		
+		
+		var fks = sql!ForeignKey.all.select(fk | fk.foreignTable.name.asString() <> ""); 
+		var otherTableFKs = fks.select(fk | fk.foreignTable.name == t.name);
+		
+		for(fk in otherTableFKs){
+			var pk = new javaM!Attribute();
+			pk.name = fk.eContainer.name.firstToLowerCase + "s";
+			pk.type = getList(fk.eContainer.name);
+			
+			var a = new javaM!Annotation();
+			a.type="OneToMany";
+			a.content = "(cascade = CascadeType.ALL, mappedBy=\""+e.name.firstToLowerCase+"\")";
+			pk.annotations.add(a);
+			
+			var a = new javaM!Annotation();
+			a.type="PodamExclude";
+			pk.annotations.add(a);
+			 
+			e.attributes.add(pk);
+		}
+		//e.name.println();
+	}
+}
+
+
+operation sql!Database getTestPackage( dao, entities ): javaM!Package{
+	var sourceP = new javaM!Package();
+	sourceP.name = "test.java";
+	
+	for(e in entities){
+		var te = new javaM!TestClass();
+		te.dao = dao;
+		te.entity = e;
+		te.name = e.name + "Test";
+		sourceP.classes.add(te);
+	}
+	
+	return sourceP;
+}
+
+operation getPrimitiveTypes(): List{
+	var primitives = new List();
+	var stringP = new javaM!PrimitiveType();
+	stringP.name = "String";
+	primitives.add(stringP);
+	
+	var intP = new javaM!PrimitiveType();
+	intP.name = "int";
+	primitives.add(intP);
+	
+	return primitives;
+	
+}
+
+operation getListTypes(): List{
+	var lists = new List();
+	
+	var cs = javaM!Class.all();
+	for(c in cs){
+		var l = new javaM!Container();
+		l.type = "List";
+		l.param = c;
+		l.name = "List<"+ l.param.name +">";
+		lists.add(l);
+	}
+	return lists;
+}
+
+operation geEntityByName(inName): javaM!Class{
+	var cs = javaM!EntityClass.all;
+	return cs.select(c | c.name == inName).at(0);
+}
+
+operation getList(className): javaM!Container{
+	var cs = javaM!Container.all();
+	return cs.select(c | c.param.name == className).at(0);
+}
+
+//----------------------------------
+//Helpers
+//----------------------------------
+
+operation string2PrimitiveType(inString){
+	var root: javaM!Program:= javaM!Program.all.at(0);
+	var javaT = inString;
+	
+	if(inString == sql!DataType#VARCHAR255){
+		javaT = 'String';
+	}
+	else if(inString == sql!DataType#INT){
+		javaT = 'int';
+	}
+	
+	for(t in root.primitiveTypes){
+		if(t.name == javaT){
+			return t;
+		}
+	}
+	return null;
+}
+
+
+operation sql!Table getPKVars(){
+	var cols = self.facts.select(f | f.isTypeOf(sql!Column)).select(c | c.name.asString() <> "id");
+	
+	var tablePk = self.facts.select(f | f.isTypeOf(sql!PrimaryKey));
+	var tablePkColumns = tablePk.collect(pk | pk.col).flatten();
+	
+	var tableFk = self.facts.select(f | f.isTypeOf(sql!ForeignKey));
+	var tableFkColumns = tableFk.collect(fk | fk.localColumns).flatten();
+	
+	
+	var pkCols = tablePkColumns;
+	var vars = new Map();
+	for(col in pkCols ){
+		var c = new Map();
+		c.put('name', col.name);
+		c.put('type', col.getType());
+		c.put('object', col);
+		vars.put(col.name, c);
+	}
+	return vars;
+}
+
+operation sql!Table getSimpleVars(){
+	var cols = self.facts.select(f | f.isTypeOf(sql!Column)).select(c | c.name.asString() <> "id");
+	
+	var tablePk = self.facts.select(f | f.isTypeOf(sql!PrimaryKey));
+	var tablePkColumns = tablePk.collect(pk | pk.col).flatten();
+	
+	var tableFk = self.facts.select(f | f.isTypeOf(sql!ForeignKey));
+	var tableFkColumns = tableFk.collect(fk | fk.localColumns).flatten();
+	
+	
+	var simpleCols = cols.excludingAll(tablePkColumns).excludingAll(tableFkColumns);
+	var vars = new Map();
+	for(col in simpleCols ){
+		var c = new Map();
+		c.put('name', col.name);
+		c.put('type', col.getType());
+		c.put('object', col);
+		vars.put(col.name, c);
+	}
+	return vars;
+}
+	
+operation sql!Table getFKVars(){
+	var cols = self.facts.select(f | f.isTypeOf(sql!Column)).select(c | c.name.asString() <> "id");
+	
+	var tablePk = self.facts.select(f | f.isTypeOf(sql!PrimaryKey));
+	var tablePkColumns = tablePk.collect(pk | pk.col).flatten();
+	
+	var tableFk = self.facts.select(f | f.isTypeOf(sql!ForeignKey));
+	var tableFkColumns = tableFk.collect(fk | fk.localColumns).flatten();
+		
+	var vars = new Map();
+	for(fk in tableFk) 
+	{
+ 		var c = new Map();
+		c.put('name', fk.foreignTable.name.firstToLowerCase());
+		c.put('type', fk.foreignTable.name);
+		c.put('object', fk);
+		vars.put(fk.foreignTable.name.firstToLowerCase(), c);
+	}	
+		
+	return vars;
+}
+
+
+	

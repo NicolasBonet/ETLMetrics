@@ -1,0 +1,173 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: CallBehaviorAction2HCN.etl 856 2012-07-03 16:35:05Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+import "ActivityNode2HCN.etl";
+
+/****r* ActivityNode2HCN/CallOperationAction2HCN
+ * SUMMARY
+ *  Transfotrm a SysML!CallOperationAction into its HiLeS Petri Net
+ *  representation. ($Rev: 856 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *  This rule creates the asscoaited PN elements required to represent a
+ *  the CallOperationAction. The CallOperationAction behavior is represented by
+ *  HiLeS:Block which is created in the ActivityPartition2Block rule. 
+ *
+ * DERIVED FROM
+ * 	* ActivityNode2HCN
+ * SEE ALSO
+ * 	* ActivityPartition2Block
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule CallOperationAction2HCN
+	transform node : SysML!CallOperationAction
+	to p : HiLeS!Place, a : HiLeS!Arc, t : HiLeS!Transition,
+		p2 : HiLeS!Place, t2 : HiLeS!Transition,
+		a2 : HiLeS!Arc, p3 : HiLeS!Place,t3:HiLeS!Transition, a3 : HiLeS!Arc, a4 : HiLeS!Arc,
+	    a5 : HiLeS!Arc,a6:HiLeS!Arc,a7:HiLeS!Arc
+	extends ActivityNode2HCN
+	{
+		--("CallOperationPN " + node.name).println();
+		if(node.~ap.isDefined())
+		{
+			p2.name = node.~ap.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P2";
+			t2.name = node.~ap.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_T2";
+			p3.name = node.~ap.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P3";
+			t3.name = node.~ap.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_T3";
+			
+			
+		}
+		else
+		{
+			p2.name = node.owner.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P2";
+			t2.name = node.owner.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_T2";
+			p3.name = node.owner.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P3";
+			t3.name = node.owner.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_T3";
+			
+		}
+		
+		a.toNode = t2;
+		a.fromNode = p;
+		
+		a2.toNode = p2;
+		a2.fromNode = t2;
+		
+		a3.fromNode = t2;
+		a3.toPoint = node.inPartition.first().equivalents().selectOne(p : HiLeS!Port | p.direction = HiLeS!PointDirection#input);
+		
+		
+		a4.fromNode = p2;
+		a4.toNode = t3;
+		
+		a5.fromPoint = node.inPartition.first().equivalents().selectOne(p : HiLeS!Port | p.direction = HiLeS!PointDirection#output);
+		a5.toNode = t3;
+		
+		a6.fromNode = t3;
+		a6.toNode = p3;
+		
+		a7.fromNode = p3;
+		a7.toNode = t;
+		// Assocaite P2 to the SB/FB
+		node.inPartition.first().equivalent().associated = p2;
+		
+	}
+	/*
+@lazy
+rule CallOperationAction2HCN
+	transform node : SysML!CallOperationAction
+	to p : HiLeS!Place, a : HiLeS!Arc, t : HiLeS!Transition,
+		p2 : HiLeS!Place, t2 : HiLeS!Transition,
+		a2 : HiLeS!Arc, p3 : HiLeS!Place,t3:HiLeS!Transition, a3 : HiLeS!Arc, a4 : HiLeS!Arc,
+	    a5 : HiLeS!Arc,a6:HiLeS!Arc,a7:HiLeS!Arc
+	extends ActivityNode2HCN
+	{
+		--("CallOperationPN " + node.name).println();
+		if(node.~ap.isDefined())
+		{
+			p2.name = node.~ap.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P2";
+			t2.name = node.~ap.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_T2";
+			p3.name = node.~ap.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P3";
+			t3.name = node.~ap.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_T3";
+			
+			
+		}
+		else
+		{
+			p2.name = node.owner.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P2";
+			t2.name = node.owner.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_T2";
+			p3.name = node.owner.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P3";
+			t3.name = node.owner.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_T3";
+			
+		}
+		
+		a.toNode = t;
+		a.fromNode = p;
+		
+		a2.toNode = p2;
+		a2.fromNode = t;
+		
+		a3.fromNode = t;
+		a3.toPoint = node.inPartition.first().equivalents().selectOne(p : HiLeS!Port | p.direction = HiLeS!PointDirection#input);
+		
+		
+		a4.fromNode = p2;
+		a4.toNode = t2;
+		
+		a5.fromPoint = node.inPartition.first().equivalents().selectOne(p : HiLeS!Port | p.direction = HiLeS!PointDirection#output);
+		a5.toNode = t2;
+		
+		a6.fromNode = t2;
+		a6.toNode = p3;
+		
+		a7.fromNode = p3;
+		a7.toNode = t3;
+		// Assocaite P2 to the SB/FB
+		node.inPartition.first().equivalent().associated = p2;
+		
+	}*/
+/*rule CallOperationAction2HCN
+	transform node : SysML!CallOperationAction
+	to p : HiLeS!Place, a : HiLeS!Arc, t : HiLeS!Transition,
+		p2 : HiLeS!Place, t2 : HiLeS!Transition,
+		a2 : HiLeS!Arc, a3 : HiLeS!Arc, a4 : HiLeS!Arc,
+	    a5 : HiLeS!Arc
+	extends ActivityNode2HCN
+	{
+		--("CallOperationPN " + node.name).println();
+		if(node.~ap.isDefined())
+		{
+			p2.name = node.~ap.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P2";
+			t2.name = node.~ap.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_T2";
+		}
+		else
+		{
+			p2.name = node.owner.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P2";
+			t2.name = node.owner.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_T2";
+		}
+		a.toNode = t2;
+		a.fromNode = p;
+		a2.fromNode = t2;
+		a2.toNode = p2;
+		a4.fromNode = p2;
+		a4.toNode = t;
+		
+		a3.fromNode = t2;
+		a3.toPoint = node.inPartition.first().equivalents().selectOne(p : HiLeS!Port | p.direction = HiLeS!PointDirection#input);
+		a5.fromPoint = node.inPartition.first().equivalents().selectOne(p : HiLeS!Port | p.direction = HiLeS!PointDirection#output);
+		a5.toNode = t;
+		
+	}*/

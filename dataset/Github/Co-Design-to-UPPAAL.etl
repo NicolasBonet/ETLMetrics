@@ -1,0 +1,1892 @@
+// Get auxiliary operations
+import "eol/Co-Design-to-UPPAAL_Operations.eol";
+
+pre 
+{
+	var i = 0;
+	var actor_counter=0; //to give IDs to each actor in System Declarations
+	var processor_counter=0; //to give IDs to each processor in System Declarations	
+	var vfi_counter=0; //to give IDs to each VFI in System Declarations		
+	var actorCount = InSDF!Actor.all.size(); //Number of Actors
+	var processorCount = InPlatform!Processor.all.size(); //Number of Processors
+	var vfiCount = InPlatform!VoltageFrequencyIsland.all.size(); // to count number of VFIs
+	var HighestFreq;
+	// var frequencyCount; // to count number of Frequencies
+	//frequencyCount.println;
+	var inBufferMap;
+	var inTokenMap;
+	var inIdleLocFreqMap;
+	var inActorCounterMap;
+	var inEdgeActorIDMap;	//to determine Actor parameter for Select in the Fire and End Edges of SDF Template 
+	var inProcTempEdgeActorIDMap; 	//to determine Actor parameter for Select in the Fire and End Edges of Processor Template 
+	var inProcessorTemplateMap;	//to determine Processor Template for each Processor Type
+	var inProcessorTemplateLocalClockMap;	//to determine Local Clock Variable for each Processor Type
+	var inProcessorTemplateVFIvariableMap;	//to determine VFI variable for each Processor Type
+	var inProcessorTemplateProcessorIndexMap;	//to determine Processor Index Variable for each Processor Type	
+	var inActorVarSysDecMap;	//to determine actor variables for System Declarations
+	var inVFIVarSysDecMap; 	//to determine VFI variables for System Declarations
+	//var inIdleFreqPowerMap; //to determine the power consumption of a processor Type at each frequency level where the processor is idle
+	//var inRunFreqPowerMap; 	//to determine the power consumption of a processor Type at each frequency level where the processor is working
+	var inActorExecTimeMap; 	//to determine the execution times of the each actor on different processor Types	
+	var inSchedulerFirstEdgeChanMap; 	//to determine the channel of first edge in Scheduler Template		
+	var inSchedulerSecEdgeChanMap; 	//to determine the channel of first edge in Scheduler Template	
+	
+	//Creating Maps
+	if (inBufferMap.isUndefined()) 
+	{
+		// create the map
+		inBufferMap = new Map;
+	}
+	
+	if (inTokenMap.isUndefined()) 
+	{
+		// create the map
+		inTokenMap = new Map;
+	}
+	
+	if (inIdleLocFreqMap.isUndefined()) 
+	{
+		// create the map
+		inIdleLocFreqMap = new Map;
+	}
+	
+	if (inActorCounterMap.isUndefined()) 
+	{
+		// create the map
+		inActorCounterMap = new Map;
+	}
+	if (inEdgeActorIDMap.isUndefined()) 
+	{
+		// create the map
+		inEdgeActorIDMap = new Map;
+	}
+	if (inProcessorTemplateMap.isUndefined()) 
+	{
+		// create the map
+		inProcessorTemplateMap = new Map;
+	}
+	if (inProcessorTemplateLocalClockMap.isUndefined())
+	{
+		inProcessorTemplateLocalClockMap=new Map;
+	}
+	if (inActorVarSysDecMap.isUndefined()) 
+	{
+		// create the map
+		inActorVarSysDecMap = new Map;
+	}
+	if (inProcTempEdgeActorIDMap.isUndefined()) 
+	{
+		// create the map
+		inProcTempEdgeActorIDMap = new Map;
+	}
+	if (inVFIVarSysDecMap.isUndefined()) 
+	{
+		// create the map
+		inVFIVarSysDecMap = new Map;
+	}
+	
+	if (inActorExecTimeMap.isUndefined())
+	{
+		inActorExecTimeMap= new Map;
+	}
+	
+	if(inSchedulerFirstEdgeChanMap.isUndefined())
+	{
+		inSchedulerFirstEdgeChanMap = new Map;
+	}	
+	
+	if(inSchedulerSecEdgeChanMap.isUndefined())
+	{
+		inSchedulerSecEdgeChanMap = new Map;
+	}
+	if(inProcessorTemplateVFIvariableMap.isUndefined())
+	{
+		inProcessorTemplateVFIvariableMap = new Map;
+	}
+	if(inProcessorTemplateProcessorIndexMap.isUndefined())
+	{
+		inProcessorTemplateProcessorIndexMap = new Map;
+	}
+	
+	//if (inIdleFreqPowerMap.isUndefined())
+	//{
+	//inIdleFreqPowerMap=new Map;
+	//}
+	
+	//if (inRunFreqPowerMap.isUndefined())
+	//{
+	//inRunFreqPowerMap=new Map;
+	//}
+
+	var out_NTA = new Out!NTA;
+	
+	//Setting name and comment for the model @INTER
+    out_NTA.name = System.user.prompt("Please enter a name for the system!");
+    //out_NTA.comment = System.user.prompt("Please enter a comment for the system!", "Bugra is a great guy!");
+	
+	//Generating global definitions area
+    var globalDeclarations= new Out!GlobalDeclarations;
+    out_NTA.globalDeclarations= globalDeclarations;//Attaching it to NTA
+       
+    //Generating system declaration area  
+    var systemDeclarations= new Out!SystemDeclarations;
+    out_NTA.systemDeclarations = systemDeclarations;//Attaching it to NTA 
+    var system= new Out!System;
+    systemDeclarations.system = system;
+    var instantiationList = new Out!InstantiationList;//Instantiating template list in system definitions
+    system.instantiationList.add(instantiationList);//Setting as property
+		
+	//Creating general data types
+	var predefinedInt = new Out!PredefinedType; //int
+	predefinedInt.name = "int";
+	out_NTA.int= predefinedInt;//Attaching it to NTA
+	   
+	var predefinedBool = new Out!PredefinedType; //bool
+	predefinedBool.name = "bool";
+	predefinedBool.type = Out!BuiltInType#BOOL;
+	out_NTA.bool= predefinedBool;//Attaching it to NTA
+	   
+	var predefinedClock= new Out!PredefinedType;//clock
+	predefinedClock.name= "clock";
+	predefinedClock.type= Out!BuiltInType#CLOCK;
+	out_NTA.clock= predefinedClock;//Attaching it to NTA
+	   
+	var predefinedChan= new Out!PredefinedType;//chan
+	predefinedChan.name= "chan";
+	predefinedChan.type= Out!BuiltInType#CHAN;
+	out_NTA.chan= predefinedChan;//Attaching it to NTA
+	   
+	var predefinedVoid= new Out!PredefinedType;//void
+	predefinedVoid.name= "void";
+	predefinedVoid.type= Out!BuiltInType#VOID;
+	out_NTA.void= predefinedVoid;//Attaching it to NTA
+
+	// Global Clock Variable Declaration
+	var globalClockVarDec= new Out!ClockVariableDeclaration; 
+	out_NTA.globalDeclarations.declaration.add(globalClockVarDec);
+		 
+	// Global Clock Variable Declaration Type Reference
+	var globalClockVarTypeRef= new Out!TypeReference;
+	globalClockVarTypeRef.referredType=out_NTA.clock;
+	globalClockVarDec.typeDefinition = globalClockVarTypeRef;
+	     
+	// Global Clock Variable
+	var globalClockVar = new Out!Variable;
+	globalClockVar.name = "globalClock";
+	globalClockVarDec.variable.add(globalClockVar);
+	
+	//Global Number of Frequencies of Each Processor Type Variable Declaration
+	for (pt in InPlatform!ProcessorType)
+	{
+	var freqVarDec= new Out!DataVariableDeclaration; 
+	out_NTA.globalDeclarations.declaration.add(freqVarDec);
+	freqVarDec.prefix=Out!DataVariablePrefix#CONST; 
+		 
+	// Global Number of Frequencies Variable Declaration Type Reference
+	var freqVarTypeRef= new Out!TypeReference;
+	freqVarTypeRef.referredType=out_NTA.int;
+	freqVarDec.typeDefinition = freqVarTypeRef;
+	     
+	// Global Number of Frequencies Variable
+	var freqVar = new Out!Variable;
+	freqVar.name = "nFrequencies"+"_"+pt.identifier;
+	freqVarDec.variable.add(freqVar);
+		 
+	// Global Number of Frequencies Variable Initialiser
+	var freqVarInit = new Out!ExpressionInitializer;
+	freqVar.initializer = freqVarInit;
+		 
+	// Global Number of Frequencies Variable Initialiser Literal Expression
+	var freqVarInitLiteral = new Out!LiteralExpression;
+	var nrFreq: Collection = pt.possibleStates.select(pt | pt.isWorking=false);
+	freqVarInitLiteral.text = nrFreq.frequency.size+"";
+	freqVarInit.expression= freqVarInitLiteral;
+	}
+	
+	// Global Number of Processors Variable Declaration
+	var procVarDec= new Out!DataVariableDeclaration; 
+	out_NTA.globalDeclarations.declaration.add(procVarDec);
+	procVarDec.prefix=Out!DataVariablePrefix#CONST; 
+			 
+	// Global Number of Processors Variable Declaration Type Reference
+	var procVarTypeRef= new Out!TypeReference;
+	procVarTypeRef.referredType=out_NTA.int;
+	procVarDec.typeDefinition = procVarTypeRef;
+		     
+	//Global Number of Processors Variable
+	var procVar = new Out!Variable;
+	procVar.name = "nProcessors";
+	procVarDec.variable.add(procVar);
+			 
+	//Global Number of Processors Variable Initialiser
+	var procVarInit = new Out!ExpressionInitializer;
+	procVar.initializer = procVarInit;
+		 
+	//Global Number of Processors Variable Initialiser Literal Expression
+	var procVarInitLiteral = new Out!LiteralExpression;
+	procVarInitLiteral.text = processorCount+"";
+	procVarInit.expression=procVarInitLiteral;
+	
+	// Global Processors Type Declaration
+	var procTypeDec= new Out!TypeDeclaration; 
+	out_NTA.globalDeclarations.declaration.add(procTypeDec);
+		 
+	// Global Processors Type Declaration Range Specification
+	var procTypeDecSpec= new Out!RangeTypeSpecification; 
+	procTypeDec.typeDefinition = procTypeDecSpec;
+		 
+	// Global Processors Type Declaration Range Specification Integer Bounds
+	var procTypeDecSpecIntBound= new Out!IntegerBounds; 
+	procTypeDecSpec.bounds = procTypeDecSpecIntBound;
+		 
+	// Global Processors Type Declaration Range Specification Integer Bounds (Lower)
+	var procTypeDecSpecIntBoundLower = new Out!LiteralExpression;
+	procTypeDecSpecIntBoundLower.text = "0";
+	procTypeDecSpecIntBound.lowerBound=procTypeDecSpecIntBoundLower;
+		 
+	// Global Processors Type Declaration Range Specification Integer Bounds (Upper)
+	var procTypeDecSpecIntBoundUpper = new Out!ArithmeticExpression;
+	procTypeDecSpecIntBoundUpper.operator = Out!ArithmeticOperator#SUBTRACT;
+	procTypeDecSpecIntBound.upperBound=procTypeDecSpecIntBoundUpper;
+	
+	// Global Processors Type Declaration Range Specification Integer Bounds (Upper) First Expression	 
+	var procTypeDecSpecIntBoundUpperFirstVariable = new Out!IdentifierExpression;
+	procTypeDecSpecIntBoundUpperFirstVariable.identifier = procVar;
+	procTypeDecSpecIntBoundUpper.firstExpr=procTypeDecSpecIntBoundUpperFirstVariable;
+	
+	// Global Processors Type Declaration Range Specification Integer Bounds (Upper) Second Expression	 
+	var procTypeDecSpecIntBoundUpperSecondVariable = new Out!LiteralExpression;
+	procTypeDecSpecIntBoundUpperSecondVariable.text = "1";
+	procTypeDecSpecIntBoundUpper.secondExpr=procTypeDecSpecIntBoundUpperSecondVariable;
+	
+	// Global Processors Type Declaration Declared Type
+	var procTypeDecTypeDeclaration = new Out!DeclaredType;
+	procTypeDecTypeDeclaration.name = "id_processors";
+	procTypeDecTypeDeclaration.typeDeclaration=procTypeDec;
+	
+	// Global cost Variable Declaration
+	var costVarDec= new Out!DataVariableDeclaration; 
+	out_NTA.globalDeclarations.declaration.add(costVarDec);
+			 
+	// Global Cost Variable Declaration Type Reference
+	var costVarTypeRef= new Out!TypeReference;
+	costVarTypeRef.referredType=out_NTA.int;
+	costVarDec.typeDefinition = costVarTypeRef;
+		     
+	//Global Cost Variable
+	var costVar = new Out!Variable;
+	costVar.name = "cost";
+	costVarDec.variable.add(costVar);
+
+	// Global cost' Variable Declaration
+	var costRateVarDec= new Out!DataVariableDeclaration; 
+	out_NTA.globalDeclarations.declaration.add(costRateVarDec);
+			 
+	// Global Cost' Variable Declaration Type Reference
+	var costRateVarTypeRef= new Out!TypeReference;
+	costRateVarTypeRef.referredType=out_NTA.int;
+	costRateVarDec.typeDefinition = costRateVarTypeRef;
+		     
+	//Global Cost' Variable
+	var costRateVar = new Out!Variable;
+	costRateVar.name = "cost'";
+	costRateVarDec.variable.add(costRateVar);		
+	
+	//Global Number of Actors Variable Declaration
+	var actorVarDec= new Out!DataVariableDeclaration; 
+	out_NTA.globalDeclarations.declaration.add(actorVarDec);
+	actorVarDec.prefix=Out!DataVariablePrefix#CONST; 
+	 
+	//Global Number of Actors Variable Declaration Type Reference
+	var actorVarTypeRef= new Out!TypeReference;
+	actorVarTypeRef.referredType=out_NTA.int;
+	actorVarDec.typeDefinition = actorVarTypeRef;
+	 
+	//Global Number of Actors Variable
+	var actorVar = new Out!Variable;
+	actorVar.name = "nActors";
+	actorVarDec.variable.add(actorVar);
+	 
+	//Global Number of Actors Variable Initialiser
+	var actorVarInit = new Out!ExpressionInitializer;
+	actorVar.initializer = actorVarInit;
+	 
+	//Global Number of Actors Variable Initialiser Literal Expression
+	var actorVarInitLiteral = new Out!LiteralExpression;
+	actorVarInitLiteral.text = actorCount+"";
+	actorVarInit.expression= actorVarInitLiteral; 
+		 
+	//Global Number of VFIs Variable Declaration
+	var vfiVarDec= new Out!DataVariableDeclaration; 
+	out_NTA.globalDeclarations.declaration.add(vfiVarDec);
+	vfiVarDec.prefix=Out!DataVariablePrefix#CONST; 
+	 
+	//Global Number of VFIs Variable Declaration Type Reference
+	var vfiVarTypeRef= new Out!TypeReference;
+	vfiVarTypeRef.referredType=out_NTA.int;
+	vfiVarDec.typeDefinition = vfiVarTypeRef;
+	 
+	//Global Number of VFIs Variable
+	var vfiVar = new Out!Variable;
+	vfiVar.name = "nVFIs";
+	vfiVarDec.variable.add(vfiVar);
+	 
+	//Global Number of VFIs Variable Initialiser
+	var vfiVarInit = new Out!ExpressionInitializer;
+	vfiVar.initializer = vfiVarInit;
+	 
+	//Global Number of VFIs Variable Initialiser Literal Expression
+	var vfiVarInitLiteral = new Out!LiteralExpression;
+	vfiVarInitLiteral.text = vfiCount+"";
+	vfiVarInit.expression= vfiVarInitLiteral;
+	
+	// Global VFIs Type Declaration
+	var vfiTypeDec= new Out!TypeDeclaration; 
+	out_NTA.globalDeclarations.declaration.add(vfiTypeDec);
+		 
+	// Global VFIs Type Declaration Range Specification
+	var vfiTypeDecSpec= new Out!RangeTypeSpecification; 
+	vfiTypeDec.typeDefinition = vfiTypeDecSpec;
+		 
+	// Global VFIs Type Declaration Range Specification Integer Bounds
+	var vfiTypeDecSpecIntBound= new Out!IntegerBounds; 
+	vfiTypeDecSpec.bounds = vfiTypeDecSpecIntBound;
+		 
+	// Global VFIs Type Declaration Range Specification Integer Bounds (Lower)
+	var vfiTypeDecSpecIntBoundLower = new Out!LiteralExpression;
+	vfiTypeDecSpecIntBoundLower.text = "0";
+	vfiTypeDecSpecIntBound.lowerBound=vfiTypeDecSpecIntBoundLower;
+		 
+	// Global VFIs Type Declaration Range Specification Integer Bounds (Upper)
+	var vfiTypeDecSpecIntBoundUpper = new Out!ArithmeticExpression;
+	vfiTypeDecSpecIntBoundUpper.operator = Out!ArithmeticOperator#SUBTRACT;
+	vfiTypeDecSpecIntBound.upperBound=vfiTypeDecSpecIntBoundUpper;
+	
+	// Global VFIs Type Declaration Range Specification Integer Bounds (Upper) First Expression	 
+	var vfiTypeDecSpecIntBoundUpperFirstVariable = new Out!IdentifierExpression;
+	vfiTypeDecSpecIntBoundUpperFirstVariable.identifier = vfiVar;
+	vfiTypeDecSpecIntBoundUpper.firstExpr=vfiTypeDecSpecIntBoundUpperFirstVariable;
+	
+	// Global VFIs Type Declaration Range Specification Integer Bounds (Upper) Second Expression	 
+	var vfiTypeDecSpecIntBoundUpperSecondVariable = new Out!LiteralExpression;
+	vfiTypeDecSpecIntBoundUpperSecondVariable.text = "1";
+	vfiTypeDecSpecIntBoundUpper.secondExpr=vfiTypeDecSpecIntBoundUpperSecondVariable;
+	
+	// Global VFIs Type Declaration Declared Type
+	var vfiTypeDecTypeDeclaration = new Out!DeclaredType;
+	vfiTypeDecTypeDeclaration.name = "id_VFIs";
+	vfiTypeDecTypeDeclaration.typeDeclaration=vfiTypeDec; 	
+	
+	// Global Current Frequency Variable Declaration
+	var currFreqVarDec= new Out!DataVariableDeclaration; 
+	out_NTA.globalDeclarations.declaration.add(currFreqVarDec);
+			 
+	// Global Current Frequency Variable Declaration Type Reference
+	var currFreqVarTypeRef= new Out!TypeReference;
+	currFreqVarTypeRef.referredType=out_NTA.int;
+	currFreqVarDec.typeDefinition = currFreqVarTypeRef;
+	
+	//Global Current Frequency Variable
+	var currFreqVar= new Out!Variable;     
+	currFreqVar.name = "curr_freq";
+	currFreqVarDec.variable.add(currFreqVar);
+	
+	// Global Current Frequency Variable Value Index
+	 var currFreqVarValueIndex= new Out!ValueIndex;
+	 currFreqVar.index.add(currFreqVarValueIndex);	
+	 
+	// Global Current Frequency Variable Value Index Variable Expression 
+	var currFreqVarValueIndexVariable = new Out!IdentifierExpression;
+	currFreqVarValueIndexVariable.identifier = vfiVar;
+	currFreqVarValueIndex.sizeExpression=currFreqVarValueIndexVariable;
+	
+	// Global Current Frequency Variable Array Initialiser
+	var currFreqVarInit = new Out!ArrayInitializer;
+	currFreqVar.initializer = currFreqVarInit;	
+	
+	// Global Number of Occupied Processors Variable Declaration
+	var nrOccProcVarDec = new Out!DataVariableDeclaration;
+	out_NTA.globalDeclarations.declaration.add(nrOccProcVarDec);
+			 
+	// Global Number of Occupied Processors Variable Declaration Type Reference
+	var nrOccProcVarTypeRef= new Out!TypeReference;
+	nrOccProcVarTypeRef.referredType=out_NTA.int;
+	nrOccProcVarDec.typeDefinition = nrOccProcVarTypeRef;
+	
+	// Global Number of Occupied Processors Variable
+	var nrOccProcVar= new Out!Variable;     
+	nrOccProcVar.name = "occupied_processor_count";
+	nrOccProcVarDec.variable.add(nrOccProcVar);
+	
+	// Global Number of Occupied Processors Variable Value Index
+	 var nrOccProcVarValueIndex= new Out!ValueIndex;
+	 nrOccProcVar.index.add(nrOccProcVarValueIndex);	
+	 
+	// Global Number of Occupied Processors Variable Value Index Variable Expression 
+	var nrOccProcVarValueIndexVariable = new Out!IdentifierExpression;
+	nrOccProcVarValueIndexVariable.identifier = vfiVar;
+	nrOccProcVarValueIndex.sizeExpression=nrOccProcVarValueIndexVariable;
+
+		
+	//Function Produce Declaration
+	var functProduceDec= new Out!FunctionDeclaration; 
+	out_NTA.globalDeclarations.declaration.add(functProduceDec);	
+	
+	//Function Produce Declaration Function
+	var functProduceDecFunct= new Out!Function; 
+	functProduceDec.`function`=functProduceDecFunct;	
+	functProduceDecFunct.name="produce";	
+	
+	//Function Produce Declaration Function Return Type Reference
+	var functProduceDecFunctRef= new Out!TypeReference;
+	functProduceDecFunctRef.referredType=out_NTA.void;	
+	functProduceDecFunct.returnType = functProduceDecFunctRef;	
+	
+	//Function Produce Declaration Function First Parameter
+	var functProduceDecFunctFirstParam= new Out!Parameter;
+	functProduceDecFunctFirstParam.callType=Out!CallType#CALL_BY_REFERENCE; 
+	functProduceDecFunct.parameter.add(functProduceDecFunctFirstParam);
+	
+	//Function Produce Declaration Function First Parameter Data Variable Declaration
+	var functProduceDecFunctFirstParamVarDec= new Out!DataVariableDeclaration; 
+	functProduceDecFunctFirstParam.variableDeclaration=functProduceDecFunctFirstParamVarDec;
+	
+	//Function Produce Declaration Function First Parameter Data Variable Declaration Type Reference
+	var functProduceDecFunctFirstParamVarDecTypeRef= new Out!TypeReference;
+	functProduceDecFunctFirstParamVarDecTypeRef.referredType=out_NTA.int;
+	functProduceDecFunctFirstParamVarDec.typeDefinition = functProduceDecFunctFirstParamVarDecTypeRef;
+	 
+	//Function Produce Declaration Function First Parameter Data Variable Declaration Variable
+	var functProduceDecFunctFirstParamVarDecVar = new Out!Variable;
+	functProduceDecFunctFirstParamVarDecVar.name = "buffer_tokens";
+	functProduceDecFunctFirstParamVarDec.variable.add(functProduceDecFunctFirstParamVarDecVar);		
+	
+	//Function Produce Declaration Function Second Parameter
+	var functProduceDecFunctSecParam= new Out!Parameter;
+	functProduceDecFunctSecParam.callType=Out!CallType#CALL_BY_VALUE; 
+	functProduceDecFunct.parameter.add(functProduceDecFunctSecParam);
+	
+	//Function Produce Declaration Function Second Parameter Data Variable Declaration
+	var functProduceDecFunctSecParamVarDec= new Out!DataVariableDeclaration; 
+	functProduceDecFunctSecParam.variableDeclaration=functProduceDecFunctSecParamVarDec;
+	
+	//Function Produce Declaration Function Second Parameter Data Variable Declaration Type Reference
+	var functProduceDecFunctSecParamVarDecTypeRef= new Out!TypeReference;
+	functProduceDecFunctSecParamVarDecTypeRef.referredType=out_NTA.int;
+	functProduceDecFunctSecParamVarDec.typeDefinition = functProduceDecFunctSecParamVarDecTypeRef;
+	 
+	//Function Produce Declaration Function Second Parameter Data Variable Declaration Variable
+	var functProduceDecFunctSecParamVarDecVar = new Out!Variable;
+	functProduceDecFunctSecParamVarDecVar.name = "tokens";
+	functProduceDecFunctSecParamVarDec.variable.add(functProduceDecFunctSecParamVarDecVar);	
+	
+	//Function Produce Declaration Function Block
+	var functProduceFunctBlock= new Out!Block;
+	functProduceDecFunct.block=functProduceFunctBlock;
+	
+	//Function Produce Declaration Function Block Expression Statement
+	var functProduceFunctBlockExprStatement= new Out!ExpressionStatement;
+	functProduceFunctBlock.statement.add(functProduceFunctBlockExprStatement);
+	
+	//Function Produce Declaration Function Block Expression Statement Assignment Expression
+	var functProduceFunctBlockExprStatementExprExpression= new Out!AssignmentExpression;
+	functProduceFunctBlockExprStatementExprExpression.operator=Out!AssignmentOperator#PLUS_EQUAL; 
+	functProduceFunctBlockExprStatement.expression=functProduceFunctBlockExprStatementExprExpression;
+	
+	//Function Produce Declaration Function Block Expression Statement Assignment Expression First Expression
+	var functProduceFunctBlockExprStatementExprExpressionFirstExpr= new Out!IdentifierExpression;
+	functProduceFunctBlockExprStatementExprExpressionFirstExpr.identifier=functProduceDecFunctFirstParamVarDecVar; 
+	functProduceFunctBlockExprStatementExprExpression.firstExpr=functProduceFunctBlockExprStatementExprExpressionFirstExpr;
+	
+	//Function Produce Declaration Function Block Expression Statement Assignment Expression Second Expression
+	var functProduceFunctBlockExprStatementExprExpressionSecondExpr= new Out!IdentifierExpression;
+	functProduceFunctBlockExprStatementExprExpressionSecondExpr.identifier=functProduceDecFunctSecParamVarDecVar; 
+	functProduceFunctBlockExprStatementExprExpression.secondExpr=functProduceFunctBlockExprStatementExprExpressionSecondExpr;	
+		
+	//Function Consume Declaration
+	var functConsumeDec= new Out!FunctionDeclaration; 
+	out_NTA.globalDeclarations.declaration.add(functConsumeDec);	
+	
+	//Function Consume Declaration Function
+	var functConsumeDecFunct= new Out!Function; 	
+	functConsumeDec.`function`=functConsumeDecFunct;	
+	functConsumeDecFunct.name="consume";	
+	
+	//Function Consume Declaration Function Return Type Reference
+	var functConsumeDecFunctRef= new Out!TypeReference;
+	functConsumeDecFunctRef.referredType=out_NTA.void;	
+	functConsumeDecFunct.returnType = functConsumeDecFunctRef;	
+	
+	//Function Produce Declaration Function First Parameter
+	var functConsumeDecFunctFirstParam= new Out!Parameter;
+	functConsumeDecFunctFirstParam.callType=Out!CallType#CALL_BY_REFERENCE; 
+	functConsumeDecFunct.parameter.add(functConsumeDecFunctFirstParam);
+	
+	//Function Consume Declaration Function First Parameter Data Variable Declaration
+	var functConsumeDecFunctFirstParamVarDec= new Out!DataVariableDeclaration; 
+	functConsumeDecFunctFirstParam.variableDeclaration=functConsumeDecFunctFirstParamVarDec;
+	
+	//Function Consume Declaration Function First Parameter Data Variable Declaration Type Reference
+	var functConsumeDecFunctFirstParamVarDecTypeRef= new Out!TypeReference;
+	functConsumeDecFunctFirstParamVarDecTypeRef.referredType=out_NTA.int;
+	functConsumeDecFunctFirstParamVarDec.typeDefinition = functConsumeDecFunctFirstParamVarDecTypeRef;
+	 
+	//Function Consume Declaration Function First Parameter Data Variable Declaration Variable
+	var functConsumeDecFunctFirstParamVarDecVar = new Out!Variable;
+	functConsumeDecFunctFirstParamVarDecVar.name = "buffer_tokens";
+	functConsumeDecFunctFirstParamVarDec.variable.add(functConsumeDecFunctFirstParamVarDecVar);		
+	
+	//Function Consume Declaration Function Second Parameter
+	var functConsumeDecFunctSecParam= new Out!Parameter;
+	functConsumeDecFunctSecParam.callType=Out!CallType#CALL_BY_VALUE; 
+	functConsumeDecFunct.parameter.add(functConsumeDecFunctSecParam);
+	
+	//Function Consume Declaration Function Second Parameter Data Variable Declaration
+	var functConsumeDecFunctSecParamVarDec= new Out!DataVariableDeclaration; 
+	functConsumeDecFunctSecParam.variableDeclaration=functConsumeDecFunctSecParamVarDec;
+	
+	//Function Consume Declaration Function Second Parameter Data Variable Declaration Type Reference
+	var functConsumeDecFunctSecParamVarDecTypeRef= new Out!TypeReference;
+	functConsumeDecFunctSecParamVarDecTypeRef.referredType=out_NTA.int;
+	functConsumeDecFunctSecParamVarDec.typeDefinition = functConsumeDecFunctSecParamVarDecTypeRef;
+	 
+	//Function Consume Declaration Function Second Parameter Data Variable Declaration Variable
+	var functConsumeDecFunctSecParamVarDecVar = new Out!Variable;
+	functConsumeDecFunctSecParamVarDecVar.name = "tokens";
+	functConsumeDecFunctSecParamVarDec.variable.add(functConsumeDecFunctSecParamVarDecVar);	
+	
+	//Function Consume Declaration Function Block
+	var functConsumeFunctBlock= new Out!Block;
+	functConsumeDecFunct.block=functConsumeFunctBlock;
+	
+	//Function Consume Declaration Function Block Expression Statement
+	var functConsumeFunctBlockExprStatement= new Out!ExpressionStatement;
+	functConsumeFunctBlock.statement.add(functConsumeFunctBlockExprStatement);
+	
+	//Function Consume Declaration Function Block Expression Statement Assignment Expression
+	var functConsumeFunctBlockExprStatementExprExpression= new Out!AssignmentExpression;
+	functConsumeFunctBlockExprStatementExprExpression.operator=Out!AssignmentOperator#MINUS_EQUAL; 
+	functConsumeFunctBlockExprStatement.expression=functConsumeFunctBlockExprStatementExprExpression;
+	
+	//Function Consume Declaration Function Block Expression Statement Assignment Expression First Expression
+	var functConsumeFunctBlockExprStatementExprExpressionFirstExpr= new Out!IdentifierExpression;
+	functConsumeFunctBlockExprStatementExprExpressionFirstExpr.identifier=functConsumeDecFunctFirstParamVarDecVar; 
+	functConsumeFunctBlockExprStatementExprExpression.firstExpr=functConsumeFunctBlockExprStatementExprExpressionFirstExpr;
+	
+	//Function Consume Declaration Function Block Expression Statement Assignment Expression Second Expression
+	var functConsumeFunctBlockExprStatementExprExpressionSecondExpr= new Out!IdentifierExpression;
+	functConsumeFunctBlockExprStatementExprExpressionSecondExpr.identifier=functConsumeDecFunctSecParamVarDecVar; 
+	functConsumeFunctBlockExprStatementExprExpression.secondExpr=functConsumeFunctBlockExprStatementExprExpressionSecondExpr;	
+	
+// Global Channel Fire Declaration
+	var globalChanFireDec= new Out!ChannelVariableDeclaration;
+	out_NTA.globalDeclarations.declaration.add(globalChanFireDec);
+		 
+	// Global Channel Fire Declaration Type Reference
+	var globalChanFireTypeRef= new Out!TypeReference;
+	globalChanFireTypeRef.referredType=out_NTA.chan;
+	globalChanFireDec.typeDefinition = globalChanFireTypeRef;
+	     
+	 // Global Channel Fire Variable
+	 var globalChanFireVar= new Out!Variable;
+	 globalChanFireVar.name = "fire";
+	 globalChanFireDec.variable.add(globalChanFireVar);
+
+	 // Global Channel Fire Variable First Value Index
+	 var globalChanFireVarFirstValueIndex= new Out!ValueIndex;
+	 globalChanFireVar.index.add(globalChanFireVarFirstValueIndex);	
+	 
+	// Global Channel Fire Variable First Value Index Variable Expression 
+	var globalChanFireVarFirstValueIndexVariable = new Out!IdentifierExpression;
+	globalChanFireVarFirstValueIndexVariable.identifier = procVar;
+	globalChanFireVarFirstValueIndex.sizeExpression=globalChanFireVarFirstValueIndexVariable;	
+	
+	 // Global Channel Fire Variable Second Value Index
+	 var globalChanFireVarSecondValueIndex= new Out!ValueIndex;
+	 globalChanFireVar.index.add(globalChanFireVarSecondValueIndex);	
+	 
+	// Global Channel Fire Variable First Value Index Variable Expression 
+	var globalChanFireVarSecondValueIndexVariable = new Out!IdentifierExpression;
+	globalChanFireVarSecondValueIndexVariable.identifier = actorVar;
+	globalChanFireVarSecondValueIndex.sizeExpression=globalChanFireVarSecondValueIndexVariable;		 
+	 
+	 // Global Channel End Declaration
+	var globalChanEndDec= new Out!ChannelVariableDeclaration; 
+	out_NTA.globalDeclarations.declaration.add(globalChanEndDec);
+		 
+	// Global Channel End Declaration Type Reference
+	var globalChanEndTypeRef= new Out!TypeReference;
+	globalChanEndTypeRef.referredType=out_NTA.chan;
+	globalChanEndDec.typeDefinition = globalChanEndTypeRef;
+	     
+	// Global Channel End Variable
+	var globalChanEndVar= new Out!Variable;
+	globalChanEndVar.name = "end";
+	globalChanEndDec.variable.add(globalChanEndVar);
+	
+	 // Global Channel End Variable First Value Index
+	 var globalChanEndVarFirstValueIndex= new Out!ValueIndex;
+	 globalChanEndVar.index.add(globalChanEndVarFirstValueIndex);	
+	 
+	// Global Channel Fire Variable First Value Index Variable Expression 
+	var globalChanEndVarFirstValueIndexVariable = new Out!IdentifierExpression;
+	globalChanEndVarFirstValueIndexVariable.identifier = procVar;
+	globalChanEndVarFirstValueIndex.sizeExpression=globalChanEndVarFirstValueIndexVariable;	
+	
+	 // Global Channel Fire Variable Second Value Index
+	 var globalChanEndVarSecondValueIndex= new Out!ValueIndex;
+	 globalChanEndVar.index.add(globalChanEndVarSecondValueIndex);	
+	 
+	// Global Channel Fire Variable First Value Index Variable Expression 
+	var globalChanEndVarSecondValueIndexVariable = new Out!IdentifierExpression;
+	globalChanEndVarSecondValueIndexVariable.identifier = actorVar;
+	globalChanEndVarSecondValueIndex.sizeExpression=globalChanEndVarSecondValueIndexVariable;
+	
+	var SDFtemplate = new Out!Template;
+	out_NTA.template.add(SDFtemplate);//Attaching to NTA
+	SDFtemplate.name="SDF_Graph"; //name of SDF Graph template
+	 
+	var location_Initial_SDFtemplate= new Out!Location; //Creating Location Initial of SDF Graph template
+	SDFtemplate.location.add(location_Initial_SDFtemplate); //Attaching Location Initial to SDF graph template
+	SDFtemplate.init=location_Initial_SDFtemplate; //Attaching Location Initial as an Initial Location of SDF graph template
+	location_Initial_SDFtemplate.name="Initial";
+	
+    //var SysDec = new Out!SystemDeclarations;
+    //nta.systemDeclarations=SysDec;
+	 
+	//Creating System Declarations Template Declarations
+    var sysDecSDFTempDec = new Out!TemplateDeclaration;
+    out_NTA.systemDeclarations.declaration.add(sysDecSDFTempDec);
+     
+    //Creating System Declarations Redefined SDF Graph Template
+    var sysDecTempDecRedefinedSDF = new Out!RedefinedTemplate;
+    sysDecSDFTempDec.declaredTemplate=sysDecTempDecRedefinedSDF;
+    sysDecTempDecRedefinedSDF.name="Redefined_SDF_Graph";
+    sysDecTempDecRedefinedSDF.referredTemplate=SDFtemplate;
+     
+    //Creating System Declarations Redefined SDF Graph Template
+    for (act in InSDF!Actor)
+    {
+	// System Declarations SDF Graph Actor Parameters Declaration
+	var sysDecRedfinedSDFActorParamDec= new Out!DataVariableDeclaration; 
+	out_NTA.systemDeclarations.declaration.add(sysDecRedfinedSDFActorParamDec);
+	sysDecRedfinedSDFActorParamDec.prefix=Out!DataVariablePrefix#CONST; 
+	 
+	// System Declarations SDF Graph Actor Parameters Declaration Type Reference
+	var sysDecRedfinedSDFActorParamDecTypeRef= new Out!TypeReference;
+    sysDecRedfinedSDFActorParamDecTypeRef.referredType=out_NTA.int;
+    sysDecRedfinedSDFActorParamDec.typeDefinition = sysDecRedfinedSDFActorParamDecTypeRef;
+     
+    // System Declarations SDF Graph Actor Parameters Variable
+	var sysDecSDFActorVar = new Out!Variable;
+	sysDecSDFActorVar.name = act.getVarName()+"_declaration";
+	sysDecRedfinedSDFActorParamDec.variable.add(sysDecSDFActorVar);
+	 
+	inActorVarSysDecMap.put(act,sysDecSDFActorVar);
+	// System Declartions SDF Graph Actor Parameters Variable Initialiser
+	var sysDecSDFActorVarInit = new Out!ExpressionInitializer;
+	sysDecSDFActorVar.initializer = sysDecSDFActorVarInit;
+	 
+	// System Declarations SDF Graph Actor Parameters Variable Initialiser Literal Expression
+	var sysDecSDFActorVarInitLiteral = new Out!LiteralExpression;
+	sysDecSDFActorVarInitLiteral.text = actor_counter+"";
+	sysDecSDFActorVarInit.expression= sysDecSDFActorVarInitLiteral;
+	actor_counter=actor_counter+1;
+	 
+    var sysDecSDFTempDecRedefinedArg = new Out!IdentifierExpression;
+    sysDecSDFTempDecRedefinedArg.identifier=sysDecSDFActorVar;
+    sysDecSDFTempDec.argument.add(sysDecSDFTempDecRedefinedArg);
+    }
+     
+    //Creating System Declarations VFI ID
+    for (vfi in InPlatform!VoltageFrequencyIsland)
+    {
+	// System Declarations VFI ID in Redefined PAM Template Parameters Declaration
+	var sysDecvfiIDParamDec= new Out!DataVariableDeclaration; 
+	out_NTA.systemDeclarations.declaration.add(sysDecvfiIDParamDec);
+	sysDecvfiIDParamDec.prefix=Out!DataVariablePrefix#CONST; 
+	 
+	// System Declarations VFI ID Parameters Declaration Type Reference
+	var sysDecvfiIDParamDecTypeRef= new Out!TypeReference;
+    sysDecvfiIDParamDecTypeRef.referredType=out_NTA.int;
+    sysDecvfiIDParamDec.typeDefinition = sysDecvfiIDParamDecTypeRef;
+     
+    // System Declarations VFI ID Parameters Variable
+	var sysDecvfiIDVar = new Out!Variable;
+	sysDecvfiIDVar.name = vfi.identifier+"_declaration";
+	sysDecvfiIDParamDec.variable.add(sysDecvfiIDVar);
+	 
+	inVFIVarSysDecMap.put(vfi,sysDecvfiIDVar);
+	
+	// System Declartions VFI ID Parameters Variable Initialiser
+	var sysDecvfiIDVarInit = new Out!ExpressionInitializer;
+	sysDecvfiIDVar.initializer = sysDecvfiIDVarInit;
+	 
+	// System Declarations VFI ID Parameters Variable Initialiser Literal Expression
+	var sysDecvfiIDVarInitLiteral = new Out!LiteralExpression;
+	sysDecvfiIDVarInitLiteral.text = vfi_counter+"";
+	sysDecvfiIDVarInit.expression= sysDecvfiIDVarInitLiteral;
+	vfi_counter=vfi_counter+1;
+    }     
+     
+    //Attaching Redefined SDF Graph Template to Instantiation List
+    out_NTA.systemDeclarations.system.instantiationList.first().template.add(sysDecTempDecRedefinedSDF);	
+    
+    //Scheduler Template
+	var Schedulertemplate = new Out!Template;
+	out_NTA.template.add(Schedulertemplate);//Attaching to NTA
+	Schedulertemplate.name="Scheduler"; //name of Scheduler Graph template
+	 
+	//var location_Initial_Schedulertemplate= new Out!Location; //Creating Location Initial of Scheduler template
+	var location_Initial_Schedulertemplate = new Out!Location;	
+	Schedulertemplate.location.add(location_Initial_Schedulertemplate); //Attaching Location Initial to Scheduler template
+	Schedulertemplate.init=location_Initial_Schedulertemplate; //Attaching Location Initial as an Initial Location of Scheduler template
+	location_Initial_Schedulertemplate.name="Initial";
+	
+	var sysDecSchedulertempDec = new Out!TemplateDeclaration;  
+    out_NTA.systemDeclarations.declaration.add(sysDecSchedulertempDec);
+    
+    //Creating System Declarations Redefined Scheduler
+    var sysDecRedefinedScheduler = new Out!RedefinedTemplate;
+    sysDecSchedulertempDec.declaredTemplate=sysDecRedefinedScheduler;
+    sysDecRedefinedScheduler.name="Redefined_Scheduler";
+    sysDecRedefinedScheduler.referredTemplate=Schedulertemplate;
+    
+    //Attaching Redefined Scheduler Template to Instantiation List
+    out_NTA.systemDeclarations.system.instantiationList.first().template.add(sysDecRedefinedScheduler);    
+    
+	for (pt in InPlatform!ProcessorType)
+	{
+	var IdleLocFreq: Collection = pt.possibleStates.select(pt | pt.isWorking=false); // Selecting all frequencies at which each processor type is idle
+	//var RunningLocFreq= IdleLocFreq.count(pt.possibleStates.frequency); // Selecting all frequencies at which each processor type is idle	 
+	var IdleFreqSorted: Collection= IdleLocFreq.sortBy(IdleLocFreq|IdleLocFreq.frequency); //Sorting the frequencies at which each processor type is idle
+	HighestFreq =IdleFreqSorted.frequency.last; //Selecting the highest frequency at which each processor type is idle	
+	}
+	
+	for (vfi in Sequence {1..vfiCount})
+	{
+	
+	// Global Current Frequency Variable Array Initialiser	Expression Initialiser	 
+	var currFreqVarInitExpInit = new Out!ExpressionInitializer;
+	currFreqVarInit.initializer.add(currFreqVarInitExpInit);
+
+	// Global Current Frequency Variable Array Initialiser	Expression Initialiser Literal Expression	
+	var currFreqVarInitExpInitLiteralExp = new Out!LiteralExpression;
+	currFreqVarInitExpInit.expression=currFreqVarInitExpInitLiteralExp;
+	
+	currFreqVarInitExpInitLiteralExp.text=HighestFreq+"";
+	
+	}
+		var javaDateBegin = new Native("java.util.Date");
+		System.out.println("Code generation started on: "+ javaDateBegin);			
+}
+
+post
+{
+
+	var javaDateEnd = new Native("java.util.Date");
+	System.out.println("Code generation finished on: "+ javaDateEnd);
+	var elapsed = javaDateEnd.getTime() - javaDateBegin.getTime();
+	var minutes = elapsed / 60000;
+	if (elapsed <> 0) System.out.println( "| --------------------- |");
+	if (elapsed <> 0) System.out.println( "| Time elapsed: " +elapsed + " ms");
+	if (elapsed <> 0) System.out.println( "| --------------------- |");
+	
+}
+
+// Global Counter per Actor Variable Declaration
+rule SDF2GlobalCounterPerActorDeclarations transform 
+	act: InSDF!Actor to counterActorVar:Out!Variable 
+{	
+	// Global Counters per Actor Variable Declaration
+	var counterActorVarDec= new Out!DataVariableDeclaration; 
+	out_NTA.globalDeclarations.declaration.add(counterActorVarDec);
+			 
+	// Global Counter per Actor Variable Declaration Type Reference
+	var counterActorVarTypeRef= new Out!TypeReference;
+	counterActorVarTypeRef.referredType=out_NTA.int;
+	counterActorVarDec.typeDefinition = counterActorVarTypeRef;
+		     
+	//Global Counter per Actor Variable
+	counterActorVar.name = act.getCounterName();
+	counterActorVarDec.variable.add(counterActorVar);
+			 
+	//Global Counter per Actor Variable Initialiser
+	var counterActorVarInit = new Out!ExpressionInitializer;
+	counterActorVar.initializer = counterActorVarInit;
+		 
+	//Global Counter per Actor Variable Initialiser Literal Expression
+	var counterActorVarInitLiteral = new Out!LiteralExpression;
+	counterActorVarInitLiteral.text = "0";
+	counterActorVarInit.expression=counterActorVarInitLiteral;	
+	
+	inActorCounterMap.put(act,counterActorVar);	
+}
+
+// Global Buffers in SDF Graph Variable Declaration
+rule SDF2GlobalBufferDeclarations transform 
+	m: InSDF!Channel to bufferVar:Out!Variable 
+{
+	var bufferVarDec= new Out!DataVariableDeclaration; 
+	out_NTA.globalDeclarations.declaration.add(bufferVarDec);
+	bufferVarDec.prefix=Out!DataVariablePrefix#NONE; 
+		 
+	// Global Buffers in SDF Graph Declaration Type Reference
+	var bufferVarTypeRef= new Out!TypeReference;
+	bufferVarTypeRef.referredType=out_NTA.int;
+	bufferVarDec.typeDefinition = bufferVarTypeRef;
+	     
+	// Global Buffers in SDF Graph Variable
+	bufferVar.name = m.getBufferName();
+	bufferVarDec.variable.add(bufferVar);
+		 
+	// Global Buffers in SDF Graph Variable Initialiser
+	var bufferVarInit = new Out!ExpressionInitializer;
+	bufferVar.initializer = bufferVarInit;
+		 
+	// Global Buffers in SDF Graph Variable Initialiser Literal Expression
+	var bufferVarInitLiteral = new Out!LiteralExpression;
+	bufferVarInitLiteral.text = m.initialTokens+"";
+	bufferVarInit.expression= bufferVarInitLiteral;
+	
+	inBufferMap.put(m,bufferVar);
+	inTokenMap.put(m,m.sourceRate);
+}
+
+//Global Scheduler Channel Variables Declarations
+rule SDF2GlobalSchedulerChannelDeclarations transform 
+	pt: InPlatform!ProcessorType to null
+{
+
+	var IdleLocFreq: Collection = pt.possibleStates.select(pt | pt.isWorking=false); // Selecting all frequencies at which each processor type is idle
+	//var RunningLocFreq= IdleLocFreq.count(pt.possibleStates.frequency); // Selecting all frequencies at which each processor type is idle	 
+	var IdleFreqSorted: Collection= IdleLocFreq.sortBy(IdleLocFreq|IdleLocFreq.frequency); //Sorting the frequencies at which each processor type is idle	
+	//var HighestFreq =IdleFreqSorted.frequency.last; //Selecting the highest frequency at which each processor type is idle
+	
+	//var RunningLocFreq: Collection = pt.possibleStates.select(pt | pt.isWorking=true); // Selecting all frequencies at which each processor type is working	
+	var TotalFreq: Integer = IdleFreqSorted.size();
+	
+	for (i in Sequence {0..TotalFreq-2}) 
+	{
+	
+	var globalChanSchedulerFirstDec= new Out!ChannelVariableDeclaration; 
+	globalChanSchedulerFirstDec.broadcast=true; 
+	out_NTA.globalDeclarations.declaration.add(globalChanSchedulerFirstDec);
+	
+	var globalChanSchedulerSecDec= new Out!ChannelVariableDeclaration; 
+	globalChanSchedulerSecDec.broadcast=true; 	
+	out_NTA.globalDeclarations.declaration.add(globalChanSchedulerSecDec);
+	
+	// Global Scheduler Channel Declaration Type Reference
+	var globalChanSchedulerFirstTypeRef= new Out!TypeReference;
+	globalChanSchedulerFirstTypeRef.referredType=out_NTA.chan;
+	globalChanSchedulerFirstDec.typeDefinition = globalChanSchedulerFirstTypeRef;
+	
+	var globalChanSchedulerSecTypeRef= new Out!TypeReference;
+	globalChanSchedulerSecTypeRef.referredType=out_NTA.chan;
+	globalChanSchedulerSecDec.typeDefinition = globalChanSchedulerSecTypeRef;		
+
+		     
+	// Global Scheduler Channel Variable
+	var globalChanSchedulerFirstVar= new Out!Variable;
+	globalChanSchedulerFirstVar.name = "fjump"+"_"+IdleLocFreq.frequency.at(i)+"_"+IdleLocFreq.frequency.at(i+1);
+	globalChanSchedulerFirstDec.variable.add(globalChanSchedulerFirstVar);
+	
+	inSchedulerFirstEdgeChanMap.put(i+pt,globalChanSchedulerFirstVar); //Adding Chan to the Map
+	
+	var globalChanSchedulerSecVar= new Out!Variable;
+	globalChanSchedulerSecVar.name = "fjump"+"_"+IdleLocFreq.frequency.at(i+1)+"_"+IdleLocFreq.frequency.at(i);
+	globalChanSchedulerSecDec.variable.add(globalChanSchedulerSecVar);
+	
+	inSchedulerSecEdgeChanMap.put(i+pt,globalChanSchedulerSecVar); //Adding Chan to the Map
+	 
+	// Global Scheduler Channel Variable First Value Index
+	var globalChanSchedulerFirstVarFirstValueIndex= new Out!ValueIndex;
+	globalChanSchedulerFirstVar.index.add(globalChanSchedulerFirstVarFirstValueIndex);
+	
+	var globalChanSchedulerSecVarFirstValueIndex= new Out!ValueIndex;
+	globalChanSchedulerSecVar.index.add(globalChanSchedulerSecVarFirstValueIndex);	
+	 
+	// Global Scheduler Channel Variable First Value Index Variable Expression 
+	var globalChanSchedulerFirstVarFirstValueIndexVariable = new Out!IdentifierExpression;
+	globalChanSchedulerFirstVarFirstValueIndexVariable.identifier = vfiVar;
+	globalChanSchedulerFirstVarFirstValueIndex.sizeExpression=globalChanSchedulerFirstVarFirstValueIndexVariable;	
+	
+	var globalChanSchedulerSecVarFirstValueIndexVariable = new Out!IdentifierExpression;
+	globalChanSchedulerSecVarFirstValueIndexVariable.identifier = vfiVar;
+	globalChanSchedulerSecVarFirstValueIndex.sizeExpression=globalChanSchedulerSecVarFirstValueIndexVariable;		
+		
+	}		
+}
+
+// SDF Graph Actor Parameters
+rule SDF2SDFActorParameters transform 
+	act: InSDF!Actor to SDFtemplateActorVar:Out!Variable
+{
+	var SDFtemplateActorParam= new Out!Parameter;
+	SDFtemplateActorParam.callType=Out!CallType#CALL_BY_VALUE;
+	SDFtemplate.parameter.add(SDFtemplateActorParam);
+	 
+	// SDF Graph Actor Parameters Declaration
+	var SDFtemplateActorParamDec= new Out!DataVariableDeclaration; 
+	SDFtemplateActorParam.variableDeclaration=SDFtemplateActorParamDec;
+	SDFtemplateActorParamDec.prefix=Out!DataVariablePrefix#CONST; 
+	 
+	// SDF Graph Actor Parameters Declaration Type Reference
+	var SDFtemplateActorParamDecTypeRef= new Out!TypeReference;
+    SDFtemplateActorParamDecTypeRef.referredType=out_NTA.int;
+    SDFtemplateActorParamDec.typeDefinition = SDFtemplateActorParamDecTypeRef;
+     
+    // SDF Graph Actor Parameters Variable
+	SDFtemplateActorVar.name = act.getVarName()+"_SDF_Graph_template";
+	SDFtemplateActorParamDec.variable.add(SDFtemplateActorVar);
+	
+	// Assigning the SDF Graph Actor Parameters Variable to the Map
+	inEdgeActorIDMap.put(act,SDFtemplateActorVar);
+}
+
+//Creating Fire Edge
+rule SDF2SDFTemplateFireEdge transform 
+	a: InSDF!Actor to EdgeSDFfire:Out!Edge //First Edge
+{
+
+	//var EdgeSDFfire= new Out!Edge; //First Edge
+	SDFtemplate.edge.add(EdgeSDFfire);
+	EdgeSDFfire.comment=a.getVarName()+ " " +"FIRE";
+	EdgeSDFfire.source=SDFtemplate.init;
+	EdgeSDFfire.target=SDFtemplate.init;
+		 
+	//Edge Fire Select
+	var EdgeSDFfireSelect= new Out!Selection;
+	EdgeSDFfire.selection.add(EdgeSDFfireSelect);
+
+	//Edge Fire Select Type Reference
+	var EdgeSDFfireSelectTypeRef= new Out!TypeReference;
+	EdgeSDFfireSelectTypeRef.referredType=procTypeDecTypeDeclaration;
+	//getSDFTemplateElementProcessorTypeDefinition().println();
+	EdgeSDFfireSelect.typeDefinition = EdgeSDFfireSelectTypeRef;
+	     
+	//Edge Fire Select Variable
+	var EdgeSDFfireVariable = new Out!Variable;
+	EdgeSDFfireVariable.name = "e";
+	EdgeSDFfireSelect.variable.add(EdgeSDFfireVariable);
+	
+
+	
+	//Edge Fire Guard
+	if (a.incomingChannels.size() >1 ) 
+	{
+		var inSDFLogicalExpressionsCollection = new Sequence(); 	//to store the Conjunction Expressions required in the guard of Fire Ege
+		var inSDFCompareExpressionsCollection = new Sequence(); 	//to store the Compare Expressions required in the guard of Fire Ege	
+			 		var counter = a.incomingChannels.size();
+		for (sizeIncomingChannels in a.incomingChannels) 
+	 	{
+	 		if (counter >1)
+	 		{
+			var EdgeSDFfireGaurdsConjuction= new Out!LogicalExpression; //Conjuction
+			EdgeSDFfireGaurdsConjuction.operator=Out!LogicalOperator#AND; 	 	
+			//EdgeSDFfire.`guard`=EdgeSDFfireGaurdsConjuction;
+			//sizeIncomingChannels.println;
+			inSDFLogicalExpressionsCollection.add(EdgeSDFfireGaurdsConjuction);
+			counter=counter-1;
+			}
+
+		}
+	 		 
+		for (e in a.incomingChannels) 
+	 	{
+			//var result:String=inTokenMap.get(e);
+			//var EdgeSDFfireGaurdsConjuctionFirstConjuction= new Out!LogicalExpression; //Conjuction
+			//EdgeSDFfireGaurdsConjuctionFirstConjuction.operator=Out!LogicalOperator#AND; 
+			//EdgeSDFfireGaurdsConjuction.firstExpr= EdgeSDFfireGaurdsConjuctionFirstConjuction;
+			
+			var EdgeSDFfireGaurdsConjuctionCompare= new Out!CompareExpression;
+			EdgeSDFfireGaurdsConjuctionCompare.operator=Out!CompareOperator#GREATER_OR_EQUAL;
+				 
+			var EdgeSDFfireGaurdsConjuctionCompareFirstExpr= new Out!IdentifierExpression;
+			EdgeSDFfireGaurdsConjuctionCompareFirstExpr.identifier=inBufferMap.get(e);
+			EdgeSDFfireGaurdsConjuctionCompare.firstExpr=EdgeSDFfireGaurdsConjuctionCompareFirstExpr;
+				 
+			var EdgeSDFfireGaurdsConjuctionCompareSecExpr= new Out!LiteralExpression;
+			EdgeSDFfireGaurdsConjuctionCompareSecExpr.text=inTokenMap.get(e)+"";
+			EdgeSDFfireGaurdsConjuctionCompare.secondExpr=EdgeSDFfireGaurdsConjuctionCompareSecExpr;
+			
+			inSDFCompareExpressionsCollection.add(EdgeSDFfireGaurdsConjuctionCompare);
+		}
+		
+			var logicalExpressionCollectionSize = inSDFLogicalExpressionsCollection.size();
+			var curLogicalExpressionIndex = 0;
+
+		while (curLogicalExpressionIndex < logicalExpressionCollectionSize)
+		{
+			if (curLogicalExpressionIndex==0 )
+			{
+			inSDFLogicalExpressionsCollection.at(curLogicalExpressionIndex).firstExpr= inSDFCompareExpressionsCollection.at(curLogicalExpressionIndex);
+			inSDFLogicalExpressionsCollection.at(curLogicalExpressionIndex).secondExpr= inSDFCompareExpressionsCollection.at(curLogicalExpressionIndex+1);		
+			}
+			
+			else if (logicalExpressionCollectionSize>1)
+			{
+			inSDFLogicalExpressionsCollection.at(curLogicalExpressionIndex).firstExpr= inSDFLogicalExpressionsCollection.at(curLogicalExpressionIndex-1);
+			inSDFLogicalExpressionsCollection.at(curLogicalExpressionIndex).secondExpr= inSDFCompareExpressionsCollection.at(curLogicalExpressionIndex+1);
+			}		
+		
+			curLogicalExpressionIndex = curLogicalExpressionIndex  + 1;
+			EdgeSDFfire.`guard`=inSDFLogicalExpressionsCollection.at(curLogicalExpressionIndex-1);
+			
+		}
+					
+	} 
+	else 
+	{
+		for (e in a.incomingChannels) 
+	 	{
+			var EdgeSDFfireGaurdsConjuctionCompare= new Out!CompareExpression;
+			EdgeSDFfireGaurdsConjuctionCompare.operator=Out!CompareOperator#GREATER_OR_EQUAL;
+			EdgeSDFfire.`guard`=EdgeSDFfireGaurdsConjuctionCompare;
+			//EdgeSDFfireGaurdsConjuction.conjunctionExpression.add(EdgeSDFfireGaurdsConjuctionCompare);
+				 
+			var EdgeSDFfireGaurdsConjuctionCompareFirstExpr= new Out!IdentifierExpression;
+			EdgeSDFfireGaurdsConjuctionCompareFirstExpr.identifier=inBufferMap.get(e);
+			EdgeSDFfireGaurdsConjuctionCompare.firstExpr=EdgeSDFfireGaurdsConjuctionCompareFirstExpr;
+				 
+			var EdgeSDFfireGaurdsConjuctionCompareSecExpr= new Out!LiteralExpression;
+			//inTokenMap.get(e.sourceRate).println();
+			EdgeSDFfireGaurdsConjuctionCompareSecExpr.text=inTokenMap.get(e)+"";
+			EdgeSDFfireGaurdsConjuctionCompare.secondExpr=EdgeSDFfireGaurdsConjuctionCompareSecExpr;
+	    }
+	 }
+	 
+	    
+	//Edge Fire Sync
+	var EdgeSDFfireSync= new Out!Synchronization;
+	EdgeSDFfireSync.kind=Out!SynchronizationKind#SEND;
+	EdgeSDFfire.synchronization=EdgeSDFfireSync;
+	
+	//Edge Fire Sync Variable Expression
+	var edgeSDFfireSyncVar= new Out!IdentifierExpression; 
+	edgeSDFfireSyncVar.identifier=globalChanFireVar;
+	EdgeSDFfireSync.channelExpression=edgeSDFfireSyncVar;
+	
+	//Edge Fire Sync Variable Expression First Variable (Processors Index)
+	var edgeSDFfireSyncVarFirstVar= new Out!IdentifierExpression; 
+	edgeSDFfireSyncVarFirstVar.identifier=EdgeSDFfireVariable;
+	edgeSDFfireSyncVar.index.add(edgeSDFfireSyncVarFirstVar);
+	
+	//Edge Fire Sync Variable Expression Second Variable (Actors Index)
+	var edgeSDFfireSyncVarSecondVar= new Out!IdentifierExpression; 
+	//Getting the correct Renamed Actor Parameter from the Map
+	edgeSDFfireSyncVarSecondVar.identifier=inEdgeActorIDMap.get(a); 
+	edgeSDFfireSyncVar.index.add(edgeSDFfireSyncVarSecondVar); 
+	
+	for (e in a.incomingChannels) 
+	{
+	//Buffer Fire Update Consume Function
+	var EdgeSDFfireUpdateConsume= new Out!FunctionCallExpression;	
+	EdgeSDFfireUpdateConsume.`function`=functConsumeDecFunct;
+	
+	//Buffer Fire Update Consume Function First Argument
+	var EdgeSDFfireUpdateConsumeFirstArg= new Out!IdentifierExpression;
+	
+	//Buffer Fire Update Consume Function First Argument
+	var EdgeSDFfireUpdateConsumeSecondArg= new Out!LiteralExpression;
+		
+
+	EdgeSDFfireUpdateConsumeFirstArg.identifier=inBufferMap.get(e);
+	EdgeSDFfireUpdateConsumeSecondArg.text=inTokenMap.get(e)+"";
+	//EdgeSDFfireUpdateConsumeSecondArg.println();
+	
+	//Buffer Fire Update Consume Function First Argument
+	EdgeSDFfireUpdateConsume.argument.add(EdgeSDFfireUpdateConsumeFirstArg);
+	EdgeSDFfireUpdateConsume.argument.add(EdgeSDFfireUpdateConsumeSecondArg);
+	
+	EdgeSDFfire.update.add(EdgeSDFfireUpdateConsume);
+	}
+	   
+}
+//Creating End Edge
+rule SDF2SDFTemplateEndEdge transform 
+	a: InSDF!Actor to EdgeSDFend:Out!Edge 
+{
+		 
+	SDFtemplate.edge.add(EdgeSDFend);
+	EdgeSDFend.comment=a.getVarName()+ " " +"END";
+	EdgeSDFend.source=SDFtemplate.init;
+	EdgeSDFend.target=SDFtemplate.init;
+	
+	//Edge End Select
+	var EdgeSDFendSelect= new Out!Selection;
+	EdgeSDFend.selection.add(EdgeSDFendSelect);
+
+	//Edge End Select Type Reference
+	var EdgeSDFendSelectTypeRef= new Out!TypeReference;
+	EdgeSDFendSelectTypeRef.referredType=procTypeDecTypeDeclaration;
+	//getSDFTemplateElementProcessorTypeDefinition().println();
+	EdgeSDFendSelect.typeDefinition = EdgeSDFendSelectTypeRef;
+	     
+	//Edge End Select Variable
+	var EdgeSDFendVariable = new Out!Variable;
+	EdgeSDFendVariable.name = "e";
+	EdgeSDFendSelect.variable.add(EdgeSDFendVariable);
+	    
+	//Edge End Sync
+	var EdgeSDFendSync= new Out!Synchronization;
+	EdgeSDFendSync.kind=Out!SynchronizationKind#RECEIVE;
+	EdgeSDFend.synchronization=EdgeSDFendSync;
+	
+	//Edge End Sync Variable Expression
+	var edgeSDFendSyncVar= new Out!IdentifierExpression; 
+	edgeSDFendSyncVar.identifier=globalChanEndVar;
+	EdgeSDFendSync.channelExpression=edgeSDFendSyncVar;
+	
+	//Edge End Sync Variable Expression First Variable (Processors Index)
+	var edgeSDFendSyncVarFirstVar= new Out!IdentifierExpression; 
+	edgeSDFendSyncVarFirstVar.identifier=EdgeSDFendVariable;
+	edgeSDFendSyncVar.index.add(edgeSDFendSyncVarFirstVar);
+	
+	//Edge End Sync Variable Expression Second Variable (Actors Index)
+	var edgeSDFendSyncVarSecondVar= new Out!IdentifierExpression; 
+	//Getting the correct Renamed Actor Parameter from the Map
+	edgeSDFendSyncVarSecondVar.identifier=inEdgeActorIDMap.get(a); 
+	edgeSDFendSyncVar.index.add(edgeSDFendSyncVarSecondVar); 	
+	
+	//Edge End Update
+	for (e in a.incomingChannels) 
+	{
+	//Edge End Update Consume Function
+	var EdgeSDFendUpdateConsume= new Out!FunctionCallExpression;	
+	EdgeSDFendUpdateConsume.`function`=functProduceDecFunct;
+	
+	//Edge End Update Consume Function First Argument
+	var EdgeSDFendUpdateConsumeFirstArg= new Out!IdentifierExpression;
+	
+	//Edge End Update Consume Function First Argument
+	var EdgeSDFendUpdateConsumeSecondArg= new Out!LiteralExpression;
+		
+
+	EdgeSDFendUpdateConsumeFirstArg.identifier=inBufferMap.get(e);
+	EdgeSDFendUpdateConsumeSecondArg.text=inTokenMap.get(e)+"";
+	//EdgeSDFendUpdateConsumeSecondArg.println();
+	
+	//Edge End Update Consume Function First Argument
+	EdgeSDFendUpdateConsume.argument.add(EdgeSDFendUpdateConsumeFirstArg);
+	EdgeSDFendUpdateConsume.argument.add(EdgeSDFendUpdateConsumeSecondArg);
+	
+	EdgeSDFend.update.add(EdgeSDFendUpdateConsume);
+	}
+	
+	//Counter Per Actor Expression
+	var counterPerActorExp= new Out!IncrementDecrementExpression;	
+	counterPerActorExp.position=Out!IncrementDecrementPosition#POST;
+	
+	//Counter Per Actor Expression Variable ExpressionInitialiser
+	var counterPerActorExpVarExp = new Out!IdentifierExpression;
+	counterPerActorExpVarExp.identifier = inActorCounterMap.get(a);
+	counterPerActorExp.expression=counterPerActorExpVarExp;
+	
+	EdgeSDFend.update.add(counterPerActorExp);	
+	
+}
+
+///////////////Processor Template********************
+
+//Processor Template
+rule PAM2PAMTemplateClockVariable transform 
+	pt: InPlatform!ProcessorType to localProcTypeClockVar:Out!Variable
+{	
+	var processorTemplate = new Out!Template;
+	inProcessorTemplateMap.put(pt,processorTemplate);		
+	//for (pt in In!ProcessorType){ 
+	//var PAMtemplate= new Out!Template;
+	out_NTA.template.add(processorTemplate);//Attaching to NTA
+	processorTemplate.name=pt.identifier; //name of PAM template same as name of processor type
+	
+	// Local Clock "x" Declaration
+	var localProcTypeClockVarDec= new Out!ClockVariableDeclaration;
+	processorTemplate.declarations=localProcTypeClockVarDec;
+		 
+	// Local Clock "x" Declaration
+	var localProcTypeClockVarDecRef= new Out!TypeReference;
+	localProcTypeClockVarDecRef.referredType=out_NTA.clock;
+	localProcTypeClockVarDec.typeDefinition = localProcTypeClockVarDecRef;
+	     
+	// Local Clock "x" Declaration
+	//var localProcTypeClockVar= new Out!Variable;
+	localProcTypeClockVar.name = "x";
+	localProcTypeClockVarDec.variable.add(localProcTypeClockVar);
+	inProcessorTemplateLocalClockMap.put(pt,localProcTypeClockVar);	
+}
+
+//This rule stores the nClockCycle of each Actor for each Processor Type
+rule PAMActorProcessorTypeExecTime transform
+	c: InAllocation!Capability to null
+{
+	inActorExecTimeMap.put(c.actor+c.processorType,c.ExecTime);
+}
+
+// PAM Template Parameters
+rule PAM2PAMpidParameters transform 
+	pt: InPlatform!ProcessorType to PAMtemplateActorVar:Out!Variable
+{
+	// PAM Processor Parameter
+	var PAMtemplateActorParam= new Out!Parameter;
+	PAMtemplateActorParam.callType=Out!CallType#CALL_BY_VALUE;
+
+	//var processorTemplate= inProcessorTemplateMap.get(pt);
+	inProcessorTemplateMap.get(pt).parameter.add(PAMtemplateActorParam);
+
+	// PAM Processor Parameter Declaration
+	var PAMtemplateActorParamDec= new Out!DataVariableDeclaration; 
+	PAMtemplateActorParam.variableDeclaration=PAMtemplateActorParamDec;
+	PAMtemplateActorParamDec.prefix=Out!DataVariablePrefix#CONST; 
+	 
+	// PAM Processor Parameters Declaration Type Reference
+	var PAMtemplateActorParamDecTypeRef= new Out!TypeReference;
+    PAMtemplateActorParamDecTypeRef.referredType=out_NTA.int;
+    PAMtemplateActorParamDec.typeDefinition = PAMtemplateActorParamDecTypeRef;
+     
+    // PAM Processor Parameters Variable
+	PAMtemplateActorVar.name = "p_id";
+	PAMtemplateActorParamDec.variable.add(PAMtemplateActorVar);
+	inProcessorTemplateProcessorIndexMap.put(pt,PAMtemplateActorVar);
+
+	// PAM Actor Parameters Declaration	
+	for (act in InSDF!Actor)
+    {
+	var PAMtemplateActorParam= new Out!Parameter;
+	PAMtemplateActorParam.callType=Out!CallType#CALL_BY_VALUE;
+	inProcessorTemplateMap.get(pt).parameter.add(PAMtemplateActorParam);
+	 
+	// PAM Actor Parameters Declaration
+	var PAMtemplateActorParamDec= new Out!DataVariableDeclaration; 
+	PAMtemplateActorParam.variableDeclaration=PAMtemplateActorParamDec;
+	PAMtemplateActorParamDec.prefix=Out!DataVariablePrefix#CONST; 
+	 
+	// PAM Actor Parameters Declaration Type Reference
+	var PAMtemplateActorParamDecTypeRef= new Out!TypeReference;
+    PAMtemplateActorParamDecTypeRef.referredType=out_NTA.int;
+    PAMtemplateActorParamDec.typeDefinition = PAMtemplateActorParamDecTypeRef;
+     
+    // PAM Actor Parameters Variable
+    var PAMtemplateActorVar = new Out!Variable;
+	PAMtemplateActorVar.name = act.getVarName()+"_PAM_template";
+	PAMtemplateActorParamDec.variable.add(PAMtemplateActorVar);
+	
+	// Assigning the SDF Graph Actor Parameters Variable to the Map
+	inProcTempEdgeActorIDMap.put(act,PAMtemplateActorVar);
+	}
+}
+
+// PAM Template Parameters
+rule PAM2PAMVFIpidParameters transform 
+	pt: InPlatform!ProcessorType to PAMtemplateVFIVar:Out!Variable
+{	
+	// PAM VFI Parameter
+	var PAMtemplateVFIParam= new Out!Parameter;
+	PAMtemplateVFIParam.callType=Out!CallType#CALL_BY_VALUE;
+
+	//var processorTemplate= inProcessorTemplateMap.get(pt);
+	inProcessorTemplateMap.get(pt).parameter.add(PAMtemplateVFIParam);
+
+	// PAM VFI Parameter Declaration
+	var PAMtemplateVFIParamDec= new Out!DataVariableDeclaration; 
+	PAMtemplateVFIParam.variableDeclaration=PAMtemplateVFIParamDec;
+	PAMtemplateVFIParamDec.prefix=Out!DataVariablePrefix#CONST; 
+	 
+	// PAM VFI Parameters Declaration Type Reference
+	var PAMtemplateVFIParamDecTypeRef= new Out!TypeReference;
+    PAMtemplateVFIParamDecTypeRef.referredType=out_NTA.int;
+    PAMtemplateVFIParamDec.typeDefinition = PAMtemplateVFIParamDecTypeRef;
+     
+    // PAM VFI Parameters Variable
+    //var PAMtemplateVFIVar = new Out!Variable;
+	PAMtemplateVFIVar.name = "vfi_id";
+	PAMtemplateVFIParamDec.variable.add(PAMtemplateVFIVar);
+	inProcessorTemplateVFIvariableMap.put(pt,PAMtemplateVFIVar);	
+}
+	
+//This rule creates an idle location in relevant template
+rule PAMProcessorState2IdleLocation transform
+	ps: InPlatform!ProcessorState to location_Idle_PAMtemplate:Out!Location
+{
+	guard: not ps.isWorking
+	
+	for (f in ps.frequency)
+	{
+	//var location_Idle_PAMtemplate= new Out!Location; //Creating Idle Location of PAM template for each frequency at which each processor type is idle
+	inProcessorTemplateMap.get(ps.processorType).location.add(location_Idle_PAMtemplate); //Attaching Idle Location to Initial to PAM graph template
+	location_Idle_PAMtemplate.name="Idle_"+ps.processorType.identifier+"_"+f; //Naming the Idle Location 
+			 
+	inIdleLocFreqMap.put(f+ps.processorType,location_Idle_PAMtemplate); //Putting all Idle locations in the map with respect to each frequency.
+	inProcessorTemplateMap.get(ps.processorType).init=inIdleLocFreqMap.get(HighestFreq+ps.processorType); //Assigning the Idle location from the map with respect to Highest frequency as an Initial Location.
+	// Adding Conjuction Expression as an Invariant for Idle Locations
+	//var procIdleLocInvConjuctionExp = new Out!ConjunctionExpression;
+	//procTypeDecSpecIntBoundUpper.operator = Out!ArithmeticOperator#SUBTRACT;
+	//location_Idle_PAMtemplate.invariant=procIdleLocInvConjuctionExp;
+	
+	// Adding Compare Expression as an Invariant for Idle Locations
+	var procIdleLocInvCompareExp = new Out!CompareExpression;
+	procIdleLocInvCompareExp.operator = Out!CompareOperator#EQUAL;
+	location_Idle_PAMtemplate.invariant=procIdleLocInvCompareExp;
+		
+	//First Expression of Compare Expression
+	var procIdleLocInvCompareExpFirstExp = new Out!IdentifierExpression;
+	procIdleLocInvCompareExpFirstExp.identifier = costRateVar;
+	procIdleLocInvCompareExp.firstExpr=procIdleLocInvCompareExpFirstExp; //Attaching First Expression to Compare Expression
+	
+	//Second Expression of Compare Expression	
+	var procIdleLocInvCompareExpSecExp=new Out!LiteralExpression;
+	procIdleLocInvCompareExpSecExp.text = ps.powerConsumption+"";
+	procIdleLocInvCompareExp.secondExpr=procIdleLocInvCompareExpSecExp; //Attaching Second Expression to Compare Expression;	
+	
+	//var IdleLocFreq: Collection = ps.select(ps | ps.isWorking=false); // Selecting all frequencies at which each processor type is idle
+	//var IdleLocFreq2: Collection = ps.select(pt | pt.isWorking=false);
+	}
+}
+
+//Processor Template's Edges between Idle Locations representing frequency switching
+rule PAMProcessorState2IdleEdges transform 
+	pt: InPlatform!ProcessorType to null
+{
+	//guard: not ps.isWorking
+	
+	var IdleLocFreq: Collection = pt.possibleStates.select(pt | pt.isWorking=false); // Selecting all frequencies at which each processor type is idle
+	//var RunningLocFreq= IdleLocFreq.count(pt.possibleStates.frequency); // Selecting all frequencies at which each processor type is idle	 
+	var IdleFreqSorted: Collection= IdleLocFreq.sortBy(IdleLocFreq|IdleLocFreq.frequency); //Sorting the frequencies at which each processor type is idle	
+	var HighestFreq =IdleFreqSorted.frequency.last; //Selecting the highest frequency at which each processor type is idle
+	
+	//var RunningLocFreq: Collection = pt.possibleStates.select(pt | pt.isWorking=true); // Selecting all frequencies at which each processor type is working	
+	var TotalFreq: Integer = IdleFreqSorted.size();
+	
+	for (i in Sequence {0..TotalFreq-2}) 
+	{
+	var EdgePAMIdleFreqFirst= new Out!Edge;
+	var EdgePAMIdleFreqSec= new Out!Edge;
+
+	inProcessorTemplateMap.get(pt).edge.add(EdgePAMIdleFreqFirst);
+	inProcessorTemplateMap.get(pt).edge.add(EdgePAMIdleFreqSec);	
+	 
+	EdgePAMIdleFreqFirst.source=inIdleLocFreqMap.get(IdleLocFreq.frequency.at(i)+pt);
+	EdgePAMIdleFreqFirst.target=inIdleLocFreqMap.get(IdleLocFreq.frequency.at(i+1)+pt);
+	EdgePAMIdleFreqFirst.comment=pt.identifier+"_" +IdleLocFreq.frequency.at(i)+"_"+IdleLocFreq.frequency.at(i+1);
+	
+	EdgePAMIdleFreqSec.source=inIdleLocFreqMap.get(IdleLocFreq.frequency.at(i+1)+pt);
+	EdgePAMIdleFreqSec.target=inIdleLocFreqMap.get(IdleLocFreq.frequency.at(i)+pt);
+	EdgePAMIdleFreqSec.comment=pt.identifier+"_" +IdleLocFreq.frequency.at(i+1)+"_"+IdleLocFreq.frequency.at(i);
+	
+	//Idle Locations Edges Synchronization
+	var EdgePAMIdleFreqFirstSync= new Out!Synchronization;
+	EdgePAMIdleFreqFirstSync.kind=Out!SynchronizationKind#RECEIVE;
+	EdgePAMIdleFreqFirst.synchronization=EdgePAMIdleFreqFirstSync;
+	
+	var EdgePAMIdleFreqSecSync= new Out!Synchronization;
+	EdgePAMIdleFreqSecSync.kind=Out!SynchronizationKind#RECEIVE;
+	EdgePAMIdleFreqSec.synchronization=EdgePAMIdleFreqSecSync;	
+	
+	//Idle Locations Edges Synchronization Variable Expression
+	var EdgePAMIdleFreqFirstSyncVar= new Out!IdentifierExpression; 
+	EdgePAMIdleFreqFirstSyncVar.identifier=inSchedulerFirstEdgeChanMap.get(i+pt);
+	EdgePAMIdleFreqFirstSync.channelExpression=EdgePAMIdleFreqFirstSyncVar;
+	
+	var EdgePAMIdleFreqSecSyncVar= new Out!IdentifierExpression; 
+	EdgePAMIdleFreqSecSyncVar.identifier=inSchedulerSecEdgeChanMap.get(i+pt);
+	EdgePAMIdleFreqSecSync.channelExpression=EdgePAMIdleFreqSecSyncVar;	
+	
+	//Idle Locations Edges Synchronization Variable Expression Variable (VFIs Index)
+	var EdgePAMIdleFreqFirstSyncVarFirstVar= new Out!IdentifierExpression; 
+	EdgePAMIdleFreqFirstSyncVarFirstVar.identifier=inProcessorTemplateVFIvariableMap.get(pt);
+	EdgePAMIdleFreqFirstSyncVar.index.add(EdgePAMIdleFreqFirstSyncVarFirstVar);
+	
+	var EdgePAMIdleFreqSecSyncVarFirstVar= new Out!IdentifierExpression; 
+	EdgePAMIdleFreqSecSyncVarFirstVar.identifier=inProcessorTemplateVFIvariableMap.get(pt);
+	EdgePAMIdleFreqSecSyncVar.index.add(EdgePAMIdleFreqSecSyncVarFirstVar);
+	}
+	
+}
+	
+//Processor Template's InUse Locations and Edges
+rule PAMProcessorState2InUseLocation transform 
+	ps: InPlatform!ProcessorState to null
+{	
+	guard: ps.isWorking
+	// Local Clock "x" Declaration
+	//var localProcTypeClockVarDec= new Out!ClockVariableDeclaration;
+	//inProcessorTemplateMap.get(pt);		 
+	//inProcessorTemplateMap.get(pt).declarations=localProcTypeClockVarDec;
+		 
+	// Local Clock "x" Declaration
+	//var localProcTypeClockVarDecRef= new Out!TypeReference;
+	//localProcTypeClockVarDecRef.referredType=out_NTA.clock;
+	//localProcTypeClockVarDec.typeDefinition = localProcTypeClockVarDecRef;
+	     
+	// Local Clock "x" Declaration
+	//var localProcTypeClockVar= new Out!Variable;
+	//localProcTypeClockVar.name = "x";
+	//localProcTypeClockVarDec.variable.add(localProcTypeClockVar);
+	 	 
+	//var IdleLocFreq: Collection = pt.possibleStates.select(pt | pt.isWorking=false); // Selecting all frequencies at which each processor type is idle
+	//var RunningLocFreq= IdleLocFreq.count(pt.possibleStates.frequency); // Selecting all frequencies at which each processor type is idle	 
+	//var IdleFreqSorted: Collection= IdleLocFreq.sortBy(IdleLocFreq|IdleLocFreq.frequency); //Sorting the frequencies at which each processor type is idle	
+	//var HighestFreq =IdleFreqSorted.frequency.last; //Selecting the highest frequency at which each processor type is idle
+	
+	//var RunningLocFreq: Collection = pt.possibleStates.select(pt | pt.isWorking=true); // Selecting all frequencies at which each processor type is working	
+	//RunningLocFreq.println();
+	 
+	for (f in ps.frequency)
+	{
+	//var location_Idle_PAMtemplate= new Out!Location; //Creating Idle Location of PAM template for each frequency at which each processor type is idle
+	//inProcessorTemplateMap.get(pt).location.add(location_Idle_PAMtemplate); //Attaching Idle Location to Initial to PAM graph template
+	//location_Idle_PAMtemplate.name="Idle_"+pt.identifier+"_"+f; //Naming the Idle Location 
+			 
+	//inIdleLocFreqMap.put(f,location_Idle_PAMtemplate); //Putting all Idle locations in the map with respect to each frequency.
+	//inProcessorTemplateMap.get(pt).init=inIdleLocFreqMap.get(HighestFreq); //Assigning the Idle location from the map with respect to Highest frequency as an Initial Location.
+	
+	// Adding Conjuction Expression as an Invariant for Idle Locations
+	//var procIdleLocInvConjuctionExp = new Out!ConjunctionExpression;
+	//procTypeDecSpecIntBoundUpper.operator = Out!ArithmeticOperator#SUBTRACT;
+	//location_Idle_PAMtemplate.invariant=procIdleLocInvConjuctionExp;
+	
+	// Adding Compare Expression as a First Expression of Conjuction Expression 
+	//var procIdleLocInvConjuctionExpCmpExp = new Out!CompareExpression;
+	//procIdleLocInvConjuctionExp.conjunctionExpression.add(procIdleLocInvConjuctionExpCmpExp);
+	//procIdleLocInvConjuctionExpCmpExp.operator = Out!CompareOperator#LESS_OR_EQUAL;	
+		
+	//First Expression of Compare Expression
+	//var procIdleLocInvConjuctionExpCmpExpFirstExp = new Out!VariableExpression;
+	//procIdleLocInvConjuctionExpCmpExpFirstExp.variable = localProcTypeClockVar;
+	//procIdleLocInvConjuctionExpCmpExp.firstExpr=procIdleLocInvConjuctionExpCmpExpFirstExp; //Attaching First Expression to Compare Expression
+	
+	//Second Expression of Compare Expression	
+	//var procIdleLocInvConjuctionExpCmpExpSecondExp=new Out!LiteralExpression;
+	//procIdleLocInvConjuctionExpCmpExpSecondExp.text = IdleFreqSorted.powerConsumption+"";
+	//procIdleLocInvConjuctionExpCmpExp.secondExpr=procIdleLocInvConjuctionExpCmpExpSecondExp; //Attaching Second Expression to Compare Expression;	
+	///IdleFreqSorted.println();
+	//if (i<IdleFreqSorted.size()-2)
+	//{
+	//i=i+1;
+	//}	 
+		for (act in InSDF!Actor)
+		{
+		var location_Running_PAMtemplate= new Out!Location; //Creating InUse Location of PAM template for each frequency at which each processor type is running
+		inProcessorTemplateMap.get(ps.processorType).location.add(location_Running_PAMtemplate); //Attaching Idle Location to Initial to PAM graph template
+		location_Running_PAMtemplate.name="InUse_"+act.identifier+"_"+ps.processorType.identifier+"_"+f; //Naming the Idle Location 
+		//inRunningLocFreqMap.put(location_Running_PAMtemplate,f); //Putting all Idle locations in the map with respect to each frequency.
+				
+		var EdgePAMfire= new Out!Edge;
+		var EdgePAMend= new Out!Edge;
+				
+		inProcessorTemplateMap.get(ps.processorType).edge.add(EdgePAMfire);
+		inProcessorTemplateMap.get(ps.processorType).edge.add(EdgePAMend);	
+				 
+		EdgePAMfire.comment=act.getVarName()+"_"+ps.processorType.identifier+"_" +f+"_"+"FIRE";
+		EdgePAMfire.source=inIdleLocFreqMap.get(f+ps.processorType);
+		EdgePAMfire.target=location_Running_PAMtemplate;
+				
+		EdgePAMend.comment=act.getVarName()+"_"+ps.processorType.identifier+"_" +f+"_" +"END";	 
+		EdgePAMend.source=location_Running_PAMtemplate;
+		EdgePAMend.target=inIdleLocFreqMap.get(f+ps.processorType);
+		
+		// Adding Conjuction Expression as an Invariant for InUse Locations
+		var procInUseLocInvConjuctionExp = new Out!LogicalExpression;
+		procInUseLocInvConjuctionExp.operator=Out!LogicalOperator#AND;		
+		//procTypeDecSpecIntBoundUpper.operator = Out!ArithmeticOperator#SUBTRACT;
+		location_Running_PAMtemplate.invariant=procInUseLocInvConjuctionExp;
+	
+		// Adding Compare Expression as a First Expression of Conjuction Expression 
+		var procInUseLocInvConjuctionExpFirstCmpExp = new Out!CompareExpression;
+		procInUseLocInvConjuctionExp.firstExpr=procInUseLocInvConjuctionExpFirstCmpExp;
+		procInUseLocInvConjuctionExpFirstCmpExp.operator = Out!CompareOperator#LESS_OR_EQUAL;	
+		
+		//First Expression of Compare Expression
+		var procInUseLocInvConjuctionExpFirstCmpExpFirstExp = new Out!IdentifierExpression;
+		procInUseLocInvConjuctionExpFirstCmpExpFirstExp.identifier = inProcessorTemplateLocalClockMap.get(ps.processorType);
+		procInUseLocInvConjuctionExpFirstCmpExp.firstExpr=procInUseLocInvConjuctionExpFirstCmpExpFirstExp; //Attaching First Expression to Compare Expression
+		
+		//Second Expression of Compare Expression	
+		var procInUseLocInvConjuctionExpFirstCmpExpFirstExpSecondExp=new Out!LiteralExpression;
+		procInUseLocInvConjuctionExpFirstCmpExpFirstExpSecondExp.text = inActorExecTimeMap.get(act+ps.processorType)+"";
+		procInUseLocInvConjuctionExpFirstCmpExp.secondExpr=procInUseLocInvConjuctionExpFirstCmpExpFirstExpSecondExp; //Attaching Second Expression to Compare Expression;	
+		
+		// Adding Compare Expression as a Second Expression of Conjuction Expression 
+		var procInUseLocInvConjuctionExpSecondCmpExp = new Out!CompareExpression;
+		procInUseLocInvConjuctionExp.secondExpr=procInUseLocInvConjuctionExpSecondCmpExp;
+		procInUseLocInvConjuctionExpSecondCmpExp.operator = Out!CompareOperator#EQUAL;
+		
+		//First Expression of Compare Expression
+		var procInUseLocInvConjuctionExpSecondCmpExpFirstExp = new Out!IdentifierExpression;
+		procInUseLocInvConjuctionExpSecondCmpExpFirstExp.identifier = costRateVar;
+		procInUseLocInvConjuctionExpSecondCmpExp.firstExpr=procInUseLocInvConjuctionExpSecondCmpExpFirstExp; //Attaching First Expression to Compare Expression
+	
+		//Second Expression of Compare Expression	
+		var procInUseLocInvConjuctionExpSecondCmpExpSecondExp=new Out!LiteralExpression;
+		procInUseLocInvConjuctionExpSecondCmpExpSecondExp.text = ps.powerConsumption+"";
+		procInUseLocInvConjuctionExpSecondCmpExp.secondExpr=procInUseLocInvConjuctionExpSecondCmpExpSecondExp; //Attaching Second Expression to Compare Expression;	
+
+//Edge Fire*********************************************************		
+		//Edge Fire Sync
+		var edgePAMfireSync= new Out!Synchronization;
+		edgePAMfireSync.kind=Out!SynchronizationKind#RECEIVE;
+		EdgePAMfire.synchronization=edgePAMfireSync;
+	
+		//Edge Fire Sync Variable Expression
+		var edgePAMfireSyncVar= new Out!IdentifierExpression; 
+		edgePAMfireSyncVar.identifier=globalChanFireVar;
+		edgePAMfireSync.channelExpression=edgePAMfireSyncVar;
+	
+		//Edge Fire Sync Variable Expression First Variable (Processors Index)
+		var edgePAMfireSyncVarFirstVar= new Out!IdentifierExpression; 
+		edgePAMfireSyncVarFirstVar.identifier=inProcessorTemplateProcessorIndexMap.get(ps.processorType);
+		edgePAMfireSyncVar.index.add(edgePAMfireSyncVarFirstVar);
+	
+		//Edge Fire Sync Variable Expression Second Variable (Actors Index)
+		var edgePAMfireSyncVarSecondVar= new Out!IdentifierExpression; 
+		
+		//Getting the correct Renamed Actor Parameter from the Map
+		edgePAMfireSyncVarSecondVar.identifier=inProcTempEdgeActorIDMap.get(act); 
+		edgePAMfireSyncVar.index.add(edgePAMfireSyncVarSecondVar); 
+	
+		//Edge Fire Update Resetting Clock
+		var edgePAMfireUpdateResetClock= new Out!AssignmentExpression;	
+		edgePAMfireUpdateResetClock.operator=Out!AssignmentOperator#EQUAL;
+		
+		//Edge Fire Update Resetting Clock First Variable (Clock x)
+		var edgePAMfireUpdateResetClockFirstVar= new Out!IdentifierExpression;	
+		edgePAMfireUpdateResetClockFirstVar.identifier=inProcessorTemplateLocalClockMap.get(ps.processorType);
+		edgePAMfireUpdateResetClock.firstExpr=edgePAMfireUpdateResetClockFirstVar;		
+	
+		//Edge Fire Update Resetting Clock Second Variable (0)
+		var edgePAMfireUpdateResetClockSecondVar= new Out!LiteralExpression; 
+		edgePAMfireUpdateResetClockSecondVar.text="0";
+		edgePAMfireUpdateResetClock.secondExpr=edgePAMfireUpdateResetClockSecondVar;				
+		
+		//Attaching Edge Fire Update Resetting Clock to Edge Fire
+		EdgePAMfire.update.add(edgePAMfireUpdateResetClock);
+	
+		//Edge Fire Occupied Processor Counter Expression
+		var counterOccProcessorExp= new Out!IncrementDecrementExpression;	
+		counterOccProcessorExp.position=Out!IncrementDecrementPosition#POST;
+	
+		//Edge Fire Occupied Processor Counter Expression Variable Expression
+		var counterOccProcessorExpVarExp = new Out!IdentifierExpression;
+		counterOccProcessorExpVarExp.identifier = nrOccProcVar;
+		counterOccProcessorExp.expression=counterOccProcessorExpVarExp;
+		
+		//Edge Fire Occupied Processor Counter Expression Variable Expression Index Variable
+		var counterOccProcessorExpVarExpIndex = new Out!IdentifierExpression;
+		counterOccProcessorExpVarExpIndex.identifier = inProcessorTemplateVFIvariableMap.get(ps.processorType);
+		counterOccProcessorExpVarExp.index.add(counterOccProcessorExpVarExpIndex);		
+	
+		EdgePAMfire.update.add(counterOccProcessorExp);	
+		
+		//Edge End******************************************************
+
+		//Edge End Sync
+		var edgePAMendSync= new Out!Synchronization;
+		edgePAMendSync.kind=Out!SynchronizationKind#SEND;
+		EdgePAMend.synchronization=edgePAMendSync;
+	
+		//Edge End Sync Variable Expression
+		var edgePAMendSyncVar= new Out!IdentifierExpression; 
+		edgePAMendSyncVar.identifier=globalChanEndVar;
+		edgePAMendSync.channelExpression=edgePAMendSyncVar;
+	
+		//Edge End Sync Variable Expression First Variable (Processors Index)
+		var edgePAMendSyncVarFirstVar= new Out!IdentifierExpression; 
+		edgePAMendSyncVarFirstVar.identifier=inProcessorTemplateProcessorIndexMap.get(ps.processorType);
+		edgePAMendSyncVar.index.add(edgePAMendSyncVarFirstVar);
+	
+		//Edge End Sync Variable Expression Second Variable (Actors Index)
+		var edgePAMendSyncVarSecondVar= new Out!IdentifierExpression; 
+		
+		//Getting the correct Renamed Actor Parameter from the Map
+		edgePAMendSyncVarSecondVar.identifier=inProcTempEdgeActorIDMap.get(act); 
+		edgePAMendSyncVar.index.add(edgePAMendSyncVarSecondVar); 
+	
+		//Edge Fire Update Resetting Clock
+		var edgePAMendUpdateResetClock= new Out!AssignmentExpression;	
+		edgePAMendUpdateResetClock.operator=Out!AssignmentOperator#EQUAL;
+		
+		//Edge End Update Resetting Clock First Variable (Clock x)
+		var edgePAMendUpdateResetClockFirstVar= new Out!IdentifierExpression; 
+		edgePAMendUpdateResetClockFirstVar.identifier=inProcessorTemplateLocalClockMap.get(ps.processorType);
+		edgePAMendUpdateResetClock.firstExpr=edgePAMendUpdateResetClockFirstVar;		
+	
+		//Edge End Update Resetting Clock Second Variable (0)
+		var edgePAMendUpdateResetClockSecondVar= new Out!LiteralExpression; 
+		edgePAMendUpdateResetClockSecondVar.text="0";
+		edgePAMendUpdateResetClock.secondExpr=edgePAMendUpdateResetClockSecondVar;				
+		
+		//Attaching Edge End Update Resetting Clock to Edge Fire
+		EdgePAMend.update.add(edgePAMendUpdateResetClock);
+	
+		//Edge End Occupied Processor Counter Expression
+		var counterOccProcessorExpEnd= new Out!IncrementDecrementExpression;	
+		counterOccProcessorExpEnd.operator=Out!IncrementDecrementOperator#DECREMENT;
+		counterOccProcessorExpEnd.position=Out!IncrementDecrementPosition#POST;
+	
+		//Edge End Occupied Processor Counter Expression Variable Expression
+		var counterOccProcessorExpEndVarExp = new Out!IdentifierExpression;
+		counterOccProcessorExpEndVarExp.identifier = nrOccProcVar;
+		counterOccProcessorExpEnd.expression=counterOccProcessorExpEndVarExp;
+		
+		//Edge Fire Occupied Processor Counter Expression Variable Expression Index Variable
+		var counterOccProcessorExpEndVarExpIndex = new Out!IdentifierExpression;
+		counterOccProcessorExpEndVarExpIndex.identifier = inProcessorTemplateVFIvariableMap.get(ps.processorType);
+		counterOccProcessorExpEndVarExp.index.add(counterOccProcessorExpEndVarExpIndex);		
+	
+		EdgePAMend.update.add(counterOccProcessorExpEnd);			
+	    }
+	}
+	
+
+	 	
+	//for (i in Sequence {0..TotalFreq-2}) 
+	//{
+	//var EdgePAMIdleFreqFirst= new Out!Edge;
+	//var EdgePAMIdleFreqSec= new Out!Edge;
+			 
+	//inProcessorTemplateMap.get(pt).edge.add(EdgePAMIdleFreqFirst);
+	//inProcessorTemplateMap.get(pt).edge.add(EdgePAMIdleFreqSec);
+			 
+	//EdgePAMIdleFreqFirst.source=inIdleLocFreqMap.get(IdleFreqSorted.frequency.at(i));
+	//EdgePAMIdleFreqFirst.target=inIdleLocFreqMap.get(IdleFreqSorted.frequency.at(i+1));
+	//EdgePAMIdleFreqFirst.comment=pt.identifier+"_" +IdleFreqSorted.frequency.at(i)+"_"+IdleFreqSorted.frequency.at(i+1);	
+			  
+	//EdgePAMIdleFreqSec.source=inIdleLocFreqMap.get(IdleFreqSorted.frequency.at(i+1));
+	//EdgePAMIdleFreqSec.target=inIdleLocFreqMap.get(IdleFreqSorted.frequency.at(i));
+	//EdgePAMIdleFreqSec.comment=pt.identifier+"_" +IdleFreqSorted.frequency.at(i+1)+"_"+IdleFreqSorted.frequency.at(i);		 
+	//}
+
+}
+
+//Creating Processor System Declarations
+rule PAM2PAMSystemDeclarations transform 
+	m: InPlatform!Processor to sysDecPAMtempDec:Out!TemplateDeclaration
+{
+    out_NTA.systemDeclarations.declaration.add(sysDecPAMtempDec);
+    
+    //Creating System Declarations Redefined PAM Template
+    var sysDecRedefinedPAM = new Out!RedefinedTemplate;
+    sysDecPAMtempDec.declaredTemplate=sysDecRedefinedPAM;
+    sysDecRedefinedPAM.name="Redefined_PAM_"+m.identifier;
+    sysDecRedefinedPAM.referredTemplate=inProcessorTemplateMap.get(m.pType);
+    
+	// System Declarations Processor ID Parameter Declaration
+	var sysDecRedfinedPAMprocParamDec= new Out!DataVariableDeclaration; 
+	out_NTA.systemDeclarations.declaration.add(sysDecRedfinedPAMprocParamDec);
+	sysDecRedfinedPAMprocParamDec.prefix=Out!DataVariablePrefix#CONST; 
+	 
+	// System Declarations Processor ID Parameter Declaration Type Reference
+	var sysDecRedfinedPAMprocParamDecTypeRef= new Out!TypeReference;
+    sysDecRedfinedPAMprocParamDecTypeRef.referredType=out_NTA.int;
+    sysDecRedfinedPAMprocParamDec.typeDefinition = sysDecRedfinedPAMprocParamDecTypeRef;
+     
+    // System Declarations Processor ID Parameter Variable
+	var sysDecProcIDVar = new Out!Variable;
+	sysDecProcIDVar.name = m.identifier+"_declaration";
+	sysDecRedfinedPAMprocParamDec.variable.add(sysDecProcIDVar);
+	 
+	//inActorVarSysDecMap.put(act,sysDecSDFActorVar);
+	// System Declartions SDF Graph Actor Parameters Variable Initialiser
+	var sysDecProcIDVarInit = new Out!ExpressionInitializer;
+	sysDecProcIDVar.initializer = sysDecProcIDVarInit;
+	 
+	// System Declarations Processor ID Parameter Variable Initialiser Literal Expression
+	var sysDecProcIDVarInitLiteral = new Out!LiteralExpression;
+	sysDecProcIDVarInitLiteral.text = processor_counter+"";
+	sysDecProcIDVarInit.expression= sysDecProcIDVarInitLiteral;
+	processor_counter=processor_counter+1;
+	 
+    var sysDecRedefinedPAMArg = new Out!IdentifierExpression;
+    sysDecRedefinedPAMArg.identifier=sysDecProcIDVar;
+    sysDecPAMtempDec.argument.add(sysDecRedefinedPAMArg);
+
+    
+    for (act in InSDF!Actor)
+    {
+
+    var sysDecPAMTempDecRedefinedArg = new Out!IdentifierExpression;
+    sysDecPAMTempDecRedefinedArg.identifier=inActorVarSysDecMap.get(act);
+    sysDecPAMtempDec.argument.add(sysDecPAMTempDecRedefinedArg);
+        
+    }
+    
+    // Passing VFI ID Parameter in Redefined PAM Template
+    var sysDecPAMvfiIDTempDecRedefinedArg = new Out!IdentifierExpression;
+    sysDecPAMvfiIDTempDecRedefinedArg.identifier=inVFIVarSysDecMap.get(m.vfIsland);
+    sysDecPAMtempDec.argument.add(sysDecPAMvfiIDTempDecRedefinedArg);
+    
+    //Attaching Redefined PAM Template to Instantiation List
+    out_NTA.systemDeclarations.system.instantiationList.first().template.add(sysDecRedefinedPAM);   
+}
+
+///////////////Scheduler Template********************
+
+//Creating Edges of Scheduler
+rule PAM2SchedulerTemplateEdge transform 
+	pt: InPlatform!ProcessorType to null
+{
+
+	var IdleLocFreq: Collection = pt.possibleStates.select(pt | pt.isWorking=false); // Selecting all frequencies at which each processor type is idle
+	//var RunningLocFreq= IdleLocFreq.count(pt.possibleStates.frequency); // Selecting all frequencies at which each processor type is idle	 
+	var IdleFreqSorted: Collection= IdleLocFreq.sortBy(IdleLocFreq|IdleLocFreq.frequency); //Sorting the frequencies at which each processor type is idle	
+	//var HighestFreq =IdleFreqSorted.frequency.last; //Selecting the highest frequency at which each processor type is idle
+	
+	//var RunningLocFreq: Collection = pt.possibleStates.select(pt | pt.isWorking=true); // Selecting all frequencies at which each processor type is working	
+	var TotalFreq: Integer = IdleFreqSorted.size();
+	
+	for (i in Sequence {0..TotalFreq-2}) 
+	{
+	var EdgeSchedulerFirst= new Out!Edge;
+	var EdgeSchedulerSec= new Out!Edge;
+
+	Schedulertemplate.edge.add(EdgeSchedulerFirst);
+	Schedulertemplate.edge.add(EdgeSchedulerSec);	
+	
+	//IdleLocFreq.frequency.at(i+1).println();		 
+	EdgeSchedulerFirst.source=location_Initial_Schedulertemplate;
+	EdgeSchedulerFirst.target=location_Initial_Schedulertemplate;
+	EdgeSchedulerFirst.comment="Scheduler_"+pt.identifier+"_" +IdleLocFreq.frequency.at(i)+"_"+IdleLocFreq.frequency.at(i+1);
+	
+	EdgeSchedulerSec.source=location_Initial_Schedulertemplate;
+	EdgeSchedulerSec.target=location_Initial_Schedulertemplate;
+	EdgeSchedulerSec.comment="Scheduler_"+pt.identifier+"_" +IdleLocFreq.frequency.at(i+1)+"_"+IdleLocFreq.frequency.at(i);
+	
+	//Scheduler Edges Select
+	var EdgeSchedulerFirstSelect= new Out!Selection;
+	EdgeSchedulerFirst.selection.add(EdgeSchedulerFirstSelect);
+	
+	var EdgeSchedulerSecSelect= new Out!Selection;
+	EdgeSchedulerSec.selection.add(EdgeSchedulerSecSelect);
+
+	//Scheduler Edges Select Type Reference
+	var EdgeSchedulerFirstSelectTypeRef= new Out!TypeReference;
+	EdgeSchedulerFirstSelectTypeRef.referredType=vfiTypeDecTypeDeclaration;
+	//getSDFTemplateElementProcessorTypeDefinition().println();
+	EdgeSchedulerFirstSelect.typeDefinition = EdgeSchedulerFirstSelectTypeRef;
+	
+	var EdgeSchedulerSecSelectTypeRef= new Out!TypeReference;
+	EdgeSchedulerSecSelectTypeRef.referredType=vfiTypeDecTypeDeclaration;
+	//getSDFTemplateElementProcessorTypeDefinition().println();
+	EdgeSchedulerSecSelect.typeDefinition = EdgeSchedulerSecSelectTypeRef;
+	     
+	//Scheduler Edges Select Variable
+	var EdgeSchedulerFirstVariable = new Out!Variable;
+	EdgeSchedulerFirstVariable.name = "f";
+	EdgeSchedulerFirstSelect.variable.add(EdgeSchedulerFirstVariable);
+	    
+	var EdgeSchedulerSecVariable = new Out!Variable;
+	EdgeSchedulerSecVariable.name = "f";
+	EdgeSchedulerSecSelect.variable.add(EdgeSchedulerSecVariable);	
+	
+	//Scheduler Edges Synchronization
+	var EdgeSchedulerFirstSync= new Out!Synchronization;
+	EdgeSchedulerFirstSync.kind=Out!SynchronizationKind#SEND;
+	EdgeSchedulerFirst.synchronization=EdgeSchedulerFirstSync;
+	
+	var EdgeSchedulerSecSync= new Out!Synchronization;
+	EdgeSchedulerSecSync.kind=Out!SynchronizationKind#SEND;
+	EdgeSchedulerSec.synchronization=EdgeSchedulerSecSync;	
+	
+	//Scheduler Edges Synchronization Variable Expression
+	var EdgeSchedulerFirstSyncVar= new Out!IdentifierExpression; 
+	EdgeSchedulerFirstSyncVar.identifier=inSchedulerFirstEdgeChanMap.get(i+pt);
+	EdgeSchedulerFirstSync.channelExpression=EdgeSchedulerFirstSyncVar;
+	
+	var EdgeSchedulerSecSyncVar= new Out!IdentifierExpression; 
+	EdgeSchedulerSecSyncVar.identifier=inSchedulerSecEdgeChanMap.get(i+pt);
+	EdgeSchedulerSecSync.channelExpression=EdgeSchedulerSecSyncVar;	
+	
+	//Scheduler Edges Synchronization Variable Expression First Variable (VFIs Index)
+	var EdgeSchedulerFirstSyncVarFirstVar= new Out!IdentifierExpression; 
+	EdgeSchedulerFirstSyncVarFirstVar.identifier=EdgeSchedulerFirstVariable;
+	EdgeSchedulerFirstSyncVar.index.add(EdgeSchedulerFirstSyncVarFirstVar);
+	
+	var EdgeSchedulerSecSyncVarFirstVar= new Out!IdentifierExpression; 
+	EdgeSchedulerSecSyncVarFirstVar.identifier=EdgeSchedulerSecVariable;
+	EdgeSchedulerSecSyncVar.index.add(EdgeSchedulerSecSyncVarFirstVar);
+	
+	//Scheduler Edges Guard
+	var EdgeSchedulerFirstGaurdsConjuction= new Out!LogicalExpression; //Conjuction
+	EdgeSchedulerFirstGaurdsConjuction.operator=Out!LogicalOperator#AND; 		
+	EdgeSchedulerFirst.`guard`=EdgeSchedulerFirstGaurdsConjuction;
+	
+	var EdgeSchedulerSecGaurdsConjuction= new Out!LogicalExpression; //Conjuction
+	EdgeSchedulerSecGaurdsConjuction.operator=Out!LogicalOperator#AND;	
+	EdgeSchedulerSec.`guard`=EdgeSchedulerSecGaurdsConjuction;	
+	 		 
+	//Scheduler Edges Guard Conjuction First Compare Expr
+	var EdgeSchedulerFirstGaurdsConjuctionCompare= new Out!CompareExpression;
+	EdgeSchedulerFirstGaurdsConjuctionCompare.operator=Out!CompareOperator#EQUAL; 
+	EdgeSchedulerFirstGaurdsConjuction.firstExpr=EdgeSchedulerFirstGaurdsConjuctionCompare;
+	
+	var EdgeSchedulerSecGaurdsConjuctionCompare= new Out!CompareExpression;
+	EdgeSchedulerSecGaurdsConjuctionCompare.operator=Out!CompareOperator#EQUAL; 
+	EdgeSchedulerSecGaurdsConjuction.firstExpr=EdgeSchedulerSecGaurdsConjuctionCompare;
+
+	//Scheduler Edges Guard Conjuction First Compare First Expr				 
+	var EdgeSchedulerFirstGaurdsConjuctionCompareFirstExpr= new Out!IdentifierExpression;
+	EdgeSchedulerFirstGaurdsConjuctionCompareFirstExpr.identifier=nrOccProcVar;
+	EdgeSchedulerFirstGaurdsConjuctionCompare.firstExpr=EdgeSchedulerFirstGaurdsConjuctionCompareFirstExpr;
+	
+	var EdgeSchedulerSecGaurdsConjuctionCompareFirstExpr= new Out!IdentifierExpression;
+	EdgeSchedulerSecGaurdsConjuctionCompareFirstExpr.identifier=nrOccProcVar;
+	EdgeSchedulerSecGaurdsConjuctionCompare.firstExpr=EdgeSchedulerSecGaurdsConjuctionCompareFirstExpr;	
+	
+	// Scheduler Edges Guard Conjuction First Compare Expr Variable Expression Index Variable
+	var EdgeSchedulerFirstGaurdsConjuctionCompareFirstExprIndex = new Out!IdentifierExpression;
+	EdgeSchedulerFirstGaurdsConjuctionCompareFirstExprIndex.identifier = EdgeSchedulerFirstVariable;
+	EdgeSchedulerFirstGaurdsConjuctionCompareFirstExpr.index.add(EdgeSchedulerFirstGaurdsConjuctionCompareFirstExprIndex);	
+	
+	var EdgeSchedulerSecGaurdsConjuctionCompareFirstExprIndex = new Out!IdentifierExpression;
+	EdgeSchedulerSecGaurdsConjuctionCompareFirstExprIndex.identifier = EdgeSchedulerSecVariable;
+	EdgeSchedulerSecGaurdsConjuctionCompareFirstExpr.index.add(EdgeSchedulerSecGaurdsConjuctionCompareFirstExprIndex);	
+	
+	//Scheduler Edges Guard Conjuction First Compare Second Expr
+	var EdgeSchedulerFirstGaurdsConjuctionCompareSecExpr= new Out!LiteralExpression;
+	EdgeSchedulerFirstGaurdsConjuctionCompareSecExpr.text="0";
+	EdgeSchedulerFirstGaurdsConjuctionCompare.secondExpr=EdgeSchedulerFirstGaurdsConjuctionCompareSecExpr;	
+	
+	var EdgeSchedulerSecGaurdsConjuctionCompareSecExpr= new Out!LiteralExpression;
+	EdgeSchedulerSecGaurdsConjuctionCompareSecExpr.text="0";
+	EdgeSchedulerSecGaurdsConjuctionCompare.secondExpr=EdgeSchedulerSecGaurdsConjuctionCompareSecExpr;		
+	
+	//Scheduler Edges Guard Conjuction Second Compare Expr
+	var EdgeSchedulerFirstGaurdsConjuctionSecCompare= new Out!CompareExpression;
+	EdgeSchedulerFirstGaurdsConjuctionSecCompare.operator=Out!CompareOperator#EQUAL; 
+	EdgeSchedulerFirstGaurdsConjuction.secondExpr=EdgeSchedulerFirstGaurdsConjuctionSecCompare;	
+	
+	var EdgeSchedulerSecGaurdsConjuctionSecCompare= new Out!CompareExpression;
+	EdgeSchedulerSecGaurdsConjuctionSecCompare.operator=Out!CompareOperator#EQUAL; 
+	EdgeSchedulerSecGaurdsConjuction.secondExpr=EdgeSchedulerSecGaurdsConjuctionSecCompare;	
+	
+	//Scheduler Edges Guard Conjuction Second Compare First Expr				 
+	var EdgeSchedulerFirstGaurdsConjuctionSecCompareFirstExpr= new Out!IdentifierExpression;
+	EdgeSchedulerFirstGaurdsConjuctionSecCompareFirstExpr.identifier=currFreqVar;
+	EdgeSchedulerFirstGaurdsConjuctionSecCompare.firstExpr=EdgeSchedulerFirstGaurdsConjuctionSecCompareFirstExpr;
+	
+	var EdgeSchedulerSecGaurdsConjuctionSecCompareFirstExpr= new Out!IdentifierExpression;
+	EdgeSchedulerSecGaurdsConjuctionSecCompareFirstExpr.identifier=currFreqVar;
+	EdgeSchedulerSecGaurdsConjuctionSecCompare.firstExpr=EdgeSchedulerSecGaurdsConjuctionSecCompareFirstExpr;	
+	
+	// Scheduler Edges Guard Conjuction First Compare Expr Variable Expression Index Variable
+	var EdgeSchedulerFirstGaurdsConjuctionSecCompareFirstExprIndex = new Out!IdentifierExpression;
+	EdgeSchedulerFirstGaurdsConjuctionSecCompareFirstExprIndex.identifier = EdgeSchedulerFirstVariable;
+	EdgeSchedulerFirstGaurdsConjuctionSecCompareFirstExpr.index.add(EdgeSchedulerFirstGaurdsConjuctionSecCompareFirstExprIndex);	
+	
+	var EdgeSchedulerSecGaurdsConjuctionSecCompareFirstExprIndex = new Out!IdentifierExpression;
+	EdgeSchedulerSecGaurdsConjuctionSecCompareFirstExprIndex.identifier = EdgeSchedulerSecVariable;
+	EdgeSchedulerSecGaurdsConjuctionSecCompareFirstExpr.index.add(EdgeSchedulerSecGaurdsConjuctionSecCompareFirstExprIndex);	
+	
+	//Scheduler Edges Guard Conjuction Compare Second Expr
+	var EdgeSchedulerFirstGaurdsConjuctionSecCompareSecExpr= new Out!LiteralExpression;
+	EdgeSchedulerFirstGaurdsConjuctionSecCompareSecExpr.text=IdleLocFreq.frequency.at(i)+"";
+	EdgeSchedulerFirstGaurdsConjuctionSecCompare.secondExpr=EdgeSchedulerFirstGaurdsConjuctionSecCompareSecExpr;
+	
+	var EdgeSchedulerSecGaurdsConjuctionSecCompareSecExpr= new Out!LiteralExpression;
+	EdgeSchedulerSecGaurdsConjuctionSecCompareSecExpr.text=IdleLocFreq.frequency.at(i+1)+"";
+	EdgeSchedulerSecGaurdsConjuctionSecCompare.secondExpr=EdgeSchedulerSecGaurdsConjuctionSecCompareSecExpr;			
+
+	}	
+	   
+}

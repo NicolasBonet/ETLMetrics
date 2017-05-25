@@ -1,0 +1,45 @@
+-- Debemos crear una unica base de datos para todos
+pre {
+	var db : new DB!Database;
+}
+
+-- Esta regla se encarga de todo!
+rule MarketPlace2Relacional
+	transform
+		c : mp!ClassUnit
+	to
+		t : DB!Table
+		{
+		guard: c.name.startsWith("_") and c.name.contains("Entity".toString())
+			-- Asignamos la tabla creada a la base de datos inicializada al comienzo y le ponemos el nombre de la clase sin el Entity
+	   		t.database = db;
+		   	t.name = c.name.replace("Entity", "").replace("_","");
+		   	t.columns = c.codeElement.equivalent();		   	
+		   	
+	   }
+
+@Lazy
+rule MarketPlace2Propiedades
+	transform
+		p : mp!StorableUnit 
+	to
+		 c:DB!Column
+		{
+			-- Asignamos la tabla creada a la base de datos inicializada al comienzo y le ponemos el nombre de la clase sin el Entity
+	   		
+		   	c.name = (p.name);
+		   	c.isPK = (p.codeRelation.select(cr|cr.`to`.name = "Id" ).size() > 0);
+		   	p.println();
+		   	
+		   	c.type=DB!DataType#varchar;
+		   	
+		   	
+		   	
+		   	
+		   	
+		   	
+	   }
+	   
+	   
+	   
+	   

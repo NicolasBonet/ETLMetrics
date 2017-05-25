@@ -1,0 +1,260 @@
+pre{
+	var a: new ModelMM!Architecture;
+	
+	var cr: new ModelMM!Create;
+	cr.name = 'create';
+	a.serviceTypes.add(cr);
+	var re: new ModelMM!Read;
+	re.name = 'read';
+	a.serviceTypes.add(re);
+	var dl: new ModelMM!Delete;
+	dl.name = 'delete';
+	a.serviceTypes.add(dl);
+	var up: new ModelMM!Update;
+	up.name = 'update';
+	a.serviceTypes.add(up);	
+}
+
+//BUSINESS LOGICS 
+
+rule SuperEnt2BuzLogic
+	transform
+		s:GrammarMM!SuperEntity
+	to
+		t:ModelMM!BusinessLogic{
+			t.functions = s.getSuperEntityFunctions();
+			t.name = s.name;
+			a.logic.add(t);
+			a.services.addAll(s.getSuperEntityServices());
+		}
+	
+rule BusinessEnt2BuzLogic
+	transform
+		s:GrammarMM!BusinessEntity
+	to
+		t:ModelMM!BusinessLogic{
+			t.name = s.name;
+			t.functions = s.getBusinessEntityFunctions();
+			a.logic.add(t);
+			a.services.addAll(s.getBusinessEntityServices());
+		}
+
+rule Pay2BuzLogic
+	transform
+		s:GrammarMM!Pay
+	to
+		t:ModelMM!BusinessLogic{
+			t.name = s.name;
+			t.functions = s.getPayFunctions();
+			a.logic.add(t);
+			a.services.addAll(s.getPayServices());
+		}
+		
+rule Complex2BuzLogic
+	transform
+		s:GrammarMM!Complex
+	to
+		t:ModelMM!BusinessLogic{
+			t.name = s.name.substring(1, s.name.length() -1).firstToUpperCase();
+			t.functions = s.getComplexFunctions();
+			a.logic.add(t);
+			a.services.addAll(s.getComplexServices());
+		}
+		
+rule Service2Function
+	transform
+		s:GrammarMM!Service
+	to
+		t:ModelMM!Function{
+			t.name = s.name;
+			t.body = s.getCalculateBody();
+			a.logic.add(t);
+			
+		}
+
+//FUNCTIONS
+
+operation GrammarMM!SuperEntity getSuperEntityFunctions() : Sequence{
+	var functions : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var f = new ModelMM!Function;
+		f.name = st.name + "_" + self.name.toLowerCase();
+		f.body = self.getSuperEntBody();
+		functions.add(f);
+	}
+	
+	return functions;
+}
+
+operation GrammarMM!BusinessEntity getBusinessEntityFunctions() : Sequence{
+	var functions : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var f = new ModelMM!Function;
+		f.name = st.name + "_" + self.name.toLowerCase();
+		f.body = self.getBusinessEntBody();
+		functions.add(f);
+	}
+	
+	return functions;
+}
+
+operation GrammarMM!Pay getPayFunctions() : Sequence{
+	var functions : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var f = new ModelMM!Function;
+		f.name = st.name + "_" + self.name.toLowerCase();
+		f.body = self.getPayBody();
+		functions.add(f);
+	}
+	
+	return functions;
+}
+
+operation GrammarMM!Complex getComplexFunctions() : Sequence{
+	var functions : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var f = new ModelMM!Function;
+		f.name = st.name + "_" + self.name.substring(1, self.name.length() -1).toLowerCase();
+		f.body = self.getComplexBody();
+		functions.add(f);
+	}
+	
+	return functions;
+}
+
+//SERVICES
+
+operation GrammarMM!SuperEntity getSuperEntityServices() : Sequence{
+	var services : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var s = new ModelMM!Service;
+		s.name = st.name + "_" + self.name.toLowerCase();
+		s.dispatcher = s.findDispatcher();
+		s.serviceType = st;
+		services.add(s);
+	}
+	
+	return services;
+}
+
+operation GrammarMM!BusinessEntity getBusinessEntityServices() : Sequence{
+	var services : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var s = new ModelMM!Service;
+		s.name = st.name + "_" + self.name.toLowerCase();
+		s.dispatcher = s.findDispatcher();
+		s.serviceType = st;
+		services.add(s);
+	}
+	
+	return services;
+}
+
+operation GrammarMM!Pay getPayServices() : Sequence{
+	var services : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var s = new ModelMM!Service;
+		s.name = st.name + "_" + self.name.toLowerCase();
+		s.dispatcher = s.findDispatcher();
+		s.serviceType = st;
+		services.add(s);
+	}
+	
+	return services;
+}
+
+operation GrammarMM!Complex getComplexServices() : Sequence{
+	var services : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var s = new ModelMM!Service;
+		s.name = st.name + "_" + self.name.substring(1, self.name.length() -1).toLowerCase();
+		s.dispatcher = s.findDispatcher();
+		s.serviceType = st;
+		services.add(s);
+	}
+	
+	return services;
+}
+
+
+
+//Bodies
+operation GrammarMM!SuperEntity getSuperEntBody(): ModelMM!FunctionBody{
+	var bodies : new ModelMM!FunctionBody;
+	var contents : String;
+	for(attr in self.attributes){
+		contents += attr.name;
+		contents += ";";
+	}
+	
+	bodies.content = contents;
+	
+	return bodies;
+}
+
+operation GrammarMM!BusinessEntity getBusinessEntBody(): ModelMM!FunctionBody{
+	var bodies : new ModelMM!FunctionBody;
+	var contents : String;
+	for(attr in self.attributes){
+		contents += attr.name;
+		contents += ";";
+	}
+	
+	bodies.content = contents;
+	
+	return bodies;
+}
+
+operation GrammarMM!Pay getPayBody(): ModelMM!FunctionBody{
+	var bodies : new ModelMM!FunctionBody;
+	var contents : String;
+	for(attr in self.attributes){
+		contents += attr.name;
+		contents += ";";
+	}
+	
+	bodies.content = contents;
+	
+	return bodies;
+}
+
+operation GrammarMM!Complex getComplexBody(): ModelMM!FunctionBody{
+	var bodies : new ModelMM!FunctionBody;
+	var contents : String;
+	for(attr in self.attributes){
+		contents += attr.name;
+		contents += ";";
+	}
+	
+	bodies.content = contents;
+	
+	return bodies;
+}
+
+operation GrammarMM!Service getCalculateBody(): ModelMM!FunctionBody{
+	var bodies : new ModelMM!FunctionBody;
+	var contents : String;
+	for(attr in self.calculate){
+		contents += attr.name;
+		contents += ";";
+	}
+	
+	bodies.content = contents;
+	
+	return bodies;
+}
+
+operation ModelMM!Service findDispatcher(): ModelMM!Function {
+	
+	var f = ModelMM!Function.allInstances.select(fu|fu.name = self.name).first();
+	
+	return f;
+}

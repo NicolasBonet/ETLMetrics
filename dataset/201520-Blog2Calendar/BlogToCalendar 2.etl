@@ -1,0 +1,52 @@
+rule Blog2Calendar
+	transform blog : B!Blog
+	to calendar:  C!Calendar
+	{
+		calendar.name = blog.name;
+		B!Article.all.select( x | x.addArticle(calendar) ); 
+	}
+	
+operation Any addArticle(calendar: C!Calendar) : Integer
+{
+	var yearArticle = self.getNumberAt(2);
+	var yearCalendar = calendar.years.select( x | x.year == yearArticle ).first();
+	if(yearCalendar == null)
+	{
+		yearCalendar = new C!Year;
+		yearCalendar.year = yearArticle;
+		calendar.years.add(yearCalendar);
+	}
+	
+	var monthArticle = self.getNumberAt(1);
+	var monthCalendar = yearCalendar.months.select( x | x.month == monthArticle ).first();
+	if(monthCalendar == null)
+	{
+		monthCalendar = new C!Month;
+		monthCalendar.month = monthArticle;
+		monthCalendar.year = yearCalendar; 
+		yearCalendar.months.add(monthCalendar); 
+	}
+	
+	var dayArticle = self.getNumberAt(0);
+	var dayCalendar = monthCalendar.days.select( x | x.day == dayArticle ).first();
+	if(dayCalendar == null)
+	{
+		dayCalendar = new C!Day;
+		dayCalendar.day = dayArticle;
+		dayCalendar.month = monthCalendar;
+		monthCalendar.days.add(dayCalendar); 
+	}
+	
+	var event = new C!Event;
+	event.event = self.summary;
+	event.owner = self.author.name;
+	event.tags = self.tags.tag.concat(", ");
+	event.day = dayCalendar;
+	
+	dayCalendar.events.add(event);
+} 
+
+operation B!Article getNumberAt(n : Integer) : Integer
+{
+	return self.date.split("/").at(n).asInteger();
+} 

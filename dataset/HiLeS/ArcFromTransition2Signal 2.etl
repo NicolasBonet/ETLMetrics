@@ -1,0 +1,48 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: Payload.etl 163 2011-09-13 14:20:08Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+
+/****r* HiLeSToVDHLAMS/ArcFromTransition2Signal
+ * SUMMARY
+ *   Transform a HiLeS:Port into a Vhdl:Port. The specific type of port would
+ *  depend on the type of the payload that connects to the port. ($Rev: 829 $)
+ * DESCRIPTION 
+ *   // Arcs that come from transitions to places/ports (structural blocks)
+* transform into a signal for putting tokens in the target: aj_aval. The arc 
+ * can not go from a trasition to the block's HcnOut port
+ * SEE ALSO
+ *
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *   	* Vhdl   - http://hiles.uniandes.edu.co/1.1/vhdl-ams
+ *
+ *****
+ */
+
+rule ArcFromTransition2Signal
+	transform arc : HiLeS!Arc
+	to aj_aval : Vhdl!Signal {
+		
+		guard : (arc.fromNode.isDefined() and arc.fromNode.isTypeOf(HiLeS!Transition))
+			//and (arc.toNode.isDefined() or (arc.toPoint.isDefined() and not "HcnIn".isSubstringOf(arc.toPoint.name)))
+
+		if(arc.toNode.isDefined())
+		{
+			aj_aval.identifier = "ajAval_" + arc.fromNode.name +  "_" + arc.toNode.name;
+		}
+		if(arc.toPoint.isDefined())
+		{
+			aj_aval.identifier = "ajAval_" + arc.fromNode.name +  "_" + arc.toPoint.name;
+		}
+		aj_aval.subtype = new Vhdl!Subtype;
+		aj_aval.subtype.type = Vhdl!Types#std_logic;
+		
+	}

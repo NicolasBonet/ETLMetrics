@@ -1,0 +1,133 @@
+rule Negocio2Sistema
+	transform proyecto:business!Proyecto
+	to sistema:mm_arquitectura!Sistema{
+	
+		sistema.nombre = proyecto.nombre;
+		sistema.dominio = proyecto.nombre;
+		
+		
+		var proyectoWEB = new mm_arquitectura!ProyectoWeb();
+		proyectoWEB.nombre = proyecto.nombre + "WEB";
+		
+		sistema.proyecto_web = proyectoWEB;
+		
+		var capaPresentacion  = new mm_arquitectura!CapaPresentacion();
+		capaPresentacion.nombre = proyecto.nombre + "WEB";
+		
+		proyectoWEB.capa_presentacion = capaPresentacion;
+		
+		
+		for (entidad in proyecto.entidades){
+		
+			//entidad
+			var _entidad = new mm_arquitectura!Entidad();
+			_entidad.nombre = entidad.nombre.toString();
+			
+			sistema.entidades.add(_entidad);
+			
+			// atributos de la entidad
+			
+			for (atributo in entidad.atributos){
+				var _atributo = new mm_arquitectura!Atributo();
+				_atributo.nombre = atributo.nombre;
+				_entidad.atributos.add(_atributo);
+			}
+			
+		}
+		
+			// relaciones	
+			for (entidad in proyecto.entidades){
+		
+				//entidad
+				var _entidad = sistema.entidades.select(e|e.nombre == entidad.nombre).first();
+				
+				//relaciones entidad
+				for (relacion in entidad.relaciones){
+					var _relacion = new mm_arquitectura!Relacion();
+					_relacion.nombre = relacion.nombre;
+					
+					if ( relacion.tipo == business!ETipoRelacion#Herencia){
+						_relacion.tipo = mm_arquitectura!ETipoRelacion#HERENCIA;
+					}else if ( relacion.tipo == business!ETipoRelacion#Agregacion){
+						_relacion.tipo = mm_arquitectura!ETipoRelacion#AGREGACION;
+					}else if ( relacion.tipo == business!ETipoRelacion#Composicion){
+						_relacion.tipo = mm_arquitectura!ETipoRelacion#COMPOSICION;
+					}
+					
+					if ( relacion.multiplicidadOrigen == business!ETipoMultiplicidad#Cero){
+						_relacion.multiplicidadOrigen = mm_arquitectura!ETipoMultiplicidad#CERO;
+					}else if ( relacion.multiplicidadOrigen == business!ETipoMultiplicidad#Uno){
+						_relacion.multiplicidadOrigen = mm_arquitectura!ETipoMultiplicidad#UNO;
+					}else if ( relacion.multiplicidadOrigen == business!ETipoMultiplicidad#Muchos){
+						_relacion.multiplicidadOrigen = mm_arquitectura!ETipoMultiplicidad#MUCHOS;
+					}
+					
+					if ( relacion.multiplicidadDestino == business!ETipoMultiplicidad#Cero){
+						_relacion.multiplicidadDestino = mm_arquitectura!ETipoMultiplicidad#CERO;
+					}else if ( relacion.multiplicidadDestino == business!ETipoMultiplicidad#Uno){
+						_relacion.multiplicidadDestino = mm_arquitectura!ETipoMultiplicidad#UNO;
+					}else if ( relacion.multiplicidadDestino == business!ETipoMultiplicidad#Muchos){
+						_relacion.multiplicidadDestino = mm_arquitectura!ETipoMultiplicidad#MUCHOS;
+					}
+					
+					
+					
+					
+					_relacion.destino = sistema.entidades.select(e|e.nombre == relacion.destino.first().nombre).first();
+					
+					_entidad.relaciones.add(_relacion);
+				}
+			}
+			
+			//Vistas
+			
+			for (_entidad in sistema.entidades){
+			
+				//Vista Listar
+				var vistaListar = new mm_arquitectura!Vista();
+				vistaListar.tipo = mm_arquitectura!ETipoVista#LISTA;
+				vistaListar.entidad = _entidad;
+				vistaListar.nombre = _entidad.nombre + "Lista";
+				
+				
+				capaPresentacion.vistas.add(vistaListar);
+				
+				
+				//Vista Detalle
+				var vistaDetalle = new mm_arquitectura!Vista();
+				vistaDetalle.tipo = mm_arquitectura!ETipoVista#DETALLE;
+				vistaDetalle.entidad = _entidad;
+				vistaDetalle.nombre = _entidad.nombre + "Detalle";
+				capaPresentacion.vistas.add(vistaDetalle);
+				
+				//Vista Agregar
+				var vistaAgregar = new mm_arquitectura!Vista();
+				vistaAgregar.tipo = mm_arquitectura!ETipoVista#AGREGAR;
+				vistaAgregar.entidad = _entidad;
+				vistaAgregar.nombre = _entidad.nombre + "Agregar";
+				capaPresentacion.vistas.add(vistaAgregar);
+				
+				
+				//Vista Modificar
+				var vistaModificar = new mm_arquitectura!Vista();
+				vistaModificar.tipo = mm_arquitectura!ETipoVista#MODIFICAR;
+				vistaModificar.entidad = _entidad;
+				vistaModificar.nombre = _entidad.nombre + "Modificar";
+				capaPresentacion.vistas.add(vistaModificar);
+				
+				
+				//Vista Eliminar
+				var vistaEliminar = new mm_arquitectura!Vista();
+				vistaEliminar.tipo = mm_arquitectura!ETipoVista#ELIMINAR;
+				vistaEliminar.entidad = _entidad;
+				vistaEliminar.nombre = _entidad.nombre + "Eliminar";
+				capaPresentacion.vistas.add(vistaEliminar);
+				
+				
+				
+			}
+			
+			
+			
+	
+	}

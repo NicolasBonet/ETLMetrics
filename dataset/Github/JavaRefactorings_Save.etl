@@ -1,0 +1,2204 @@
+
+rule removeSingletonAnnotation
+	transform
+		c : javaMM!ClassDeclaration 
+	to 
+		c2 : javaMM2!ClassDeclaration, fieldDeclSingleton : javaMM2!FieldDeclaration, modif : javaMM2!Modifier, typeAccess : javaMM2!TypeAccess,
+		varDeclFragment : javaMM2!VariableDeclarationFragment, nullLiteral : javaMM2!NullLiteral, constructor : javaMM2!ConstructorDeclaration,
+		modC : javaMM2!Modifier, emptyBlock : javaMM2!Block, meth : javaMM2!MethodDeclaration, modM : javaMM2!Modifier, block : javaMM2!Block,
+		typeAccessC : javaMM2!TypeAccess, ifStatement : javaMM2!IfStatement, infixExp : javaMM2!InfixExpression,
+		singlVarAcc : javaMM2!SingleVariableAccess, nullLit : javaMM2!NullLiteral, ifBlock : javaMM2!Block, expressionStatement : javaMM2!ExpressionStatement,
+		exprAssignment : javaMM2!Assignment, singlVarAccess : javaMM2!SingleVariableAccess, classInstanceCreation : javaMM2!ClassInstanceCreation,
+		typeAccess2 : javaMM2!TypeAccess, returnStatement : javaMM2!ReturnStatement, singleVarAccess : javaMM2!SingleVariableAccess {
+		
+			guard : (c.annotations->exists(a | a.type.type.name = 'Singleton'))
+		
+			if (c.abstractTypeDeclaration.isDefined() and c.abstractTypeDeclaration.equivalent().isDefined()){ c2.abstractTypeDeclaration := c.abstractTypeDeclaration.equivalent(); }
+			if (c.annotations.isDefined() and c.annotations.equivalent().isDefined()){
+				c2.annotations := c.annotations->excluding(c.annotations->select(a | a.type.type.name = 'Singleton')->first()).equivalent(); }
+			if (c.anonymousClassDeclarationOwner.isDefined() and c.anonymousClassDeclarationOwner.equivalent().isDefined()){ c2.anonymousClassDeclarationOwner := c.anonymousClassDeclarationOwner.equivalent(); }
+			if (c.bodyDeclarations.isDefined() and c.bodyDeclarations.isDefined()){
+				c2.bodyDeclarations := Sequence{fieldDeclSingleton, constructor, meth}; -- c.bodyDeclarations.equivalent();
+						-- ->including(fieldDeclSingleton)
+						-- ->including(constructor)
+						-- ->including(meth);
+			}
+			if (c.comments.isDefined() and c.comments.equivalent().isDefined()){ c2.comments := c.comments.equivalent(); }
+			if (c.commentsAfterBody.isDefined() and c.commentsAfterBody.equivalent().isDefined()){ c2.commentsAfterBody := c.commentsAfterBody.equivalent(); }
+			if (c.commentsBeforeBody.isDefined() and c.commentsBeforeBody.equivalent().isDefined()){ c2.commentsBeforeBody := c.commentsBeforeBody.equivalent(); }
+			if (c.modifier.isDefined() and c.modifier.equivalent().isDefined()){ c2.modifier := c.modifier.equivalent();}
+			c2.name := c.name;
+			if (c.originalClassFile.isDefined() and c.originalClassFile.equivalent().isDefined()){ c2.originalClassFile := c.originalClassFile.equivalent(); }
+			if (c.originalCompilationUnit.isDefined() and c.originalCompilationUnit.equivalent().isDefined()){ c2.originalCompilationUnit := c.originalCompilationUnit.equivalent();}
+			if (c.package.isDefined() and c.package.equivalent().isDefined()){ c2.package := c.package.equivalent(); }
+			c2.proxy := c.proxy;
+			if (c.superClass.isDefined() and c.superClass.equivalent().isDefined()){ c2.superClass := c.superClass.equivalent(); }
+			if (c.superInterfaces.isDefined() and c.superInterfaces.equivalent().isDefined()){ c2.superInterfaces := c.superInterfaces.equivalent(); }
+			if (c.typeParameters.isDefined() and c.typeParameters.equivalent().isDefined()){ c2.typeParameters := c.typeParameters.equivalent(); }
+			if (c.usagesInImports.isDefined() and c.usagesInImports.equivalent().isDefined()){ c2.usagesInImports := c.usagesInImports.equivalent(); }
+			if (c.usagesInTypeAccess.isDefined() and c.usagesInTypeAccess.equivalent().isDefined()){ c2.usagesInTypeAccess := c.usagesInTypeAccess.equivalent(); }
+		
+		--- elements to add for: private static ClassName instance = null;
+			fieldDeclSingleton.modifier := modif;
+			fieldDeclSingleton.type := typeAccess;
+			fieldDeclSingleton.fragments := Sequence{varDeclFragment};
+		
+			modif.static := true;
+			modif.visibility := VisibilityKind#private;
+		
+			typeAccess.type := c.equivalent();	
+
+			varDeclFragment.name := 'instance';
+			if (c.originalCompilationUnit.isDefined() and c.originalCompilationUnit.equivalent().isDefined()){ varDeclFragment.originalCompilationUnit := c.originalCompilationUnit.equivalent(); }
+			varDeclFragment.variablesContainer := fieldDeclSingleton;
+			varDeclFragment.initializer := nullLiteral;
+
+			if (c.originalCompilationUnit.isDefined() and c.originalCompilationUnit.equivalent().isDefined()){ nullLiteral.originalCompilationUnit := c.originalCompilationUnit.equivalent(); }
+
+		--- elements to add for: private ClassName() { }
+			constructor.modifier := modC;
+			constructor.name := c.name;
+			constructor.body := emptyBlock;
+			if (c.originalCompilationUnit.isDefined() and c.originalCompilationUnit.equivalent().isDefined()){ constructor.originalCompilationUnit := c.originalCompilationUnit.equivalent(); }
+
+			modC.visibility := VisibilityKind#private;
+
+			if (c.originalCompilationUnit.isDefined() and c.originalCompilationUnit.equivalent().isDefined()){ emptyBlock.originalCompilationUnit := c.originalCompilationUnit.equivalent();}			
+
+		--- elements to add for: 
+		--- public static ClassName getInstance(){
+		---	if (instance==null){
+		---		instance = new MyBinding();
+		---	}
+		---	return instance;
+		---}
+			meth.name := 'getInstance';
+			meth.modifier := modM;
+			meth.body := block;
+			meth.returnType := typeAccessC;
+
+			modM.visibility := VisibilityKind#public;		
+		
+			block.statements := Sequence{ifStatement, returnStatement};
+
+			typeAccessC.type := c.equivalent();		
+
+			ifStatement.expression := infixExp;
+			ifStatement.thenStatement := ifBlock;
+			if (c.originalCompilationUnit.isDefined() and c.originalCompilationUnit.equivalent().isDefined()){ ifStatement.originalCompilationUnit := c.originalCompilationUnit.equivalent(); }
+
+			infixExp.leftOperand := singlVarAcc;
+			infixExp.rightOperand := nullLit;
+			infixExp.operator := InfixExpressionKind#EQUALS;
+
+			singlVarAcc.variable := varDeclFragment;
+			if (c.originalCompilationUnit.isDefined() and c.originalCompilationUnit.equivalent().isDefined()){ singlVarAcc.originalCompilationUnit := c.originalCompilationUnit.equivalent();}
+
+			if (c.originalCompilationUnit.isDefined() and c.originalCompilationUnit.equivalent().isDefined()){ nullLit.originalCompilationUnit := c.originalCompilationUnit.equivalent(); }
+		
+			ifBlock.statements := Sequence{expressionStatement};
+			if (c.originalCompilationUnit.isDefined() and c.originalCompilationUnit.equivalent().isDefined()){ ifBlock.originalCompilationUnit := c.originalCompilationUnit.equivalent(); }
+		
+			expressionStatement.expression := exprAssignment;
+			if (c.originalCompilationUnit.isDefined() and c.originalCompilationUnit.equivalent().isDefined()){ expressionStatement.originalCompilationUnit := c.originalCompilationUnit.equivalent(); }
+
+			exprAssignment.leftHandSide := singlVarAccess;
+			exprAssignment.rightHandSide := classInstanceCreation;
+			if (c.originalCompilationUnit.isDefined() and c.originalCompilationUnit.equivalent().isDefined()){ exprAssignment.originalCompilationUnit := c.originalCompilationUnit.equivalent();}
+
+			singlVarAccess.variable := varDeclFragment;
+			if (c.originalCompilationUnit.isDefined() and c.originalCompilationUnit.equivalent().isDefined()){ singlVarAccess.originalCompilationUnit := c.originalCompilationUnit.equivalent();}
+
+			classInstanceCreation.type := typeAccess2;
+			if (c.originalCompilationUnit.isDefined() and c.originalCompilationUnit.equivalent().isDefined()){ classInstanceCreation.originalCompilationUnit := c.originalCompilationUnit.equivalent();}
+
+			typeAccess2.type := c.equivalent();
+			if (c.originalCompilationUnit.isDefined() and c.originalCompilationUnit.equivalent().isDefined()){ typeAccess2.originalCompilationUnit := c.originalCompilationUnit.equivalent(); }
+
+			returnStatement.expression := singleVarAccess;
+
+			singleVarAccess.variable := varDeclFragment;
+			if (c.originalCompilationUnit.isDefined() and c.originalCompilationUnit.equivalent().isDefined()){ singleVarAccess.originalCompilationUnit := c.originalCompilationUnit.equivalent(); }
+
+}
+
+rule privateConstructorDeclaration
+	transform c : javaMM!ConstructorDeclaration 
+	to c2 : javaMM2!ConstructorDeclaration, modif : javaMM2!Modifier, getInstanceMethod : javaMM2!MethodDeclaration,
+		modM : javaMM2!Modifier, block : javaMM2!Block, typeAccessC : javaMM2!TypeAccess, ifStatement : javaMM2!IfStatement, 
+		infixExp : javaMM2!InfixExpression, singlVarAcc : javaMM2!SingleVariableAccess, nullLit : javaMM2!NullLiteral,
+		ifBlock : javaMM2!Block, expressionStatement : javaMM2!ExpressionStatement, exprAssignment : javaMM2!Assignment,
+		singlVarAccess : javaMM2!SingleVariableAccess, classInstanceCreation : javaMM2!ClassInstanceCreation,
+		typeAccess2 : javaMM2!TypeAccess,returnStatement : javaMM2!ReturnStatement, singleVarAccess : javaMM2!SingleVariableAccess {
+		
+		guard : (c.abstractTypeDeclaration.isDefined() and c.abstractTypeDeclaration.annotations->exists(a | a.type.type.name = 'Singleton'))
+			   		
+			c2.modifier := modif;
+			c2.abstractTypeDeclaration := c.abstractTypeDeclaration.equivalent();
+			c2.annotations := c.annotations.equivalent();
+			c2.anonymousClassDeclarationOwner := c.anonymousClassDeclarationOwner.equivalent();
+			c2.body := c.body.equivalent();
+			c2.comments := c.comments.equivalent();
+			c2.name := c.name;
+			c2.originalClassFile := c.originalClassFile.equivalent();
+			c2.originalCompilationUnit := c.originalCompilationUnit.equivalent();
+			c2.parameters := c.parameters.equivalent();
+			c2.proxy := c.proxy;
+			c2.thrownExceptions := c.thrownExceptions.equivalent();
+			c2.typeParameters := c.typeParameters.equivalent();
+			c2.usages := c.usages.equivalent();
+			c2.usagesInDocComments := c.usagesInDocComments.equivalent();
+			c2.usagesInImports := c.usagesInImports.equivalent();
+		
+			modif.visibility := VisibilityKind#private;
+			modif.static := c.modifier.static;
+			modif.originalCompilationUnit := c.originalCompilationUnit.equivalent();
+
+		--- creation of new method getInstance with the proper parameters (with the same parameters the constructor has)
+			getInstanceMethod.parameters := c.parameters->collect(p | thisModule.createParams(p));
+			getInstanceMethod.name := 'getInstance';
+			getInstanceMethod.modifier := modM;
+			getInstanceMethod.originalCompilationUnit := c.originalCompilationUnit.equivalent();
+			getInstanceMethod.originalClassFile := c.originalClassFile.equivalent();
+			getInstanceMethod.abstractTypeDeclaration := c.abstractTypeDeclaration.equivalent();
+			getInstanceMethod.body := block.equivalent();
+			getInstanceMethod.returnType := typeAccessC.equivalent();
+		
+			modM.visibility := VisibilityKind#public;			
+		
+			block.statements := Sequence{ifStatement, returnStatement};
+		
+			typeAccessC.type := c.abstractTypeDeclaration.equivalent();		
+		
+			ifStatement.expression := infixExp;
+			ifStatement.thenStatement := ifBlock;
+			ifStatement.originalCompilationUnit := c.originalCompilationUnit.equivalent();
+
+			infixExp.leftOperand := singlVarAcc;
+			infixExp.rightOperand := nullLit;
+			infixExp.operator := InfixExpressionKind#EQUALS;
+		
+			-- singlVarAcc.variable := thisModule.resolveTemp(c.abstractTypeDeclaration, 'varDeclFragment');
+			singlVarAcc.originalCompilationUnit := c.originalCompilationUnit.equivalent();
+		
+			nullLit.originalCompilationUnit := c.originalCompilationUnit.equivalent();
+		
+			ifBlock.statements := Sequence{expressionStatement};
+			ifBlock.originalCompilationUnit := c.originalCompilationUnit.equivalent();
+		
+			expressionStatement.expression := exprAssignment;
+			expressionStatement.originalCompilationUnit := c.originalCompilationUnit.equivalent();
+		
+			exprAssignment.leftHandSide := singlVarAccess;
+			exprAssignment.rightHandSide := classInstanceCreation;
+			exprAssignment.operator := InfixExpressionKind#ASSIGN;
+			exprAssignment.originalCompilationUnit := c.originalCompilationUnit.equivalent();
+		
+			-- variable := thisModule.resolveTemp(c.abstractTypeDeclaration, 'varDeclFragment');
+			originalCompilationUnit := c.originalCompilationUnit.equivalent();
+
+			classInstanceCreation.type := typeAccess2;
+			classInstanceCreation.originalCompilationUnit := c.originalCompilationUnit.equivalent();
+			classInstanceCreation.arguments := c.parameters->collect(t | t.type);
+		
+			typeAccess2.type := c.abstractTypeDeclaration.equivalent();
+			typeAccess2.originalCompilationUnit := c.originalCompilationUnit.equivalent();
+		
+			returnStatement.expression := singleVarAccess;
+		
+			-- singleVarAccess.variable := thisModule.resolveTemp(c.abstractTypeDeclaration, 'varDeclFragment');
+			singleVarAccess.originalCompilationUnit := c.originalCompilationUnit.equivalent();
+}
+
+--@lazy
+--rule createParams
+--	transform p : javaMM!SingleVariableDeclaration
+--	to p2 : javaMM2!SingleVariableDeclaration {
+--			name := p.name;
+--			type := p.type.equivalent();
+--			originalCompilationUnit := p.originalCompilationUnit.equivalent();
+--			varargs := p.varargs.equivalent();
+--			initializer := p.initializer.equivalent();
+--			modifier := p.modifier.equivalent();
+--			-- methodDeclaration := thisModule.resolveTemp(p.methodDeclaration, 'getInstanceMethod');
+--
+--}
+
+rule ConstructorDeclaration
+			transform inn : javaMM!ConstructorDeclaration
+			to out : javaMM2!ConstructorDeclaration {
+			guard : (not inn.abstractTypeDeclaration.isDefined() or not inn.abstractTypeDeclaration.annotations->exists(a | a.type.type.name = 'Singleton'))
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+}
+
+rule ClassDeclaration
+		transform inn : javaMM!ClassDeclaration 
+		to out : javaMM2!ClassDeclaration {
+			guard : (not ((inn.annotations->exists(a | a.type.type.name = 'Singleton'))))
+			out.name := inn.name;
+			out.proxy := inn.proxy;
+			if (inn.superClass.isDefined() and inn.superClass.equivalent().isDefined()) {
+			out.superClass := inn.superClass.equivalent(); }
+}
+	
+	
+--------------------------------------------
+		
+		rule Annotation
+			transform inn : javaMM!Annotation
+			to out : javaMM2!Annotation {
+
+
+
+
+				if (inn.type.isDefined() and inn.type.equivalent().isDefined()) {
+				out.type := inn.type.equivalent(); }
+				
+				if (inn.values.isDefined() and inn.values.equivalent().isDefined()) {
+				out.values := inn.values.equivalent(); }
+		
+		}
+		
+		rule Archive
+			transform inn : javaMM!Archive
+			to out : javaMM2!Archive {
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+				out.originalFilePath := inn.originalFilePath;
+
+				if (inn.classFiles.isDefined() and inn.classFiles.equivalent().isDefined()) {
+				out.classFiles := inn.classFiles.equivalent(); }
+				
+				if (inn.manifest.isDefined() and inn.manifest.equivalent().isDefined()) {
+				out.manifest := inn.manifest.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule AssertStatement
+			transform inn : javaMM!AssertStatement
+			to out : javaMM2!AssertStatement {
+
+
+
+
+				if (inn.message.isDefined() and inn.message.equivalent().isDefined()) {
+				out.message := inn.message.equivalent(); }
+				
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+		
+		}
+		 		
+
+		 		
+
+		
+		rule AnnotationMemberValuePair
+			transform inn : javaMM!AnnotationMemberValuePair
+			to out : javaMM2!AnnotationMemberValuePair {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+				if (inn.member.isDefined() and inn.member.equivalent().isDefined()) {
+				out.member := inn.member.equivalent(); }
+				
+				if (inn.value.isDefined() and inn.value.equivalent().isDefined()) {
+				out.value := inn.value.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule AnnotationTypeDeclaration
+			transform inn : javaMM!AnnotationTypeDeclaration
+			to out : javaMM2!AnnotationTypeDeclaration {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+
+
+
+
+
+
+
+		
+		}
+		 		
+
+		
+		rule AnnotationTypeMemberDeclaration
+			transform inn : javaMM!AnnotationTypeMemberDeclaration
+			to out : javaMM2!AnnotationTypeMemberDeclaration {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+
+
+
+
+				--if (inn._default.isDefined() and inn._default.equivalent().isDefined()) {
+				--out._default := inn._default.equivalent(); }
+				
+				if (inn.type.isDefined() and inn.type.equivalent().isDefined()) {
+				out.type := inn.type.equivalent(); }
+				
+				if (inn.usages.isDefined() and inn.usages.equivalent().isDefined()) {
+				out.usages := inn.usages.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule AnonymousClassDeclaration
+			transform inn : javaMM!AnonymousClassDeclaration
+			to out : javaMM2!AnonymousClassDeclaration {
+
+
+
+
+				if (inn.bodyDeclarations.isDefined() and inn.bodyDeclarations.equivalent().isDefined()) {
+				out.bodyDeclarations := inn.bodyDeclarations.equivalent(); }
+				
+				if (inn.classInstanceCreation.isDefined() and inn.classInstanceCreation.equivalent().isDefined()) {
+				out.classInstanceCreation := inn.classInstanceCreation.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule ArrayAccess
+			transform inn : javaMM!ArrayAccess
+			to out : javaMM2!ArrayAccess {
+
+
+
+
+				if (inn.array.isDefined() and inn.array.equivalent().isDefined()) {
+				out.array := inn.array.equivalent(); }
+				
+				if (inn.index.isDefined() and inn.index.equivalent().isDefined()) {
+				out.index := inn.index.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule ArrayCreation
+			transform inn : javaMM!ArrayCreation
+			to out : javaMM2!ArrayCreation {
+
+
+
+
+
+				if (inn.dimensions.isDefined() and inn.dimensions.equivalent().isDefined()) {
+				out.dimensions := inn.dimensions.equivalent(); }
+				
+				if (inn.initializer.isDefined() and inn.initializer.equivalent().isDefined()) {
+				out.initializer := inn.initializer.equivalent(); }
+				
+				if (inn.type.isDefined() and inn.type.equivalent().isDefined()) {
+				out.type := inn.type.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule ArrayInitializer
+			transform inn : javaMM!ArrayInitializer
+			to out : javaMM2!ArrayInitializer {
+
+
+
+				if (inn.expressions.isDefined() and inn.expressions.equivalent().isDefined()) {
+				out.expressions := inn.expressions.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule ArrayLengthAccess
+			transform inn : javaMM!ArrayLengthAccess
+			to out : javaMM2!ArrayLengthAccess {
+
+
+
+				if (inn.array.isDefined() and inn.array.equivalent().isDefined()) {
+				out.array := inn.array.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule ArrayType
+			transform inn : javaMM!ArrayType
+			to out : javaMM2!ArrayType {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+				out.dimensions := inn.dimensions;
+				if (inn.elementType.isDefined() and inn.elementType.equivalent().isDefined()) {
+				out.elementType := inn.elementType.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule Assignment
+			transform inn : javaMM!Assignment
+			to out : javaMM2!Assignment {
+
+
+
+
+				out.operator := inn.operator;
+				if (inn.leftHandSide.isDefined() and inn.leftHandSide.equivalent().isDefined()) {
+				out.leftHandSide := inn.leftHandSide.equivalent(); }
+				
+				if (inn.rightHandSide.isDefined() and inn.rightHandSide.equivalent().isDefined()) {
+				out.rightHandSide := inn.rightHandSide.equivalent(); }
+		
+		}
+		 		
+
+		 		
+
+		
+		rule BooleanLiteral
+			transform inn : javaMM!BooleanLiteral
+			to out : javaMM2!BooleanLiteral {
+
+
+
+				out.value := inn.value;						
+		}
+		 		
+
+		
+		rule BlockComment
+			transform inn : javaMM!BlockComment
+			to out : javaMM2!BlockComment {
+
+
+
+				out.content := inn.content;
+				out.enclosedByParent := inn.enclosedByParent;
+				out.prefixOfParent := inn.prefixOfParent;						
+		}
+		 		
+
+		
+		rule Block
+			transform inn : javaMM!Block
+			to out : javaMM2!Block {
+
+
+
+				if (inn.statements.isDefined() and inn.statements.equivalent().isDefined()) {
+				out.statements := inn.statements.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule BreakStatement
+			transform inn : javaMM!BreakStatement
+			to out : javaMM2!BreakStatement {
+
+
+
+				if (inn.label.isDefined() and inn.label.equivalent().isDefined()) {
+				out.label := inn.label.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule CastExpression
+			transform inn : javaMM!CastExpression
+			to out : javaMM2!CastExpression {
+
+
+
+
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+				
+				if (inn.type.isDefined() and inn.type.equivalent().isDefined()) {
+				out.type := inn.type.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule CatchClause
+			transform inn : javaMM!CatchClause
+			to out : javaMM2!CatchClause {
+
+
+
+
+				if (inn.exception.isDefined() and inn.exception.equivalent().isDefined()) {
+				out.exception := inn.exception.equivalent(); }
+				
+				if (inn.body.isDefined() and inn.body.equivalent().isDefined()) {
+				out.body := inn.body.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule CharacterLiteral
+			transform inn : javaMM!CharacterLiteral
+			to out : javaMM2!CharacterLiteral {
+
+
+
+				out.escapedValue := inn.escapedValue;						
+		}
+		 		
+
+		
+		rule ClassFile
+			transform inn : javaMM!ClassFile
+			to out : javaMM2!ClassFile {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+				out.originalFilePath := inn.originalFilePath;
+
+
+				if (inn.type.isDefined() and inn.type.equivalent().isDefined()) {
+				out.type := inn.type.equivalent(); }
+				
+				if (inn.attachedSource.isDefined() and inn.attachedSource.equivalent().isDefined()) {
+				out.attachedSource := inn.attachedSource.equivalent(); }
+				
+				if (inn.package.isDefined() and inn.package.equivalent().isDefined()) {
+				out.package := inn.package.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule ClassInstanceCreation
+			transform inn : javaMM!ClassInstanceCreation
+			to out : javaMM2!ClassInstanceCreation {
+
+
+
+
+
+
+
+
+				if (inn.anonymousClassDeclaration.isDefined() and inn.anonymousClassDeclaration.equivalent().isDefined()) {
+				out.anonymousClassDeclaration := inn.anonymousClassDeclaration.equivalent(); }
+				
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+				
+				if (inn.type.isDefined() and inn.type.equivalent().isDefined()) {
+				out.type := inn.type.equivalent(); }
+		
+		}
+		 	
+		 		
+
+		
+		rule ConditionalExpression
+			transform inn : javaMM!ConditionalExpression
+			to out : javaMM2!ConditionalExpression {
+
+
+
+
+
+				if (inn.elseExpression.isDefined() and inn.elseExpression.equivalent().isDefined()) {
+				out.elseExpression := inn.elseExpression.equivalent(); }
+				
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+				
+				if (inn.thenExpression.isDefined() and inn.thenExpression.equivalent().isDefined()) {
+				out.thenExpression := inn.thenExpression.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule ConstructorInvocation
+			transform inn : javaMM!ConstructorInvocation
+			to out : javaMM2!ConstructorInvocation {
+
+
+
+
+
+		
+		}
+		 		
+
+		
+		rule CompilationUnit
+			transform inn : javaMM!CompilationUnit
+			to out : javaMM2!CompilationUnit {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+				out.originalFilePath := inn.originalFilePath;
+
+
+
+				if (inn.commentList.isDefined() and inn.commentList.equivalent().isDefined()) {
+				out.commentList := inn.commentList.equivalent(); }
+				
+				if (inn.imports.isDefined() and inn.imports.equivalent().isDefined()) {
+				out.imports := inn.imports.equivalent(); }
+				
+				if (inn.package.isDefined() and inn.package.equivalent().isDefined()) {
+				out.package := inn.package.equivalent(); }
+				
+				if (inn.types.isDefined() and inn.types.equivalent().isDefined()) {
+				out.types := inn.types.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule ContinueStatement
+			transform inn : javaMM!ContinueStatement
+			to out : javaMM2!ContinueStatement {
+
+
+
+				if (inn.label.isDefined() and inn.label.equivalent().isDefined()) {
+				out.label := inn.label.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule DoStatement
+			transform inn : javaMM!DoStatement
+			to out : javaMM2!DoStatement {
+
+
+
+
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+				
+				if (inn.body.isDefined() and inn.body.equivalent().isDefined()) {
+				out.body := inn.body.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule EmptyStatement
+			transform inn : javaMM!EmptyStatement
+			to out : javaMM2!EmptyStatement {
+
+
+		
+		}
+		 		
+
+		
+		rule EnhancedForStatement
+			transform inn : javaMM!EnhancedForStatement
+			to out : javaMM2!EnhancedForStatement {
+
+
+
+
+
+				if (inn.body.isDefined() and inn.body.equivalent().isDefined()) {
+				out.body := inn.body.equivalent(); }
+				
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+				
+				if (inn.parameter.isDefined() and inn.parameter.equivalent().isDefined()) {
+				out.parameter := inn.parameter.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule EnumConstantDeclaration
+			transform inn : javaMM!EnumConstantDeclaration
+			to out : javaMM2!EnumConstantDeclaration {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+
+
+				out.extraArrayDimensions := inn.extraArrayDimensions;
+
+
+
+				if (inn.anonymousClassDeclaration.isDefined() and inn.anonymousClassDeclaration.equivalent().isDefined()) {
+				out.anonymousClassDeclaration := inn.anonymousClassDeclaration.equivalent(); }
+				
+				if (inn.arguments.isDefined() and inn.arguments.equivalent().isDefined()) {
+				out.arguments := inn.arguments.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule EnumDeclaration
+			transform inn : javaMM!EnumDeclaration
+			to out : javaMM2!EnumDeclaration {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+
+
+
+
+
+
+
+
+				if (inn.enumConstants.isDefined() and inn.enumConstants.equivalent().isDefined()) {
+				out.enumConstants := inn.enumConstants.equivalent(); }
+		
+		}
+		 		
+
+		 		
+
+		
+		rule ExpressionStatement
+			transform inn : javaMM!ExpressionStatement
+			to out : javaMM2!ExpressionStatement {
+
+
+
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule FieldAccess
+			transform inn : javaMM!FieldAccess
+			to out : javaMM2!FieldAccess {
+
+
+
+
+				if (inn.field.isDefined() and inn.field.equivalent().isDefined()) {
+				out.field := inn.field.equivalent(); }
+				
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule FieldDeclaration
+			transform inn : javaMM!FieldDeclaration
+			to out : javaMM2!FieldDeclaration {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+
+
+
+		
+		}
+		 		
+
+		
+		rule ForStatement
+			transform inn : javaMM!ForStatement
+			to out : javaMM2!ForStatement {
+
+
+
+
+
+
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+				
+				if (inn.updaters.isDefined() and inn.updaters.equivalent().isDefined()) {
+				out.updaters := inn.updaters.equivalent(); }
+				
+				if (inn.initializers.isDefined() and inn.initializers.equivalent().isDefined()) {
+				out.initializers := inn.initializers.equivalent(); }
+				
+				if (inn.body.isDefined() and inn.body.equivalent().isDefined()) {
+				out.body := inn.body.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule IfStatement
+			transform inn : javaMM!IfStatement
+			to out : javaMM2!IfStatement {
+
+
+
+
+
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+				
+				if (inn.thenStatement.isDefined() and inn.thenStatement.equivalent().isDefined()) {
+				out.thenStatement := inn.thenStatement.equivalent(); }
+				
+				if (inn.elseStatement.isDefined() and inn.elseStatement.equivalent().isDefined()) {
+				out.elseStatement := inn.elseStatement.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule ImportDeclaration
+			transform inn : javaMM!ImportDeclaration
+			to out : javaMM2!ImportDeclaration {
+
+
+
+				out.static := inn.static;
+				if (inn.importedElement.isDefined() and inn.importedElement.equivalent().isDefined()) {
+				out.importedElement := inn.importedElement.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule InfixExpression
+			transform inn : javaMM!InfixExpression
+			to out : javaMM2!InfixExpression {
+
+
+
+				out.operator := inn.operator;
+
+
+				if (inn.rightOperand.isDefined() and inn.rightOperand.equivalent().isDefined()) {
+				out.rightOperand := inn.rightOperand.equivalent(); }
+				
+				if (inn.leftOperand.isDefined() and inn.leftOperand.equivalent().isDefined()) {
+				out.leftOperand := inn.leftOperand.equivalent(); }
+				
+				if (inn.extendedOperands.isDefined() and inn.extendedOperands.equivalent().isDefined()) {
+				out.extendedOperands := inn.extendedOperands.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule Initializer
+			transform inn : javaMM!Initializer
+			to out : javaMM2!Initializer {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+
+
+				if (inn.body.isDefined() and inn.body.equivalent().isDefined()) {
+				out.body := inn.body.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule InstanceofExpression
+			transform inn : javaMM!InstanceofExpression
+			to out : javaMM2!InstanceofExpression {
+
+
+
+
+				if (inn.rightOperand.isDefined() and inn.rightOperand.equivalent().isDefined()) {
+				out.rightOperand := inn.rightOperand.equivalent(); }
+				
+				if (inn.leftOperand.isDefined() and inn.leftOperand.equivalent().isDefined()) {
+				out.leftOperand := inn.leftOperand.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule InterfaceDeclaration
+			transform inn : javaMM!InterfaceDeclaration
+			to out : javaMM2!InterfaceDeclaration {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+
+
+
+
+
+
+
+
+		
+		}
+		 		
+
+		
+		rule Javadoc
+			transform inn : javaMM!Javadoc
+			to out : javaMM2!Javadoc {
+
+
+
+				out.content := inn.content;
+				out.enclosedByParent := inn.enclosedByParent;
+				out.prefixOfParent := inn.prefixOfParent;
+				if (inn.tags.isDefined() and inn.tags.equivalent().isDefined()) {
+				out.tags := inn.tags.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule LabeledStatement
+			transform inn : javaMM!LabeledStatement
+			to out : javaMM2!LabeledStatement {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+				if (inn.body.isDefined() and inn.body.equivalent().isDefined()) {
+				out.body := inn.body.equivalent(); }
+				
+				if (inn.usagesInBreakStatements.isDefined() and inn.usagesInBreakStatements.equivalent().isDefined()) {
+				out.usagesInBreakStatements := inn.usagesInBreakStatements.equivalent(); }
+				
+				if (inn.usagesInContinueStatements.isDefined() and inn.usagesInContinueStatements.equivalent().isDefined()) {
+				out.usagesInContinueStatements := inn.usagesInContinueStatements.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule LineComment
+			transform inn : javaMM!LineComment
+			to out : javaMM2!LineComment {
+
+
+
+				out.content := inn.content;
+				out.enclosedByParent := inn.enclosedByParent;
+				out.prefixOfParent := inn.prefixOfParent;						
+		}
+		 		
+
+		
+		rule Manifest
+			transform inn : javaMM!Manifest
+			to out : javaMM2!Manifest {
+
+				if (inn.mainAttributes.isDefined() and inn.mainAttributes.equivalent().isDefined()) {
+				out.mainAttributes := inn.mainAttributes.equivalent(); }
+				
+				if (inn.entryAttributes.isDefined() and inn.entryAttributes.equivalent().isDefined()) {
+				out.entryAttributes := inn.entryAttributes.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule ManifestAttribute
+			transform inn : javaMM!ManifestAttribute
+			to out : javaMM2!ManifestAttribute {
+				out.key := inn.key;
+				out.value := inn.value;						
+		}
+		 		
+
+		
+		rule ManifestEntry
+			transform inn : javaMM!ManifestEntry
+			to out : javaMM2!ManifestEntry {
+				out.name := inn.name;
+				if (inn.attributes.isDefined() and inn.attributes.equivalent().isDefined()) {
+				out.attributes := inn.attributes.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule MemberRef
+			transform inn : javaMM!MemberRef
+			to out : javaMM2!MemberRef {
+
+
+
+
+				if (inn.member.isDefined() and inn.member.equivalent().isDefined()) {
+				out.member := inn.member.equivalent(); }
+				
+				if (inn.qualifier.isDefined() and inn.qualifier.equivalent().isDefined()) {
+				out.qualifier := inn.qualifier.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule MethodDeclaration
+			transform inn : javaMM!MethodDeclaration
+			to out : javaMM2!MethodDeclaration {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+
+
+
+
+
+
+
+
+				out.extraArrayDimensions := inn.extraArrayDimensions;
+
+
+				if (inn.returnType.isDefined() and inn.returnType.equivalent().isDefined()) {
+				out.returnType := inn.returnType.equivalent(); }
+				
+				if (inn.redefinedMethodDeclaration.isDefined() and inn.redefinedMethodDeclaration.equivalent().isDefined()) {
+				out.redefinedMethodDeclaration := inn.redefinedMethodDeclaration.equivalent(); }
+				
+				if (inn.redefinitions.isDefined() and inn.redefinitions.equivalent().isDefined()) {
+				out.redefinitions := inn.redefinitions.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule MethodInvocation
+			transform inn : javaMM!MethodInvocation
+			to out : javaMM2!MethodInvocation {
+
+
+
+
+
+
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule MethodRef
+			transform inn : javaMM!MethodRef
+			to out : javaMM2!MethodRef {
+
+
+
+
+
+				if (inn.method.isDefined() and inn.method.equivalent().isDefined()) {
+				out.method := inn.method.equivalent(); }
+				
+				if (inn.qualifier.isDefined() and inn.qualifier.equivalent().isDefined()) {
+				out.qualifier := inn.qualifier.equivalent(); }
+				
+				if (inn.parameters.isDefined() and inn.parameters.equivalent().isDefined()) {
+				out.parameters := inn.parameters.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule MethodRefParameter
+			transform inn : javaMM!MethodRefParameter
+			to out : javaMM2!MethodRefParameter {
+
+
+
+				out.name := inn.name;
+				out.varargs := inn.varargs;
+				if (inn.type.isDefined() and inn.type.equivalent().isDefined()) {
+				out.type := inn.type.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule Model
+			transform inn : javaMM!Model
+			to out : javaMM2!Model {
+				out.name := inn.name;
+
+
+
+
+
+				if (inn.ownedElements.isDefined() and inn.ownedElements.equivalent().isDefined()) {
+				out.ownedElements := inn.ownedElements.equivalent(); }
+				
+				if (inn.orphanTypes.isDefined() and inn.orphanTypes.equivalent().isDefined()) {
+				out.orphanTypes := inn.orphanTypes.equivalent(); }
+				
+				if (inn.unresolvedItems.isDefined() and inn.unresolvedItems.equivalent().isDefined()) {
+				out.unresolvedItems := inn.unresolvedItems.equivalent(); }
+				
+				if (inn.compilationUnits.isDefined() and inn.compilationUnits.equivalent().isDefined()) {
+				out.compilationUnits := inn.compilationUnits.equivalent(); }
+				
+				if (inn.classFiles.isDefined() and inn.classFiles.equivalent().isDefined()) {
+				out.classFiles := inn.classFiles.equivalent(); }
+				
+				if (inn.archives.isDefined() and inn.archives.equivalent().isDefined()) {
+				out.archives := inn.archives.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule Modifier
+			transform inn : javaMM!Modifier
+			to out : javaMM2!Modifier {
+
+
+
+				out.visibility := inn.visibility;
+				out.inheritance := inn.inheritance;
+				out.static := inn.static;
+				out.transient := inn.transient;
+				out.volatile := inn.volatile;
+				out.native := inn.native;
+				out.strictfp := inn.strictfp;
+				out.synchronized := inn.synchronized;
+
+
+
+				if (inn.bodyDeclaration.isDefined() and inn.bodyDeclaration.equivalent().isDefined()) {
+				out.bodyDeclaration := inn.bodyDeclaration.equivalent(); }
+				
+				if (inn.singleVariableDeclaration.isDefined() and inn.singleVariableDeclaration.equivalent().isDefined()) {
+				out.singleVariableDeclaration := inn.singleVariableDeclaration.equivalent(); }
+				
+				if (inn.variableDeclarationStatement.isDefined() and inn.variableDeclarationStatement.equivalent().isDefined()) {
+				out.variableDeclarationStatement := inn.variableDeclarationStatement.equivalent(); }
+				
+				if (inn.variableDeclarationExpression.isDefined() and inn.variableDeclarationExpression.equivalent().isDefined()) {
+				out.variableDeclarationExpression := inn.variableDeclarationExpression.equivalent(); }
+		
+		}
+		 		
+
+		 		
+
+		 		
+
+		
+		rule NumberLiteral
+			transform inn : javaMM!NumberLiteral
+			to out : javaMM2!NumberLiteral {
+
+
+
+				out.tokenValue := inn.tokenValue;						
+		}
+		 		
+
+		
+		rule NullLiteral
+			transform inn : javaMM!NullLiteral
+			to out : javaMM2!NullLiteral {
+
+
+		
+		}
+		 		
+
+		
+		rule Package
+			transform inn : javaMM!Package
+			to out : javaMM2!Package {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+
+
+				if (inn.ownedElements.isDefined() and inn.ownedElements.equivalent().isDefined()) {
+				out.ownedElements := inn.ownedElements.equivalent(); }
+				
+				--if (inn._model.isDefined() and inn._model.equivalent().isDefined()) {
+				--out._model := inn._model.equivalent(); }
+				
+				if (inn.ownedPackages.isDefined() and inn.ownedPackages.equivalent().isDefined()) {
+				out.ownedPackages := inn.ownedPackages.equivalent(); }
+				
+				if (inn.package.isDefined() and inn.package.equivalent().isDefined()) {
+				out.package := inn.package.equivalent(); }
+				
+				if (inn.usagesInPackageAccess.isDefined() and inn.usagesInPackageAccess.equivalent().isDefined()) {
+				out.usagesInPackageAccess := inn.usagesInPackageAccess.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule PackageAccess
+			transform inn : javaMM!PackageAccess
+			to out : javaMM2!PackageAccess {
+
+
+
+
+				if (inn.package.isDefined() and inn.package.equivalent().isDefined()) {
+				out.package := inn.package.equivalent(); }
+				
+				if (inn.qualifier.isDefined() and inn.qualifier.equivalent().isDefined()) {
+				out.qualifier := inn.qualifier.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule ParameterizedType
+			transform inn : javaMM!ParameterizedType
+			to out : javaMM2!ParameterizedType {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+				if (inn.type.isDefined() and inn.type.equivalent().isDefined()) {
+				out.type := inn.type.equivalent(); }
+				
+				if (inn.typeArguments.isDefined() and inn.typeArguments.equivalent().isDefined()) {
+				out.typeArguments := inn.typeArguments.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule ParenthesizedExpression
+			transform inn : javaMM!ParenthesizedExpression
+			to out : javaMM2!ParenthesizedExpression {
+
+
+
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule PostfixExpression
+			transform inn : javaMM!PostfixExpression
+			to out : javaMM2!PostfixExpression {
+
+
+
+				out.operator := inn.operator;
+				if (inn.operand.isDefined() and inn.operand.equivalent().isDefined()) {
+				out.operand := inn.operand.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule PrefixExpression
+			transform inn : javaMM!PrefixExpression
+			to out : javaMM2!PrefixExpression {
+
+
+
+				out.operator := inn.operator;
+				if (inn.operand.isDefined() and inn.operand.equivalent().isDefined()) {
+				out.operand := inn.operand.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule PrimitiveType
+			transform inn : javaMM!PrimitiveType
+			to out : javaMM2!PrimitiveType {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+		
+		}
+		 		
+
+		
+		rule PrimitiveTypeBoolean
+			transform inn : javaMM!PrimitiveTypeBoolean
+			to out : javaMM2!PrimitiveTypeBoolean {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+		
+		}
+		 		
+
+		
+		rule PrimitiveTypeByte
+			transform inn : javaMM!PrimitiveTypeByte
+			to out : javaMM2!PrimitiveTypeByte {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+		
+		}
+		 		
+
+		
+		rule PrimitiveTypeChar
+			transform inn : javaMM!PrimitiveTypeChar
+			to out : javaMM2!PrimitiveTypeChar {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+		
+		}
+		 		
+
+		
+		rule PrimitiveTypeDouble
+			transform inn : javaMM!PrimitiveTypeDouble
+			to out : javaMM2!PrimitiveTypeDouble {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+		
+		}
+		 		
+
+		
+		rule PrimitiveTypeShort
+			transform inn : javaMM!PrimitiveTypeShort
+			to out : javaMM2!PrimitiveTypeShort {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+		
+		}
+		 		
+
+		
+		rule PrimitiveTypeFloat
+			transform inn : javaMM!PrimitiveTypeFloat
+			to out : javaMM2!PrimitiveTypeFloat {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+		
+		}
+		 		
+
+		
+		rule PrimitiveTypeInt
+			transform inn : javaMM!PrimitiveTypeInt
+			to out : javaMM2!PrimitiveTypeInt {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+		
+		}
+		 		
+
+		
+		rule PrimitiveTypeLong
+			transform inn : javaMM!PrimitiveTypeLong
+			to out : javaMM2!PrimitiveTypeLong {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+		
+		}
+		 		
+
+		
+		rule PrimitiveTypeVoid
+			transform inn : javaMM!PrimitiveTypeVoid
+			to out : javaMM2!PrimitiveTypeVoid {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+		
+		}
+		 		
+
+		
+		rule ReturnStatement
+			transform inn : javaMM!ReturnStatement
+			to out : javaMM2!ReturnStatement {
+
+
+
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule SingleVariableAccess
+			transform inn : javaMM!SingleVariableAccess
+			to out : javaMM2!SingleVariableAccess {
+
+
+
+
+				if (inn.variable.isDefined() and inn.variable.equivalent().isDefined()) {
+				out.variable := inn.variable.equivalent(); }
+				
+				if (inn.qualifier.isDefined() and inn.qualifier.equivalent().isDefined()) {
+				out.qualifier := inn.qualifier.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule SingleVariableDeclaration
+			transform inn : javaMM!SingleVariableDeclaration
+			to out : javaMM2!SingleVariableDeclaration {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+				out.extraArrayDimensions := inn.extraArrayDimensions;
+
+
+
+				out.varargs := inn.varargs;
+
+
+
+
+				if (inn.modifier.isDefined() and inn.modifier.equivalent().isDefined()) {
+				out.modifier := inn.modifier.equivalent(); }
+				
+				if (inn.type.isDefined() and inn.type.equivalent().isDefined()) {
+				out.type := inn.type.equivalent(); }
+				
+				if (inn.annotations.isDefined() and inn.annotations.equivalent().isDefined()) {
+				out.annotations := inn.annotations.equivalent(); }
+				
+				if (inn.methodDeclaration.isDefined() and inn.methodDeclaration.equivalent().isDefined()) {
+				out.methodDeclaration := inn.methodDeclaration.equivalent(); }
+				
+				if (inn.catchClause.isDefined() and inn.catchClause.equivalent().isDefined()) {
+				out.catchClause := inn.catchClause.equivalent(); }
+				
+				if (inn.enhancedForStatement.isDefined() and inn.enhancedForStatement.equivalent().isDefined()) {
+				out.enhancedForStatement := inn.enhancedForStatement.equivalent(); }
+		
+		}
+		 		
+
+		 		
+
+		
+		rule StringLiteral
+			transform inn : javaMM!StringLiteral
+			to out : javaMM2!StringLiteral {
+
+
+
+				out.escapedValue := inn.escapedValue;						
+		}
+		 		
+
+		
+		rule SuperConstructorInvocation
+			transform inn : javaMM!SuperConstructorInvocation
+			to out : javaMM2!SuperConstructorInvocation {
+
+
+
+
+
+
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule SuperFieldAccess
+			transform inn : javaMM!SuperFieldAccess
+			to out : javaMM2!SuperFieldAccess {
+
+
+
+
+				if (inn.field.isDefined() and inn.field.equivalent().isDefined()) {
+				out.field := inn.field.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule SuperMethodInvocation
+			transform inn : javaMM!SuperMethodInvocation
+			to out : javaMM2!SuperMethodInvocation {
+
+
+
+
+
+
+		
+		}
+		 		
+
+		
+		rule SwitchCase
+			transform inn : javaMM!SwitchCase
+			to out : javaMM2!SwitchCase {
+
+
+
+				--out._default := inn._default;
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule SwitchStatement
+			transform inn : javaMM!SwitchStatement
+			to out : javaMM2!SwitchStatement {
+
+
+
+
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+				
+				if (inn.statements.isDefined() and inn.statements.equivalent().isDefined()) {
+				out.statements := inn.statements.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule SynchronizedStatement
+			transform inn : javaMM!SynchronizedStatement
+			to out : javaMM2!SynchronizedStatement {
+
+
+
+
+				if (inn.body.isDefined() and inn.body.equivalent().isDefined()) {
+				out.body := inn.body.equivalent(); }
+				
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule TagElement
+			transform inn : javaMM!TagElement
+			to out : javaMM2!TagElement {
+
+
+
+				out.tagName := inn.tagName;
+				if (inn.fragments.isDefined() and inn.fragments.equivalent().isDefined()) {
+				out.fragments := inn.fragments.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule TextElement
+			transform inn : javaMM!TextElement
+			to out : javaMM2!TextElement {
+
+
+
+				out.text := inn.text;						
+		}
+		 		
+
+		
+		rule ThisExpression
+			transform inn : javaMM!ThisExpression
+			to out : javaMM2!ThisExpression {
+
+
+
+		
+		}
+		 		
+
+		
+		rule ThrowStatement
+			transform inn : javaMM!ThrowStatement
+			to out : javaMM2!ThrowStatement {
+
+
+
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule TryStatement
+			transform inn : javaMM!TryStatement
+			to out : javaMM2!TryStatement {
+
+
+
+
+
+				if (inn.body.isDefined() and inn.body.equivalent().isDefined()) {
+				out.body := inn.body.equivalent(); }
+				
+				if (inn.finally.isDefined() and inn.finally.equivalent().isDefined()) {
+				out.finally := inn.finally.equivalent(); }
+				
+				if (inn.catchClauses.isDefined() and inn.catchClauses.equivalent().isDefined()) {
+				out.catchClauses := inn.catchClauses.equivalent(); }
+		
+		}
+		 		
+
+		 		
+
+		
+		rule TypeAccess
+			transform inn : javaMM!TypeAccess
+			to out : javaMM2!TypeAccess {
+
+
+
+
+				if (inn.type.isDefined() and inn.type.equivalent().isDefined()) {
+				out.type := inn.type.equivalent(); }
+				
+				if (inn.qualifier.isDefined() and inn.qualifier.equivalent().isDefined()) {
+				out.qualifier := inn.qualifier.equivalent(); }
+		
+		}
+		 		
+
+		 		
+
+		
+		rule TypeDeclarationStatement
+			transform inn : javaMM!TypeDeclarationStatement
+			to out : javaMM2!TypeDeclarationStatement {
+
+
+
+				if (inn.declaration.isDefined() and inn.declaration.equivalent().isDefined()) {
+				out.declaration := inn.declaration.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule TypeLiteral
+			transform inn : javaMM!TypeLiteral
+			to out : javaMM2!TypeLiteral {
+
+
+
+				if (inn.type.isDefined() and inn.type.equivalent().isDefined()) {
+				out.type := inn.type.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule TypeParameter
+			transform inn : javaMM!TypeParameter
+			to out : javaMM2!TypeParameter {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+				if (inn.bounds.isDefined() and inn.bounds.equivalent().isDefined()) {
+				out.bounds := inn.bounds.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule UnresolvedItem
+			transform inn : javaMM!UnresolvedItem
+			to out : javaMM2!UnresolvedItem {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+		
+		}
+		 		
+
+		
+		rule UnresolvedItemAccess
+			transform inn : javaMM!UnresolvedItemAccess
+			to out : javaMM2!UnresolvedItemAccess {
+
+
+
+
+				if (inn.element.isDefined() and inn.element.equivalent().isDefined()) {
+				out.element := inn.element.equivalent(); }
+				
+				if (inn.qualifier.isDefined() and inn.qualifier.equivalent().isDefined()) {
+				out.qualifier := inn.qualifier.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule UnresolvedAnnotationDeclaration
+			transform inn : javaMM!UnresolvedAnnotationDeclaration
+			to out : javaMM2!UnresolvedAnnotationDeclaration {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+
+
+
+
+
+
+
+		
+		}
+		 		
+
+		
+		rule UnresolvedAnnotationTypeMemberDeclaration
+			transform inn : javaMM!UnresolvedAnnotationTypeMemberDeclaration
+			to out : javaMM2!UnresolvedAnnotationTypeMemberDeclaration {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+
+
+
+
+		
+		}
+		 		
+
+		
+		rule UnresolvedClassDeclaration
+			transform inn : javaMM!UnresolvedClassDeclaration
+			to out : javaMM2!UnresolvedClassDeclaration {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+
+
+
+
+
+
+
+
+
+		
+		}
+		 		
+
+		
+		rule UnresolvedEnumDeclaration
+			transform inn : javaMM!UnresolvedEnumDeclaration
+			to out : javaMM2!UnresolvedEnumDeclaration {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+
+
+
+
+
+
+
+
+		
+		}
+		 		
+
+		
+		rule UnresolvedInterfaceDeclaration
+			transform inn : javaMM!UnresolvedInterfaceDeclaration
+			to out : javaMM2!UnresolvedInterfaceDeclaration {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+
+
+
+
+
+
+
+
+		
+		}
+		 		
+
+		
+		rule UnresolvedLabeledStatement
+			transform inn : javaMM!UnresolvedLabeledStatement
+			to out : javaMM2!UnresolvedLabeledStatement {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+		
+		}
+		 		
+
+		
+		rule UnresolvedMethodDeclaration
+			transform inn : javaMM!UnresolvedMethodDeclaration
+			to out : javaMM2!UnresolvedMethodDeclaration {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+
+
+
+
+
+
+
+
+				out.extraArrayDimensions := inn.extraArrayDimensions;
+
+
+		
+		}
+		 		
+
+		
+		rule UnresolvedSingleVariableDeclaration
+			transform inn : javaMM!UnresolvedSingleVariableDeclaration
+			to out : javaMM2!UnresolvedSingleVariableDeclaration {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+				out.extraArrayDimensions := inn.extraArrayDimensions;
+
+
+
+				out.varargs := inn.varargs;
+
+
+
+
+		
+		}
+		 		
+
+		
+		rule UnresolvedType
+			transform inn : javaMM!UnresolvedType
+			to out : javaMM2!UnresolvedType {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+		
+		}
+		 		
+
+		
+		rule UnresolvedTypeDeclaration
+			transform inn : javaMM!UnresolvedTypeDeclaration
+			to out : javaMM2!UnresolvedTypeDeclaration {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+
+
+
+
+
+
+
+
+		
+		}
+		 		
+
+		
+		rule UnresolvedVariableDeclarationFragment
+			transform inn : javaMM!UnresolvedVariableDeclarationFragment
+			to out : javaMM2!UnresolvedVariableDeclarationFragment {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+				out.extraArrayDimensions := inn.extraArrayDimensions;
+
+
+		
+		}
+		 		
+
+		 		
+
+		
+		rule VariableDeclarationExpression
+			transform inn : javaMM!VariableDeclarationExpression
+			to out : javaMM2!VariableDeclarationExpression {
+
+
+
+
+
+
+				if (inn.modifier.isDefined() and inn.modifier.equivalent().isDefined()) {
+				out.modifier := inn.modifier.equivalent(); }
+				
+				if (inn.annotations.isDefined() and inn.annotations.equivalent().isDefined()) {
+				out.annotations := inn.annotations.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule VariableDeclarationFragment
+			transform inn : javaMM!VariableDeclarationFragment
+			to out : javaMM2!VariableDeclarationFragment {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+				out.extraArrayDimensions := inn.extraArrayDimensions;
+
+
+				if (inn.variablesContainer.isDefined() and inn.variablesContainer.equivalent().isDefined()) {
+				out.variablesContainer := inn.variablesContainer.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule VariableDeclarationStatement
+			transform inn : javaMM!VariableDeclarationStatement
+			to out : javaMM2!VariableDeclarationStatement {
+
+
+
+
+
+				out.extraArrayDimensions := inn.extraArrayDimensions;
+
+				if (inn.modifier.isDefined() and inn.modifier.equivalent().isDefined()) {
+				out.modifier := inn.modifier.equivalent(); }
+				
+				if (inn.annotations.isDefined() and inn.annotations.equivalent().isDefined()) {
+				out.annotations := inn.annotations.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule WildCardType
+			transform inn : javaMM!WildCardType
+			to out : javaMM2!WildCardType {
+
+
+
+				out.name := inn.name;
+				out.proxy := inn.proxy;
+
+
+				out.upperBound := inn.upperBound;
+				if (inn.bound.isDefined() and inn.bound.equivalent().isDefined()) {
+				out.bound := inn.bound.equivalent(); }
+		
+		}
+		 		
+
+		
+		rule WhileStatement
+			transform inn : javaMM!WhileStatement
+			to out : javaMM2!WhileStatement {
+
+
+
+
+				if (inn.expression.isDefined() and inn.expression.equivalent().isDefined()) {
+				out.expression := inn.expression.equivalent(); }
+				
+				if (inn.body.isDefined() and inn.body.equivalent().isDefined()) {
+				out.body := inn.body.equivalent(); }
+		
+		}
+		 		

@@ -1,0 +1,64 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: Payload.etl 163 2011-09-13 14:20:08Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+
+/****r* HiLeSToVDHLAMS/Payload2Signal
+ * SUMMARY
+ *   Transform a HiLeS:Port into a Vhdl:Port. The specific type of port would
+ *  depend on the type of the payload that connects to the port. ($Rev: 829 $)
+ * DESCRIPTION 
+ *   // Create a signal to represent payloads that connect. Only Payloads that go
+// from a HiLeS!Port to a HiLeS!Port and are Discrete Type are transformed into signals
+ * SEE ALSO
+ *
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *   	* Vhdl   - http://hiles.uniandes.edu.co/1.1/vhdl-ams
+ *
+ *****
+ */
+@greedy
+rule Payload2Signal
+	transform pl : HiLeS!Payload
+	to s : Vhdl!Signal	{
+		
+		guard : pl.source.isTypeOf(HiLeS!Port) and pl.target.isTypeOf(HiLeS!Port) 
+				and pl.type.isSignalType()
+		
+		s.identifier = pl.name;
+		s.subtype = new Vhdl!Subtype;
+		if(s.size = 1)
+		{
+			switch(pl.type)
+			{
+				case("Boolean") : s.subtype.type = Vhdl!Types#boolean;
+				case("Logic") : s.subtype.type = Vhdl!Types#std_logic;
+				case("Integer") : s.subtype.type = Vhdl!Types#integer;
+				case("Real") : s.subtype.type = Vhdl!Types#real;
+				case("Char") : s.subtype.type = Vhdl!Types#character;
+				case("Time") : s.subtype.type = Vhdl!Types#time;
+				case("Natural") : s.subtype.type = Vhdl!Types#natural;
+			}
+		}
+		else
+		{
+			switch( pl.type)
+			{
+				case("Logic") : signal.subtype.type = Vhdl!Types#std_logic_vector;
+				default : port.name.println("PortToInterfaceSignal, un supported signal type for port ");
+			}
+			s.subtype.range = new Vhdl!Range;
+			s.subtype.range.begin = pl.size-1;
+			s.subtype.range.direction = Vhdl!RangeDirection#downto;
+			s.subtype.range.end = 0;
+		}
+		
+	}

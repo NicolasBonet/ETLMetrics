@@ -1,0 +1,74 @@
+-- Debemos crear una unica base de datos para todos
+pre {
+	var db : new DB!Database;
+	
+}
+
+-- Esta regla se encarga de todo!
+rule MarketPlace2Relacional
+	transform
+		c : mp!ClassUnit
+	to
+		t : DB!Table
+{
+		guard :(c.name.contains('Entity'))
+			-- Asignamos la tabla creada a la base de datos inicializada al comienzo y le ponemos el nombre de la clase sin el Entity
+	   		t.database = db;
+		   	t.name = c.name.replace("Entity", "");
+        var args=	c.eContents.select(x|x.isKindOf(mp!StorableUnit));
+	
+	for(i in args)
+   {
+   
+	 t.columns.add(new DB!Column);
+	 t.columns.last().name=i.name;
+	if(i.type.name=='Integer' or i.type.name=='Long'){
+	 t.columns.last().type=DB!DataType#int;
+	 }else{
+	 if(i.type.name=='String'){
+	 t.columns.last().type=DB!DataType#varchar;
+	 }else{ 
+	 t.columns.last().type=DB!DataType#unknown;
+	 }
+	 }
+	  for (j in i.eContents.select(x|x.isKindOf(mp!HasValue)))
+	  {
+	  
+	   for(k in j.eContents.select(x|x.isKindOf(mp!Attribute)))
+	    {
+	 if(k.tag='referencedColumnName')
+	        {
+	       
+	          db.contents.add(new DB!ForeignKey);
+	          db.contents.last().name=i.name;
+	          db.contents.last().isMany=true;
+	          db.contents.last().child=t.columns.last();
+	         }
+	     if(k.tag='generator' or k.tag='referencedColumnName' )
+	     
+	      {
+	       
+	       t.columns.last().notNull=true;
+	       t.primaryKeys.add(t.columns.last());
+	       t.primaryKeys.last().table=t;
+	       
+	       }
+	    
+	        }     
+	      }	
+	    }  
+	    
+	    for(x in DB!ForeignKey.all){ 
+	   for(m in DB!Table.all){
+	  if(m.name=='_'+x.name.replace('IdEntity','').firstToUpperCase()){
+	  x.parent=m.columns.first();
+	  }
+	   
+	   }
+	    
+	    }
+	    
+	  }
+   
+
+	

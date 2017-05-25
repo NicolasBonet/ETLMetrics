@@ -1,0 +1,93 @@
+pre{
+	csv!Empresa.all.collect(e|e.getEmpresa());
+}
+
+operation csv!Empresa getEmpresa(): meta!Empresa{
+	var empresa = new meta!Empresa;
+	var proyectos:Set;
+	var desarrolladores:Set;
+	var nombreProyectos = csv!Proyecto.all.collect(p|p.nombre).asSet();
+	var nombreDesarrolladores = csv!Desarrollador.all.collect(p|p.nombre).asSet();
+	for (nombre in nombreProyectos) {
+		var proyecto = new csv!Proyecto;
+		proyecto.nombre = nombre;
+		proyectos.add(proyecto);
+	}
+	for (nombre in nombreDesarrolladores) {
+		var desarrollador = new meta!Desarrollador;
+		desarrollador.nombreCompleto = nombre;
+		desarrolladores.add(desarrollador);
+	}
+	empresa.desarrolladores = desarrolladores;
+	empresa.proyectos = proyectos.collect(p|p.getProyecto());
+}
+
+operation csv!Proyecto getProyecto(): meta!Proyecto{
+	var proyecto = new meta!Proyecto;
+	proyecto.nombre = self.nombre;
+	var fases:Set;
+	var casosUso:Set;
+	var nombreFases = csv!Proyecto.all.select(p|p.nombre = self.nombre).collect(p|p.Tarea).collect(t:csv!Tarea|t.getFase()).asSet();
+	var nombreCasosUso = csv!Proyecto.all.select(p|p.nombre = self.nombre).collect(p|p.Tarea).collect(t:csv!Tarea|t.getCasoUso()).asSet();
+	for (id in nombreFases) {
+		var fase = new meta!Fase;
+		fase.id = id;
+		fases.add(fase);
+	}
+	for (id in nombreCasosUso) {
+		var casoUso = new meta!CasoUso;
+		casoUso.nombre = id;
+		casosUso.add(casoUso);
+	}
+	proyecto.casosDeUso = casosUso;
+	proyecto.fases = fases.collect(f|f.asignarTareas(self.nombre));
+	return proyecto;
+}  
+
+operation meta!Fase asignarTareas(proyecto:String){
+	var tareas = csv!Proyecto.all.select(p|p.nombre = proyecto).collect(p|p.Tarea);
+	self.tareas = tareas.collect(t:csv!Tarea|t.getTarea());
+	return self;
+}  
+
+operation csv!Tarea getTarea():meta!Tarea{
+	var tarea = new meta!Tarea;
+	tarea.horasEstimadas = self.estimado.asInteger();
+	tarea.horasEjecutadas = 0;
+	if(self.registrado <> null){
+		tarea.horasEjecutadas = self.registrado.asInteger();
+	}
+	tarea.fechaCreacion = self.fechaCreacion.asString().substring(0,10);
+	if(self.fechaCompletado <> null){
+		tarea.fechaCompletado = self.fechaCompletado.asString().substring(0,10);
+	}
+	tarea.numeroSecuencia = self.version.asDouble();
+	
+	if(self.version.asString().trim().isInteger()){
+		tarea.tipo = meta!TipoTarea#Planeada;
+	}
+	else{
+		tarea.tipo = meta!TipoTarea#Reproceso;
+	}
+	
+	var csvCasoUso:csv!CasoUso = self.casoUso;
+	var casoUso = meta!CasoUso.all.select(c|c.nombre = csvCasoUso.name).first();
+	casoUso.tareas.add(tarea);
+	
+	var csvDesarrollador:csv!Desarrollador = self.asignadoA;
+	var desarrollador = meta!Desarrollador.all.select(c|c.nombreCompleto = csvDesarrollador.nombre).first();
+	desarrollador.tareas.add(tarea);
+	
+	return tarea;
+}
+
+operation csv!Tarea getFase():String{
+	return self.fase.id;
+}
+
+operation csv!Tarea getCasoUso():String{
+	return self.casoUso.name;
+}
+
+
+	

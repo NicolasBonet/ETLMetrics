@@ -1,0 +1,1582 @@
+rule Annotation
+	transform inn : javaMM!Annotation
+	to out : javaMM2!Annotation {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.type := inn.type;
+		out.values := inn.values;	
+			}
+		
+
+
+rule Archive
+	transform inn : javaMM!Archive
+	to out : javaMM2!Archive {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.originalFilePath := inn.originalFilePath;				
+		out.classFiles := inn.classFiles;
+		out.manifest := inn.manifest;	
+		
+	}
+		
+
+
+rule AssertStatement
+	transform inn : javaMM!AssertStatement
+	to out : javaMM2!AssertStatement {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.message := inn.message;
+		out.expression := inn.expression;		}
+		
+
+		
+
+
+rule AnnotationMemberValuePair
+	transform inn : javaMM!AnnotationMemberValuePair
+	to out : javaMM2!AnnotationMemberValuePair {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.member := inn.member;
+		out.value := inn.value;		}
+		
+
+
+rule AnnotationTypeDeclaration
+	transform inn : javaMM!AnnotationTypeDeclaration
+	to out : javaMM2!AnnotationTypeDeclaration {
+	
+	guard : not inn.isTypeOf(javaMM!UnresolvedAnnotationDeclaration)
+	
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		out.modifier := inn.modifier;
+		-- out.usagesInTypeAccess := inn.usagesInTypeAccess.equivalent;
+		out.bodyDeclarations := inn.bodyDeclarations;
+		out.commentsBeforeBody := inn.commentsBeforeBody;
+		out.commentsAfterBody := inn.commentsAfterBody;
+		out.package := inn.package;
+		out.superInterfaces := inn.superInterfaces;		}
+		
+
+
+rule AnnotationTypeMemberDeclaration
+	transform inn : javaMM!AnnotationTypeMemberDeclaration
+	to out : javaMM2!AnnotationTypeMemberDeclaration {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		out.modifier := inn.modifier;
+		out._default := inn._default;
+		out.type := inn.type;
+		out.usages := inn.usages;		}
+		
+
+
+rule AnonymousClassDeclaration
+	transform inn : javaMM!AnonymousClassDeclaration
+	to out : javaMM2!AnonymousClassDeclaration {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.bodyDeclarations := inn.bodyDeclarations;
+		out.classInstanceCreation := inn.classInstanceCreation;
+}
+		
+
+
+rule ArrayAccess
+	transform inn : javaMM!ArrayAccess
+	to out : javaMM2!ArrayAccess {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.array := inn.array;
+		out.index := inn.index;		}
+		
+
+
+rule ArrayCreation
+	transform inn : javaMM!ArrayCreation
+	to out : javaMM2!ArrayCreation {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		--out.dimensions := inn.dimensions;
+		out.initializer := inn.initializer;
+		out.type := inn.type;		}
+		
+
+
+rule ArrayInitializer
+	transform inn : javaMM!ArrayInitializer
+	to out : javaMM2!ArrayInitializer {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		--out.expressions := inn.expressions;	
+		}
+		
+
+
+rule ArrayLengthAccess
+	transform inn : javaMM!ArrayLengthAccess
+	to out : javaMM2!ArrayLengthAccess {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.array := inn.array;		}
+		
+
+
+rule ArrayType
+	transform inn : javaMM!ArrayType
+	to out : javaMM2!ArrayType {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		--out.usagesInTypeAccess := inn.usagesInTypeAccess;
+		out.dimensions := inn.dimensions;				
+		out.elementType := inn.elementType;		}
+		
+
+
+rule Assignment
+	transform inn : javaMM!Assignment
+	to out : javaMM2!Assignment {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.leftHandSide := inn.leftHandSide;
+		out.operator := inn.operator;				
+		out.rightHandSide := inn.rightHandSide;		}
+		
+
+		
+
+
+rule BooleanLiteral
+	transform inn : javaMM!BooleanLiteral
+	to out : javaMM2!BooleanLiteral {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.value := inn.value;						}
+		
+
+
+rule BlockComment
+	transform inn : javaMM!BlockComment
+	to out : javaMM2!BlockComment {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.content := inn.content;				
+		out.enclosedByParent := inn.enclosedByParent;				
+		out.prefixOfParent := inn.prefixOfParent;						}
+		
+
+
+rule Block
+	transform inn : javaMM!Block
+	to out : javaMM2!Block {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		--out.statements := inn.statements;		
+		}
+		
+
+
+rule BreakStatement
+	transform inn : javaMM!BreakStatement
+	to out : javaMM2!BreakStatement {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.label := inn.label;		}
+		
+
+
+rule CastExpression
+	transform inn : javaMM!CastExpression
+	to out : javaMM2!CastExpression {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.expression := inn.expression;
+		out.type := inn.type;
+	}
+		
+
+
+rule CatchClause
+	transform inn : javaMM!CatchClause
+	to out : javaMM2!CatchClause {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.exception := inn.exception;
+		out.body := inn.body;		}
+		
+
+
+rule CharacterLiteral
+	transform inn : javaMM!CharacterLiteral
+	to out : javaMM2!CharacterLiteral {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.escapedValue := inn.escapedValue;						}
+		
+
+
+rule ClassFile
+	transform inn : javaMM!ClassFile
+	to out : javaMM2!ClassFile {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.originalFilePath := inn.originalFilePath;				
+		out.type := inn.type;
+		out.attachedSource := inn.attachedSource;
+		out.package := inn.package;		}
+		
+
+
+rule ClassInstanceCreation
+	transform inn : javaMM!ClassInstanceCreation
+	to out : javaMM2!ClassInstanceCreation {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.method := inn.method;
+		--out.arguments := inn.arguments;
+		out.typeArguments := inn.typeArguments;
+		out.anonymousClassDeclaration := inn.anonymousClassDeclaration;
+		out.expression := inn.expression;
+		out.type := inn.type;		}
+		
+
+
+rule ConstructorDeclaration
+	transform inn : javaMM!ConstructorDeclaration
+	to out : javaMM2!ConstructorDeclaration {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		--out.modifier := inn.modifier;
+		--out.body := inn.body;
+		--out.parameters := inn.parameters;
+		--out.thrownExceptions := inn.thrownExceptions;
+		--out.typeParameters := inn.typeParameters;
+		--out.usagesInDocComments := inn.usagesInDocComments;
+		--out.usages := inn.usages;		
+		}
+		
+
+
+rule ConditionalExpression
+	transform inn : javaMM!ConditionalExpression
+	to out : javaMM2!ConditionalExpression {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.elseExpression := inn.elseExpression;
+		out.expression := inn.expression;
+		out.thenExpression := inn.thenExpression;		}
+		
+
+
+rule ConstructorInvocation
+	transform inn : javaMM!ConstructorInvocation
+	to out : javaMM2!ConstructorInvocation {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.method := inn.method;
+		--out.arguments := inn.arguments;
+		out.typeArguments := inn.typeArguments;		}
+		
+
+
+rule ClassDeclaration
+	transform inn : javaMM!ClassDeclaration
+	to out : javaMM2!ClassDeclaration {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		--out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		--out.modifier := inn.modifier;
+		--out.usagesInTypeAccess := inn.usagesInTypeAccess;
+		--out.bodyDeclarations := inn.bodyDeclarations;
+		--out.commentsBeforeBody := inn.commentsBeforeBody;
+		--out.commentsAfterBody := inn.commentsAfterBody;
+		--out.package := inn.package;
+		--out.superInterfaces := inn.superInterfaces;
+		--out.typeParameters := inn.typeParameters;
+		--out.superClass := inn.superClass;	
+			}
+		
+
+		
+
+
+rule CompilationUnit
+	transform inn : javaMM!CompilationUnit
+	to out : javaMM2!CompilationUnit {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.originalFilePath := inn.originalFilePath;				
+		out.commentList := inn.commentList;
+		--out.imports := inn.imports;
+		out.package := inn.package;
+		out.types := inn.types;		}
+		
+
+
+rule ContinueStatement
+	transform inn : javaMM!ContinueStatement
+	to out : javaMM2!ContinueStatement {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.label := inn.label;		}
+		
+
+
+rule DoStatement
+	transform inn : javaMM!DoStatement
+	to out : javaMM2!DoStatement {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.expression := inn.expression;
+		out.body := inn.body;		}
+		
+
+
+rule EmptyStatement
+	transform inn : javaMM!EmptyStatement
+	to out : javaMM2!EmptyStatement {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;		}
+		
+
+
+rule EnhancedForStatement
+	transform inn : javaMM!EnhancedForStatement
+	to out : javaMM2!EnhancedForStatement {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.body := inn.body;
+		out.expression := inn.expression;
+		out.parameter := inn.parameter;		}
+		
+
+
+rule EnumConstantDeclaration
+	transform inn : javaMM!EnumConstantDeclaration
+	to out : javaMM2!EnumConstantDeclaration {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		out.modifier := inn.modifier;
+		out.extraArrayDimensions := inn.extraArrayDimensions;				
+		out.initializer := inn.initializer;
+		out.usageInVariableAccess := inn.usageInVariableAccess;
+		out.anonymousClassDeclaration := inn.anonymousClassDeclaration;
+		out.arguments := inn.arguments;		}
+		
+
+
+rule EnumDeclaration
+	transform inn : javaMM!EnumDeclaration
+	to out : javaMM2!EnumDeclaration {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		out.modifier := inn.modifier;
+		out.usagesInTypeAccess := inn.usagesInTypeAccess;
+		out.bodyDeclarations := inn.bodyDeclarations;
+		out.commentsBeforeBody := inn.commentsBeforeBody;
+		out.commentsAfterBody := inn.commentsAfterBody;
+		out.package := inn.package;
+		out.superInterfaces := inn.superInterfaces;
+		out.enumConstants := inn.enumConstants;		}
+		
+
+		
+
+
+rule ExpressionStatement
+	transform inn : javaMM!ExpressionStatement
+	to out : javaMM2!ExpressionStatement {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.expression := inn.expression;		}
+		
+
+
+rule FieldAccess
+	transform inn : javaMM!FieldAccess
+	to out : javaMM2!FieldAccess {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.field := inn.field;
+		out.expression := inn.expression;		}
+		
+
+
+rule FieldDeclaration
+	transform inn : javaMM!FieldDeclaration
+	to out : javaMM2!FieldDeclaration {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		--out.modifier := inn.modifier;
+		--out.type := inn.type;
+		--out.fragments := inn.fragments;	
+			}
+		
+
+
+rule ForStatement
+	transform inn : javaMM!ForStatement
+	to out : javaMM2!ForStatement {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.expression := inn.expression;
+		--out.updaters := inn.updaters;
+		--out.initializers := inn.initializers;
+		out.body := inn.body;		}
+		
+
+
+rule IfStatement
+	transform inn : javaMM!IfStatement
+	to out : javaMM2!IfStatement {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.expression := inn.expression;
+		out.thenStatement := inn.thenStatement;
+		out.elseStatement := inn.elseStatement;		}
+		
+
+
+rule ImportDeclaration
+	transform inn : javaMM!ImportDeclaration
+	to out : javaMM2!ImportDeclaration {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.static := inn.static;				
+		out.importedElement := inn.importedElement;		}
+		
+
+
+rule InfixExpression
+	transform inn : javaMM!InfixExpression
+	to out : javaMM2!InfixExpression {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.operator := inn.operator;				
+		out.rightOperand := inn.rightOperand;
+		out.leftOperand := inn.leftOperand;
+		--out.extendedOperands := inn.extendedOperands;	
+			}
+		
+
+
+rule Initializer
+	transform inn : javaMM!Initializer
+	to out : javaMM2!Initializer {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		--out.modifier := inn.modifier;
+		--out.body := inn.body;		
+		}
+		
+
+
+rule InstanceofExpression
+	transform inn : javaMM!InstanceofExpression
+	to out : javaMM2!InstanceofExpression {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.rightOperand := inn.rightOperand;
+		out.leftOperand := inn.leftOperand;		}
+		
+
+
+rule InterfaceDeclaration
+	transform inn : javaMM!InterfaceDeclaration
+	to out : javaMM2!InterfaceDeclaration {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		--out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		out.modifier := inn.modifier;
+		--out.usagesInTypeAccess := inn.usagesInTypeAccess;
+		--out.bodyDeclarations := inn.bodyDeclarations;
+		out.commentsBeforeBody := inn.commentsBeforeBody;
+		out.commentsAfterBody := inn.commentsAfterBody;
+		out.package := inn.package;
+		--out.superInterfaces := inn.superInterfaces;
+		--out.typeParameters := inn.typeParameters;	
+			}
+		
+
+
+rule Javadoc
+	transform inn : javaMM!Javadoc
+	to out : javaMM2!Javadoc {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.content := inn.content;				
+		out.enclosedByParent := inn.enclosedByParent;				
+		out.prefixOfParent := inn.prefixOfParent;				
+		--out.tags := inn.tags;	
+			}
+		
+
+
+rule LabeledStatement
+	transform inn : javaMM!LabeledStatement
+	to out : javaMM2!LabeledStatement {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.body := inn.body;
+		out.usagesInBreakStatements := inn.usagesInBreakStatements;
+		out.usagesInContinueStatements := inn.usagesInContinueStatements;		}
+		
+
+
+rule LineComment
+	transform inn : javaMM!LineComment
+	to out : javaMM2!LineComment {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.content := inn.content;				
+		out.enclosedByParent := inn.enclosedByParent;				
+		out.prefixOfParent := inn.prefixOfParent;						}
+		
+
+
+rule Manifest
+	transform inn : javaMM!Manifest
+	to out : javaMM2!Manifest {
+		out.mainAttributes := inn.mainAttributes;
+		out.entryAttributes := inn.entryAttributes;		}
+		
+
+
+rule ManifestAttribute
+	transform inn : javaMM!ManifestAttribute
+	to out : javaMM2!ManifestAttribute {
+		out.key := inn.key;				
+		out.value := inn.value;						}
+		
+
+
+rule ManifestEntry
+	transform inn : javaMM!ManifestEntry
+	to out : javaMM2!ManifestEntry {
+		out.name := inn.name;				
+		out.attributes := inn.attributes;		}
+		
+
+
+rule MemberRef
+	transform inn : javaMM!MemberRef
+	to out : javaMM2!MemberRef {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.member := inn.member;
+		out.qualifier := inn.qualifier;		}
+		
+
+
+rule MethodDeclaration
+	transform inn : javaMM!MethodDeclaration
+	to out : javaMM2!MethodDeclaration {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		--out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		--out.modifier := inn.modifier;
+		--out.body := inn.body;
+		--out.parameters := inn.parameters;
+		--out.thrownExceptions := inn.thrownExceptions;
+		--out.typeParameters := inn.typeParameters;
+		--out.usagesInDocComments := inn.usagesInDocComments;
+		--out.usages := inn.usages;
+		--out.extraArrayDimensions := inn.extraArrayDimensions;				
+		--out.returnType := inn.returnType;
+		--out.redefinedMethodDeclaration := inn.redefinedMethodDeclaration;
+		--out.redefinitions := inn.redefinitions;		
+		}
+		
+
+
+rule MethodInvocation
+	transform inn : javaMM!MethodInvocation
+	to out : javaMM2!MethodInvocation {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.method := inn.method;
+		--out.arguments := inn.arguments;
+		--out.typeArguments := inn.typeArguments;
+		out.expression := inn.expression;		}
+		
+
+
+rule MethodRef
+	transform inn : javaMM!MethodRef
+	to out : javaMM2!MethodRef {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.method := inn.method;
+		out.qualifier := inn.qualifier;
+		--out.parameters := inn.parameters;	
+			}
+		
+
+
+rule MethodRefParameter
+	transform inn : javaMM!MethodRefParameter
+	to out : javaMM2!MethodRefParameter {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.varargs := inn.varargs;				
+		out.type := inn.type;		}
+		
+
+
+rule Model
+	transform inn : javaMM!Model
+	to out : javaMM2!Model {
+		out.name := inn.name;				
+		--out.ownedElements := inn.ownedElements;
+		--out.orphanTypes := inn.orphanTypes;
+		--out.unresolvedItems := inn.unresolvedItems;
+		--out.compilationUnits := inn.compilationUnits;
+		out.classFiles := inn.classFiles;
+		out.archives := inn.archives;		}
+		
+
+
+rule Modifier
+	transform inn : javaMM!Modifier
+	to out : javaMM2!Modifier {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.visibility := inn.visibility;				
+		out.inheritance := inn.inheritance;				
+		out.static := inn.static;				
+		out.transient := inn.transient;				
+		out.volatile := inn.volatile;				
+		out.native := inn.native;				
+		out.strictfp := inn.strictfp;				
+		out.synchronized := inn.synchronized;				
+		out.bodyDeclaration := inn.bodyDeclaration;
+		--out.singleVariableDeclaration := inn.singleVariableDeclaration;
+		--out.variableDeclarationStatement := inn.variableDeclarationStatement;
+		--out.variableDeclarationExpression := inn.variableDeclarationExpression;	
+			}
+		
+
+		
+
+		
+
+
+rule NumberLiteral
+	transform inn : javaMM!NumberLiteral
+	to out : javaMM2!NumberLiteral {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.tokenValue := inn.tokenValue;						}
+		
+
+
+rule NullLiteral
+	transform inn : javaMM!NullLiteral
+	to out : javaMM2!NullLiteral {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;		}
+		
+
+
+rule Package
+	transform inn : javaMM!Package
+	to out : javaMM2!Package {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		--out.ownedElements := inn.ownedElements;
+		--out._model := inn._model;
+		--out.ownedPackages := inn.ownedPackages;
+		out.package := inn.package;
+		--out.usagesInPackageAccess := inn.usagesInPackageAccess;	
+			}
+		
+
+
+rule PackageAccess
+	transform inn : javaMM!PackageAccess
+	to out : javaMM2!PackageAccess {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.package := inn.package;
+		out.qualifier := inn.qualifier;		}
+		
+
+
+rule ParameterizedType
+	transform inn : javaMM!ParameterizedType
+	to out : javaMM2!ParameterizedType {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		--out.usagesInTypeAccess := inn.usagesInTypeAccess;
+		out.type := inn.type;
+		--out.typeArguments := inn.typeArguments;	
+			}
+		
+
+
+rule ParenthesizedExpression
+	transform inn : javaMM!ParenthesizedExpression
+	to out : javaMM2!ParenthesizedExpression {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.expression := inn.expression;		}
+		
+
+
+rule PostfixExpression
+	transform inn : javaMM!PostfixExpression
+	to out : javaMM2!PostfixExpression {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.operator := inn.operator;				
+		out.operand := inn.operand;		}
+		
+
+
+rule PrefixExpression
+	transform inn : javaMM!PrefixExpression
+	to out : javaMM2!PrefixExpression {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.operator := inn.operator;				
+		out.operand := inn.operand;		}
+		
+
+
+rule PrimitiveType
+	transform inn : javaMM!PrimitiveType
+	to out : javaMM2!PrimitiveType {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.usagesInTypeAccess := inn.usagesInTypeAccess;		}
+		
+
+
+rule PrimitiveTypeBoolean
+	transform inn : javaMM!PrimitiveTypeBoolean
+	to out : javaMM2!PrimitiveTypeBoolean {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		--out.usagesInTypeAccess := inn.usagesInTypeAccess;		
+		}
+		
+
+
+rule PrimitiveTypeByte
+	transform inn : javaMM!PrimitiveTypeByte
+	to out : javaMM2!PrimitiveTypeByte {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		--out.usagesInTypeAccess := inn.usagesInTypeAccess;		
+		}
+		
+
+
+rule PrimitiveTypeChar
+	transform inn : javaMM!PrimitiveTypeChar
+	to out : javaMM2!PrimitiveTypeChar {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		--out.usagesInTypeAccess := inn.usagesInTypeAccess;	
+			}
+		
+
+
+rule PrimitiveTypeDouble
+	transform inn : javaMM!PrimitiveTypeDouble
+	to out : javaMM2!PrimitiveTypeDouble {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		--out.usagesInTypeAccess := inn.usagesInTypeAccess;
+				}
+		
+
+
+rule PrimitiveTypeShort
+	transform inn : javaMM!PrimitiveTypeShort
+	to out : javaMM2!PrimitiveTypeShort {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		--out.usagesInTypeAccess := inn.usagesInTypeAccess;	
+			}
+		
+
+
+rule PrimitiveTypeFloat
+	transform inn : javaMM!PrimitiveTypeFloat
+	to out : javaMM2!PrimitiveTypeFloat {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		--out.usagesInTypeAccess := inn.usagesInTypeAccess;	
+			}
+		
+		
+
+
+rule PrimitiveTypeInt
+	transform inn : javaMM!PrimitiveTypeInt
+	to out : javaMM2!PrimitiveTypeInt {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		--out.usagesInTypeAccess := inn.usagesInTypeAccess;	
+			}
+		
+
+
+rule PrimitiveTypeLong
+	transform inn : javaMM!PrimitiveTypeLong
+	to out : javaMM2!PrimitiveTypeLong {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		--out.usagesInTypeAccess := inn.usagesInTypeAccess;
+				}
+		
+
+
+rule PrimitiveTypeVoid
+	transform inn : javaMM!PrimitiveTypeVoid
+	to out : javaMM2!PrimitiveTypeVoid {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		--out.usagesInTypeAccess := inn.usagesInTypeAccess;	
+			}
+		
+
+
+rule ReturnStatement
+	transform inn : javaMM!ReturnStatement
+	to out : javaMM2!ReturnStatement {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.expression := inn.expression;		}
+		
+
+
+rule SingleVariableAccess
+	transform inn : javaMM!SingleVariableAccess
+	to out : javaMM2!SingleVariableAccess {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.variable := inn.variable;
+		out.qualifier := inn.qualifier;		}
+		
+
+
+rule SingleVariableDeclaration
+	transform inn : javaMM!SingleVariableDeclaration
+	to out : javaMM2!SingleVariableDeclaration {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.extraArrayDimensions := inn.extraArrayDimensions;				
+		out.initializer := inn.initializer;
+		--out.usageInVariableAccess := inn.usageInVariableAccess;
+		out.modifier := inn.modifier;
+		out.varargs := inn.varargs;				
+		out.type := inn.type;
+		out.annotations := inn.annotations;
+		out.methodDeclaration := inn.methodDeclaration;
+		out.catchClause := inn.catchClause;
+		--out.enhancedForStatement := inn.enhancedForStatement;	
+			}
+		
+
+		
+
+
+rule StringLiteral
+	transform inn : javaMM!StringLiteral
+	to out : javaMM2!StringLiteral {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.escapedValue := inn.escapedValue;						}
+		
+
+
+rule SuperConstructorInvocation
+	transform inn : javaMM!SuperConstructorInvocation
+	to out : javaMM2!SuperConstructorInvocation {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.method := inn.method;
+		--out.arguments := inn.arguments;
+		out.typeArguments := inn.typeArguments;
+		out.expression := inn.expression;		}
+		
+
+
+rule SuperFieldAccess
+	transform inn : javaMM!SuperFieldAccess
+	to out : javaMM2!SuperFieldAccess {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.qualifier := inn.qualifier;
+		out.field := inn.field;		}
+		
+
+
+rule SuperMethodInvocation
+	transform inn : javaMM!SuperMethodInvocation
+	to out : javaMM2!SuperMethodInvocation {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.qualifier := inn.qualifier;
+		out.method := inn.method;
+		--out.arguments := inn.arguments;
+		out.typeArguments := inn.typeArguments;		}
+		
+
+
+rule SwitchCase
+	transform inn : javaMM!SwitchCase
+	to out : javaMM2!SwitchCase {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out._default := inn._default;				
+		out.expression := inn.expression;		}
+		
+
+
+rule SwitchStatement
+	transform inn : javaMM!SwitchStatement
+	to out : javaMM2!SwitchStatement {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.expression := inn.expression;
+		out.statements := inn.statements;		}
+		
+
+
+rule SynchronizedStatement
+	transform inn : javaMM!SynchronizedStatement
+	to out : javaMM2!SynchronizedStatement {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.body := inn.body;
+		out.expression := inn.expression;		}
+		
+
+
+rule TagElement
+	transform inn : javaMM!TagElement
+	to out : javaMM2!TagElement {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.tagName := inn.tagName;				
+		--out.fragments := inn.fragments;	
+			}
+		
+
+
+rule TextElement
+	transform inn : javaMM!TextElement
+	to out : javaMM2!TextElement {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.text := inn.text;						}
+		
+
+
+rule ThisExpression
+	transform inn : javaMM!ThisExpression
+	to out : javaMM2!ThisExpression {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.qualifier := inn.qualifier;		}
+		
+
+
+rule ThrowStatement
+	transform inn : javaMM!ThrowStatement
+	to out : javaMM2!ThrowStatement {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.expression := inn.expression;		}
+		
+
+
+rule TryStatement
+	transform inn : javaMM!TryStatement
+	to out : javaMM2!TryStatement {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.body := inn.body;
+		out.finally := inn.finally;
+		--out.catchClauses := inn.catchClauses;	
+			}
+		
+
+		
+
+
+rule TypeAccess
+	transform inn : javaMM!TypeAccess
+	to out : javaMM2!TypeAccess {
+		--out.comments := inn.comments;
+		--out.originalCompilationUnit := inn.originalCompilationUnit;
+		--out.originalClassFile := inn.originalClassFile;
+		out.type := inn.type;
+		--out.qualifier := inn.qualifier;	
+			}
+		
+		
+
+		
+
+
+rule TypeDeclarationStatement
+	transform inn : javaMM!TypeDeclarationStatement
+	to out : javaMM2!TypeDeclarationStatement {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.declaration := inn.declaration;		}
+		
+
+
+rule TypeLiteral
+	transform inn : javaMM!TypeLiteral
+	to out : javaMM2!TypeLiteral {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.type := inn.type;		}
+		
+
+
+rule TypeParameter
+	transform inn : javaMM!TypeParameter
+	to out : javaMM2!TypeParameter {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		--out.usagesInTypeAccess := inn.usagesInTypeAccess;
+		--out.bounds := inn.bounds;	
+			}
+		
+
+
+rule UnresolvedItem
+	transform inn : javaMM!UnresolvedItem
+	to out : javaMM2!UnresolvedItem {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;		}
+		
+
+
+rule UnresolvedItemAccess
+	transform inn : javaMM!UnresolvedItemAccess
+	to out : javaMM2!UnresolvedItemAccess {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.element := inn.element;
+		out.qualifier := inn.qualifier;		}
+		
+
+
+rule UnresolvedAnnotationDeclaration
+	transform inn : javaMM!UnresolvedAnnotationDeclaration 
+	to out : javaMM2!UnresolvedAnnotationDeclaration {
+	
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		out.modifier := inn.modifier;
+		out.usagesInTypeAccess := inn.usagesInTypeAccess;
+		out.bodyDeclarations := inn.bodyDeclarations;
+		out.commentsBeforeBody := inn.commentsBeforeBody;
+		out.commentsAfterBody := inn.commentsAfterBody;
+		out.package := inn.package;
+		out.superInterfaces := inn.superInterfaces;		}
+		
+
+
+rule UnresolvedAnnotationTypeMemberDeclaration
+	transform inn : javaMM!UnresolvedAnnotationTypeMemberDeclaration
+	to out : javaMM2!UnresolvedAnnotationTypeMemberDeclaration {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		out.modifier := inn.modifier;
+		out._default := inn._default;
+		out.type := inn.type;
+		out.usages := inn.usages;		}
+		
+
+
+rule UnresolvedClassDeclaration
+	transform inn : javaMM!UnresolvedClassDeclaration
+	to out : javaMM2!UnresolvedClassDeclaration {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		out.modifier := inn.modifier;
+		out.usagesInTypeAccess := inn.usagesInTypeAccess;
+		out.bodyDeclarations := inn.bodyDeclarations;
+		out.commentsBeforeBody := inn.commentsBeforeBody;
+		out.commentsAfterBody := inn.commentsAfterBody;
+		out.package := inn.package;
+		out.superInterfaces := inn.superInterfaces;
+		out.typeParameters := inn.typeParameters;
+		out.superClass := inn.superClass;		}
+		
+
+
+rule UnresolvedEnumDeclaration
+	transform inn : javaMM!UnresolvedEnumDeclaration
+	to out : javaMM2!UnresolvedEnumDeclaration {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		out.modifier := inn.modifier;
+		out.usagesInTypeAccess := inn.usagesInTypeAccess;
+		out.bodyDeclarations := inn.bodyDeclarations;
+		out.commentsBeforeBody := inn.commentsBeforeBody;
+		out.commentsAfterBody := inn.commentsAfterBody;
+		out.package := inn.package;
+		out.superInterfaces := inn.superInterfaces;
+		out.enumConstants := inn.enumConstants;		}
+		
+
+
+rule UnresolvedInterfaceDeclaration
+	transform inn : javaMM!UnresolvedInterfaceDeclaration
+	to out : javaMM2!UnresolvedInterfaceDeclaration {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		out.modifier := inn.modifier;
+		out.usagesInTypeAccess := inn.usagesInTypeAccess;
+		out.bodyDeclarations := inn.bodyDeclarations;
+		out.commentsBeforeBody := inn.commentsBeforeBody;
+		out.commentsAfterBody := inn.commentsAfterBody;
+		out.package := inn.package;
+		out.superInterfaces := inn.superInterfaces;
+		out.typeParameters := inn.typeParameters;		}
+		
+
+
+rule UnresolvedLabeledStatement
+	transform inn : javaMM!UnresolvedLabeledStatement
+	to out : javaMM2!UnresolvedLabeledStatement {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.body := inn.body;
+		out.usagesInBreakStatements := inn.usagesInBreakStatements;
+		--out.usagesInContinueStatements := inn.usagesInContinueStatements;		
+		}
+		
+
+
+rule UnresolvedMethodDeclaration
+	transform inn : javaMM!UnresolvedMethodDeclaration
+	to out : javaMM2!UnresolvedMethodDeclaration {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		out.modifier := inn.modifier;
+		out.body := inn.body;
+		out.parameters := inn.parameters;
+		out.thrownExceptions := inn.thrownExceptions;
+		out.typeParameters := inn.typeParameters;
+		out.usagesInDocComments := inn.usagesInDocComments;
+		out.usages := inn.usages;
+		out.extraArrayDimensions := inn.extraArrayDimensions;				
+		out.returnType := inn.returnType;
+		out.redefinedMethodDeclaration := inn.redefinedMethodDeclaration;
+		out.redefinitions := inn.redefinitions;		}
+		
+
+
+rule UnresolvedSingleVariableDeclaration
+	transform inn : javaMM!UnresolvedSingleVariableDeclaration
+	to out : javaMM2!UnresolvedSingleVariableDeclaration {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.extraArrayDimensions := inn.extraArrayDimensions;				
+		out.initializer := inn.initializer;
+		out.usageInVariableAccess := inn.usageInVariableAccess;
+		out.modifier := inn.modifier;
+		out.varargs := inn.varargs;				
+		out.type := inn.type;
+		out.annotations := inn.annotations;
+		out.methodDeclaration := inn.methodDeclaration;
+		out.catchClause := inn.catchClause;
+		out.enhancedForStatement := inn.enhancedForStatement;		}
+		
+
+
+rule UnresolvedType
+	transform inn : javaMM!UnresolvedType
+	to out : javaMM2!UnresolvedType {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.usagesInTypeAccess := inn.usagesInTypeAccess;		}
+		
+
+
+rule UnresolvedTypeDeclaration
+	transform inn : javaMM!UnresolvedTypeDeclaration
+	to out : javaMM2!UnresolvedTypeDeclaration {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.abstractTypeDeclaration := inn.abstractTypeDeclaration;
+		out.annotations := inn.annotations;
+		out.anonymousClassDeclarationOwner := inn.anonymousClassDeclarationOwner;
+		out.modifier := inn.modifier;
+		out.usagesInTypeAccess := inn.usagesInTypeAccess;
+		out.bodyDeclarations := inn.bodyDeclarations;
+		out.commentsBeforeBody := inn.commentsBeforeBody;
+		out.commentsAfterBody := inn.commentsAfterBody;
+		out.package := inn.package;
+		out.superInterfaces := inn.superInterfaces;		}
+		
+
+
+rule UnresolvedVariableDeclarationFragment
+	transform inn : javaMM!UnresolvedVariableDeclarationFragment
+	to out : javaMM2!UnresolvedVariableDeclarationFragment {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.extraArrayDimensions := inn.extraArrayDimensions;				
+		out.initializer := inn.initializer;
+		out.usageInVariableAccess := inn.usageInVariableAccess;
+		out.variablesContainer := inn.variablesContainer;		}
+		
+
+		
+
+
+rule VariableDeclarationExpression
+	transform inn : javaMM!VariableDeclarationExpression
+	to out : javaMM2!VariableDeclarationExpression {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.type := inn.type;
+		--out.fragments := inn.fragments;
+		out.modifier := inn.modifier;
+		out.annotations := inn.annotations;		}
+		
+
+
+rule VariableDeclarationFragment
+	transform inn : javaMM!VariableDeclarationFragment
+	to out : javaMM2!VariableDeclarationFragment {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		out.extraArrayDimensions := inn.extraArrayDimensions;				
+		out.initializer := inn.initializer;
+		--out.usageInVariableAccess := inn.usageInVariableAccess;
+		out.variablesContainer := inn.variablesContainer;		}
+		
+
+
+rule VariableDeclarationStatement
+	transform inn : javaMM!VariableDeclarationStatement
+	to out : javaMM2!VariableDeclarationStatement {
+		--out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.type := inn.type;
+		out.fragments := inn.fragments;
+		out.extraArrayDimensions := inn.extraArrayDimensions;				
+		out.modifier := inn.modifier;
+		out.annotations := inn.annotations;		}
+		
+
+
+rule WildCardType
+	transform inn : javaMM!WildCardType
+	to out : javaMM2!WildCardType {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.name := inn.name;				
+		out.proxy := inn.proxy;				
+		out.usagesInImports := inn.usagesInImports;
+		--out.usagesInTypeAccess := inn.usagesInTypeAccess;
+		out.upperBound := inn.upperBound;				
+		out.bound := inn.bound;		}
+		
+
+
+rule WhileStatement
+	transform inn : javaMM!WhileStatement
+	to out : javaMM2!WhileStatement {
+		out.comments := inn.comments;
+		out.originalCompilationUnit := inn.originalCompilationUnit;
+		out.originalClassFile := inn.originalClassFile;
+		out.expression := inn.expression;
+		out.body := inn.body;		}
+		

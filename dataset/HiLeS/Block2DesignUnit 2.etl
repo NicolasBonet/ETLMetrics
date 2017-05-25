@@ -1,0 +1,65 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: Block2DesignUnit.etl 973 2013-11-07 22:58:54Z ra.caliz70@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+
+/****r* HiLeSToVDHLAMS/Block2DesignUnit
+ * SUMMARY
+ *   Transform a HiLeS:Block into a Vhdl:DesignUnit. The desing unit will
+ * contain the entity that defines the block's interface and an architecture
+ * that describes the behavior of the block. All HiLeS ports in the block
+ * are transformed into interfaces. ($Rev: 973 $).
+ * DESCRIPTION
+ * |html <B>@abstract</B>
+ * DERIVED BY
+ * 	* Structural2DesignUnit
+ * 	* Functional2DesignUnit
+ * 	* Decision2DesignUnit
+ *   
+ * SEE ALSO
+ *		* 
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *   	* Vhdl   - http://hiles.uniandes.edu.co/1.1/vhdl-ams
+ *
+ ******
+ */
+@abstract
+rule Block2DesignUnit
+	transform block : HiLeS!Block
+	to unit : Vhdl!DesignUnit {
+		
+		// Context
+		unit.contextClause = new Vhdl!ContextClause;
+		var library = new Vhdl!LibraryClause;
+		//library.logicalName.add(hiles);		// Should only be added for SB
+		library.logicalName.add("ieee_proposed;");
+		unit.contextClause.contextItem.add(library);
+		var use = new Vhdl!UseClause;
+		//uses.selectedName.add("hiles.petrinet.all");	// Should only be added for SB
+		use.selectedName.add("ieee.std_logic_1164.all");
+		use.selectedName.add("ieee_proposed.electrical_systems.all");
+		unit.contextClause.contextItem.add(use);
+		
+		// Primary Units
+		var entity = new Vhdl!Entity;
+		entity.identifier = block.name;
+		// Entity header: Generics and Interface Ports
+		var header = new Vhdl!EntityHeader;
+		// ATM HiLeS blocks do not include any genereics
+		// Ports come from the block ports.
+		block.port.equivalent(block.name);
+		header.port.addAll(block.port.equivalent());
+		entity.header = header;
+		unit.libraryUnit.add(entity);
+		// Secondary Units
+		// -- Added depending on the block type
+		
+	}

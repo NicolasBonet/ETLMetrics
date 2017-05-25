@@ -1,0 +1,183 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: ActivityPartition2Block.etl 1003 2015-05-03 00:30:47Z kd.sanchez21@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+
+/****r* Behavior/ActivityPartition2Block
+ * SUMMARY
+ *  Transfotrm a SysML!ActivityPartition into a HiLeS Block. The specific type
+ * of block is decided in the derived rules ($Rev: 1003 $).
+ * DESCRIPTION
+ * |html <B>@abstract</B>
+ *  An ActivityPartition represents a block that executes a specific
+ * CallBehaviorAction. The block must contain the HCN and other HiLeS elements
+ * that represent the CallBehaviorAction nodes and edges. Disregarding the
+ * specific block type, all blocks should have an input and an ouput port to
+ * connect to the HCN. 
+ * DERIVED BY
+ * 	* ActivityPartition2Structural
+ * 	* ActivityPartition2Functional
+ * SEE ALSO
+ *  * MainBlock2HCN
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@abstract
+rule ActivityPartition2Block
+ 	transform ap : SysML!ActivityPartition
+ 	to block: HiLeS!Block, pIn : HiLeS!Port, pOut : HiLeS!Port
+ 	{
+ 	    println("ActivityParameter2Point");
+ 		block.name = ap.represents.name.toCamelCase("\\s");
+ 		
+ 		if(not(
+ 				SysML!HiLeS::FunctionalBlock.all().exists(fb | fb.base_Class = ap.represents.type) or
+ 				SysML!HiLeS::MainBlock.all().exists(fb | fb.base_Class = ap.represents.type)
+ 				))
+ 		{
+ 		pIn.name = "aj_aval_"+block.name+"_HcnIn";
+ 		pIn.direction = HiLeS!PointDirection#input;
+ 		pOut.name = "marque_"+block.name+"_HcnOut";
+ 		pOut.direction = HiLeS!PointDirection#output;
+ 		}
+ 		else
+ 		{
+ 		pIn.name = block.name+"_HcnIn";
+ 		pIn.direction = HiLeS!PointDirection#input;
+ 		pOut.name = block.name+"_HcnOut";
+ 		pOut.direction = HiLeS!PointDirection#output;
+ 		
+ 		}
+ 		
+ 		block.port.add(pOut);
+ 		block.port.add(pIn);
+ 		println("EndActivityParameter2Point");
+ 	}
+
+/****r* ActivityPartition2Block/ActivityPartition2Structural
+ * SUMMARY
+ *  Transfotrm a SysML!ActivityPartition into a HiLeS!Structural Block.
+ * ($Rev: 1003 $).
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *  Additional ports and an architecture with services, payloads and nested
+ * blocks are added according to the nodes and edges of the CallBehaviorAction
+ * invoked by the partition (partitions can only ivoke one CallBehaviorAtion).
+ * The rule is lazy so it is only executed for cloned activity partitions.
+ * DERIVED FROM
+ * 	* ActivityPartition2Block
+ * SEE ALSO
+ *  * MainBlock2HCN
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule ActivityPartition2Structural
+	transform ap : SysML!ActivityPartition
+ 	to block: HiLeS!Structural, pIn : HiLeS!Port, pOut : HiLeS!Port,
+ 	   sIn : HiLeS!Service, sOut : HiLeS!Service 
+ 	//to block: HiLeS!Structural
+ 	extends ActivityPartition2Block
+ 	{
+ 	
+ 		guard : not (
+ 				SysML!HiLeS::FunctionalBlock.all().exists(fb | fb.base_Class = ap.represents.type) or
+ 				SysML!HiLeS::MainBlock.all().exists(fb | fb.base_Class = ap.represents.type)
+ 				)
+ 		println("ActivityPartition2Structural");
+ 		sIn.name = "aj_aval_"+block.name+"_HcnIn";
+ 		sIn.direction = HiLeS!PointDirection#from;
+ 		sOut.name ="marque_"+ block.name+"_HcnOut";
+ 		sOut.direction = HiLeS!PointDirection#`to`;
+		//block.name = ap.represents.name.toCamelCase("\\s");
+		var arch = new HiLeS!Architecture;
+		arch.name = block.name;
+		block.innerArchitecture = arch;
+		arch.service.add(sIn);
+		arch.service.add(sOut);
+		var pn = new HiLeS!PetriNet;
+		// Since different ActivityPartitions can have the same CallBehavior, we need
+		// to clone the behavior.
+		var activity = ap.node.selectOne(n | n.isTypeOf(SysML!CallBehaviorAction)).behavior;
+		if(activity.isDefined())
+		{
+			ap.~activity = new SysML!Activity;
+			ap.~activity.isReadOnly = activity.isReadOnly;
+			ap.~activity.isSingleExecution = activity.isSingleExecution;
+			for (node in activity.node)
+			{
+				//node.type().println("Node type ");
+				ap.addClonedNode(node);
+			}
+			for (edge in activity.edge)
+			{
+				ap.addClonedEdge(edge);
+			}
+			for (ag in activity.`group`.select(ag | ag.isTypeOf(SysML!ActivityPartition)))
+			{
+				var cap = new SysML!ActivityPartition;
+				cap.name = ag.name;
+				cap.node.add(ap.~activity.node.selectOne(cb : SysML!CallBehaviorAction
+						| cb.name = ag.node.first().name
+						));
+				cap.node.first().inPartition.add(cap);
+				cap.represents = ag.represents;
+				cap.~isCloned = true;
+				ap.~activity.`group`.add(cap);
+			}
+			pn.element.addAll(ap.~activity.node.equivalent().select(e | e.isKindOf(HiLeS!Element)));
+			pn.element.addAll(ap.~activity.edge.equivalent().select(e | e.isKindOf(HiLeS!Element)));
+			// Add sttructural blocks to build the hierarchy
+			arch.block.addAll(ap.~activity.`group`.equivalent().select(b
+				| b.isTypeOf(HiLeS!Structural) or b.isTypeOf(HiLeS!Functional)));
+			//Add Functional blocks of decision nodes
+			arch.block.addAll(ap.~activity.node.equivalent().select(b | b.isTypeOf(HiLeS!Decision)));
+			// Add ports and services for ActivityParameters, filter them so ports form decision nodes are not added
+			block.port.addAll(ap.~activity.node.select(n | n.isTypeOf(SysML!ActivityParameterNode)).equivalent().select(e | e.isTypeOf(HiLeS!Port)));
+			arch.service.addAll(ap.~activity.node.select(n | n.isTypeOf(SysML!ActivityParameterNode)).equivalent().select(e | e.isTypeOf(HiLeS!Service)));
+			arch.payload.addAll(ap.~activity.edge.equivalent().select(e | e.isKindOf(HiLeS!Payload)));
+		}
+		arch.petriNet = pn;
+		println("EndActivityPartition2Structural");
+ 	}
+/****r* ActivityPartition2Block/ActivityPartition2Structural
+ * SUMMARY
+ *  Transfotrm a SysML!ActivityPartition into a HiLeS!Functional Block.
+ * ($Rev: 1003 $).
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ * Only blocks with the <<FunctionalBlock>> stereotype are transformned.
+ * The rule is lazy so it is only executed for cloned activity partitions.
+ * DERIVED FROM
+ * 	* ActivityPartition2Block
+ * SEE ALSO
+ *  * MainBlock2HCN
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule ActivityPartition2Functional
+	transform ap : SysML!ActivityPartition
+ 	to block: HiLeS!Functional, pIn : HiLeS!Port, pOut : HiLeS!Port
+ 	extends ActivityPartition2Block
+ 	{
+ 		guard: SysML!HiLeS::FunctionalBlock.all().exists(fb | fb.base_Class = ap.represents.type)
+ 		println("ActivityPartition2Functional");
+ 		println("EndActivityPartition2Functional");
+ 	}

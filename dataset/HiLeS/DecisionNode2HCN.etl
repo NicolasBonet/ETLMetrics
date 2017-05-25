@@ -1,0 +1,97 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: DecisionNode2HCN.etl 1003 2015-05-03 00:30:47Z kd.sanchez21@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+import "ActivityNode2HCN.etl";
+
+/****r* Behavior/DecisionNode2HCN
+ * SUMMARY
+ *   Transfotrm a SysML DecisionNode into its HiLeS Petri Net representation. ($Rev: 1003 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *   This rule only creates the HCN elements to represent the behavior of the 
+ * Decision block craeted in DecisionNode2Decision. 
+ *
+ * DERIVED FROM
+ * 	* ActivityNode2HCN
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ ******
+ */
+@lazy
+rule DecisionNode2HCN
+	transform node : SysML!DecisionNode
+	to  p : HiLeS!Place, a : HiLeS!Arc, t : HiLeS!Transition,
+		a2 : HiLeS!Arc, a3 : HiLeS!Arc, p2 : HiLeS!Place
+	extends ActivityNode2HCN
+	{
+		
+		println('DecisionNode2HCN');
+		if(node.~ap.isDefined())
+		{
+			p2.name = node.~ap.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P2";
+		}
+		else
+		{
+			p2.name = node.owner.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P2";
+		}
+		
+		a2.fromNode = t;
+		a2.toNode = p2;
+		
+		a3.fromNode = t;
+		a3.toPoint = node.equivalents("DecisionNode2Decision").selectOne(p : HiLeS!Port
+				| p.name = "HcnIn"
+				); 
+		node.equivalents("DecisionNode2Decision").selectOne(b | b.isTypeOf(HiLeS!Decision)).associated = p2;
+		println('EndDecisionNode2HCN');
+	}
+
+/****r* Behavior/DecisionNode2Decision
+ * SUMMARY
+ *   Transform a SysML DecisionNode into its HiLeS Petri Net representation. ($Rev: 1003 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *   This rule only creates the Decision block to represent the decision node
+ * and two ports: one for the HCN input and one for the payload that is used
+ * to evaluate the conditions.
+ *
+ * SEE ALSO
+ *   	* ActivityPetriNet
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ ******
+ */
+@lazy
+rule DecisionNode2Decision
+	transform node : SysML!DecisionNode
+	to block : HiLeS!Decision, pHcn : HiLeS!Port, pDecision : HiLeS!Port
+	{
+		println('DecisionNode2Decision');
+		
+		block.name = node.owner.name + node.name;
+		
+		pHcn.name = "HcnIn";
+		pHcn.direction = HiLeS!PointDirection#input;
+		
+		pDecision.name = "DecisionInput";
+		pDecision.direction = HiLeS!PointDirection#input;
+		
+		block.port.add(pHcn);
+		block.port.add(pDecision);
+		block.port.addAll(node.outgoing.equivalent().select(p | p.isTypeOf(HiLeS!Port)));
+		block.port.addAll(node.decisionInputFlow.equivalents().select(p | p.isTypeOf(HiLeS!Port)));
+		block.`guard`.addAll(node.outgoing.collect(o | o.`guard`).flatten().equivalent());
+		println('EndDecisionNode2Decision');
+	}

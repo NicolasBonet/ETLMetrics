@@ -1,0 +1,61 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: InitialArchitecture.etl 818 2012-06-13 16:17:29Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+ 
+/****r* Structure/InitialArchitecture
+ * SUMMARY
+ *   Transfotrm a SysML:Package into a  HiLeS:Architecture.
+ * ($Rev: 818 $)
+ * DESCRIPTION 
+ *   This rule creates the HiLeS:HilesSystem initial architecture, the
+ * architecture is created from the SysML model's "Logical Solution" package.
+ * Blocks are added to the architecture starting from the the root block in the
+ * system's bdd diagram. 
+ * SEE ALSO
+ *   	* StructuralBlock
+ * 
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ * SPECIFICATION
+ 		top  relation InitialArchitecture
+  		{
+   			checkonly domain SysML p:Package {
+				owner = m:Model,
+				name = pn,
+				packagedElement = pe:PackageableElement{},
+			}
+     		enforece domain HiLeS a:Architecture {
+				sytem = s:HilesSystem{}
+				name = pn,
+				isDefault = true,
+				block = b:Block{},
+			}
+			when {
+        		ModelToSystem(m, s);
+				pn = "LogicalSolution";
+     		}
+			where {
+				MainBlock(pm, b)
+     	}
+  	}
+ *
+ ******
+ */
+rule Package2Architecture
+	transform p : SysML!Package
+	to a : HiLeS!Architecture {
+		
+		guard : p.name = 'LogicalSolution'
+		
+		a.name = p.name;
+		a.block.add(SysML!HiLeS::MainBlock.all.selectOne(mb | p.packagedElement.includes(mb.base_Class)).equivalent());
+	}

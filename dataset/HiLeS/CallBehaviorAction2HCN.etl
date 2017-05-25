@@ -1,0 +1,70 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: CallBehaviorAction2HCN.etl 1003 2015-05-03 00:30:47Z kd.sanchez21@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+import "ActivityNode2HCN.etl";
+
+/****r* ActivityNode2HCN/CallBehaviorAction2HCN
+ * SUMMARY
+ *  Transfotrm a SysML!CallBehaviorAction into its HiLeS Petri Net
+ *  representation. ($Rev: 1003 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *  This rule creates the asscoaited PN elements required to represent a
+ *  the CallBehaviorAction. The CallBehaviorAction behavior is represented by
+ *  HiLeS:Block which is created in the ActivityPartition2Block rule. 
+ *
+ * DERIVED FROM
+ * 	* ActivityNode2HCN
+ * SEE ALSO
+ * 	* ActivityPartition2Block
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule CallBehaviorAction2HCN
+	transform node : SysML!CallBehaviorAction
+	to p : HiLeS!Place, a : HiLeS!Arc, t : HiLeS!Transition,
+		p2 : HiLeS!Place, t2 : HiLeS!Transition,
+		a2 : HiLeS!Arc, a3 : HiLeS!Arc, a4 : HiLeS!Arc,
+	    a5 : HiLeS!Arc
+	extends ActivityNode2HCN
+	{
+		--("CallBehaviorPN " + node.name).println();
+		println("CallBehaviorAction2HCN");
+		if(node.~ap.isDefined())
+		{
+			p2.name = node.~ap.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P2";
+			t2.name = node.~ap.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_T2";
+		}
+		else
+		{
+			p2.name = node.owner.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P2";
+			t2.name = node.owner.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_T2";
+		}
+		a.toNode = t2;
+		a2.fromNode = t2;
+		a2.toNode = p2;
+		a4.fromNode = p2;
+		a4.toNode = t;
+		// Connect the arcs to the respective ports in the Block, the block is 
+		// the equivalent of the ActivityPartition that contains the CallBehavior
+		a3.fromNode = t2;
+		a3.toPoint = node.inPartition.first().equivalents().selectOne(p : HiLeS!Port | p.direction = HiLeS!PointDirection#input);
+		a5.fromPoint = node.inPartition.first().equivalents().selectOne(p : HiLeS!Port | p.direction = HiLeS!PointDirection#output);
+		a5.toNode = t;
+		// Assocaite P2 to the SB/FB
+		node.inPartition.first().equivalent().associated = p2;
+		println("EndCallBehaviorAction2HCN");
+	}

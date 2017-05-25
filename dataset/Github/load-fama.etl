@@ -1,0 +1,110 @@
+pre {
+	"Loading feature model".println();
+}
+
+rule featureModel
+  transform sxfm :  XML!`t_feature-model`
+  to fm : FAMA!FeatureModel {
+
+  fm.name = 'Imported FM';
+
+  // root
+  fm.root ::= sxfm.children.select( x | x.isTypeOf( XML!t_feature ) ).first();
+	
+  // set of constraints
+  for (dep in sxfm.children.select( x | x.isTypeOf( XML!t_requires ) or x.isTypeOf( XML!t_excludes) ) ) {
+	fm.dependencies.add( dep.equivalent() );
+  }
+}
+
+rule feature
+  transform sxf : XML!t_feature
+  to f : FAMA!Feature {
+  
+  f.name = sxf.s_name;
+  for ( relation in sxf.children.select( x | x.isDefined() ) ){
+  	f.relations.add( relation.equivalent() );
+  }
+}
+
+rule solitaryFeature
+  transform sxf : XML!t_solitaryFeature
+  to f : FAMA!Feature {
+  
+  f.name = sxf.s_name;
+  for ( relation in sxf.children.select( x | x.isDefined() ) ){
+  	f.relations.add( relation.equivalent() );
+  }
+}
+
+rule groupedFeature
+  transform sxf : XML!t_groupedFeature
+  to f : FAMA!Feature {
+  
+  f.name = sxf.s_name;
+  for ( relation in sxf.children.select( x | x.isDefined() ) ){
+  	f.relations.add( relation.equivalent() );
+  }
+}
+
+rule cardinality
+  transform sxc : XML!t_cardinality
+  to c : FAMA!Cardinality {
+  
+  c.min = sxc.i_min;
+  c.max = sxc.i_max;
+}
+
+rule binaryRelation
+  transform sxbr : XML!t_binaryRelation
+  to br : FAMA!BinaryRelation {
+  
+  br.cardinality ::= sxbr.children.select( x | x.isTypeOf( XML!t_cardinality ) ).first();
+  for(  feature in sxbr.children.select( x | not x.isTypeOf( XML!t_cardinality ) ) ) {
+  	br.destination.add( feature.equivalent() );
+  } 
+}
+
+rule setRelation
+  transform sxbr : XML!t_setRelation
+  to br : FAMA!SetRelation {
+  
+  br.cardinality ::= sxbr.children.select( x | x.isTypeOf( XML!t_cardinality ) ).first();
+  for(  feature in sxbr.children.select( x | not x.isTypeOf( XML!t_cardinality ) ) ) {
+  	br.destination.add( feature.equivalent() );
+  }
+}
+
+rule requires
+  transform sxreq : XML!t_requires
+  to req : FAMA!RequiresDependency {
+
+  req.name 				= sxreq.s_name;
+  req.~feature_name 	= sxreq.s_feature;
+  req.~requires_name 	= sxreq.s_requires;
+}
+
+rule excludes
+  transform sxexc : XML!t_excludes
+  to exc : FAMA!ExcludesDependency {
+
+  exc.name 				= sxexc.s_name;
+  exc.~feature_name		= sxexc.s_feature;
+  exc.~excludes_name	= sxexc.s_excludes;
+}
+
+post {
+	"Updating dependencies".println();
+
+	for ( req in FAMA!RequiresDependency.all ) {
+	  req.origin = FAMA!Feature.all.select( f | f.name = req.~feature_name ).first();
+	  req.destination = FAMA!Feature.all.select( f | f.name = req.~requires_name ).first();
+	}
+
+	for ( exc in FAMA!ExcludesDependency.all ) {
+	  exc.origin = FAMA!Feature.all.select( f | f.name = exc.~feature_name ).first();
+	  exc.destination = FAMA!Feature.all.select( f | f.name = exc.~excludes_name ).first();
+	}
+
+	"Done".println();
+}

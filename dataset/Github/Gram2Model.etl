@@ -1,0 +1,899 @@
+pre{
+	var a: ModelMM!Architecture;
+	var bm: ModelMM!BusinessModel;
+	
+	var dataTypes = new Sequence;
+	
+	dataTypes.add(new ModelMM!String);
+	dataTypes.add(new ModelMM!Integer);
+	dataTypes.add(new ModelMM!Float);
+	dataTypes.add(new ModelMM!Boolean);
+	dataTypes.add(new ModelMM!Date);
+	dataTypes.add(new ModelMM!Enum);
+	dataTypes.add(new ModelMM!Other);
+	
+	var servicesTypes = new Sequence;
+	
+	var cr: new ModelMM!Create;
+	cr.name = 'create';
+	servicesTypes.add(cr);
+	var re: new ModelMM!Read;
+	re.name = 'read';
+	servicesTypes.add(re);
+	var dl: new ModelMM!Delete;
+	dl.name = 'delete';
+	servicesTypes.add(dl);
+	var up: new ModelMM!Update;
+	up.name = 'update';
+	servicesTypes.add(up);
+	
+	PilaValidationsMM!PilaValidations.all.collect(t|t.getArchitecture());
+	a.serviceTypes = servicesTypes;
+	
+}
+
+operation PilaValidationsMM!PilaValidations getArchitecture () : ModelMM!Architecture {
+	
+	a = new ModelMM!Architecture;
+	
+	bm = new ModelMM!BusinessModel;
+		
+	bm.entities.add(GrammarMM!ServiceOperator.all.at(0).getModelEntities());
+	bm.entities.addAll(self.getEntities());
+	bm.dataTypes = dataTypes;
+	
+	a.businessModel = bm;
+	a.views = GrammarMM!ServiceOperator.all.at(0).getViews();
+	
+	return a;
+}
+
+operation GrammarMM!ServiceOperator getModelEntities() : ModelMM!Entity {
+	
+	var root = new ModelMM!Entity;
+	root.name = self.name;
+	root.childrenEntities = self.getServiceOperatorEntities();
+	for(a in self.attributes){
+		root.attributes.add(a.toModelAttribute());
+	}
+	root.childrenEntities.addAll(self.getServiceOperatorServices());
+	
+	return root; 
+}
+
+operation GrammarMM!ServiceOperator getServiceOperatorEntities() : Sequence {
+	
+	var seSeq = self.superEntities.select(e|e.isTypeOf(GrammarMM!SuperEntity));
+	var seModelSeq = new Sequence;
+	
+	for(se in seSeq){
+		var ent = new ModelMM!Entity;
+		ent.name = se.name;
+		ent.childrenEntities = se.getSuperEntityChildren();
+		for(a in se.attributes){
+			ent.attributes.add(a.toModelAttribute());
+		}
+		ent.childrenEntities.addAll(se.getSuperEntityPayments());
+		seModelSeq.add(ent);	
+	}
+	
+	return seModelSeq;
+}
+
+operation GrammarMM!SuperEntity getSuperEntityChildren(): Sequence {
+	
+	var beSeq = self.entities.select(e|e.isTypeOf(GrammarMM!BusinessEntity));
+	var beModelSeq = new Sequence;
+	
+	for (be in beSeq){
+		var ent = new ModelMM!Entity;
+		ent.name = be.name;
+		for(a in be.attributes){
+			ent.attributes.add(a.toModelAttribute());
+		}
+		beModelSeq.add(ent);
+	}
+	
+	return beModelSeq;
+}
+
+operation GrammarMM!SuperEntity getSuperEntityPayments(): Sequence {
+	
+	var paSeq = self.pays.select(e|e.isTypeOf(GrammarMM!Pay));
+	var paModelSeq = new Sequence;
+	
+	for (pa in paSeq){
+		var ent = new ModelMM!Entity;
+		ent.name = pa.name;
+		for(a in pa.attributes){
+			ent.attributes.add(a.toModelAttribute());
+		}
+		paModelSeq.add(ent);
+	}
+	
+	return paModelSeq;
+}
+
+operation GrammarMM!ServiceOperator getServiceOperatorServices() : Sequence {
+	
+	var seSeq = self.services.select(e|e.isTypeOf(GrammarMM!Service));
+	var seModelSeq = new Sequence;
+	
+	for(se in seSeq){
+		var ent = new ModelMM!Entity;
+		ent.name = se.name;
+		ent.methods = se.getServiceMethods();
+		for(a in se.displayName){
+			ent.attributes.add(a.toModelAttribute());
+		}
+		seModelSeq.add(ent);	
+	}
+	
+	return seModelSeq;
+}
+
+operation GrammarMM!Service getServiceMethods() : Sequence {
+	
+	var meSeq = self.calculate.select(e|e.isTypeOf(GrammarMM!Calculate));
+	var meModelSeq = new Sequence;
+	
+	for(me in meSeq){
+		var met = new ModelMM!Method;
+		met.name = me.name;
+		met.body = me.toBody();
+		meModelSeq.add(met);	
+	}
+	
+	return meModelSeq;
+}
+
+operation GrammarMM!Attribute toModelAttribute() : Any {
+	if(self.isTypeOf(GrammarMM!StringValue)){
+		var a : new ModelMM!Attribute;
+		a.name = self.name.replace("\"","");
+		a.attType = dataTypes[0];
+		return a;
+	}
+	else if(self.isTypeOf(GrammarMM!IntegerValue)){
+		var a : new ModelMM!Attribute;
+		a.name = self.name.replace("\"","");
+		a.attType = dataTypes[1];
+		return a;
+	}
+	else if(self.isTypeOf(GrammarMM!FloatValue)){
+		var a : new ModelMM!Attribute;
+		a.name = self.name.replace("\"","");
+		a.attType = dataTypes[2];
+		return a;
+	}
+	else if(self.isTypeOf(GrammarMM!BooleanValue)){
+		var a : new ModelMM!Attribute;
+		a.name = self.name.replace("\"","");
+		a.attType = dataTypes[3];
+		return a;
+	}
+	else if(self.isTypeOf(GrammarMM!Date)){
+		var a : new ModelMM!Attribute;
+		a.name = self.name.replace("\"","");
+		a.attType = dataTypes[4];
+		return a;
+	}
+	else if(self.isTypeOf(GrammarMM!Enum)){
+		var a : new ModelMM!Attribute;
+		a.name = self.name;
+		a.value = self.items;
+		a.attType = dataTypes[5];
+		return a;
+	}
+	else if(self.isTypeOf(GrammarMM!Complex)){
+		var e : new ModelMM!Entity;
+		e.name = self.name.replace("\"","").firstToUpperCase();
+		for(a in self.attributes){
+			e.attributes.add(a.toModelAttribute());
+		}
+		return e;
+	}
+	
+	return new ModelMM!Attribute;
+}
+		
+operation GrammarMM!Calculate toBody(): ModelMM!Body{
+	var body : new ModelMM!Body;
+	var contents : String;
+	var level : Integer;
+	level = 1;
+	for (cond in self.conditions){
+		contents += cond.transformStatement(level);
+	}
+	body.content = contents;
+	
+	return body;
+}
+
+operation GrammarMM!Statement transformStatement(level : Integer) : String{
+	var contents : String;
+	level += 1;
+	contents += "\n"; 
+	var base : String = "";
+	var cont = 0;
+	while(cont < level){
+		base += "\t";
+		cont++;
+	}
+	
+	contents += base;
+	
+	if (self.isTypeOf(GrammarMM!Variable)){
+		contents += self.name.tolowercase();
+		contents += " = ";
+		contents += self.value;
+		contents += "\n";
+	}
+	else if (self.isTypeOf(GrammarMM!If)){
+		contents += self.transformIf(level);
+	}
+	else if (self.isTypeOf(GrammarMM!Return)){
+		contents += "return ";
+		contents += self.value.transformOperation();
+		contents += "\n";
+	}
+	
+	return contents;
+}
+
+operation GrammarMM!If transformIf(level : Integer) : String{
+	var contents : String = "";
+	var hasLogicOp : Boolean = false;
+	var logicOpSeq : Sequence;
+	var logicOpIt : Integer = 0;
+	
+	var base : String = "";
+	var cont = 0;
+	while(cont < level){
+		base += "\t";
+		cont++;
+	}
+	
+	contents += "if ";
+	
+	if(self.expressions.size()>1){
+		hasLogicOp = true;
+		logicOpSeq = self.logoperator;
+	}
+	
+	if(not self.expressions.isEmpty()){
+		for (exp in self.expressions){
+			contents += exp.transformExpression();
+			if(hasLogicOp and (logicOpIt < logicOpSeq.size())){
+				contents += " ";
+				contents += logicOpSeq.at(logicOpIt);
+				contents += " ";
+				logicOpIt++;
+			}
+		}
+	}
+	
+	contents += ":\n";
+	
+	if(not self.statements.isEmpty()){
+		for (st in self.statements){
+			contents += base + st.transformStatement(level);
+		}
+	}
+	
+	if(not self.esleIf.isEmpty()){
+		contents += "\t";
+		for (elf in self.esleIf){
+			contents += "\n";
+			contents += base + "elif ";
+			
+			var hasLogicOpEIf : Boolean = false;
+			var logicOpSeqEIf : Sequence;
+			var logicOpItEIf : Integer = 0;
+	
+			if(elf.expressions.size()>1){
+				hasLogicOpEIf = true;
+				logicOpSeqEIf = elf.logoperator;
+			}
+			
+			if(not elf.expressions.isEmpty()){		
+				for(exp in elf.expressions){
+					contents += exp.transformExpression();
+					if(hasLogicOpEIf and (logicOpItEIf < logicOpSeqEIf.size())){
+						contents += " ";
+						contents += logicOpSeqEIf.at(logicOpItEIf);
+						contents += " ";
+						logicOpItEIf++;
+					}
+				}
+			}
+			
+			contents += ":\n";
+			
+			if(not elf.statements.isEmpty()){
+				for(st in elf.statements){
+					contents += st.transformStatement(level);
+				}
+			}
+		}
+	}
+	
+	if(self.els.isDefined()){
+		contents += "\n";
+		contents += base + "else";
+		contents += ":\n";
+		for (el in self.els){
+			if(not el.statements.isEmpty()){
+				for(st in el.statements){
+					contents += st.transformStatement(level);
+				}
+			}
+		}
+	}
+	
+	return contents;
+}
+
+operation GrammarMM!Expression transformExpression() : String{
+	var contents : String;
+
+	if(self.elementLeft.isDefined()){
+		contents += self.elementLeft.element.toLowerCase();
+		contents += " ";
+	}
+	if(self.comparator.isDefined()){
+		contents += self.comparator;
+		contents += " ";
+	}
+	if(self.elementRight.isDefined()){
+		if(self.elementLeft.isDefined()){
+			if(self.elementLeft.element.equals("ultimaNovedad.tipo")){
+				if (not PilaValidationsMM!PilaValidations.all.get(0).tiponovedad.isEmpty()) {
+					var tiposNov = PilaValidationsMM!PilaValidations.all.get(0).tiponovedad;
+					for(novedad in tiposNov){
+						var nameTar = novedad.nombre.trim();
+						nameTar = nameTar.replace(" ","");
+						
+						var nameSrc = self.elementRight.element.trim();
+						nameSrc = nameSrc.replace(" ","");
+						nameSrc = nameSrc.replace("\"","");
+											
+						if(nameSrc.toLowerCase().equals(nameTar.toLowerCase())){
+							contents += novedad.codigo;	
+						}
+					}
+				}
+			}
+			else{
+				contents += self.elementRight.element.toLowerCase();	
+			}
+		}
+		else{
+			contents += self.elementRight.element.toLowerCase();
+		}
+	}
+	
+	return contents;
+}
+
+operation GrammarMM!Operation transformOperation() : String{
+	var contents : String;
+	
+	if(self.valueLeft.isDefined()){
+		contents += self.valueLeft.toLowerCase();
+		contents += " ";
+	}
+	if(self.operator.isDefined()){
+		contents += self.operator;
+		contents += " ";
+	}
+	if(self.valueRight.isDefined()){
+		contents += self.valueRight.toLowerCase();
+	}
+	
+	return contents;
+}
+
+
+
+operation PilaValidationsMM!PilaValidations getEntities() : Sequence {
+	var entities = new Sequence;
+	
+	if (not self.pagadorpensiones.isEmpty()) {
+		var entity = new ModelMM!Entity;
+		entity.name = self.pagadorpensiones.get(0).eClass.name;
+			
+		var attribute = new ModelMM!Attribute;
+		attribute.name = 'descripcion';
+		attribute.attType = dataTypes[0];
+			
+		entity.attributes.add(attribute);
+		entities.add(entity);
+	}
+	
+	if (not self.tipopensionado.isEmpty()) {
+		var entity = new ModelMM!Entity;
+		entity.name = self.tipopensionado.get(0).eClass.name;
+			
+		var attribute = new ModelMM!Attribute;
+		attribute.name = 'descripcion';
+		attribute.attType = dataTypes[0];
+			
+		entity.attributes.add(attribute);
+		entities.add(entity);
+	}
+	
+	if (not self.tipopension.isEmpty()) {
+		var entity = new ModelMM!Entity;
+		entity.name = self.tipopension.get(0).eClass.name;
+			
+		var attribute = new ModelMM!Attribute;
+		attribute.name = 'descripcion';
+		attribute.attType = dataTypes[0];
+			
+		entity.attributes.add(attribute);
+		entities.add(entity);
+	}
+	
+	if (not self.tiponovedad.isEmpty()) {
+		var entity = new ModelMM!Entity;
+		entity.name = self.tiponovedad.get(0).eClass.name;
+		
+		var attribute = new ModelMM!Attribute;
+		attribute.name = 'descripcion';
+		attribute.attType = dataTypes[0];
+		
+		entity.attributes.add(attribute);
+		entities.add(entity);
+	}
+	
+	if (not self.codigociu.isEmpty()) {
+		var entity = new ModelMM!Entity;
+		entity.name = self.codigociu.get(0).eClass.name;
+		
+		var attribute = new ModelMM!Attribute;
+		attribute.name = 'descripcion';
+		attribute.attType = dataTypes[1];
+		
+		entity.attributes.add(attribute);
+		entities.add(entity);
+	}
+	
+	if (not self.tipopensionado.get(0).pagadorpensiones.isEmpty()) {
+		var entity = new ModelMM!Entity;
+		var nombre = self.tipopensionado.get(0).eClass.name + 
+		self.tipopensionado.get(0).pagadorpensiones.get(0).eClass.name;
+		entity.name = nombre;
+			
+		var attribute1 = new ModelMM!Attribute;
+		attribute1.name = 'tipo_pensionado' + '-' + self.tipopensionado.get(0).eClass.name;
+		attribute1.attType = dataTypes[6];
+		
+		entity.attributes.add(attribute1);
+		
+		var attribute2 = new ModelMM!Attribute;
+		attribute2.name = 'tipo_pagador_pensiones' + '-' + self.tipopensionado.get(0).pagadorpensiones.get(0).eClass.name;
+		attribute2.attType = dataTypes[6];
+		
+		entity.attributes.add(attribute2);
+		
+		entities.add(entity);
+	}
+	
+	return entities;
+}
+
+operation GrammarMM!ServiceOperator getViews(): Sequence{	
+	var views = new Sequence;
+	
+	var viewParent = new ModelMM!View;
+	viewParent.name = self.name;
+	viewParent.gComponents = self.attributes.getGraphicalComponents();	
+	
+	var viewChild1 = new ModelMM!View;
+	for (superEntity in self.superEntities){		
+		viewChild1.name = superEntity.name;
+		viewChild1.gComponents = superEntity.attributes.getGraphicalComponents();
+		viewChild1.childs = superEntity.getViewChilds();
+		
+		viewParent.childs.add(viewChild1);		
+		
+		for (entity in superEntity.entities){
+			var viewChild2 = new ModelMM!View;
+			viewChild2.name = entity.name;
+			viewChild2.gComponents = entity.attributes.getGraphicalComponents();			
+			viewChild1.childs.addAll(entity.getViewChilds());			
+			
+			viewChild1.childs.add(viewChild2);
+		}
+		
+		for (pay in superEntity.pays){
+			var viewChild3 = new ModelMM!View;
+			viewChild3.name = pay.name;
+			viewChild3.gComponents = pay.attributes.getGraphicalComponents();			
+			viewChild3.childs = pay.getViewChilds();
+			
+			viewChild1.childs.add(viewChild3);
+		}		
+	}	
+	
+	for (service in self.services){
+		var viewChild4 = new ModelMM!View;
+		viewChild4.name = service.name;
+		viewChild4.gComponents = service.calculate.getGraphicalComponents();		
+		
+		viewChild1.childs.add(viewChild4);
+	}
+	
+	views.add(viewParent);
+	return views;
+}
+
+operation GrammarMM!Enum getItems(): Sequence{
+	var items = new Sequence;
+	
+	var isFirts = new Boolean;
+	isFirts = true;	
+	for (item in self.items){
+		var newItem = new ModelMM!ListItem;
+		newItem.action = item;
+		
+		if (isFirts){
+			newItem.isSelected = true;
+			isFirts = false;			
+		}
+		
+		items.add(newItem);	
+	}
+	
+	return items;
+}
+
+operation Collection getGraphicalComponents(): Sequence{
+	var graphicalComponents = new Sequence;
+	
+	var idCalculate = 1;
+	for (attribute in self){
+		if (attribute.isTypeOf(GrammarMM!StringValue)){
+			var text = new ModelMM!Text;
+			text.name = attribute.name.substring(1, attribute.name.length() - 1);
+			text.displayName = attribute.displayName.substring(1, attribute.displayName.length() - 1);
+			
+			graphicalComponents.add(text);
+		}
+		else if (attribute.isTypeOf(GrammarMM!IntegerValue)){
+			var number = new ModelMM!Number;
+			number.name = attribute.name.substring(1, attribute.name.length() - 1);
+			number.displayName = attribute.displayName.substring(1, attribute.displayName.length() - 1);
+			
+			graphicalComponents.add(number);
+		}
+		else if (attribute.isTypeOf(GrammarMM!BooleanValue)){
+			var radio = new ModelMM!Radio;
+			radio.name = attribute.name.substring(1, attribute.name.length() - 1);
+			radio.displayName = attribute.displayName.substring(1, attribute.displayName.length() - 1);
+			
+			graphicalComponents.add(radio);
+		}
+		else if (attribute.isTypeOf(GrammarMM!FloatValue)){
+			var number = new ModelMM!Number;
+			number.name = attribute.name.substring(1, attribute.name.length() - 1);
+			number.displayName = attribute.displayName.substring(1, attribute.displayName.length() - 1);
+			
+			graphicalComponents.add(number);
+		}
+		else if (attribute.isTypeOf(GrammarMM!Date)){
+			var datePicker = new ModelMM!DatePicker;
+			datePicker.name = attribute.name.substring(1, attribute.name.length() - 1);
+			datePicker.displayName = attribute.displayName.substring(1, attribute.displayName.length() - 1);
+			
+			graphicalComponents.add(datePicker);
+		}
+		else if (attribute.isTypeOf(GrammarMM!Enum)){
+			var dropdownList = new ModelMM!DropdownList;
+			dropdownList.name = attribute.name.substring(1, attribute.name.length() - 1);
+			dropdownList.displayName = attribute.displayName.substring(1, attribute.displayName.length() - 1);
+			dropdownList.items = attribute.getItems();
+			
+			graphicalComponents.add(dropdownList);
+		}	
+		else if (attribute.isTypeOf(GrammarMM!Calculate)){
+			var button = new ModelMM!Button;			
+			button.name = attribute.name.toLowerCase();
+			button.displayName = attribute.name;			
+			button.id = idCalculate + "";
+			
+			idCalculate += 1;	
+			
+			graphicalComponents.add(button);
+		}					
+	}
+	
+	return graphicalComponents;
+}
+
+operation Any getViewChilds(): Sequence{
+	var views = new Sequence;
+	
+	for (attribute in self.attributes){
+		if (attribute.isTypeOf(GrammarMM!Complex) and attribute.name.matches("\"novedad\"")){
+					
+			var view = new ModelMM!View;
+			view.name = attribute.name.substring(1, attribute.name.length() - 1).firstToUpperCase();			
+			view.gComponents = attribute.attributes.getGraphicalComponents();
+			
+			views.add(view);								
+		}							
+	}
+	
+	return views;
+}
+
+//BUSINESS LOGICS 
+
+rule SuperEnt2BuzLogic
+	transform
+		s:GrammarMM!SuperEntity
+	to
+		t:ModelMM!BusinessLogic{
+			t.functions = s.getSuperEntityFunctions();
+			t.name = s.name;
+			a.logic.add(t);
+			a.services.addAll(s.getSuperEntityServices());
+		}
+	
+rule BusinessEnt2BuzLogic
+	transform
+		s:GrammarMM!BusinessEntity
+	to
+		t:ModelMM!BusinessLogic{
+			t.name = s.name;
+			t.functions = s.getBusinessEntityFunctions();
+			a.logic.add(t);
+			a.services.addAll(s.getBusinessEntityServices());
+		}
+
+rule Pay2BuzLogic
+	transform
+		s:GrammarMM!Pay
+	to
+		t:ModelMM!BusinessLogic{
+			t.name = s.name;
+			t.functions = s.getPayFunctions();
+			a.logic.add(t);
+			a.services.addAll(s.getPayServices());
+		}
+		
+rule Complex2BuzLogic
+	transform
+		s:GrammarMM!Complex
+	to
+		t:ModelMM!BusinessLogic{
+			t.name = s.name.substring(1, s.name.length() -1).firstToUpperCase();
+			t.functions = s.getComplexFunctions();
+			a.logic.add(t);
+			a.services.addAll(s.getComplexServices());
+		}
+		
+rule Service2Function
+	transform
+		s:GrammarMM!Service
+	to
+		t:ModelMM!BusinessLogic{
+			t.name = s.name.firstToUpperCase();
+			t.functions = s.getCalculateFunctions();
+			a.logic.add(t);
+			a.services.addAll(s.getCalculateServices());
+		}
+
+//FUNCTIONS
+
+operation GrammarMM!SuperEntity getSuperEntityFunctions() : Sequence{
+	var functions : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var f = new ModelMM!Function;
+		f.name = st.name + "_" + self.name.toLowerCase();
+		f.body = self.getSuperEntBody();
+		functions.add(f);
+	}
+	
+	return functions;
+}
+
+operation GrammarMM!BusinessEntity getBusinessEntityFunctions() : Sequence{
+	var functions : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var f = new ModelMM!Function;
+		f.name = st.name + "_" + self.name.toLowerCase();
+		f.body = self.getBusinessEntBody();
+		functions.add(f);
+	}
+	
+	return functions;
+}
+
+operation GrammarMM!Pay getPayFunctions() : Sequence{
+	var functions : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var f = new ModelMM!Function;
+		f.name = st.name + "_" + self.name.toLowerCase();
+		f.body = self.getPayBody();
+		functions.add(f);
+	}
+	
+	return functions;
+}
+
+operation GrammarMM!Complex getComplexFunctions() : Sequence{
+	var functions : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var f = new ModelMM!Function;
+		f.name = st.name + "_" + self.name.substring(1, self.name.length() -1).toLowerCase();
+		f.body = self.getComplexBody();
+		functions.add(f);
+	}
+	
+	return functions;
+}
+
+operation GrammarMM!Service getCalculateFunctions() : Sequence{
+	var functions : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var f = new ModelMM!Function;
+		f.name = st.name + "_" + self.name.toLowerCase();
+		f.body = self.getCalculateBody();
+		functions.add(f);
+	}
+	
+	return functions;
+}
+
+//SERVICES
+
+operation GrammarMM!SuperEntity getSuperEntityServices() : Sequence{
+	var services : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var s = new ModelMM!Service;
+		s.name = st.name + "_" + self.name.toLowerCase();
+		s.dispatcher = s.findDispatcher();
+		s.serviceType = st;
+		services.add(s);
+	}
+	
+	return services;
+}
+
+operation GrammarMM!BusinessEntity getBusinessEntityServices() : Sequence{
+	var services : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var s = new ModelMM!Service;
+		s.name = st.name + "_" + self.name.toLowerCase();
+		s.dispatcher = s.findDispatcher();
+		s.serviceType = st;
+		services.add(s);
+	}
+	
+	return services;
+}
+
+operation GrammarMM!Pay getPayServices() : Sequence{
+	var services : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var s = new ModelMM!Service;
+		s.name = st.name + "_" + self.name.toLowerCase();
+		s.dispatcher = s.findDispatcher();
+		s.serviceType = st;
+		services.add(s);
+	}
+	
+	return services;
+}
+
+operation GrammarMM!Complex getComplexServices() : Sequence{
+	var services : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var s = new ModelMM!Service;
+		s.name = st.name + "_" + self.name.substring(1, self.name.length() -1).toLowerCase();
+		s.dispatcher = s.findDispatcher();
+		s.serviceType = st;
+		services.add(s);
+	}
+	
+	return services;
+}
+
+operation GrammarMM!Service getCalculateServices() : Sequence{
+	var services : new Sequence;
+	
+	for (st in a.serviceTypes){
+		var s = new ModelMM!Service;
+		s.name = st.name + "_" + self.name.toLowerCase();
+		s.dispatcher = s.findDispatcher();
+		s.serviceType = st;
+		services.add(s);
+	}
+	
+	return services;
+}
+
+//Bodies
+operation GrammarMM!SuperEntity getSuperEntBody(): ModelMM!FunctionBody{
+	var bodies : new ModelMM!FunctionBody;
+	var contents : String;
+	for(attr in self.attributes){
+		contents += attr.name;
+		contents += ";";
+	}
+	
+	bodies.content = contents;
+	
+	return bodies;
+}
+
+operation GrammarMM!BusinessEntity getBusinessEntBody(): ModelMM!FunctionBody{
+	var bodies : new ModelMM!FunctionBody;
+	var contents : String;
+	for(attr in self.attributes){
+		contents += attr.name;
+		contents += ";";
+	}
+	
+	bodies.content = contents;
+	
+	return bodies;
+}
+
+operation GrammarMM!Pay getPayBody(): ModelMM!FunctionBody{
+	var bodies : new ModelMM!FunctionBody;
+	var contents : String;
+	for(attr in self.attributes){
+		contents += attr.name;
+		contents += ";";
+	}
+	
+	bodies.content = contents;
+	
+	return bodies;
+}
+
+operation GrammarMM!Complex getComplexBody(): ModelMM!FunctionBody{
+	var bodies : new ModelMM!FunctionBody;
+	var contents : String;
+	for(attr in self.attributes){
+		contents += attr.name;
+		contents += ";";
+	}
+	
+	bodies.content = contents;
+	
+	return bodies;
+}
+
+operation GrammarMM!Service getCalculateBody(): ModelMM!FunctionBody{
+	var bodies : new ModelMM!FunctionBody;
+	var contents : String;
+	for(attr in self.calculate){
+		contents += attr.name;
+		contents += ";";
+	}
+	
+	bodies.content = contents;
+	
+	return bodies;
+}
+
+operation ModelMM!Service findDispatcher(): ModelMM!Function {
+	
+	var f = ModelMM!Function.allInstances.select(fu|fu.name = self.name).first();
+	
+	return f;
+}

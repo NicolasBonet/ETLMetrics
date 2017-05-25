@@ -1,0 +1,309 @@
+pre {
+  "Running ETL...".println();
+}
+
+rule TrNetModel2TrNetModel
+  transform mIn : VisualModel!TrNetModel
+  to mOut : CoreModel!TrNetModel{
+
+	mOut.id = mIn.id;
+	
+	mOut.patterns = mIn.patterns.equivalent();
+	mOut.operators = mIn.operators.equivalent();
+	
+}
+
+
+rule Pattern2Pattern
+  transform eIn : VisualModel!Pattern
+  to eOut : CoreModel!Pattern{
+  
+  eOut.id = eIn.id;
+  
+  eOut.nodes = eIn.nodes.equivalent();
+  
+  eOut.edges = eIn.edges.equivalent();
+  
+  eOut.expected_size = eIn.expected_size;
+}
+
+
+rule Combinator2Combinator
+  transform cIn : VisualModel!Combinator
+  to cOut : CoreModel!Combinator{
+  
+  cOut.operands = cIn.operands.equivalent();
+  cOut.results = cIn.results.equivalent();
+  
+  cOut.id = cIn.id;
+  
+  /* DEBUG 
+  for (restriction in findOperatorSameRestrictions(cIn)){
+  	restriction.println();
+  }
+  */
+  
+  /* DEBUG 
+  cIn.println();
+  for (pattern in getIncomingPatternsSet(cIn)){
+  	pattern.println();
+  }
+  */
+  /* DEBUG 
+  for (same in VisualModel!Same.all.select(sameRestriction | hasSourceInSomePatternsSameRestriction(sameRestriction, getIncomingPatternsSet(cIn)))) {
+  	same.println();
+  }
+  */
+  
+  //Find the Same restrictions between this operator's operands.
+  cOut.restrictions.addAll(findOperatorSameRestrictions(cIn).collect(s | copySameRestrictionToCoreModel(s)));
+  
+  //Find the Different restrictions between this operator's operands.
+  cOut.restrictions.addAll(findOperatorDifferentRestrictions(cIn).collect(s | copyDifferentRestrictionToCoreModel(s)));
+  
+  //Find the Keep restrictions between this operator's operands and results.
+  cOut.restrictions.addAll(findOperatorKeepRestrictions(cIn).collect(k | copyKeepRestrictionToCoreModel(k)));
+  
+  
+}
+
+
+rule External2External
+  transform eIn : VisualModel!External
+  to eOut : CoreModel!External{
+  
+  eOut.operands = eIn.operands.equivalent();
+  eOut.results = eIn.results.equivalent();
+  
+  eOut.id = eIn.id;
+  
+}
+
+
+rule Union2Union
+  transform eIn : VisualModel!Union
+  to eOut : CoreModel!Union{
+  
+  eOut.operands = eIn.operands.equivalent();
+  eOut.results = eIn.results.equivalent();
+  
+  eOut.id = eIn.id;
+  
+  //Find the Same restrictions between this operator's operands.
+  eOut.restrictions.addAll(findOperatorSameRestrictions(eIn).collect(s | copySameRestrictionToCoreModel(s)));
+  
+  //Find the Keep restrictions between this operator's operands and results.
+  eOut.restrictions.addAll(findOperatorKeepRestrictions(eIn).collect(k | copyKeepRestrictionToCoreModel(k)));
+  
+}
+
+
+
+/* */
+rule MandatoryNode2MandatoryNode
+  transform eIn : VisualModel!MandatoryNode
+  to eOut : CoreModel!MandatoryNode{
+  eOut.name = eIn.name;
+  eOut.id = eIn.id;
+  
+  eOut.attributes = eIn.attributes.equivalent();
+}
+
+rule OptionalNode2OptionalNode
+  transform eIn : VisualModel!OptionalNode
+  to eOut : CoreModel!OptionalNode{
+  eOut.name = eIn.name;
+  eOut.id = eIn.id;
+  
+  eOut.attributes = eIn.attributes.equivalent();
+}
+
+rule EdgePattern2EdgePattern
+  transform eIn : VisualModel!EdgePattern
+  to eOut : CoreModel!EdgePattern{
+  eOut.name = eIn.name;
+  
+  
+  eOut.source = eIn.source.equivalent();
+  eOut.target = eIn.target.equivalent();
+}
+
+rule AttributePattern2AttributePattern
+  transform aIn : VisualModel!AttributePattern
+  to aOut : CoreModel!AttributePattern{
+  
+  guard: aIn.operator=="="
+  
+  aOut.name = aIn.name;
+  
+  // For string literals. In the future, here we try to evaluate the type of the restriction.
+  var sl = new CoreModel!StringLiteral;
+  sl.value = aIn.expression;
+  aOut.expression = sl;
+  
+  var operator = new CoreModel!Equality;
+  aOut.operator = operator;
+}
+
+
+rule SomeOperand2SomeOperand
+  transform eIn : VisualModel!SomeOperand
+  to eOut : CoreModel!SomeOperand{
+  eOut.count = eIn.count;
+  eOut.index = eIn.index;
+  
+  eOut.pattern = eIn.pattern.equivalent();
+  eOut.operator = eIn.operator.equivalent();
+
+}
+
+rule AntiOperand2AntiOperand
+  transform eIn : VisualModel!AntiOperand
+  to eOut : CoreModel!AntiOperand{
+  eOut.index = eIn.index;
+  
+  eOut.pattern = eIn.pattern.equivalent();
+  eOut.operator = eIn.operator.equivalent();
+}
+
+rule OptionalOperand2OptionalOperand
+  transform eIn : VisualModel!OptionalOperand
+  to eOut : CoreModel!OptionalOperand{
+  eOut.index = eIn.index;
+  
+  eOut.pattern = eIn.pattern.equivalent();
+  eOut.operator = eIn.operator.equivalent();
+}
+
+rule AnyOperand2AnyOperand
+  transform eIn : VisualModel!AnyOperand
+  to eOut : CoreModel!AnyOperand{
+  eOut.index = eIn.index;
+  
+  eOut.pattern = eIn.pattern.equivalent();
+  eOut.operator = eIn.operator.equivalent();
+}
+
+rule SomeResult2SomeResult
+  transform eIn : VisualModel!SomeResult
+  to eOut : CoreModel!SomeResult{
+  
+  eOut.count = eIn.count;
+  
+  eOut.pattern = eIn.pattern.equivalent();
+  eOut.operator = eIn.operator.equivalent();
+}
+
+rule AnyResult2AnyResult
+  transform eIn : VisualModel!AnyResult
+  to eOut : CoreModel!AnyResult{
+  
+  eOut.pattern = eIn.pattern.equivalent();
+  eOut.operator = eIn.operator.equivalent();
+}
+
+
+
+operation findOperatorSameRestrictions(operator) {
+  return VisualModel!Same.all.select(sameRestriction | hasSourceInSomePatternSameRestriction(sameRestriction, getIncomingPatternsSet(operator)) and hasTargetInSomePatternSameRestriction(sameRestriction, getIncomingPatternsSet(operator)));
+}
+
+operation findOperatorDifferentRestrictions(operator) {
+  return VisualModel!Different.all.select(differentRestriction | hasSourceInSomePatternDifferentRestriction(differentRestriction, getIncomingPatternsSet(operator)) and hasTargetInSomePatternDifferentRestriction(differentRestriction, getIncomingPatternsSet(operator)));
+}
+
+operation hasSourceInSomePatternSameRestriction(sameRestriction, setOfPatterns){
+	return setOfPatterns.exists(somePattern | hasSourceInPatternSameRestriction(sameRestriction, somePattern));
+}
+
+operation hasSourceInSomePatternDifferentRestriction(differentRestriction, setOfPatterns){
+	return setOfPatterns.exists(somePattern | hasSourceInPatternDifferentRestriction(differentRestriction, somePattern));
+}
+
+operation hasSourceInSomePatternKeepRestriction(keepRestriction, setOfPatterns){
+	return setOfPatterns.exists(somePattern | hasSourceInPatternKeepRestriction(keepRestriction, somePattern));
+}
+
+operation hasSourceInPatternKeepRestriction(keepRestriction, somePattern){
+	return somePattern.nodes.exists(someNode | keepRestriction.source = someNode);
+}
+
+operation hasTargetInSomePatternSameRestriction(sameRestriction, setOfPatterns){
+	return setOfPatterns.exists(somePattern | hasTargetInPatternSameRestriction(sameRestriction, somePattern));
+}
+
+operation hasTargetInSomePatternDifferentRestriction(differentRestriction, setOfPatterns){
+	return setOfPatterns.exists(somePattern | hasTargetInPatternSameRestriction(differentRestriction, somePattern));
+}
+
+operation hasTargetInSomePatternKeepRestriction(keepRestriction, setOfPatterns){
+	return setOfPatterns.exists(somePattern | hasTargetInPatternKeepRestriction(keepRestriction, somePattern));
+}
+
+operation hasSourceInPatternSameRestriction(sameRestriction, somePattern){
+	return somePattern.nodes.exists(someNode | sameRestriction.source = someNode);
+}
+
+operation hasSourceInPatternDifferentRestriction(differentRestriction, somePattern){
+	return somePattern.nodes.exists(someNode | differentRestriction.source = someNode);
+}
+
+operation hasTargetInPatternSameRestriction(differentRestriction, somePattern){
+	return somePattern.nodes.exists(someNode | differentRestriction.target = someNode);
+}
+
+operation hasTargetInPatternSameRestriction(sameRestriction, somePattern){
+	return somePattern.nodes.exists(someNode | sameRestriction.target = someNode);
+}
+
+operation hasTargetInPatternKeepRestriction(keepRestriction, somePattern){
+	return somePattern.nodes.exists(someNode | keepRestriction.target = someNode);
+}
+
+operation getIncomingPatternsSet(operator){
+	return operator.operands.collect(operand | operand.pattern).asSet();
+}
+
+operation getOutgoingPatternsSet(operator){
+	return operator.results.collect(result | result.pattern).asSet();
+}
+
+operation findOperatorKeepRestrictions(operator) {
+	return VisualModel!Keep.all.select(keepRestriction | hasSourceInSomePatternKeepRestriction(keepRestriction, getIncomingPatternsSet(operator)) and hasTargetInSomePatternKeepRestriction(keepRestriction, getOutgoingPatternsSet(operator)));
+}
+
+operation trnetvisual::Combinator findOperatorKeepRestrictions(): Collection {
+  return trnetvisual::Keep.all.select(k: trnetvisual::Keep | self.operands.exists(o:trnetvisual::Pattern| o.nodes.exists(n : trnetvisual::NodePattern| n = k.source)) and self.results.exists(o:trnetvisual::Pattern| o.nodes.exists(n : trnetvisual::NodePattern| n = k.target)) );
+}
+
+operation copySameRestrictionToCoreModel(s: trnetvisual::Same) : CoreModel!trnet::Same {
+	var result = new CoreModel!trnet::Same;
+	
+	result.source = s.source.equivalent();
+	result.target = s.target.equivalent();
+	
+	return result;
+}
+
+operation copyDifferentRestrictionToCoreModel(s: VisualModel!Different) : CoreModel!Different {
+	var result = new CoreModel!Different;
+	
+	result.source = s.source.equivalent();
+	result.target = s.target.equivalent();
+	
+	return result;
+}
+
+operation copyKeepRestrictionToCoreModel(k: trnetvisual::Keep) : CoreModel!trnet::Keep {
+	var result = new CoreModel!trnet::Keep;
+	
+	result.source = k.source.equivalent();
+	result.target = k.target.equivalent();
+	
+	return result;
+}
+
+
+post {
+  "Running ETL... DONE".println();
+}

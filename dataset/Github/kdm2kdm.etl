@@ -1,0 +1,720 @@
+pre {
+  "kdm2kdm Transformation".println();
+}
+
+post {
+	
+	if(kdmMicro!CodeModel.allInstances().size() > 0)
+	{
+		generateClassLevelRelations();
+	}
+	
+	executeClusteres();
+	
+	"Done".println();
+}
+
+operation executeClusteres(){
+	var modelElem = kdmMicro!CodeModel.allInstances().first();
+  	var classes = modelElem.getAllContents()->select(class|class.isTypeOf(kdmMicro!ClassUnit) or class.isTypeOf(kdmMicro!InterfaceUnit) or class.isTypeOf(kdmMicro!TemplateUnit));
+	
+	var clases2 = classes->asSet()->select(class|not(class.isTypeOf(kdmMicro!PrimitiveType) or class.isTypeOf(kdmMicro!TemplateParameter) or class.isTypeOf(kdmMicro!FloatType) or class.isTypeOf(kdmMicro!IntegerType) or class.isTypeOf(kdmMicro!VoidType)));
+	" clases totales ".println(clases2.size());
+	var relations = kdmMicro!ClassLevelRelation.allInstances();
+	var clusterTool = new Native("clusterer.EJBClusterer");
+	
+	var ejbs = new Set;
+	var entities = new Set;
+	
+	for(c in clases2){		
+		if (c.containsEntity()){
+			entities.add(c);
+		}
+		else if(c.containsEJB()){
+			ejbs.add(c);
+		}
+	}
+	(" clases EJB: " + ejbs).println(ejbs.size());
+	(" clases entidad: " + entities).println(entities.size());	
+	
+	clusterTool.constructGraph(clases2->asSet(),relations->asSet());
+	
+	var clus = clusterTool.makeCluster(ejbs,entities);
+	
+	for(cluster in clus){
+		var cl = new kdmMicro!Cluster;
+		cl.name = cluster.name;
+		var df = new Set;
+		df = cluster.codeElement->asSet()->select(class|not(class.isTypeOf(kdmMicro!PrimitiveType) or class.isTypeOf(kdmMicro!TemplateParameter) or class.isTypeOf(kdmMicro!FloatType) or class.isTypeOf(kdmMicro!IntegerType) or class.isTypeOf(kdmMicro!VoidType)));
+		
+		cl.codeElement.addAll(df);
+		modelElem.codeElement.add(cl);
+		("-----------Cluster(EJB) "+cl.name+"------------").println();
+		for (elem in cl.codeElement){
+				elem.name.println();
+		}
+	}
+	
+	var clusters = kdmMicro!Cluster.allInstances();
+	
+	var union = new Set;
+	for(cluster in clusters){
+		union.addAll(cluster.codeElement);
+	}
+		
+	var noClasificadas =   clases2->asSet()->select(c | union->asSet()->select(a|a.name==c.name)->isEmpty());
+	("********************  Clases no clasificadas en algun cluster EJB (no aparece en algun camino)  *******: ").println();
+	for (noClasificada in noClasificadas) {
+		(noClasificada.name).println();
+	}
+	
+	var i = 1;
+	for(a in clusters){
+		var A = new Set;
+		A = a.codeElement;
+		var j=1;
+		for(b in clusters){
+			var B = new Set;
+			B = b.codeElement;
+		
+			var union = new Set;
+			var intersect = new Set;
+			
+			union.addAll(A);
+			union.addAll(B);
+			
+			intersect.addAll(A->select(c|B->includes(c)));
+			
+			if((not existClusterRelation(a, b)) and intersect->size()<>0 and a<>b){
+				var relation = new kdmMicro!ClusterRelation;
+				relation.`from`= a;
+				relation.`to` = b;
+				relation.codeElement.addAll(intersect);
+				modelElem.codeElement.add(relation);
+			}
+			var value = new Real;
+			value = ((intersect->size()->asReal())/(A->size()->asReal())).max(((intersect->size()->asReal())/(B->size()->asReal())));
+			
+			//(""+i+"--"+j+":"+value).println();
+			
+			j=j+1;
+		}
+		i=i+1;
+	}
+}
+
+//Raiz
+rule ModelElement2ModelElement
+transform t: code!ModelElement
+to o: kdmMicro!ModelElement{
+
+}
+
+rule Segment2Segment	
+transform t : code!Segment
+to o : kdmMicro!Segment {
+	o.name = t.name;
+	o.`model` = t.`model`.equivalent();
+	o.annotation = t.annotation.equivalent();
+}
+
+rule Annotation2Annotation
+transform t: code!Annotation
+to o: kdmMicro!Annotation{
+	o.text = t.text;
+}
+
+// CodeModel
+
+rule KDM2KDM
+transform t : code!CodeModel
+to o : kdmMicro!CodeModel {
+	o.name = t.name;
+	o.codeElement = t.codeElement.equivalent();
+	o.annotation = t.annotation.equivalent();
+}
+
+//Elementos principales de cdigo
+rule AbstractCodeElement2AbstractCodeElement
+transform t: code!AbstractCodeElement
+to o: kdmMicro!AbstractCodeElement{
+
+	o.name = t.name;
+	o.codeRelation = t.codeRelation.equivalent();
+	o.comment = t.comment.equivalent();
+	   o.annotation = t.annotation.equivalent();
+	  
+}
+
+rule CommentUnit2CommentUnit
+transform t : code!CommentUnit
+to o : kdmMicro!CommentUnit {
+	o.text= t.text;
+}
+
+rule CodeItem2CodeItem
+transform t: code!CodeItem
+to o: kdmMicro!CodeItem
+extends AbstractCodeElement2AbstractCodeElement{
+	
+
+}
+
+//-----------------------
+//Elementos de tipo Modulo
+rule Module2Module
+transform t: code!Module
+to o : kdmMicro!Module
+extends CodeItem2CodeItem{
+	o.codeElement = t.codeElement.equivalent();
+}
+
+rule Package2Package
+transform t : code!Package
+to o : kdmMicro!Package 
+extends Module2Module{
+	//o.name= t.name;
+	//o.codeElement = t.codeElement.equivalent();
+}
+
+//--------------------------
+
+//--------------------------
+//Elementos de tipo ComputationalObject
+
+rule ComputationalObject2ComputationalObject
+transform t: code!ComputationalObject
+to o: kdmMicro!ComputationalObject
+extends CodeItem2CodeItem{
+	
+}
+
+rule DataElement2DataElement
+transform t : code!DataElement
+to o: kdmMicro!DataElement
+extends ComputationalObject2ComputationalObject{
+
+	o.type = t.type.equivalent();
+	
+	o.codeElement = o.codeElement.equivalent();
+	o.`ext` = t.`ext`;
+	if(t.size.isDefined()){
+	o.size = t.size;}
+}
+
+rule ParameterUnit2ParameterUnit
+transform t : code!ParameterUnit
+to o : kdmMicro!ParameterUnit 
+extends DataElement2DataElement{
+	
+	o.kind = t.kind.equivalent();
+		
+	if(t.pos.isDefined()){
+	o.pos = t.pos;}
+}
+
+rule StorableUnit2StorableUnit
+transform t : code!StorableUnit
+to o : kdmMicro!StorableUnit 
+extends DataElement2DataElement{
+	o.kind = o.kind;
+	/*
+	var crel = new kdmMicro!ClassLevelRelation;
+	crel.`from`= o.getParentClassUnit();
+	crel.`to`= o.type.getParentClassUnit();
+	crel.type = "SotorableUnit";*/
+}
+
+rule ControlElement2ControlElement
+transform t : code!ControlElement
+to o: kdmMicro!ControlElement
+extends ComputationalObject2ComputationalObject{
+	o.type = t.type.equivalent();
+	o.codeElement = t.codeElement.equivalent();
+}
+
+rule MethodUnit2MethodUnit
+transform t: code!MethodUnit
+to o: kdmMicro!MethodUnit
+extends ControlElement2ControlElement{
+	o.kind = t.kind.equivalent();
+	o.export = t.export.equivalent();
+}
+
+rule CallabUnit2CallableUnit
+transform t: code!CallableUnit
+to o: kdmMicro!CallableUnit
+extends ControlElement2ControlElement{
+	o.kind = t.kind.equivalent();
+}
+
+//----------------------------
+
+//----------------------------
+//Elementos de tipo DataType
+
+rule DataType2DataType
+transform t: code!Datatype
+to o: kdmMicro!Datatype
+extends CodeItem2CodeItem{
+	
+}
+
+rule TemplateUnit2TemplateUnit
+transform t: code!TemplateUnit
+to o: kdmMicro!TemplateUnit
+extends DataType2DataType{
+	o.codeElement = t.codeElement.equivalent();
+}
+
+rule TemplateTypet2TemplateType
+transform t: code!TemplateType
+to o: kdmMicro!TemplateType
+extends DataType2DataType{
+	
+}
+
+rule TemplateParameter2TemplateParameter
+transform t: code!TemplateParameter
+to o: kdmMicro!TemplateParameter
+extends DataType2DataType{
+	
+}
+
+rule VoidType2VoidType
+transform t: code!VoidType
+to o: kdmMicro!VoidType
+extends PrimitiveType2PrimitiveType{
+	
+}
+
+rule PrimitiveType2PrimitiveType
+transform t: code!PrimitiveType
+to o: kdmMicro!PrimitiveType
+extends DataType2DataType{
+	
+}
+
+rule IntegerType2IntegerType
+transform t: code!IntegerType
+to o: kdmMicro!IntegerType
+extends DataType2DataType{
+	
+}
+
+rule FloatType2FloatType
+transform t: code!FloatType
+to o: kdmMicro!FloatType
+extends DataType2DataType{
+	
+}
+
+rule ClassUnit2ClassUnit
+transform t : code!ClassUnit
+to o : kdmMicro!ClassUnit 
+extends DataType2DataType{
+	o.codeElement = t.codeElement.equivalent();
+	if(t.isAbstract.isDefined()){
+	o.isAbstract = t.isAbstract;}
+}
+
+rule InterfaceUnit2InterfaceUnit
+transform t: code!InterfaceUnit
+to o: kdmMicro!InterfaceUnit
+extends DataType2DataType{
+	o.codeElement = t.codeElement.equivalent();
+}
+
+rule Signature2Signature
+transform t : code!Signature
+to o : kdmMicro!Signature 
+extends DataType2DataType{
+	o.parameterUnit = t.parameterUnit.equivalent();
+	
+}
+
+//-----------------------------------
+
+//-----------------------------------
+// Relaciones: Elementos de tipo 
+
+//Relaciones entre elementos de cdigo
+rule AbstractCodeRelationship2AbstractCodeRelationship
+transform t: code!AbstractCodeRelationship
+to o: kdmMicro!AbstractCodeRelationship{
+	o.`to`= t.`to`.equivalent();
+	o.`from` = t.`from`.equivalent();
+	o.annotation  = t.annotation.equivalent();
+}
+
+rule Imports2Imports
+transform t : code!Imports
+to o : kdmMicro!Imports 
+extends AbstractCodeRelationship2AbstractCodeRelationship{
+
+}
+
+rule VisibleIn2VisibleIn
+transform t : code!VisibleIn
+to o : kdmMicro!VisibleIn
+extends AbstractCodeRelationship2AbstractCodeRelationship{
+
+}
+
+rule Implements2Implements
+transform t : code!Implements
+to o : kdmMicro!Implements
+extends AbstractCodeRelationship2AbstractCodeRelationship{
+}
+
+rule ImplementationOf2ImplementationOf
+transform t : code!ImplementationOf
+to o : kdmMicro!ImplementationOf 
+extends AbstractCodeRelationship2AbstractCodeRelationship{
+}
+
+rule Extends2Extends
+transform t : code!Extends
+to o : kdmMicro!Extends
+extends AbstractCodeRelationship2AbstractCodeRelationship{
+}
+
+rule HasValue2HasValue
+transform t : code!HasValue
+to o : kdmMicro!HasValue 
+extends AbstractCodeRelationship2AbstractCodeRelationship{
+}
+
+rule HasType2HasType
+transform t : code!HasType
+to o : kdmMicro!HasType 
+extends AbstractCodeRelationship2AbstractCodeRelationship{
+}
+
+/*
+rule ParameterTo2ParameterTo
+transform t : code!ParameterTo
+to o : kdmMicro!ParameterTo 
+extends AbstractCodeRelationship2AbstractCodeRelationship{
+}
+
+rule InstanceOf2InstanceOf
+transform t : code!InstanceOf
+to o : kdmMicro!InstanceOf 
+extends AbstractCodeRelationship2AbstractCodeRelationship{
+}
+*/
+
+//------------------------------------
+//ACTION PACKAGE
+
+rule ActionElement2ActionElement
+transform t : code!ActionElement
+to o : kdmMicro!ActionElement 
+extends AbstractCodeElement2AbstractCodeElement{
+	o.kind = t.kind;
+	o.codeElement = t.codeElement.equivalent();
+	o.actionRelation = t.actionRelation.equivalent();
+}
+
+rule BlockUnit2BlockUnit
+transform t : code!BlockUnit
+to o : kdmMicro!BlockUnit 
+extends ActionElement2ActionElement{
+}
+
+rule ExceptionUnit2ExceptionUnit
+transform t : code!ExceptionUnit
+to o : kdmMicro!ExceptionUnit 
+extends BlockUnit2BlockUnit{
+}
+
+rule CatchUnit2CatchUnit
+transform t : code!CatchUnit
+to o : kdmMicro!CatchUnit 
+extends ExceptionUnit2ExceptionUnit{
+}
+
+rule TryUnit2TryUnit
+transform t : code!TryUnit
+to o : kdmMicro!TryUnit 
+extends ExceptionUnit2ExceptionUnit{
+}
+
+rule FinallyUnit2FinallyUnit
+transform t : code!FinallyUnit
+to o : kdmMicro!FinallyUnit 
+extends ExceptionUnit2ExceptionUnit{
+}
+
+
+//--------------------------------
+
+//Relaciones a nivel de acciones
+
+rule AbstracActionRelationship2AbstracActionRelationship
+transform t: code!AbstractActionRelationship
+to o: kdmMicro!AbstracActionRelationship{
+	o.`to`= t.`to`.equivalent();
+	o.`from` = t.`from`.equivalent();
+	o.annotation  = t.annotation.equivalent();
+}
+
+rule Call2Call
+transform t : code!Calls
+to o : kdmMicro!Calls 
+extends AbstracActionRelationship2AbstracActionRelationship{
+}
+
+rule Reads2Reads
+transform t : code!Reads
+to o : kdmMicro!Reads 
+extends AbstracActionRelationship2AbstracActionRelationship{
+}
+
+rule Writes2Writes
+transform t : code!Writes
+to o : kdmMicro!Writes 
+extends AbstracActionRelationship2AbstracActionRelationship{
+
+}
+
+rule Creates2Creates
+transform t : code!Creates
+to o : kdmMicro!Creates
+extends AbstracActionRelationship2AbstracActionRelationship{
+}
+
+//-------HELPERS--------
+
+//Recorre todo el modelo y genera las relaciones que existen enre ClassUnit
+operation generateClassLevelRelations(){
+	var mod = kdmMicro!CodeModel.allInstances().first();
+	var sons = mod.getAllContents();
+    
+    var modExt = kdmMicro!CodeModel.allInstances().select(x| x.name = "externals").first();
+	var sonsExt = modExt.getAllContents();
+	
+	//A tiene un atributo de B
+	("->Cantidad A tiene un atributo de B: " + sons->select(a| a.isTypeOf(kdmMicro!StorableUnit))->size()).println();
+	for (e in sons->select(a| a.isTypeOf(kdmMicro!StorableUnit)) ){
+		if (e.type.isDefined()){
+		    var ori = e.getParentClassUnit();
+			var dest = e.type.getParentClassUnit();
+		    var exists = sonsExt.ValidateClassUnitExistsInExternals(dest);
+		    
+			if(not exists)
+			{  
+				var crel := mod.darRelation(ori,dest);
+				var types = new  kdmMicro!TypeRelation;
+				types.name = "Containment";
+				crel.typeRelations.add(types);
+			}
+		}	
+	}
+	
+	//A llama un servicio de B "calls"
+	("->Cantidad A llama un servicio de B (calls): " + sons->select(a |a.isTypeOf(kdmMicro!ActionElement) and a.name = 'method invocation' )->size()).println();
+	for (e in sons->select(a |a.isTypeOf(kdmMicro!ActionElement) and a.name = 'method invocation' )){
+		var call = e.eContents()->select(c |c.isTypeOf(kdmMicro!Calls)).first();
+		if (call <> null and (call.`from`.getParentClassUnit() <> call.`to`.getParentClassUnit())){
+
+			var ori = call.`from`.getParentClassUnit();
+			var dest = call.`to`.getParentClassUnit();
+			if (dest.name <> 'valueOf') {
+				var exists = sonsExt.ValidateClassUnitExistsInExternals(dest);
+				
+				if(not exists)
+				{
+					var crel := mod.darRelation(ori,dest);
+					var types = new  kdmMicro!TypeRelation;
+					types.name = "Uses";
+					types.call = call;
+					types.esEntreMetodos = "true";
+					crel.typeRelations.add(types);
+				} 
+			}
+		}	
+	}
+	
+	//A tiene un metodo que referencia a B como parametro o como retorno
+	("->Cantidad A tiene un metodo que referencia a B como parametro o como retorno: " + sons->select(a |a.isTypeOf(kdmMicro!ParameterUnit))->size()).println();
+	for (e in sons->select(a |a.isTypeOf(kdmMicro!ParameterUnit))){
+		if (e.type.isDefined()){
+			var ori = e.getParentClassUnit();
+			var dest= e.type.getParentClassUnit();
+			
+			var exists = sonsExt.ValidateClassUnitExistsInExternals(dest);
+			if(not exists)
+			{
+				var crel := mod.darRelation(ori,dest);
+				var types = new kdmMicro!TypeRelation;
+				types.name = "Uses";
+				crel.typeRelations.add(types);
+			}
+		}
+	}
+
+	//A implementa B
+	("->Cantidad A implementa B: " +  sons->select(a |a.isTypeOf(kdmMicro!Implements))->size()).println();
+	for (e in sons->select(a |a.isTypeOf(kdmMicro!Implements))){
+		if (e.`from`.isDefined()){
+			var ori = e.`from`.getParentClassUnit();
+			var dest = e.`to`.getParentClassUnit();
+			
+			var exists = sonsExt.ValidateClassUnitExistsInExternals(dest);
+			if(not exists)
+			{
+				var crel := mod.darRelation(ori,dest);
+				var types = new kdmMicro!TypeRelation;
+				types.name = "Implements";
+				crel.typeRelations.add(types);
+			}
+		}
+	}
+	
+	//A extiende de B
+	("->Cantidad A extiende de B: " +  sons->select(a |a.isTypeOf(kdmMicro!Extends))->size()).println();
+	for (e in sons->select(a |a.isTypeOf(kdmMicro!Extends))){
+		if (e.type.isDefined()){
+			var ori = e.`from`.getParentClassUnit();
+			var dest = e.`to`.getParentClassUnit();
+			
+			var exists = sonsExt.ValidateClassUnitExistsInExternals(dest);
+			if(not exists)
+			{
+				var crel := mod.darRelation(ori,dest);
+				var types = new kdmMicro!TypeRelation;
+				types.name = "Extends";
+				crel.typeRelations.add(types);
+			}
+		}
+	}
+	
+	//Dentro de un metodo de una clase A se usa, modifica o instancia una variabale de tipo B - Writes/Reads/Creates
+	("->Cantidad Dentro de un metodo de una clase A se usa, modifica o instancia una variabale de tipo B - Writes/Reads/Creates: " +  sons->select(a |a.isTypeOf(kdmMicro!ActionElement) and a.name = 'ASSIGN' )->size()).println();
+	for (e in sons->select(a |a.isTypeOf(kdmMicro!ActionElement) and a.name = 'ASSIGN' )){
+		var call = e.eContents()->select(c |c.isTypeOf(kdmMicro!Writes) or c.isTypeOf(kdmMicro!Reads) or c.isTypeOf(kdmMicro!Creates)).first();	
+		if (call.isDefined()){
+			if (call.`to`.isDefined()){
+			   if (e.getParentClassUnit() <> call.`to`.getParentClassUnit()){
+					var ori = e.getParentClassUnit();
+					var dest = call.`to`.getParentClassUnit();
+					var exists = sonsExt.ValidateClassUnitExistsInExternals(dest);
+					if(not exists)
+					{
+						var crel := mod.darRelation(ori,dest);
+						var types = new kdmMicro!TypeRelation;
+						types.name = "Containment";
+						crel.typeRelations.add(types);
+					}
+			   }
+			}
+		}	
+	}
+	
+	//Anotaciones - HasValue
+	("->Cantidad Anotaciones - HasValue: " +  sons->select(a |a.isTypeOf(kdmMicro!HasValue))->size()).println();
+	for (e in sons->select(a |a.isTypeOf(kdmMicro!HasValue))){
+	    var call = e.eContents()->select(c |c.isTypeOf(kdmMicro!Annotation)).first(); 	
+		if (call.isDefined() and  e.`from`.getParentClassUnit() <> e.`to`.getParentClassUnit()){
+			var ori = e.`from`.getParentClassUnit();
+			var dest = e.`to`.getParentClassUnit();
+			
+			var exists = sonsExt.ValidateClassUnitExistsInExternals(dest);
+			if(not exists)
+			{
+				var crel := mod.darRelation(ori,dest);
+				var types = new kdmMicro!TypeRelation;
+				types.name = "Annotation";
+				crel.typeRelations.add(types);
+			}
+		}
+	}
+}
+
+//Obtiene la clase "CodeItem" que contiene o a la que pertenece el AbstractCodeElement 
+operation kdmMicro!AbstractCodeElement getParentClassUnit() : kdmMicro!CodeItem{
+	var class = self;
+	while (class.name <> 'valueOf' and not (class.isTypeOf(kdmMicro!PrimitiveType) or class.isTypeOf(kdmMicro!TemplateParameter) or class.isTypeOf(kdmMicro!FloatType) or class.isTypeOf(kdmMicro!IntegerType) or  class.isTypeOf(kdmMicro!VoidType) or class.isTypeOf(kdmMicro!TemplateType) or class.isTypeOf(kdmMicro!ClassUnit) or class.isTypeOf(kdmMicro!InterfaceUnit) or class.isTypeOf(kdmMicro!TemplateUnit))){
+			class = class.eContainer();
+	}
+	return class;
+}
+
+ 
+operation kdmMicro!AbstractCodeElement getMethodUnit() : kdmMicro!CodeItem{
+	var class = self;
+	while (not (class.isTypeOf(kdmMicro!MethodUnit))){
+			class = class.eContainer();
+	}
+	return class;
+}
+
+operation kdmMicro!AbstractCodeElement getPackage() : String{
+	var paquete = '';
+	var pack = self.eContainer();
+	while ((pack.isTypeOf(kdmMicro!Package))){			
+			paquete = pack.name + "." + paquete ;
+			pack = pack.eContainer();
+	}
+	return paquete;
+}
+
+//Obtiene la lista de todos los elementos que conetiene un Modelo 
+operation kdmMicro!ModelElement getAllContents(): Sequence{
+	var set = new Sequence;
+	set.addAll(self.eContents());
+	for (e in  self.eContents()){
+		set.addAll(e.getAllContents());
+	}
+	return set;
+}
+
+//A partir de una Clase "CodeItem" a y una Clase b se genera la relacion estere estas
+//Si la relacion ya existe se adiciona el tipo de asociacion a la relacion ya existente
+operation kdmMicro!CodeModel darRelation(a: kdmMicro!CodeItem, b: kdmMicro!CodeItem): kdmMicro!ClassLevelRelation{	
+	var relations = kdmMicro!ClassLevelRelation.allInstances();
+	var rel = relations->select(e | (e.`from` = a  and e.`to` = b)).first();
+	if(rel.isDefined()){
+		return rel;
+	}
+	else{
+		var rel = new kdmMicro!ClassLevelRelation;
+		rel.`from` = a;
+		rel.`to` = b;
+		self.codeElement.add(rel);
+		return rel;
+	}
+}
+
+// identifica si un ClassUnit esta en el paquete de externos
+// para no inlcuirlas en las relaciones
+operation Sequence ValidateClassUnitExistsInExternals(class: kdmMicro!CodeItem): Boolean{
+	if(self.exists(a | a.equals(class)))
+	 return true;
+	else
+	 return false; 	
+}
+
+operation existClusterRelation(i : kdmMicro!Cluster, j : kdmMicro!Cluster): Boolean{
+	var relations = kdmMicro!ClusterRelation.allInstances();
+	for (relation in relations)
+		{
+		if((relation.`from` == i and relation.`to` == j) or (relation.`from` == j and relation.`to` == i))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+operation kdmMicro!CodeItem containsEntity(): Boolean
+{
+	return self.codeRelation.select(hasValue | hasValue.isTypeOf(kdmMicro!HasValue) and hasValue.annotation.size() > 0 and hasValue.`to`.name.equalsIgnoreCase("Entity") ).size > 0;
+}
+
+operation kdmMicro!CodeItem containsEJB(): Boolean
+{
+	return self.isTypeOf(kdmMicro!ClassUnit)  and self.codeRelation.select(hasValue | hasValue.isTypeOf(kdmMicro!HasValue) and hasValue.annotation.size() > 0 and (hasValue.`to`.name.equalsIgnoreCase("Stateless") or hasValue.`to`.name.equalsIgnoreCase("Stateful") or hasValue.`to`.name.equalsIgnoreCase("Remote") or hasValue.`to`.name.equalsIgnoreCase("Service")  or hasValue.`to`.name.equalsIgnoreCase("Repository") ) ).size > 0;
+}

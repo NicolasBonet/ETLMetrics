@@ -1,0 +1,159 @@
+rule Article
+	transform inn : DBLP!Article
+	to out : DBLP2!Article {
+		out.title := inn.title;				
+		out.fromPage := inn.fromPage;				
+		out.toPage := inn.toPage;				
+		out.number := inn.number;				
+		out.journal := inn.journal;
+		out.volume := inn.volume;				
+		out.month := inn.month;				
+		out.year := inn.year;						
+}
+		
+
+
+rule Author
+	transform inn : DBLP!Author
+	to out : DBLP2!Author {
+		out.name := inn.name;				
+		out.records := inn.records;		
+}
+		
+
+
+rule Journal
+	transform inn : DBLP!Journal
+	to out : DBLP2!Journal {
+		out.name := inn.name;				
+		out.articles := inn.articles;		
+}
+		
+
+
+rule Book
+	transform inn : DBLP!Book
+	to out : DBLP2!Book {
+		out.title := inn.title;				
+		out.year := inn.year;				
+		out.publisher := inn.publisher;
+		out.month := inn.month;				
+		out.volume := inn.volume;				
+		out.series := inn.series;				
+		out.edition := inn.edition;				
+		out.isbn := inn.isbn;						
+}
+		
+
+
+rule InCollection
+	transform inn : DBLP!InCollection
+	to out : DBLP2!InCollection {
+		out.title := inn.title;				
+		out.bookTitle := inn.bookTitle;				
+		out.year := inn.year;				
+		out.editors := inn.editors;
+		out.fromPage := inn.fromPage;				
+		out.toPage := inn.toPage;				
+		out.sponsoredBy := inn.sponsoredBy;
+		out.publisher := inn.publisher;
+		out.month := inn.month;						
+}
+		
+
+
+rule InProceedings
+	transform inn : DBLP!InProceedings
+	to out : DBLP2!InProceedings {
+		out.title := inn.title;				
+		out.bootitle := inn.bootitle;				
+		out.year := inn.year;				
+		out.fromPage := inn.fromPage;				
+		out.toPage := inn.toPage;				
+		out.month := inn.month;				
+		out.editors := inn.editors;
+		out.organization := inn.organization;
+		out.publisher := inn.publisher;		
+}
+		
+
+
+rule MastersThesis
+	transform inn : DBLP!MastersThesis
+	to out : DBLP2!MastersThesis {
+		out.title := inn.title;				
+		out.year := inn.year;				
+		out.school := inn.school;
+		out.month := inn.month;						
+}
+		
+
+
+rule Proceedings
+	transform inn : DBLP!Proceedings
+	to out : DBLP2!Proceedings {
+		out.title := inn.title;				
+		out.year := inn.year;				
+		out.editors := inn.editors;
+		out.publisher := inn.publisher;
+		out.sponsoredBy := inn.sponsoredBy;
+		out.month := inn.month;				
+		out.isbn := inn.isbn;						
+}
+		
+
+
+rule PhDThesis
+	transform inn : DBLP!PhDThesis
+	to out : DBLP2!PhDThesis {
+		out.title := inn.title;				
+		out.year := inn.year;				
+		out.month := inn.month;				
+		out.school := inn.school;		
+}
+		
+
+
+rule Www
+	transform inn : DBLP!Www
+	to out : DBLP2!Www {
+		out.editors := inn.editors;
+		out.title := inn.title;				
+		out.year := inn.year;				
+		out.month := inn.month;						
+}
+		
+
+
+rule Editor
+	transform inn : DBLP!Editor
+	to out : DBLP2!Editor {
+		out.name := inn.name;						
+}
+		
+
+
+rule Organization
+	transform inn : DBLP!Organization
+	to out : DBLP2!Organization {
+		out.name := inn.name;						
+}
+		
+
+
+rule Publisher
+	transform inn : DBLP!Publisher
+	to out : DBLP2!Publisher {
+		out.name := inn.name;				
+		out.address := inn.address;						
+}
+		
+
+
+rule School
+	transform inn : DBLP!School
+	to out : DBLP2!School {
+		out.name := inn.name;				
+		out.address := inn.address;						
+}
+		

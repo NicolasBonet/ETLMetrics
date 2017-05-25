@@ -1,0 +1,109 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: PortToInterfaceSignal.etl 1002 2015-05-03 00:29:43Z kd.sanchez21@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+import "helpers/HiLeS2VhdlTypes.eol";
+
+/****r* HiLeSToVDHLAMS/PortToInterfaceSignal
+ * SUMMARY
+ *   Transform a HiLeS:Port into a Vhdl:Port. The specific type of port would
+ *  depend on the type of the payload that connects to the port. ($Rev: 1002 $)
+ * DESCRIPTION 
+ *   Create a vhdl!Port for each hiles!Port The actual port type would depend 
+ * on the type of the payload that connects to the port and is decided
+ * by guard on derived rules.
+ * SEE ALSO
+ *
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *   	* Vhdl   - http://hiles.uniandes.edu.co/1.1/vhdl-ams
+ *
+ *****
+ */
+pre
+{
+	
+}
+rule PortToInterfaceSignal
+	transform port : HiLeS!Port
+	to signal : Vhdl!InterfaceSignal
+	{
+		// If the port owner is a strucutral, the type of signal is retreived
+		// from the type of a payload in the block's inner architecure that
+		// connects to the port's matching service. If the block is a functional
+		// then the type of signal is retreived from the type of a payload in the
+		// block's parent architecture that is connected to the port. 
+		guard
+		{
+			if(port.owner.isKindOf(HiLeS!Functional))
+			{
+				pl = port.owner.parentArchitecture.payload.selectOne(pl
+						| (pl.target = port) or (pl.source = port)
+						);
+			}
+			else
+			{
+				pl = port.owner.innerArchitecture.payload.selectOne(pl
+						| (pl.target.name = port.name) or (pl.source.name = port.name)
+						); // Do it with inner architecture so it works for the main block
+			}
+			if(pl.isDefined())
+			{
+				return pl.type.isSignalType();
+			}
+			// If not, it can be the ports that connect to the petri net (HcnIn and HcnOut)
+			println(""+port.name);
+			pl = port.owner.parentArchitecture.petriNet.element.selectOne(a : HiLeS!Arc
+						| (a.fromPoint = port) or (a.toPoint = port)
+						);
+			return pl.isDefined();
+			
+		}
+		signal.identifier = port.name;
+		switch (port.direction)
+		{
+			case(HiLeS!PointDirection#input) : signal.mode = Vhdl!Mode#`in`;
+			case(HiLeS!PointDirection#output) : signal.mode = Vhdl!Mode#out;
+		}
+		signal.subtype = new Vhdl!Subtype;
+		if(pl.isKindOf(HiLeS!Payload))
+		{
+			if(port.size = 1)
+			{
+				switch(pl.type)
+				{
+					case("Boolean") : signal.subtype.type = Vhdl!Types#boolean;
+					case("Logic") : signal.subtype.type = Vhdl!Types#std_logic;
+					case("Integer") : signal.subtype.type = Vhdl!Types#integer;
+					case("Real") : signal.subtype.type = Vhdl!Types#real;
+					case("Char") : signal.subtype.type = Vhdl!Types#character;
+					case("Time") : signal.subtype.type = Vhdl!Types#time;
+					case("Natural") : signal.subtype.type = Vhdl!Types#natural;
+				}
+			}
+			else
+			{
+				switch( pl.type)
+				{
+					case("Logic") : signal.subtype.type = Vhdl!Types#std_logic_vector;
+					default : port.name.println("PortToInterfaceSignal, un supported signal type for port ");
+				}
+				signal.subtype.range = new Vhdl!Range;
+				signal.subtype.range.begin = port.size-1;
+				signal.subtype.range.direction = Vhdl!RangeDirection#downto;
+				signal.subtype.range.end = 0;
+			}
+		}
+		else
+		{
+			signal.subtype.type = Vhdl!Types#std_logic;
+		}
+	}
+ 

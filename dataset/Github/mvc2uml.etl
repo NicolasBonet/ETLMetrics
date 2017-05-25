@@ -1,0 +1,95 @@
+import "../M2T/lib/Utils.eol";
+
+pre init {
+	var primitiveTypes = new Set;
+	var rootModel;
+}
+
+post end {
+	rootModel.packagedElement.addAll(primitiveTypes);
+}
+
+rule MVCModel2Model
+transform mm : MVC!MVCModel 
+	to um : UML!Model{
+	
+	rootModel = um;
+	um.name = mm.name;
+	for(_component in mm->components){
+		for (_model in _component->models){
+			var t = new UML!Class;
+			t.name=_model.rootEntity.name;
+			
+			um.packagedElement.add(t);
+			
+			//Crear las asociaciones
+			/*for (a in _model.associations){
+			var p = new UML!Property;
+			p.name = a.name;
+			p.type ::= a.target;
+			
+			p.lowerValue = new UML!LiteralInteger;
+			p.lowerValue.value = a.lowerBound;
+			
+			p.upperValue = new UML!LiteralUnlimitedNatural;
+			p.upperValue.value = a.upperBound;
+			
+			if (a.containment)
+				p.aggregation = UML!AggregationKind#composite;
+			else if (a.upperBound = -1)
+				p.aggregation = UML!AggregationKind#shared;
+			
+			var asc = new UML!Association;
+			asc.name = p.name;
+			
+			
+			var ownedEnd = new UML!Property;
+			ownedEnd.type ::= a.source;
+			ownedEnd.name = a.source.name.toLowerFirst();
+			
+			ownedEnd.lowerValue = new UML!LiteralInteger;
+			ownedEnd.lowerValue.value = 1;
+			
+			ownedEnd.upperValue = new UML!LiteralUnlimitedNatural;
+			ownedEnd.upperValue.value = 1;
+			
+			asc.memberEnd.add(ownedEnd);
+			
+			asc.ownedEnd.add(ownedEnd) ;
+			p.association =  asc;
+			um.packagedElement.add(asc);
+			_model.rootEntity.equivalent().ownedAttribute.add(p);
+		}*/
+		}
+	}
+	um.packagedElement.addAll(primitiveTypes);
+}
+
+rule Entity2Class 
+	transform s : MVC!Entity
+	to t : UML!Class {
+	'prueba'.println();
+	s.println();
+	t.name = s.name;
+	
+	t.ownedAttribute.addAll(s.attributes.equivalent());
+}
+
+rule Attribute2Property 
+	transform s : MVC!Attribute
+	to t : UML!Property {
+	
+	t.name = s.name;
+	if (primitiveTypes->selectOne(t|t.name = s.type).isUndefined()){
+		var type = new UML!PrimitiveType;
+		type.name = s.type;
+		primitiveTypes.add(type);
+	}
+	t.type = primitiveTypes->selectOne(t|t.name = s.type);
+	
+	t.lowerValue = new UML!LiteralInteger;
+	t.lowerValue.value = 1;
+	
+	t.upperValue = new UML!LiteralUnlimitedNatural;
+	t.upperValue.value = 1;
+}

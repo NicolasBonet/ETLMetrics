@@ -1,0 +1,72 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: SysML2HilesBehavior.etl 998 2015-03-24 21:54:06Z kd.sanchez21@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+
+/****h* SysML2HiLeS/Behavior
+ *  NAME
+ *    SysML2HilesBehavior -- Consolidation of rules that must be executed to
+ * transform the behavior componentes of a SysML model to a HiLeS model.
+ * ($Rev: 998 $)
+ *  USAGE
+ 	<target name="SysML2HilesBehavior">
+ 	  <epsilon.etl src="SysML2HilesBehavior.etl">
+        <model ref="SysML"/>
+ 		<model ref="HiLeS"/>
+	<\target>
+ *  DESCRIPTION
+ *    Imports each of the source files that contain etl rules to perform the
+ *   model-to-model transformation of the behavior elements. Behavior information
+ *   is contained in Activities in the SysML model, and these activities are
+ *   related to Structural blocks (SysML blocks).
+ *  INPUTS
+ *  		* SysML The SysML model (conforms to http://www.eclipse.org/papyrus/0.7.0/SysML)
+ * 	  		* HiLeS The HiLeS Behavior Model (conforms to http://hiles.uniandes.edu.co/1.1/HiLeS)
+ *  RESULT
+ *    A HiLeS model containing behavior elements. Some structural elements are
+ *   created in order to facilitate the merge process.
+ *  SEE ALSO
+ *    SysML2HiLeS/Structure, SysML2HiLeS/Merge
+ *  USES
+
+ ******
+ */
+import "../helpers/SysMLBehaviorClone.eol";
+import "../helpers/Utils.eol";
+import "../structure/Model2System.etl";
+import "../structure/InitialArchitecture.etl";
+import "ActivityParameter2Point.etl";
+import "ActivityPartition2Block.etl";
+import "CallBehaviorAction2HCN.etl";
+/*Se creo este archivo nuevo*/
+import "CallOperationAction2HCN.etl";
+
+import "ControlFlow2HCN.etl";
+import "ControlFlowDecision2HCN.etl";
+import "ControlFlowDecisionJoin2HCN.etl";
+import "ControlFlowJoin2HCN.etl";
+import "DecisionNode2HCN.etl";
+import "FinalNode.etl";
+import "ForkNode2HCN.etl";
+import "InitialNode2HCN.etl";
+import "JoinNode2HCN.etl";
+import "MainBlock2HCN.etl";
+import "MergeNode2HCN.etl";
+import "ObjectFlow2Payload.etl";
+import "ValueSpecification2Guard.etl";
+
+pre{
+	HiLeS.resource.useXmiIds = true; // Generate xmi.id for HiLeS model elements automatically.
+	"Generating Behavior".println();
+}
+
+post {
+	"Success".println();
+}

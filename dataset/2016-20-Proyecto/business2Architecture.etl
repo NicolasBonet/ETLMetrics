@@ -1,0 +1,329 @@
+// (R-01) Regla de producción que transforma los elementos raices de los metamodelos: PaymentService -> Application 
+//     En el metamodelo destino no existe una entidad homóloga para InformationOperator
+//     Los elementos tipo View se construyen en la regla (2)
+rule PaymentService2Application 
+
+	transform ps : servicioPago_M2!PaymentService
+	
+	to ap : architectureMM!Application {
+		// El campo "name" de Application se produce de la concatenación de campo "name" de 
+		// PaymentService e InformationOperator
+		ap.name = ps.name + " :: " + ps.informationOperators.name;
+		
+		// Transformación de BusinessEntity a Model, llamado a regla (R-02)
+		ap.models = ps.informationOperators.businessEntities.equivalent();
+		
+		// Homologar asociaciones entre BusinessEntity, llamado a función (F-01)
+		ps.informationOperators.createAssociationsModels();
+		
+		// Creación de Rol de Administración
+		var administratorRole = new architectureMM!Role;
+		administratorRole.name = 'ADMINISTRADOR';
+		ap.roles.add(administratorRole);
+		
+		// Creación de Rol de Operador
+		var operatorRole = new architectureMM!Role;
+		operatorRole.name = 'OPERADOR';
+		ap.roles.add(operatorRole);
+		
+		// Transformación de PayingRules a PayingRules, llamado a regla (R-05)
+		ap.payingRules = ps.informationOperators.payingRules.equivalent();		
+	}
+	
+// (R-02) Regla de producción que transforma: BusinessEntity -> Model
+rule BusinessEntity2Model 
+
+	transform be : servicioPago_M2!BusinessEntity
+	
+	to md : architectureMM!Model {
+		// Campo "name"
+		md.name = be.name;
+		
+		// Campo "isUser" se fija por defecto en NULL
+		md.isUser = null;
+		
+		// Transformación de Attribute a Field, llamado a regla (R-03) 
+		md.fields = be.attribute.equivalent();
+		// El primer campo es marcado para actuar com Label y Filtro de la entidad del Modelo
+		if(md.fields > 0) {
+			md.fields.get(0).isLabel = true;
+			md.fields.get(0).isFilter = true;
+		}
+		
+		// Contruir Views, llamando la función (F-02)
+		be.createViewForBusinessEntity("LIST", md);
+		be.createViewForBusinessEntity("CREATE", md);
+		be.createViewForBusinessEntity("UPDATE", md);
+	}
+	
+	
+// (R-03) Regla de producción que transforma: Attribute -> Field
+rule Attribute2Field 
+
+	transform at : servicioPago_M2!Attribute
+	
+	to fd : architectureMM!Field {
+		// Campo "name"
+		fd.name = at.name;
+		
+		// Campo "dataType", llamando función (F-03)
+		fd.dataType = at.getConvertDataType();
+		
+		// Campo "length"
+		fd.length = at.length;
+		
+		// Campo "regularExpression"
+		fd.regularExpression = at.regularExpression;
+		
+		// Campo "mandatory"
+		fd.mandatory = at.mandatory;
+		
+		// Transformación de Value a Choice, llamado a regla (R-04)
+		fd.choices = at.possibleValues.equivalent();
+	}
+	
+// (R-04) Regla de producción que transforma: Value -> Choice
+rule Value2Choice
+
+	transform vl : servicioPago_M2!Value
+	
+	to ch : architectureMM!Choice {
+		// Campo "code" a "value"
+		ch.value = vl.code;
+		
+		// Campo "value" a "label"
+		ch.label = vl.value;
+	}
+	
+// (R-05) Regla de producción que transforma: PayingRules -> PayingRules
+rule PayingRules2PayingRules 
+
+	transform pO : servicioPago_M2!PayingRule
+	
+	to pT : architectureMM!PayingRule {
+		// Campo "name"
+		pT.name = pO.name;
+		
+		// Campo "category"
+		pT.category = pO.category;
+		
+		// Transformación de ConditionsCollection a ConditionsCollection, llamado a regla (R-06)
+		pT.conditionsCollection = pO.conditionsCollection.equivalent();
+	}
+	
+// (R-06) Regla de producción que transforma: ConditionsCollection -> ConditionsCollection
+rule ConditionsCollection2ConditionsCollection 
+
+	transform ccO : servicioPago_M2!ConditionsCollection
+	
+	to ccT : architectureMM!ConditionsCollection {
+		// Campo "logicOperation", llamando función (F-04)
+		ccT.logicOperation = ccO.getConvertLogicOperation();
+		
+		// Transformación de Formula a Formula, llamado a regla (R-07)
+		ccT.formulaPossitive = ccO.formulaPossitive.equivalent();
+		
+		// Transformación de Formula a Formula, llamado a regla (R-07)
+		ccT.formulaNegative = ccO.formulaNegative.equivalent();
+		
+		// Transformación de Condition a Condition, llamado a regla (R-11, R-12 o R-13)
+		ccT.conditions = ccO.conditions.equivalent();
+	}
+
+// (R-07) Regla de producción que transforma: Formula -> Formula
+rule Formula2Formula 
+
+	transform fO : servicioPago_M2!Formula
+	
+	to fT : architectureMM!Formula {
+		// Transformación de Expression a Expression, llamado a regla (R-08, R-09 o R-10)
+		fT.expression = fO.expression.equivalent();		
+	}
+
+// (R-08) Regla de producción que transforma: Constant -> Constant
+rule Constant2Constant 
+
+	transform cO : servicioPago_M2!Constant
+	
+	to cT : architectureMM!Constant {
+	    cT.value = cO.value;		
+	}
+	
+// (R-09) Regla de producción que transforma: AttributeLiteral -> FieldLiteral
+rule AttributeLiteral2FieldLiteral 
+
+	transform alO : servicioPago_M2!AttributeLiteral
+	
+	to alT : architectureMM!FieldLiteral {
+	    alT.fieldCalculate = architectureMM!Field.all.select(m | m.name == alO.attributeCalculate.name).get(0);		
+	}
+
+// (R-10) Regla de producción que transforma: ArithmeticOperation -> ArithmeticOperation
+rule ArithmeticOperation2ArithmeticOperation 
+
+	transform aoO : servicioPago_M2!ArithmeticOperation
+	
+	to aoT : architectureMM!ArithmeticOperation {
+		// Campo "operationType", llamando función (F-05)
+		aoT.operationType = aoO.getConvertOperationType();
+	
+		// Transformación de Expression a Expression, llamado a regla (R-08, R-09 o R-10)
+		aoT.left = aoO.left.equivalent();
+		aoT.right = aoO.right.equivalent();		
+	}
+	
+// (R-11) Regla de producción que transforma: ReferenceValue -> ReferenceValue
+rule ReferenceValue2ReferenceValue 
+
+	transform rvO : servicioPago_M2!ReferenceValue
+	
+	to rvT : architectureMM!ReferenceValue {
+	    rvT.value = rvO.value;		
+	}
+	
+// (R-12) Regla de producción que transforma: AttributeCondition -> FieldCondition
+rule AttributeCondition2FieldCondition 
+
+	transform acO : servicioPago_M2!AttributeCondition
+	
+	to acT : architectureMM!FieldCondition {
+	    acT.fieldCondition = architectureMM!Field.all.select(m | m.name == acO.attributeCondition.name).get(0);		
+	}
+
+// (R-13) Regla de producción que transforma: Instruction -> Instruction
+rule Instruction2Instruction
+
+	transform itO : servicioPago_M2!Instruction
+	
+	to itT : architectureMM!Instruction {
+		// Campo "compOperation", llamando función (F-06)
+		itT.compOperation = itO.getConvertCompOperation();
+	
+		// Transformación de Condition a Condition, llamado a regla (R-11, R-12 o R-13)
+		itT.left = itO.left.equivalent();
+		itT.right = itO.right.equivalent();		
+	}
+
+// (F-01) Función la crear asociaciones entre Model a partir de las asociaciones entre BusinessEntities
+operation servicioPago_M2!InformationOperator createAssociationsModels() {
+
+	// Identificar BusinessEntity con asociaciones
+	for (beO in self.businessEntities.select(s | s.businessEntities.notEmpty()) ) {	
+		// Indentificar Model Origen
+		var mdO = architectureMM!Model.all.select(m | m.name == beO.name).get(0);
+	
+		// Procesar cada asociación
+		for (beT in beO.businessEntities) {
+			// Indentificar Model Origen
+			var mdT = architectureMM!Model.all.select(m | m.name == beT.name).get(0);
+			// Crear Asociación
+			mdO.relations.add(mdT);		
+		}		
+	}
+}
+	
+// (F-02) Función que permite crear View a partir de BusinessEntity
+//	   Parámetros: vwm:String define el tipo de View a construir y md:architectureMM!Model refencia
+//				   a la entidad del modelo asociada
+operation servicioPago_M2!BusinessEntity createViewForBusinessEntity(vwt : String, md : architectureMM!Model) {
+
+	// Crear View para consulta
+	var view = new architectureMM!View;		
+	
+	// Campo "isService" se fija por defecto en FALSE
+	view.isService = false;
+	
+	// Establecer asociación con la entidad de tipo Model
+	view.modelRef.add(md);
+	
+	// Crear Template
+	view.template = new architectureMM!Template;
+	
+	// Según el tipo de View se asigna: name, type y template.name
+	if(vwt == "LIST") {
+		view.name = self.name + "ListView";
+	
+		view.type = architectureMM!ViewType#LIST;
+		view.template.name = self.name.toLowerCase() + "_list";
+	} else if(vwt == "CREATE") {
+		view.name = self.name + "CreateView";
+	
+		view.type = architectureMM!ViewType#CREATE;
+		view.template.name = self.name.toLowerCase() + "_create";
+	} else if(vwt == "UPDATE") {
+		view.name = self.name + "UpdateView";
+	
+		view.type = architectureMM!ViewType#UPDATE;
+		view.template.name = self.name.toLowerCase() + "_update";
+	}
+	
+	// Añadir View a al elemento Raiz
+	architectureMM!Application.all.at(0).views.add(view);
+}
+	
+// (F-03) Función para homologar el Enum DataType del metamodelo de Origen al Destino
+operation servicioPago_M2!Attribute getConvertDataType() {
+	if( self.dataType == servicioPago_M2!DataType#STRING ) {
+		return architectureMM!DataType#STRING;
+	}
+	else if ( self.dataType == servicioPago_M2!DataType#DATETIME ) {
+		return architectureMM!DataType#DATETIME;
+	}
+	else if ( self.dataType == servicioPago_M2!DataType#INTEGER ) {
+		return architectureMM!DataType#INTEGER;
+	}
+	else if ( self.dataType == servicioPago_M2!DataType#DOUBLE ) {
+		return architectureMM!DataType#DOUBLE;
+	}
+	else if ( self.dataType == servicioPago_M2!DataType#BOOLEAN ) {
+		return architectureMM!DataType#BOOLEAN;
+	}
+}
+
+// (F-04) Función para homologar el Enum LogicOperation del metamodelo de Origen al Destino
+operation servicioPago_M2!ConditionsCollection getConvertLogicOperation() {
+	if( self.logicOperation == servicioPago_M2!LogicOperation#AND ) {
+		return architectureMM!LogicOperation#AND;
+	}
+	else if ( self.logicOperation == servicioPago_M2!LogicOperation#OR ) {
+		return architectureMM!LogicOperation#OR;
+	}
+}
+
+// (F-05) Función para homologar el Enum OperationType del metamodelo de Origen al Destino
+operation servicioPago_M2!ArithmeticOperation getConvertOperationType() {
+	if( self.operationType == servicioPago_M2!OperationType#PLUS ) {
+		return architectureMM!OperationType#PLUS;
+	}
+	else if ( self.operationType == servicioPago_M2!OperationType#MINUS ) {
+		return architectureMM!OperationType#MINUS;
+	}
+	else if ( self.operationType == servicioPago_M2!OperationType#DIV ) {
+		return architectureMM!OperationType#DIV;
+	}
+	else if ( self.operationType == servicioPago_M2!OperationType#MULTI ) {
+		return architectureMM!OperationType#MULTI;
+	}
+}
+
+// (F-06) Función para homologar el Enum CompOperation del metamodelo de Origen al Destino
+operation servicioPago_M2!Instruction getConvertCompOperation() {
+	if( self.compOperation == servicioPago_M2!ComparationOperation#EQUAL ) {
+		return architectureMM!ComparationOperation#EQUAL;
+	}
+	else if ( self.compOperation == servicioPago_M2!ComparationOperation#DISTINCT ) {
+		return architectureMM!ComparationOperation#DISTINCT;
+	}
+	else if ( self.compOperation == servicioPago_M2!ComparationOperation#GREATER_THAN ) {
+		return architectureMM!ComparationOperation#GREATER_THAN;
+	}
+	else if ( self.compOperation == servicioPago_M2!ComparationOperation#GREATER_EQUAL_THAN ) {
+		return architectureMM!ComparationOperation#GREATER_EQUAL_THAN;
+	}
+	else if ( self.compOperation == servicioPago_M2!ComparationOperation#SMALLER_THAN ) {
+		return architectureMM!ComparationOperation#SMALLER_THAN;
+	}
+	else if ( self.compOperation == servicioPago_M2!ComparationOperation#SMALLER_EQUAL_THAN ) {
+		return architectureMM!ComparationOperation#SMALLER_EQUAL_THAN;
+	}
+}

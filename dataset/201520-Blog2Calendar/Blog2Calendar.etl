@@ -1,0 +1,53 @@
+pre{var calendario; }
+
+rule Blog2Calendar
+transform b:blog!Blog
+to c:cal!Calendar{ 
+c.name=b.name;
+
+calendario=c;
+c.years=b.categories.articles.equivalent();
+
+}
+
+
+
+rule BlogYear2CalendarYear
+transform b:blog!Article
+to c:cal!Year{
+
+calendario.years.add(c);
+c.year=b.getYear();
+
+c.months.add(new cal!Month);
+c.months.last().month=b.getMonth();
+c.months.last().year=c;
+c.months.last().days.add(new cal!Day);
+c.months.last().days.last().day=b.getDay();
+c.months.last().days.last().month=c.months.last();
+c.months.last().days.last().events.add(new cal!Event);
+c.months.last().days.last().events.last().owner=b.author.name;
+c.months.last().days.last().events.last().event=b.summary;
+c.months.last().days.last().events.last().day=c.months.last().days.last();
+c.months.last().days.last().events.last().tags=b.tags.tag[0]+','+b.tags.tag[1];
+
+
+}
+
+
+
+
+
+
+operation blog!Article getYear():Integer{
+  var dateArray:Sequence:=  self.date.toString().split('/');
+  return dateArray[2].asInteger();
+}
+operation blog!Article getMonth():Integer{
+  var dateArray:Sequence:=  self.date.toString().split('/');
+  return dateArray[1].asInteger();
+}
+operation blog!Article getDay():Integer{
+  var dateArray:Sequence:=  self.date.toString().split('/');
+  return dateArray[0].asInteger();
+}

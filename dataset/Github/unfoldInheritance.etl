@@ -1,0 +1,376 @@
+pre parameters {
+	// These parameters can be used to instantiate this transformation template
+	var superClassName : String = "Request";
+}
+
+rule Behavior2Behavior 
+	transform s : SRC!Behavior
+	to t : TGT!Behavior {
+	if (s.formalization = SRC!FormalizationKind#dpo) {
+		t.formalization = TGT!FormalizationKind#dpo;
+	}
+	else {
+		t.formalization = TGT!FormalizationKind#spo;
+	}
+	t.metamodelGD = s.metamodelGD; // This is where metamodel transformers could be tied in. 
+	
+	t.rules ::= s.rules; 
+	
+	// I'm ignoring things that are essentially irrelevant for my purposes for the moment, such as denseTime and nonInjectiveness 
+	// or helpers!
+}
+
+@abstract
+rule Rule2RuleNonaffected 
+	transform s : SRC!Rule
+	to t : TGT!Rule {
+	guard: not s.patterns.els->flatten()
+	                         ->select (e | e.isKindOf(SRC!Object))
+	                         ->exists (o : SRC!Object | o.getMetamodelClass().name = superClassName) 
+
+	('Running non-affected version for rule ' + s.name).println();
+	/*
+	('All associated class names: ' + s.patterns.els->select (e | e.isKindOf(SRC!Object))
+	                                                ->collect(o | o.getMetamodelClass().name)).println();
+	('All pattern objects: ' + s.patterns.els->flatten()->select (e | e.isKindOf(SRC!Object))).println();
+	*/
+	s.copyTo (t);
+}
+
+rule Atomic2AtomicNonaffected 
+	transform s : SRC!AtomicRule
+	to t : TGT!AtomicRule 
+	extends Rule2RuleNonaffected { }
+
+rule Ongoing2OngoingNonaffected 
+	transform s : SRC!OngoingRule
+	to t : TGT!OngoingRule 
+	extends Rule2RuleNonaffected { }
+
+@abstract
+rule Rule2RuleAffected 
+	transform s : SRC!Rule
+	to tRules   : Set(TGT!Rule) {
+	guard: s.patterns.els->flatten()
+	                     ->select (e | e.isKindOf(SRC!Object))
+	                     ->exists (o : SRC!Object | o.getMetamodelClass().name = superClassName) 
+	
+	// Copy original rule
+	// TODO: Only do this if superclass isn't actually abstract                     
+	var rCopy = s.createTGTRule();
+	s.copyTo (rCopy);
+	tRules.add (rCopy);
+	
+	// Create new rules for all combinations of types
+	tRules.addAll (s.generateSubclassedRules (superClassName));
+}
+
+rule Atomic2AtomicAffected 
+	transform s : SRC!AtomicRule
+	to t : Set(TGT!AtomicRule) 
+	extends Rule2RuleAffected { }
+
+rule Ongoing2OngoingAffected 
+	transform s : SRC!OngoingRule
+	to t : Set(TGT!OngoingRule) 
+	extends Rule2RuleAffected { }
+
+// Not sure this actually needs to be lazy -- I'm hoping that this will create a separate copy every time it is called
+@lazy 
+rule CopyVariable 
+	transform s : SRC!Variable
+	to t : TGT!Variable {
+	t.name = s.name;
+	t.type = s.type;
+	t.value = s.value;
+}
+
+@lazy
+rule CopyPattern 
+	transform s : SRC!Pattern
+	to t : TGT!Pattern {
+	t.els ::= s.els;
+	t.name = s.name;
+}
+
+@abstract
+rule CopyPatternEl 
+	transform s : SRC!PatternEl
+	to t : TGT!PatternEl { }
+	
+@lazy
+rule CopyObject 
+	transform s : SRC!Object
+	to t : TGT!Object 
+	extends CopyPatternEl {
+	t.id = s.id;
+	t.sfs ::= s.sfs;
+	t.classGD = s.classGD;
+	t.outLinks ::= s.outLinks;
+	t.inLinks ::= s.inLinks;
+}
+
+@lazy
+rule CopyClock 
+	transform s : SRC!Clock
+	to t : TGT!Clock 
+	extends CopyObject { }
+
+@lazy
+rule CopyLink 
+	transform s : SRC!Link
+	to t : TGT!Link
+	extends CopyPatternEl {
+	t.src ::= s.src;
+	t.target ::= s.target;
+	t.ref = s.ref;
+	t.pos = s.pos; 
+}
+
+@lazy
+rule CopyActionExec
+	transform s : SRC!ActionExec
+	to t : TGT!ActionExec {
+	// TODO: Tricky: Really would need to specify which one in cases where we have unfolded the rules, right?
+	// Alternatively, would have to unfold in here, too. -- ignoring for now
+	t.action ::= s.action;
+	t.participants ::= s.participants;
+	t.id = s.id;
+	t.status = s.status;
+	
+	// Ignoring for now the time-related properties
+}
+
+@lazy
+rule CopyCondition 
+	transform s : SRC!Condition
+	to t : TGT!Condition {
+	t.oclValue = s.oclValue;
+}
+
+@lazy
+rule CopyObjectRole 
+	transform s : SRC!ObjectRole
+	to t : TGT!ObjectRole {
+	t.actualObject ::= s.actualObject;
+	t.role ::= s.role;
+}
+
+@lazy
+rule CopySlots 
+	transform s : SRC!Slot
+	to t : TGT!Slot {
+	t.sf = s.sf;
+	t.oclValue = s.oclValue;
+}
+
+// TODO: Fix unique names for rules
+// Generate unfolding of this rule for all direct sub-classes of class superClassName
+operation SRC!Rule generateSubclassedRules (superClassName : String) : Set(TGT!Rule) {
+    // Collect all objects whose class will need to change
+	var potentialAffectedObjects : Set (SRC!Object) = self.patterns.els->flatten()
+	                                                                   ->select (e | e.isKindOf (SRC!Object))
+	                                                                   ->select (o : SRC!Object | o.getMetamodelClass().name = superClassName)
+	                                                                   ->asSet();
+    // Collect all potentially affected objects in the LHS -- needed to check for objects that are bound in the rhs or any nacs
+    var lhsObjects : Set (SRC!Object) = self.lhs.els->flatten()
+                                                    ->select(e | potentialAffectedObjects->includes (e))
+                                                    ->asSet();
+    // Collect RHS objects that are affected, but are already bound in the LHS. These will always need to be changed together with the corresponding LHS object
+	var boundRHSObjects : Set (SRC!Object) = self.rhs.els->flatten()
+	                                                     ->select(e | potentialAffectedObjects->includes (e))
+                                                         ->select(o : SRC!Object | lhsObjects->exists(o1 | o1.id = o.id))
+                                                         ->asSet();
+    // Collect NAC objects that are affected, but are already bound in the LHS. These will always need to be changed together with the corresponding LHS object
+	var boundNACObjects : Set (SRC!Object) = self.nacs.els->flatten()
+	                                                      ->select(e | potentialAffectedObjects->includes (e))
+                                                          ->select(o : SRC!Object | lhsObjects->exists(o1 | o1.id = o.id))
+                                                          ->asSet();
+                                                          
+    // Compute the set of objects for which decisions about their class actually do have to be made; that is, the set of unbound potentially affected objects in any of the patterns
+    var directlyAffectedObjects : Set (SRC!Object) = potentialAffectedObjects->excludingAll (boundRHSObjects)
+                                                                             ->excludingAll (boundNACObjects);
+    
+    // Compute set of sub classes over which to unfold rule set.
+    var clazz : METAMODEL!EClass = directlyAffectedObjects->random().getMetamodelClass(); // Should be the same for any of them.
+    var subClasses : Set(METAMODEL!EClass) = clazz.findSubclasses();
+    ('Subclasses identified: ' + subClasses.name).println();
+    
+	return self.generateSubclassedRules (subClasses, directlyAffectedObjects, boundRHSObjects, boundNACObjects);
+}
+
+// Generates unfolding of this rule for all objects that are instances of superClass, using the classes in subClasses as replacements. 
+operation SRC!Rule generateSubclassedRules (subClasses : Set(METAMODEL!EClass), directlyAffectedObjects : Set (SRC!Object), boundRHSObjects : Set(SRC!Object), boundNACObjects : Set(SRC!Object)) : Set(TGT!Rule) {
+    var tRules : Set(TGT!Rule) = new Set(TGT!Rule);
+    
+    var ob : SRC!Object = directlyAffectedObjects->random();
+    var remainingObjects = directlyAffectedObjects->excluding(ob);
+    
+    var allocatedObjects = new Map;
+    
+    for (cl in subClasses) {
+    	 allocatedObjects.put (ob, cl);
+    	 tRules.addAll (self.generateSubclassedRules (0, allocatedObjects, remainingObjects, boundRHSObjects, boundNACObjects, subClasses));
+    	 allocatedObjects.clear();
+	}
+    
+    return tRules;
+}
+
+// Recursively unfold the rule and generate all possible combinations
+operation SRC!Rule generateSubclassedRules (nCounter : Integer, allocatedObjects : Map, remainingObjects : Set (SRC!Object), boundRHSObjects : Set(SRC!Object), boundNACObjects : Set(SRC!Object), subClasses : Set(METAMODEL!EClass)) : Set(TGT!Rule) {
+    var tRules : Set(TGT!Rule) = new Set(TGT!Rule);
+
+	if (remainingObjects->isEmpty()) {
+		tRules.add (self.generateRule (nCounter, allocatedObjects, boundRHSObjects, boundNACObjects));
+	} else {
+    	var ob : SRC!Object = remainingObjects->random();
+    	var newRemainingObjects = remainingObjects->excluding(ob);
+		
+		for (cl in subClasses) {
+			allocatedObjects.put (ob, cl);
+			tRules.addAll (self.generateSubclassedRules (nCounter + 1, allocatedObjects, newRemainingObjects, boundRHSObjects, boundNACObjects, subClasses));
+			allocatedObjects.remove (ob);
+		}
+	}
+	
+	return tRules;
+}
+
+// Generate rule derivation as specified.
+operation SRC!Rule generateRule (nCounter : Integer, allocatedObjects : Map, boundRHSObjects : Set (SRC!Object), boundNACObjects : Set(SRC!Object)): TGT!Rule {
+	var rResult : TGT!Rule = self.createTGTRule();
+
+	rResult.name = self.name + nCounter;
+    rResult.vbles ::= self.vbles; 
+
+    rResult.lhs = self.lhs.deriveAsLHS(allocatedObjects); 
+	rResult.rhs = self.rhs.deriveAsRHS(allocatedObjects, boundRHSObjects); 
+	rResult.nacs = self.nacs->collect (n | n.deriveAsRHS(allocatedObjects, boundRHSObjects)); 
+	
+    rResult.patterns = Set{rResult.lhs}->including(rResult.rhs)
+                                       ->includingAll(rResult.nacs); 
+    
+    return rResult;	
+}
+
+operation SRC!Pattern deriveAsLHS(allocatedObjects : Map) : TGT!Pattern {
+	var pResult = new TGT!Pattern;
+	
+	pResult.name = self.name;
+	
+	for (el in self.els) {
+		if (el.isKindOf (SRC!Object)) {
+			if (allocatedObjects.containsKey (el)) {
+				var newOb = new TGT!Object;
+				
+				newOb.id = el.id;
+				newOb.sfs ::= el.sfs; 
+				newOb.outLinks ::= el.outLinks; 
+				newOb.inLinks ::= el.inLinks; 
+				
+				newOb.classGD = el.getUpdatedClassGD(allocatedObjects.get(el));
+				
+				pResult.els.add(newOb);
+			}
+			else {
+				pResult.els.add (el.equivalent()); 
+			}
+		}
+		else {
+			pResult.els.add (el.equivalent()); 
+		}
+	}
+	
+	return pResult;
+}
+
+operation SRC!Pattern deriveAsRHS(allocatedObjects : Map, boundRHSObjects : Set (SRC!Object)) : TGT!Pattern {
+	var pResult = new TGT!Pattern;
+	
+	pResult.name = self.name;
+	
+	for (el in self.els) {
+		if (el.isKindOf (SRC!Object)) {
+			if (allocatedObjects.containsKey (el)) {
+				var newOb = new TGT!Object;
+				
+				newOb.id = el.id;
+				newOb.sfs ::= el.sfs; 
+				newOb.outLinks ::= el.outLinks; 
+				newOb.inLinks ::= el.inLinks; 
+				
+				newOb.classGD = el.getUpdatedClassGD(allocatedObjects.get(el));
+				
+				pResult.els.add(newOb);
+			}
+			else if (boundRHSObjects.contains (el)) {
+				var newOb = new TGT!Object;
+				
+				newOb.id = el.id;
+				newOb.sfs ::= el.sfs; 
+				newOb.outLinks ::= el.outLinks; 
+				newOb.inLinks ::= el.inLinks; 
+				
+				// Need to find corresponding LHS element and its mapped class
+				for (el1 in allocatedObjects.keys) {
+					if (el1.id = el.id) {
+						newOb.classGD = el1.getUpdatedClassGD(allocatedObjects.get(el1));
+					}
+				}
+				
+				pResult.els.add(newOb);			
+			}
+			else {
+				pResult.els.add (el.equivalent()); 
+			}
+		}
+		else {
+			pResult.els.add (el.equivalent()); 
+		}
+	}
+	
+	return pResult;
+}
+
+operation SRC!Object getUpdatedClassGD(clazz : METAMODEL!EClass) : GCS!ClassGD {
+    return self.classGD.owningModel.getAllOfType("ClassGD")->select (cgd | cgd.class = clazz)->random();
+}
+
+operation SRC!Object getMetamodelClass() : METAMODEL!EClass {
+    //('Getting metamodel class for: ' + self).println();
+    //('ClassGD.class is: ' + self.classGD.class).println();
+	return self.classGD.class;
+}
+
+operation METAMODEL!EClass findSubclasses() : Set(METAMODEL!EClass) {
+	var result = METAMODEL!EClass.all()->select(sc : METAMODEL!EClass | self.isSuperTypeOf(sc))->asSet();
+	
+	if (self.isAbstract) {
+		result.remove (self);
+	} 
+
+	return result;
+}
+
+operation SRC!Rule createTGTRule() : TGT!Rule {
+	if (self.isTypeOf (SRC!AtomicRule)) {
+		return new TGT!AtomicRule;
+	}
+	else {
+		return new TGT!OngoingRule;
+	}
+}
+
+operation SRC!Rule copyTo (t : TGT!Rule)  {
+	t.name = self.name;
+    t.vbles ::= self.vbles; 
+    t.lhs ::= self.lhs; 
+    t.rhs ::= self.rhs; 
+    t.nacs ::= self.nacs; 
+    
+    t.patterns = Set{t.lhs}->including(t.rhs)
+                           ->includingAll(t.nacs);
+
+    // Again ignoring things like time bounds etc. for the moment
+}

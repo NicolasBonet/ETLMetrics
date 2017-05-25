@@ -1,0 +1,92 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: FlowProperty2Point.etl 856 2012-07-03 16:35:05Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+ 
+/****r* Structure/FlowProperty2Point
+ * SUMMARY
+ *   Transform a SysML:FlowProperty to a HiLeS:Point. ($Rev: 856 $)
+ * DESCRIPTION
+ *	|html <B>@abstract</B>
+ *   Copies the name and id form the sysml FlowProperty. The port direction
+ * depends on the FlowProperty direction. For properties that have a DataType
+ * that extends LogicVector or AnalogVector (in the HiLeS UML Library) the size
+ * of the point depends on the multiplicity of the DataType property that
+ * subsets the "slot" property of the LogicVector or AnalogVector DataTypes.
+ * There are separate rules for FlowPrperties with an in/out direction and ones
+ * that have inout, because since in HiLeS there are no inout ports, a SysML
+ * inout FlowPort must be transformed into one in and one out point. Additionaly
+ * separate rules are defined for the case where the FlowPort that has a type
+ * of the FlowSpecificatin that defines the FlowProperty, is Conjugated in which 
+ * case the direction of the property is the opposite. If the FlowPort is
+ * conjugated this changes the direction of the point. 
+ * 
+ * DERIVED BY
+ *  * FlowProperty2Port
+ *  * FlowProperty2Service
+ * DOMAIN
+ *   	* SysML  - http://www.topcased.org/2.0/sysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ * SEE
+ *  FlowPort2Point
+ *
+ ******
+ */
+// These rules are the same that for FlowPorts, i.e. modifications should be done
+// in both
+@abstract
+rule FlowProperty2Point
+	transform flowProperty : SysML!FlowProperty
+	to point : HileS!Point {
+		
+		guard : not (flowProperty.direction = SysML!FlowDirection#inout)
+		
+		point.name = flowProperty.base_Property.name.toCamelCase("\\s");
+	}
+
+	
+//================================= INOUT ====================================
+/****r* Structure/FlowPropertyInout2Point
+ * SUMMARY
+ *   Transform a SysML:FlowProperty to two HiLeS:Point. ($Rev: 856 $)
+ * DESCRIPTION
+ *	|html <B>@abstract</B>
+ *   Since HiLeS does not support inout ports, these type of ports must be 
+ * transforned into two HiLeS!Ports, on input and one otput. Copies the name and
+ * id form the sysml FlowProperty. The port direction depends on the
+ * FlowProperty direction. For properties that have a DataType that extends
+ * LogicVector or AnalogVector (in the HiLeS UML Library) the size of the point
+ * depends on the multiplicity of the DataType property that subsets the "slot"
+ * property of the LogicVector or AnalogVector DataTypes. 
+ * 
+ * DERIVED BY
+ *  * FlowPropertyInout2Port
+ *  * FlowPropertyInout2Service
+ * DOMAIN
+ *   	* SysML  - http://www.topcased.org/2.0/sysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ * SEE
+ *  FlowPortInout2Point
+ *
+ ******
+ */
+@abstract
+rule FlowPropertyInout2Point
+	transform flowProperty : SysML!FlowProperty
+	to pointIn : HileS!Point, pointOut : HileS!Point {
+		
+		guard : flowProperty.direction = SysML!FlowDirection#inout
+		
+		pointIn.name = flowProperty.base_Property.name.toCamelCase("\\s");
+		pointOut.name = flowProperty.base_Property.name.toCamelCase("\\s");
+	}
+
+
+	

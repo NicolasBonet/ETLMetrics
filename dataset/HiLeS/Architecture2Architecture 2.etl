@@ -1,0 +1,49 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: Structural2DesignUnit.etl 866 2012-07-18 14:29:53Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+
+/****r* HiLeSToVDHLAMS/Architecture2Architecure
+ * SUMMARY
+ *   Transform a HiLeS:Architecture into a Vhdl:Architecture.  ($Rev: 866 $)
+ * DESCRIPTION 
+ *   
+ * 
+ *
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *   	* Vhdl   - http://hiles.uniandes.edu.co/1.1/vhdl-ams
+ *
+ ******
+ */
+ rule Architecture2Architecture
+ 	transform ha : HiLeS!Architecture
+ 	to va : Vhdl!Architecture
+ 	{	
+ 		va.identifier = "behavior";
+ 		va.declarative = new Vhdl!BlockDeclarativePart;
+ 		// Signals for payloads and arcs
+ 		va.declarative.declarativeItem.addAll(ha.payload.equivalent());
+ 		// The system architecture does not have a Petri Net
+ 		if(ha.petriNet.isDefined())
+ 		{
+ 			println("Arquitectura tiene red"+ha.name);
+ 			va.declarative.declarativeItem.addAll(ha.petriNet.element.select(e | e.isTypeOf(HiLeS!Arc)).equivalent());
+ 			va.declarative.declarativeItem.addAll(ha.petriNet.element.select(e | e.isTypeOf(HiLeS!Place)).equivalent().select(s | s.isTypeOf(Vhdl!Signal)));
+ 			//va.statement.addAll(ha.petriNet.element.select(e | e.isTypeOf(HiLeS!Node)).equivalent());
+ 			va.statement.addAll(ha.petriNet.element.select(e | e.isTypeOf(HiLeS!Place)).equivalent().select(s | s.isTypeOf(Vhdl!ComponentInstantiation)));
+ 			va.statement.addAll(ha.petriNet.element.select(e | e.isTypeOf(HiLeS!Transition)).equivalent().select(s | s.isTypeOf(Vhdl!ComponentInstantiation)));
+ 			
+ 		}
+ 		// Component instantations
+ 		va.statement.addAll(ha.block.equivalent().select(ci | ci.isTypeOf(Vhdl!ComponentInstantiation)));
+ 		
+ 	}
+ 	

@@ -1,0 +1,495 @@
+pre {
+	"Iniciando Transformacion CIM2PIM-BackEndLogic".println();
+}
+
+rule Pagos2PimApp
+	transform 
+		s:PagosM!Application
+	to	
+		t:PagosPim!Application
+	{
+	
+		t.name = s.name;
+		//Iniciamdo capa logica de negocio
+		t.logicalComponents.add(s.intermediary.equivalent()); //Intermediary a Objeto de Negocio
+		t.logicalComponents.addAll(s.intermediary.superentities.equivalent()); //Super Entidad a Objeto de Negocio
+		for (se:PagosM!SuperEntity in s.intermediary->superentities){ 
+			t.logicalComponents.addAll(se->participants.equivalent()); //Entidad a Objeto de Negocio
+			for (pa:PagosM!Participant in se->participants) {
+				t.logicalComponents.addAll(pa->templatesForms.equivalent()); //Templates de Informacion
+				for (it:PagosM!InformationTemplate in pa->templatesForms) {
+					t.logicalComponents.addAll(it->providers.equivalent());// Adiciona los providers 
+					if (it.templateCalc <> "" and it.templateCalc <> null) {
+						var calculationGroup = new PagosPim!LogicComponent;
+						calculationGroup.name = it.templateCalc;
+						calculationGroup.persistible = false; 
+						t.logicalComponents.add(calculationGroup);
+						calculationGroup.operations.addAll(it->templates.equivalent());
+						//t.logicalComponents.last().operations.addAll(it->templates.equivalent()); // Adiciona operaciones de calculo para formulas dadas
+					}
+				}	
+			}
+		}
+		setRelations(s, t); //Adiciona relaciones entre objetos
+		
+		//Iniciando logica UI Creando Vistas Iniciales
+		t.views = t.logicalComponents.equivalent("LogicComp2ViewCom");
+		
+		//Iniciando Capa de datos DAO - Entities
+		t.datalayercomponents = t.logicalComponents.equivalent("LogicComp2DataLayer");
+		
+	}
+	
+//Capa Front
+@lazy
+rule LogicComp2ViewCom
+	transform 
+		s:PagosPim!LogicComponent
+	to	
+		t:PagosPim!ViewComponent
+	{
+		t.name = s.name;
+		t.title = "Administrador " + s.name;
+		t.attributes = s.attributes.equivalent();
+		t.controls = s.operations.equivalent();
+		t.frontservices = s.operations.equivalent();
+		t.subcomponents = s.relations.equivalent();
+		//t.frontservices.add 
+	}
+	
+	rule Operation2FrontService
+	transform 
+		s:PagosPim!Operation
+	to	
+		t:PagosPim!FrontService
+	{
+		guard: (not s.name.startsWith('calculate'))
+		if (s.name.startsWith("create")) 
+			t.name = 'post';
+		else if (s.name.startsWith("update"))
+			t.name = 'put';
+		else if (s.name.startsWith("delete"))
+			t.name = 'delete';	
+		else if (s.name.startsWith("read"))
+			t.name = 'get';
+		else 
+			t.name = s.name;	
+		t.name = t.name.concat(s.name);
+		t.fullName = s.name;
+	}
+	
+	rule Operation2Action
+	transform 
+		s:PagosPim!Operation
+	to	
+		t:PagosPim!Action
+	{
+		guard: (not s.name.startsWith('calculate'))
+		t.name = s.name;
+		if (s.name.startsWith("create"))
+			t.label = 'Add';
+		else if (s.name.startsWith("update"))
+			t.label = 'Modify';
+		else if (s.name.startsWith("delete"))
+			t.label = 'Delete';	
+		else if (s.name.startsWith("read"))
+			t.label = 'Query';
+		t.service = PagosPim!FrontService.AllInstances->select(e | e.fullName = s.name).first(); 
+	}
+
+rule Attrib2Input
+	transform 
+		s:PagosPim!Attribute
+	to	
+		t:PagosPim!Input
+	{
+		guard: (s.complexType = null or s.isIndex = "@Indice")
+		t.name = s.name;
+		t.type = s.type;
+		t.isIndex = s.isIndex;
+		t.complexType = getComplexType(s);
+		t.label = s.name.firstToUpperCase();
+		if (s.isIndex = "@Indice") { //Busca el servicio que consulta la entidad y lo asocial al campo
+			t.service = PagosPim!FrontService.AllInstances->select(e | e.fullName = "read".concat(s.complexType.name)).first();
+		}
+	}
+
+rule Attrib2Output
+	transform 
+		s:PagosPim!Attribute
+	to	
+		t:PagosPim!Output
+	{
+		guard: (s.complexType <> null and s.isIndex = null)
+		t.name = s.name;
+		t.type = s.type;
+		t.isIndex = s.isIndex;
+		t.complexType = getComplexType(s);
+		t.label = s.name.firstToUpperCase();
+	}
+
+rule Operation2Output //Adiciona los campos de salida de los calculos
+	transform 
+		s:PagosPim!Operation
+	to	
+		t:PagosPim!Output
+	{
+		guard: (s.name.startsWith('calculate') or s.name.startsWith('getTotal'))
+		t.name = s.name;
+		t.label = s.name.firstToUpperCase();
+	}
+
+rule Relation2SubComponent
+	transform 
+		s:PagosPim!Relation
+	to	
+		t:PagosPim!SubComponent
+	{
+		t.name = s.name;
+		t.cardinality = s.cardinality;
+		t.type = s.type;
+	}
+	
+
+//Capa Logica de negocio
+rule Intermediary2LogicalEntity
+	transform
+		s:PagosM!Intermediary
+	to
+		t:PagosPim!LogicComponent
+	{
+		t.name = s.name;
+	}
+	
+//Capa Logica de negocio
+rule SuperEntity2LogicalEntity
+	transform
+		s:PagosM!SuperEntity
+	to
+		t:PagosPim!LogicComponent
+	{
+		t.name = s.name;
+		t.attributes = s.attLists.equivalent();
+		addCrudOperations(t);
+	}
+
+rule Participants2LogicalEntity
+	transform
+		s:PagosM!Participant
+	to
+		t:PagosPim!LogicComponent
+	{
+		t.name = s.name;
+		t.attributes = s.attLists.equivalent();
+		addCrudOperations(t);
+	}
+	
+rule InformationTemplate2LogicalEntity
+	transform
+		s:PagosM!InformationTemplate
+	to
+		t:PagosPim!LogicComponent
+	{
+		t.name = s.name;
+		t.attributes = s.attLists.equivalent();
+		addCrudOperations(t);
+	}
+	
+rule Provider2LogicalEntity
+	transform
+		s:PagosM!Provider
+	to
+		t:PagosPim!LogicComponent
+	{
+		t.name = s.name;
+		t.attributes = s.attLists.equivalent();
+		addCrudOperations(t);
+	}
+	
+rule CalculationTemplate2Operation
+	transform
+		s:PagosM!CalculationTemplate
+	to
+		t:PagosPim!Operation
+	{
+		var body = new PagosPim!Body;
+		if (s.name = "Totalizador") 
+			t.name = 'getTotal';
+		else
+			t.name = 'calculate' + s.name;
+		t.attributes = s.attLists.equivalent();
+		t.body = s.formulas.equivalent(); 
+	}
+
+
+rule Formula2Body
+	transform
+		s:PagosM!Formula
+	to
+		t:PagosPim!Body
+	{
+		t.returnExp = s.formulaReturn.equivalent(); 
+		t.ifblock = s.formulaBody.equivalent();
+	}
+	
+	rule ifBlock2ifBlock
+	transform
+		s:PagosM!IfBlock
+	to
+		t:PagosPim!IfBlock
+	{
+		t.ifcondition = s.ifSentence.equivalent(); 
+		t.elsesegment = s.elseSentence.equivalent();
+	}
+	
+	
+	rule IfCondition2IfCondition
+	transform
+		s:PagosM!IfCondition
+	to
+		t:PagosPim!IfCondition
+	{
+		//t.returnBlock = s.expression.equivalent();
+		t.returnBlock = s.formulaReturn.equivalent();
+		t.logicalexpressions = s.logExp.equivalent(); //Revisar esta cardinalidad		
+	}
+	
+	
+	rule ElseSegment2ElseSegment
+	transform
+		s:PagosM!ElseSegment
+	to
+		t:PagosPim!ElseSegment
+	{
+		t.innerIfBlocks = s.ifSentence.equivalent();
+	}
+	
+
+	
+rule ReturnBlock2Return
+	transform
+		s:PagosM!ReturnBlock
+	to
+		t:PagosPim!Return
+	{
+		t.expression = s.expression.equivalent(); 
+	}
+	
+rule Expression2Expression
+	transform
+		s:PagosM!Expression
+	to
+		t:PagosPim!Expression
+	{
+		//No necesita implementacion
+	}
+
+
+rule TerminalValue2TerminalValue
+	transform
+		s:PagosM!TerminalValue
+	to
+		t:PagosPim!TerminalValue
+	{
+		t.value = s.valor;
+		t.method = s.method;
+		t.attribute = s.variable.equivalent();
+		t.parent = s.parent;
+		if (t.parent.isDefined()) {
+			t.value = t.parent.name; 
+		}
+	}
+
+rule Adicion2Add
+	transform
+		s:PagosM!Adicion
+	to
+		t:PagosPim!Add
+	{
+		t.operator = getSign(s.operator);
+		t.leftExp = s.left.equivalent();
+		t.rightExp = s.rexp.equivalent();
+	}
+
+rule Multiplicacion2Mult
+	transform
+		s:PagosM!Multiplicacion
+	to
+		t:PagosPim!Mult
+	{
+		t.operator = getSign(s.operator);
+		t.leftExp = s.left.equivalent();
+		t.rightExp = s.rexp.equivalent();
+	}
+
+
+rule ExpresionLogica2LogicalExpression
+	transform
+		s:PagosM!ExpresionLogica
+	to
+		t:PagosPim!LogicalExpression
+	{
+		t.logicalOperator = s.logOper;
+		t.literal = s.literal;
+		t.conOper = s.conOper;
+		t.moreExpressions = s.exp.equivalent();
+		t.leftTerm = s.variable.equivalent(); 
+		t.rightTerm = s.variable2.equivalent(); 
+		//t.innerif = s.xxxx.equivalent(); //NO Existe en el origen MetaM Pagos
+	}
+
+
+rule BusinessAttribute2Attribute
+	transform
+		s:PagosM!BusinessAttribute
+	to
+		t:PagosPim!Attribute
+	{
+		t.name = s.name;
+		t.isIndex = s.isIndex;
+		t.type = getType(s.type);
+		t.expression = s.exp.equivalent();
+		t.complexType = getComplexTypePagosM(s);
+	}
+	
+	
+//Capa Datos Entities
+@lazy
+rule LogicComp2DataLayer
+	transform 
+		s:PagosPim!LogicComponent
+	to	
+		t:PagosPim!DataLayerComponent
+	{
+		//guard: (s.persistible)
+		t.name = s.name;
+		t.fields = s.attributes.equivalent("Attrib2Field");
+		t.fields.addAll(s.operations.equivalent("Operation2Field"));
+	}
+
+@lazy
+rule Attrib2Field
+	transform 
+		s:PagosPim!Attribute
+	to	
+		t:PagosPim!Field
+	{
+		t.name = s.name;
+		t.type = s.type;
+		t.isIndex = s.isIndex;
+		t.complexType = getComplexType(s);
+	}
+	
+@lazy
+rule Operation2Field //Adiciona los campos de salida de los calculos
+	transform 
+		s:PagosPim!Operation
+	to	
+		t:PagosPim!Field
+	{
+		guard: (s.name.startsWith('calculate') or s.name.startsWith('getTotal'))
+		t.name = s.name;
+		t.name.println();
+	}
+	
+//OPERATIONS ***************************************************************************************//
+
+//adiciona CRUD para las entidades
+operation addCrudOperations(t): void {
+	//adiciona las operaciones CRUD
+	"creando Crud".println();
+	t.type.println();
+	addSingleOper(t, 'create');
+	addSingleOper(t, 'update');
+	addSingleOper(t, 'delete');
+	addSingleOper(t, 'read');
+}
+
+operation addSingleOper(t, prefix:String): void {
+	var oper = new PagosPim!Operation;
+	var body = new PagosPim!Body;
+	oper.name = prefix + t.name;
+	oper.body = body;
+	t.operations.add(oper);
+}
+
+operation getSign(operator: String) {
+	switch (operator) {
+		case "*": return PagosPim!MultOper#MULT;
+		case "/": return PagosPim!MultOper#DIV;
+		case "+": return PagosPim!AddOper#ADD;
+		case "-": return PagosPim!AddOper#MINUS;
+	}
+}
+
+operation getType(type: String) {
+	switch (type) {
+		case "String": return PagosPim!DataTypes#String;
+		case "Date": return PagosPim!DataTypes#Date;
+		case "Number": return PagosPim!DataTypes#double;
+		case "Double": return PagosPim!DataTypes#double;
+		case "Integer": return PagosPim!DataTypes#int;
+		case "Long": return PagosPim!DataTypes#long;
+	}
+}
+
+operation setRelations(s, t) {
+	"RELACION".println();
+	for (it:PagosM!Intermediary in s.intermediary) { //Padre
+		var parent = t.logicalComponents->selectOne(e|e.name = it.name);
+		for (se:PagosM!SuperEntity in it->superentities) {	 //Hijos	 Intermediario
+			createRealtion(parent, se, t, "");
+			var parent = t.logicalComponents->selectOne(e|e.name = se.name);
+			for (pa:PagosM!Participant in se->participants) { //Hijos de SuperEntidad
+				createRealtion(parent, pa, t, "");
+				var parent = t.logicalComponents->selectOne(e|e.name = pa.name);
+				for (inf:PagosM!InformationTemplate in pa->templatesForms) { //Hijos de Participant
+					createRealtion(parent, inf, t, "");
+					var parent = t.logicalComponents->selectOne(e|e.name = inf.name);
+					var calcTem =  inf->templates.first();
+					if (calcTem <> null)
+						createRealtion(parent, calcTem, t, inf.templateCalc);
+					//for (ct:PagosM!CalculationTemplate in inf->templates) { //Hijos de Information Templates
+					//	createRealtion(parent, ct, t, inf.templateCalc);
+					//}
+				}
+			}
+		}
+	}
+}	
+
+operation createRealtion(parent, se, t, prefix) {
+	"creando relacion".println();
+	var child;
+	var relation = new PagosPim!Relation;
+	if (prefix = "")
+		child = t.logicalComponents->selectOne(e|e.name = prefix.concat(se.name));
+	else
+		child = t.logicalComponents->selectOne(e|e.name = prefix);
+	child.name.println();
+	relation.targetComponent = child;
+	relation.name = child.name;
+	parent.relations.add(relation);
+}
+
+operation getComplexType(s) {
+	var isFeature = s->expression.isKindOf(PagosPim!TerminalValue);
+	if (isFeature) {
+		var objTV = s->expression;
+		if (objTV.hasProperty("parent")) {
+			return objTV.parent;
+		}
+	}
+	return null;
+}
+
+operation getComplexTypePagosM(s) {
+	var isFeature = s->exp.isKindOf(PagosM!TerminalValue);
+	if (isFeature) {
+		var objTV = s->exp;
+		if (objTV.hasProperty("parent")) {
+			return objTV.parent;
+		}
+	}
+	return null;
+}

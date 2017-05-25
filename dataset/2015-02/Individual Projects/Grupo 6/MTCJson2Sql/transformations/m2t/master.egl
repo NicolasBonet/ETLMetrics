@@ -1,3 +1,0 @@
-[% var t: Template:=TemplateFactory.load('SQLSchema.egl');
-   t.generate('../../generated/JsonSchema.sql');
-%]

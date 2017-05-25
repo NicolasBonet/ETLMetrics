@@ -1,0 +1,64 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: HilesToVHDL.etl 973 2013-11-07 22:58:54Z ra.caliz70@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+ 
+ /****h*  m2m/HiLeSToVDHLAMS
+ *  NAME
+ *    HilesToVHDLAMS -- Consolidation of rules that must be executed to
+ * transform the behavior componentes of a HiLeS model to a VHDL-AMS model.
+ * ($Rev: 973 $)
+ *  USAGE
+ 	<target name="Hiles2VHDL">
+		<epsilon.etl src="HilesToVHDL.etl">
+			<model ref="HiLeS"/>
+			<model ref="Vhdl"/>
+		</epsilon.etl>
+	</target>
+ *  DESCRIPTION
+ *    This file consolidates the set of sources that conform the transfor-
+ *  mation from a HiLeS model to a VHDL-AMS model, and contains the rule that
+ *  craetes the VHDL-AMS root element: DesignUnit.
+ *  INPUTS
+ *			* hiles The HiLeS Model (conforms to http://hiles.uniandes.edu.co/1.1/HiLeS)
+ * 			* vhdl 	The VHDL-AMS Model (conforms to http://hiles.uniandes.edu.co/1.1/vhdl-ams)
+ *  RESULT
+ *    A Vhdl-Ams model containing the vhdl representation of the HiLeS model.
+ *  USES
+ * 
+ ******
+ */
+import "ArcFromTransition2Signal.etl";
+import "Architecture2Architecture.etl";
+import "ArcToTransition2Signal.etl";
+import "Block2ComponentInstantiation.etl";
+import "Block2DesignUnit.etl";
+import "Decision2DesignUnit.etl";
+import "System2DesignUnit.etl";
+import "Functional2DesignUnit.etl";
+import "Payload2Quantity.etl";
+import "Payload2Signal.etl";
+import "Payload2Terminal.etl";
+import "Place2ComponentInstantiation.etl";
+import "PortToInterfaceQuantity.etl";
+import "PortToInterfaceSignal.etl";
+import "PortToInterfaceTerminal.etl";
+import "Structural2DesignUnit.etl";
+import "Transition2ComponentInstantiation.etl";
+pre
+{
+	HiLeS.resource.useXmiIds = true; // Generate xmi.id for HiLeS model elements automatically.
+	"HiLeS To VHDL-AMS".println();
+	var pl;
+}
+	
+post{
+	"Success".println();
+}

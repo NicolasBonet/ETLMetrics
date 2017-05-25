@@ -1,0 +1,51 @@
+pre{
+	var architecture: new ModelMM!Architecture;
+	var businessModel: new ModelMM!BusinessModel;
+	var entityTipoPension = new ModelMM!Entity;
+	var entityTipoPensionado = new ModelMM!Entity;
+	var entityPagadorPensiones = new ModelMM!Entity;
+}
+
+rule PagadorPensiones2Attribute 
+	transform s : PilaValidationsMM!TipoPagadorPensiones
+	to t : ModelMM!Attribute {
+	t.name = s.codigo.toString();
+	t.value = s.nombre;
+	entityPagadorPensiones.name = s.eClass.name;
+	entityPagadorPensiones.attributes.add(t);
+	businessModel.entities.add(entityPagadorPensiones);
+}
+
+rule TipoPensionado2Attribute 
+	transform s : PilaValidationsMM!TipoPensionado
+	to t : ModelMM!Attribute {
+	t.name = s.codigo.toString();
+	t.value = s.nombre;
+	entityTipoPensionado.name = s.eClass.name;
+	entityTipoPensionado.attributes.add(t);
+	
+	if (not s.pagadorpensiones.isEmpty()) {
+		var entityTipoPensionadoPagadorPensiones = new ModelMM!Entity;
+		entityTipoPensionadoPagadorPensiones.name = s.eClass.name + s.pagadorpensiones.get(0).eClass.name;
+		for (pagadorPensiones in s.pagadorpensiones) {
+			System.out.println("[" + s.codigo + ", " + pagadorPensiones.codigo + "]");
+		}
+		
+	}
+}
+
+rule TipoPension2Attribute 
+	transform s : PilaValidationsMM!TipoPension
+	to t : ModelMM!Attribute {
+	t.name = s.codigo.toString();
+	t.value = s.nombre;
+	entityTipoPension.name = s.eClass.name;
+	entityTipoPension.attributes.add(t);
+}
+
+post {
+	//businessModel.entities.add(entityPagadorPensiones);
+	businessModel.entities.add(entityTipoPensionado);
+	businessModel.entities.add(entityTipoPension);
+	architecture.businessModel = businessModel;
+}

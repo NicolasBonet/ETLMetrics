@@ -1,0 +1,60 @@
+-- Debemos crear una unica base de datos para todos
+pre {
+	var db : new DB!Database;
+}
+
+-- Esta regla se encarga de todo!
+rule MarketPlace2Relacional
+	transform
+		c : mp!ClassUnit
+	to
+		t : DB!Table//, t2 : DB!Column
+		{
+			-- Asignamos la tabla creada a la base de datos inicializada al comienzo y le ponemos el nombre de la clase sin el Entity
+	   		t.database = db;
+		   	t.name = c.name.replace("Entity", "");
+		   	var elements = c.eContents.select(a|a.isKindOf(mp!StorableUnit));
+		   	for(element in elements)
+		   	{
+		   		var tmpColumn = new DB!Column;
+		   		//Asignando nombre de la columna
+		   		tmpColumn.name = element.name;
+		   		// Asignando tipos de la columna
+		   		switch(element.type.name)
+		   		{
+		   			case "Integer"	:	tmpColumn.type = DB!DataType#int;
+		   			case "Long"		:	tmpColumn.type = DB!DataType#int;
+		   			case "String"	:	tmpColumn.type = DB!DataType#varchar;
+		   			case "Text"		:	tmpColumn.type = DB!DataType#varchar;
+		   			default			: 	tmpColumn.type = DB!DataType#unknown;
+		   		}
+		   		
+		   		//Buscando si el atributo es NOT NULL y columnas referenciadas
+		   		for(value in element.eContents.select(a|a.isKindOf(mp!HasValue)))
+		   		{
+		   			for(attribute in value.eContents.select(a|a.isKindOf(mp!Attribute)))
+		   			{
+		   				if(attribute.tag = 'generator' or attribute.tag = 'referencedColumnName')
+		   				{	
+		   					//Si el atributo es NOT NULL, se marca		
+		   					tmpColumn.notNull = true;
+		   					//Se define la llave primaria
+		   					t.primaryKeys.add(tmpColumn);
+							tmpColumn.table = t;
+		   					if(attribute.tag = 'referencedColumnName')
+		   					{
+		   						//Se crea la llave foránea
+								var tmpFK = new DB!ForeignKey;
+								tmpFK.name = element.name;
+								tmpFK.isMany = true;
+								tmpFK.parent = t.primaryKeys.last();
+		   						tmpFK.child = t.columns.last();
+		   						db.contents.add(tmpFK);
+		   					}
+						}
+		   			}
+		   		}
+		   		//Agregando el objeto
+		   		t.columns.add(tmpColumn);
+		   	}
+	   }

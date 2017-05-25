@@ -1,0 +1,55 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: ControlFlowJoin2HCN.etl 1003 2015-05-03 00:30:47Z kd.sanchez21@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+
+/****r* Behavior/ControlFlowJoin2HCN
+ * SUMMARY
+ *  Transfotrm a SysML!ActivityNode into its HiLeS Control Net
+ *  representation. ($Rev: 1003 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *  If the control flow goes to a JoinNode the join node tarnsformation creates
+ * a place that can be used once for a control flow to the node. Once the place
+ * is used this rule is invoked to crate the additional place required.
+ * SEE ALSO
+ *  * ActivityNode2HCN
+ *  * ControlFlow2HCN
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule ControlFlowJoin2HCN
+	transform edge : SysML!ControlFlow
+	to a1: HiLeS!Arc, a2 : HiLeS!Arc, p : HiLeS!Place
+	{
+		guard : not edge.source.isTypeOf(SysML!DecisionNode) and 
+					(edge.target.isTypeOf(SysML!JoinNode) and edge.target.~pIsAssigned = true)
+		println("ControlFlowJoin2HCN");			
+		if(edge.~ap.isDefined())
+		{
+			p.name = edge.~ap.name.toCamelCase("\\s") + edge.name.toCamelCase("\\s") + "_P";
+		}
+		else
+		{
+			p.name = edge.owner.name.toCamelCase("\\s") + edge.name.toCamelCase("\\s") + "_P";
+		}
+		
+		a1.fromNode = edge.source.equivalents().selectOne(p : HiLeS!Transition | p.name.endsWith("T1"));
+		a1.toNode = p;
+		
+		a2.fromNode = p;
+		a2.toNode = edge.target.equivalents().selectOne(t : HiLeS!Transition | t.name.endsWith("T1"));
+		println("EndControlFlowJoin2HCN");
+	}

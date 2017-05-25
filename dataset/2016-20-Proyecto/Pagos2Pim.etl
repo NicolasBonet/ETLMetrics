@@ -1,0 +1,12 @@
+pre {
+	"Iniciando Transformacion CIM2PIM".println();
+}
+
+rule Pagos2PimApp
+	transform 
+		s:PagosM!Application
+	to	
+		t:PagosPim!Application
+	{
+		t.name = s.name;
+	}

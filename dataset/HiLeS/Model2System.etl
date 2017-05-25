@@ -1,0 +1,57 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: Model2System.etl 856 2012-07-03 16:35:05Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+
+
+/****r* Structure/ModelToSystem
+ * SUMMARY
+ *   Transform a SysML:Model into a HiLeS:HilesSystem. ($Rev: 856 $)
+ * DESCRIPTION 
+ *   The HiLeS system's name will correspond to the model's name. The
+ * initialArchitecture is the first result of the transformation of the model's
+ * packages.
+ * SEE ALSO
+ *   	* InitialArchitecture
+ * 
+ * DOMAIN
+ *   	* sysmlModel  -http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* hilesS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ * SPECIFICATION
+ 		top relation ModelToSystem
+   		{
+    		checkonly domain SysML m:Model {
+				name=mn,
+				packagedElement = p:Package{}
+			}
+      		enforce domain HiLeS s:HilesSystem {
+				name=mn,
+				initialArchitecture = ia:Architecture{}
+			}
+ 			where {
+         		InitialArchitecture(p, ia);
+      		}
+   		}
+ *
+ ******
+ */
+@primary
+rule Model2System
+	transform m : SysML!Model
+	to s : HiLeS!HilesSystem {
+		
+		// All the Imported Packages are also SysML!Model. This guard filters
+		// SysML!Model that are not imported
+		guard : not SysML!PackageImport.all().collect(pi | pi.importedPackage).includes(m)
+		
+		s.name = m.name.toCamelCase("\\s");
+		s.initialArchitecture = m.packagedElement.equivalent().first();
+	}
+ 

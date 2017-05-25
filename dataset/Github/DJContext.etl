@@ -1,0 +1,125 @@
+import "SharedOperations.etl";
+
+pre {
+	// Modify Bjoerner model
+	prepareBjoerner();
+
+	// Main B Machine
+	new BMachine!Machine;
+
+	// Set ALLTRACK = all units + nullTrack
+	var alltrack = newBSet("ALLTRACK");
+
+	//	set ALLCONNECTOR = all connectors
+	var allconnector = newBSet("ALLCONNECTOR");
+
+	// Set SIGNAL = all signal names
+	var signal = newBSet("ALLSIGNAL");
+
+	// Set POINTS = all point pointNames
+	var points = newBSet("ALLPOINTS");
+
+	// Set ROUTE = all route names
+	var routeB = newBSet("ROUTE");
+
+	//	Set BUFFERSIGNALS = all route buffer signals
+	var bufferSignals = newBSet("ALLBUFFERSIGNALS");
+
+	//	Property BUFFER = all route terminals
+	var buffer = newBProperty("BUFFER");
+
+	//	Property CROSSING
+	var crossing = newBProperty("CROSSING");
+	
+	// Property ENTRY
+	var entry = newBProperty("ENTRY");
+	
+	// Property EXIT
+	var exit = newBProperty("EXIT");
+
+	var connectorCount = 0;
+}
+
+//////// Transformation Rules ////////
+
+// Add unit names to ALLTRACK
+@greedy
+rule processUnits
+transform u : Bjoerner!Unit
+to se : BMachine!Element {
+
+	se.name = u.name;
+	alltrack.hasSetElements.add(se);
+}
+
+// Add all signal names to SIGNAL
+rule processSignals
+transform s : Bjoerner!Signal
+to se : BMachine!Element {
+
+	se.name = s.name;
+	signal.hasSetElements.add(se);
+}
+
+rule processAllConnector 
+transform c : Bjoerner!Connector
+to se : BMachine!Element {
+	se.name = "C" + connectorCount.toString();
+	allconnector.hasSetElements.add(se);
+	connectorCount = connectorCount + 1;
+}
+
+// Add all point pointNames to POINTS
+rule processPoints
+transform p : Bjoerner!Point
+to se : BMachine!Element {
+
+	se.name = p.pointName;
+	points.hasSetElements.add(se);
+}
+
+// Add all necessary route names to ROUTE
+rule processControlTable
+transform r : Bjoerner!Route
+to se : BMachine!Element {
+	
+	// only transform if route is in control table
+	guard : r.isNecessaryRoute()
+	
+	se.name = r.name;
+	routeB.hasSetElements.add(se); 
+}
+
+// Add end units to ENTRY and EXIT
+rule findEndUnits
+transform c : Bjoerner!Connector
+to pe : BMachine!PropElement, e : BMachine!Element {
+
+	// Only transform if connector has 1 unit
+	guard : c.numUnits() = 1
+	
+	// Find unit
+	var u : Bjoerner!Unit = c.findUnit();
+	e.name = u.name;
+	pe.hasDomainElements.add(e);
+	
+	// If unit has a signal add pe to ENTRY
+	if (u.hasSignals.size > 0) {entry.hasPropElements.add(pe);}
+	// Else add to EXIT
+	else {exit.hasPropElements.add(pe);}	
+}
+
+// Find BUFFERS
+rule findBuffers
+transform b : Bjoerner!Terminal
+to pe : BMachine!PropElement {
+	
+	buffer.hasPropElements.add(b);
+}
+
+// Find CROSSINGS
+rule findCrossings
+transform c : Bjoerner!Crossing
+to pe : BMachine!PropElement {
+	crossing.hasPropElements.add(c);
+}

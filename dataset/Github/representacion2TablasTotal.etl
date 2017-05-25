@@ -1,0 +1,133 @@
+pre {
+  	"Running Tablas Total Transformationd".println();
+	var microservicios = source!Microservicio.allInstances();	
+	var rangoColores = Sequence {target!Color#blue, target!Color#green, target!Color#yellow, target!Color#orange, target!Color#red, target!Color#purple, target!Color#gray};  
+	var simplificado = new target!Diagrama();
+	simplificado.name = "MicroserviciosTablasTotal";
+	simplificado.elementos = new Sequence();
+	simplificado.isRoot = true;
+}
+
+post transformacionSimplificacion {
+	generarDiagramaSimplificado();
+}
+
+operation generarDiagramaSimplificado() {		
+	"Numero microservicios obtenidos: ".println(microservicios.size());
+
+	var countColor = 1;
+	
+	//Creando Microservicios Visuales
+	for (microservicio in microservicios) {
+			
+			("Generando Microservicio " + microservicio.name).println();
+		
+			var elipseMs  = new target!Elipse();
+			if (countColor == 7){
+				countColor = 0;
+			}
+			
+			elipseMs.color = rangoColores.get(countColor);
+			countColor = countColor + 1;
+			elipseMs.largo = 8;
+			elipseMs.alto = 8;
+			elipseMs.name = microservicio.name;
+			elipseMs.elipses = new Sequence();	
+			simplificado.elementos.add(elipseMs);
+	}
+	
+	var asociacion = null;
+	var tablaDestino = null;
+	var elipseOrigen = null;
+	var tablasEnMicros = new Set();
+	
+	//Creando Tablas Visuales
+	for (microservicio in microservicios) {
+		("Generando Microservicio " + microservicio.name).println();
+		for (claseR in microservicio.clases.select(cr | cr.tablasAccedidas.size() > 0)){
+			("	Generando Clase " + claseR.name).println();
+			for (tabla in claseR.tablasAccedidas){
+				("		Generando Tabla " + tabla.name + " Cantidad " + tabla.tiposQuery.size()).println();
+				tablaDestino  = tablasEnMicros.select(c | c.name = tabla.name).first();
+				if (not tablaDestino.isDefined()) {
+					tablaDestino = new target!Clase();
+					tablaDestino.elementos = new Set();
+					tablaDestino.conectores = new Set();
+					tablaDestino.name = tabla.name;							
+					tablasEnMicros.add(tablaDestino);	
+					simplificado.elementos.add(tablaDestino);
+				}
+				for (tipoQuery in tabla.tiposQuery){
+					if (tipoQuery.tipo.toString() = "Create"){
+						("			Generando Relacion " + microservicio.name + " Tabla " + tablaDestino.name + ' CREATE ').println();
+						elipseOrigen = simplificado.elementos.select(e | e.name = microservicio.name and e.isTypeOf(target!Elipse)).first();
+						asociacion = new target!Asociacion();
+						asociacion.grosor = 3;
+						asociacion.color = target!Color#purple;
+						asociacion.estilo = target!EstiloLinea#SOLIDA;
+						asociacion.enrutamiento = target!TipoEnrutamiento#DIRECTO;
+						asociacion.flecha_source = target!TipoFlecha#NO_TIENE;
+						asociacion.flecha_target = target!TipoFlecha#SENCILLA;					
+						asociacion.source = elipseOrigen;
+						asociacion.target = tablaDestino;
+						asociacion.nameSource = "".toString();
+						asociacion.nameTarget = "C".toString();
+						elipseOrigen.conectores.add(asociacion);				
+					}
+					else if (tipoQuery.tipo.toString() = "Read"){
+						("			Generando Relacion " + microservicio.name + " Tabla " + tablaDestino.name + ' READ ').println();
+						elipseOrigen = simplificado.elementos.select(e | e.name = microservicio.name and e.isTypeOf(target!Elipse)).first();
+						asociacion = new target!Asociacion();
+						asociacion.grosor = 1;
+						asociacion.color = target!Color#green;
+						asociacion.estilo = target!EstiloLinea#SOLIDA;
+						asociacion.enrutamiento = target!TipoEnrutamiento#DIRECTO;
+						asociacion.flecha_source = target!TipoFlecha#NO_TIENE;
+						asociacion.flecha_target = target!TipoFlecha#SENCILLA;					
+						asociacion.source = elipseOrigen;
+						asociacion.target = tablaDestino;
+						asociacion.nameSource = "".toString();
+						asociacion.nameTarget = "R".toString();
+						elipseOrigen.conectores.add(asociacion);				
+					}
+					else if (tipoQuery.tipo.toString() = "Update"){
+						("			Generando Relacion " + microservicio.name + " Tabla " + tablaDestino.name + ' UPDATE ').println();
+						elipseOrigen = simplificado.elementos.select(e | e.name = microservicio.name and e.isTypeOf(target!Elipse)).first();
+						asociacion = new target!Asociacion();
+						asociacion.grosor = 2;
+						asociacion.color = target!Color#orange;
+						asociacion.estilo = target!EstiloLinea#SOLIDA;
+						asociacion.enrutamiento = target!TipoEnrutamiento#DIRECTO;
+						asociacion.flecha_source = target!TipoFlecha#NO_TIENE;
+						asociacion.flecha_target = target!TipoFlecha#SENCILLA;					
+						asociacion.source = elipseOrigen;
+						asociacion.target = tablaDestino;
+						asociacion.nameSource = "".toString();
+						asociacion.nameTarget = "U".toString();	
+						elipseOrigen.conectores.add(asociacion);
+					}
+					else if (tipoQuery.tipo.toString() = "Delete"){
+						("			Generando Relacion " + microservicio.name + " Tabla " + tablaDestino.name + ' DELETE ').println();
+						elipseOrigen = simplificado.elementos.select(e | e.name = microservicio.name and e.isTypeOf(target!Elipse)).first();
+						asociacion = new target!Asociacion();
+						asociacion.grosor = 4;
+						asociacion.color = target!Color#red;
+						asociacion.estilo = target!EstiloLinea#SOLIDA;
+						asociacion.enrutamiento = target!TipoEnrutamiento#DIRECTO;
+						asociacion.flecha_source = target!TipoFlecha#NO_TIENE;
+						asociacion.flecha_target = target!TipoFlecha#SENCILLA;					
+						asociacion.source = elipseOrigen;
+						asociacion.target = tablaDestino;
+						asociacion.nameSource = "".toString();
+						asociacion.nameTarget = "D".toString();
+						elipseOrigen.conectores.add(asociacion);
+					}				
+				}	
+			}
+		}	
+	}
+}
+
+post {
+	"\n\nDone".println();
+}

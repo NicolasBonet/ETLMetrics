@@ -1,0 +1,219 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: FlowPort2Port.etl 807 2012-06-08 21:09:51Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+import "FlowPort2Point.etl";
+
+// ============================= IN/OUT PORTS =================================
+/****r* FlowPort2Point/FlowPort2Port
+ * SUMMARY
+ *   Transform a SysML:FlowPort to a HiLeS:Port. ($Rev: 807 $)
+ * DESCRIPTION
+ * |html <B>@abstract</B>
+ *   These rules extends FlowPort2Point and assigns the correct direction type
+ * the the Port. 
+ * 
+ * DERIVED FROM
+ *  * FlowPort2Point
+ * DERIVED BY
+ *  * FlowPort2PortSingle
+ *	* FlowPort2PortVector
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@abstract
+rule FlowPort2Port
+	transform flowPort : SysML!FlowPort
+	to point : HiLeS!Port
+	extends FlowPort2Point
+	{
+		
+		if(flowPort.direction = SysML!FlowDirection#`in`) {
+			point.direction = HiLeS!PointDirection#input;
+		} else {
+			if(flowPort.direction = SysML!FlowDirection#out) {
+				point.direction = HiLeS!PointDirection#output;
+			}	
+		}
+	}
+
+/****r* FlowPort2Port/FlowPort2PortSingle
+ * SUMMARY
+ *   Transform a SysML:FlowPort to a HiLeS:Port. ($Rev: 807 $)
+ * DESCRIPTION 
+ * |html <B>@lazy</B>
+ *   These rules extends FlowPort2Port and assigns the correct size (1) to the
+ * port. The rule is lazy because it must be invoked only for specific ports (in
+ * the main block) and for cloned FlowPorts.
+ * DERIVED FROM
+ *   * FlowPort2Port
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule FlowPort2PortSingle
+	transform flowPort : SysML!FlowPort
+	to point : HiLeS!Port
+	extends FlowPort2Port
+	{
+		
+		guard : flowPort.base_Port.type.isTypeOf(SysML!PrimitiveType)
+		
+		point.size = 1;
+	}
+
+/****r* FlowPort2Port/FlowPort2PortVector
+ * SUMMARY
+ *   Transform a SysML:FlowPort to a HiLeS:Port. ($Rev: 807 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *   These rules extends FlowPort2Port and assigns the correct size to the
+ * port depending on the size of the Logic or Analog vector that types the port.
+ * The rule is lazy because it must be invoked only for specific ports (in
+ * the main block) and for cloned FlowPorts.
+ * DERIVED FROM
+ *   * FlowPort2Port
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule FlowPort2PortVector
+	transform flowPort : SysML!FlowPort
+	to point : HiLeS!Port
+	extends FlowPort2Port
+	{
+	
+		guard : not flowPort.base_Port.type.isTypeOf(SysML!PrimitiveType)
+				and flowPort.base_Port.type.generalization.collect(g
+					| g.general
+					).exists(grl
+						| grl.name = "LogicVector" or grl.name = "AnalogVector"
+						)
+		
+		/* The size of the Port is multiplicity of the owned attribute of the
+		 * flowPort.type that subsets the slot property of the LogicVector or
+		 * AnalogVecgtor datatype of the HiLeS library */
+		point.size = flowPort.base_Port.type.ownedAttribute.selectOne(oa
+				| oa.subsettedProperty.one(sp 
+					| sp.name = "slot")).upperValue.value;
+	}
+
+// ============================= INOUT PORTS =================================
+
+/****r* FlowPortInout2Point/FlowPortInout2Port
+ * SUMMARY
+ *   Transform a SysML:FlowPort to two HiLeS:Port. ($Rev: 807 $)
+ * DESCRIPTION
+ * |html <B>@abstract</B>
+ *   These rules extends FlowPortInout2Point and assigns the correct direction
+ * type to the Port. Each port is assigned a distinct name that includes the
+ * direction. The rule is lazy because it must be invoked only for specific
+ * ports (in the main block) and for cloned FlowPorts.
+ * DERIVED FROM
+ *   * FlowPortInout2Point
+ * DERIVED BY
+ *  * FlowPortInout2PortSingle
+ *	* FlowPortInout2PortVector
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@abstract
+rule FlowPortInout2Port
+	transform flowPort : SysML!FlowPort
+	to pointIn : HiLeS!Port, pointOut : HiLeS!Port
+	extends FlowPortInout2Point
+	{
+		
+		pointIn.name = pointIn.name + "In";
+		pointOut.name = pointOut.name + "Out";
+		pointIn.direction = HiLeS!PointDirection#input;	
+		pointOut.direction = HiLeS!PointDirection#output;
+	}
+
+/****r* FlowPortInout2Port/FlowPortInout2PortSingle
+ * SUMMARY
+ *   Transform a SysML:FlowPort to two HiLeS:Port. ($Rev: 807 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *   These rules extends FlowPortInout2Port and assigns the correct size (1) to 
+ * the ports. The rule is lazy because it must be invoked only for specific
+ * ports (in the main block) and for cloned FlowPorts.
+ * DERIVED FROM
+ *   * FlowPortInout2Port
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule FlowPortInout2PortSingle
+	transform flowPort : SysML!FlowPort
+	to pointIn : HiLeS!Port, pointOut : HiLeS!Port
+	extends FlowPortInout2Port
+	{
+		
+		guard : flowPort.base_Port.type.isTypeOf(SysML!PrimitiveType)
+		
+		pointIn.size = 1;
+		pointOut.size = 1;
+	}
+
+/****r* FlowPortInout2Port/FlowPortInout2PortVector
+ * SUMMARY
+ *   Transform a SysML:FlowPort to two HiLeS:Port. ($Rev: 807 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *   These rules extends FlowPortInout2Port and assigns the correct size to the
+ * port depending on the size of the Logic or Analog vector that types the port.
+ * The rule is lazy because it must be invoked only for specific ports (in
+ * the main block) and for cloned FlowPorts.
+ * DERIVED FROM
+ *   * FlowPortInout2Port
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule FlowPortInout2PortVector
+	transform flowPort : SysML!FlowPort
+	to pointIn : HiLeS!Port, pointOut : HiLeS!Port
+	extends FlowPortInout2Port
+	{
+	
+		guard : not flowPort.base_Port.type.isTypeOf(SysML!PrimitiveType)
+				and flowPort.base_Port.type.generalization.collect(g
+					| g.general
+					).exists(grl
+						| grl.name = "LogicVector" or grl.name = "AnalogVector"
+						)
+		
+		/* The size of the Port is multiplicity of the owned attribute of the
+		 * flowPort.type that subsets the slot property of the LogicVector
+		 * datatype of the HiLeS library */
+		pointIn.size = flowPort.base_Port.type.ownedAttribute.selectOne(oa
+				| oa.subsettedProperty.one(sp 
+					| sp.name = "slot")).upperValue.value;
+		pointOut.size = pointIn.size;
+	}

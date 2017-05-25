@@ -1,0 +1,80 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: SysML2HilesStructure.etl 988 2014-08-11 21:11:24Z kd.sanchez21@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+ 
+/****h* SysML2HiLeS/Structure
+ *  SUMMARY
+ *    SysML2HilesStructure -- Consolidation of rules that must be executed to
+ * transform the structural componentes of a SysML model to a HiLeS model. ($Rev: 988 $)
+ *  USAGE
+ 	<target name="SysML2HilesStructure">
+ 	  <epsilon.etl src="SysML2HilesStructure.etl">
+        <model ref="SysML"/>
+ 		<model ref="HiLeS"/>
+	<\target>
+ *  DESCRIPTION
+ *    Imports each of the source files that contain etl rules to perform the
+ * model-to-model transformation of the structural elements.
+ *  INPUTS
+ *    SysML The SysML model (conforms to http://www.eclipse.org/papyrus/0.7.0/SysML)
+ * 	  HiLeS The HiLeS Structural Model (conforms to http://hiles.uniandes.edu.co/1.1/HiLeS)
+ *  RESULT
+ *    A HiLeS model containing structure elements.
+ *  SEE ALSO
+ *    SysML2HiLeS/Behavior, SysML2HiLeS/Merge
+ *  USES
+ *    HiLeSVariableOutputs.eol
+ *    Connector2DigitalPayload.etl
+ *    Connector2NodePayload.etl
+ *    Connector2TerminalPayload.etl
+ *    Connector2VectorAnalogPayload.etl
+ *    Connector2VectorDigitalPayload.etl
+ *    Model2System.etl
+ *    InitialArchitecture.etl
+ *    MainBlock2Structural.etl
+ *    Property2Block.etl
+ *    FlowPort2Point.etl
+ *    FlowPort2Port.etl
+ *    FlowPort2Service.etl
+ *    FlowProperty2Point.etl
+ *    FlowProperty2Port.etl
+ *    FlowProperty2Service.etl
+ ******
+ */
+import "../helpers/HilesVariableOutputs.eol";
+import "../helpers/Utils.eol";
+import "Connector2DigitalPayload.etl";
+import "Connector2NodePayload.etl";
+import "Connector2TerminalPayload.etl";
+import "Connector2VectorAnalogPayload.etl";
+import "Connector2VectorDigitalPayload.etl";
+import "Model2System.etl";
+import "InitialArchitecture.etl";
+import "MainBlock2Structural.etl";
+import "Property2Block.etl";
+import "FlowPort2Point.etl";
+import "FlowPort2Port.etl";
+import "FlowPort2Service.etl";
+import "FlowProperty2Point.etl";
+import "FlowProperty2Port.etl";
+import "FlowProperty2Service.etl";
+
+
+pre
+{
+	HiLeS.resource.useXmiIds = true; // Generate xmi.id for HiLeS model elements automatically.
+	"Generating Structure".println();
+}
+
+post
+{
+	"Success".println();
+}

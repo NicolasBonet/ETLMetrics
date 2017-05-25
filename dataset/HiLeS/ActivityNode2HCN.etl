@@ -1,0 +1,59 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: ActivityNode2HCN.etl 1003 2015-05-03 00:30:47Z kd.sanchez21@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+/****r* Behavior/ActivityNode2HCN
+ * SUMMARY
+ *  Transfotrm a SysML!ActivityNode into its HiLeS Control Net
+ *  representation. ($Rev: 1003 $)
+ * DESCRIPTION
+ * |html <B>@abstract</B>
+ *  All ActivityNodes are transformed into a place an arc and a transition, this
+ * is so that for resolving arc connections the names _P1 and _T1 can always
+ * be used (except for the DecisionNode which is a PITA and for FinalNodes)
+ * DERIVED BY
+ * 	* CallBehaviorAction2HCN
+ * 	* ForkNode2HCN
+ * 	* InitialNode2HCN
+ * 	* InitialNode2HCNDeep
+ * 	* JoinNode2HCN
+ * 	* MergeNode2HCN
+ * SEE ALSO
+ *  * MainBlock2HCN
+ *	* ActivityPartition2Block
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@abstract
+rule ActivityNode2HCN
+	transform node : SysML!ActivityNode
+	to p : HiLeS!Place, a : HiLeS!Arc, t : HiLeS!Transition
+	{	
+		println("ActivityNode");
+		if(node.~ap.isDefined())
+		{
+			p.name = node.~ap.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P1";
+			t.name = node.~ap.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_T1";
+		}
+		else
+		{
+			p.name = node.owner.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P1";
+			t.name = node.owner.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_T1";
+		}
+		a.fromNode = p;
+		a.toNode = t;
+		println("EndActivityNode");
+	}
+	
+

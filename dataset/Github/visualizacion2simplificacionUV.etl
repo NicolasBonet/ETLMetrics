@@ -1,0 +1,251 @@
+pre {
+  "Running Simplification Transformation".println();
+	var percentage : Real;
+	var diagrama = source!Diagrama.allInstances()->select(d | d.isRoot)->first();
+	var clusters = diagrama.elementos->select(e | e.isTypeOf(target!Elipse));
+	var rangoColores = Sequence {target!Color#blue, target!Color#green, target!Color#yellow, target!Color#orange, target!Color#red, target!Color#purple, target!Color#gray};  
+}
+
+operation generarDiagramaSimplificado() {	
+	"\tNœmero clusters: ".print();
+	clusters.size().println();
+	
+	var simplificado = new target!Diagrama();
+	simplificado.name = diagrama.name + " Simplificado " + (percentage * 100).round() + "%";
+	simplificado.elementos = new Sequence();
+	simplificado.diagrama = simplificado;
+	simplificado.isRoot = true;
+	
+	var count = 0;
+	var countColor = 1;
+	var visitados = new Set;
+	for (cluster in clusters) {
+		if (visitados->includes(cluster)) {
+			continue;
+		}
+			
+		"*".println();
+		var conectados = cluster.darConectados(percentage, visitados);
+		if (not conectados.isEmpty()) {
+			var clase  = new target!Elipse();
+			if (countColor == 7){
+				countColor = 0;
+			}
+			" color".println(rangoColores.get(countColor));
+			clase.color = rangoColores.get(countColor);
+			countColor = countColor + 1;
+			clase.largo = 10;
+			clase.alto = 10;
+			clase.name = "Cluster " + count;
+			clase.elipses = new Sequence();
+
+			var diagramaSimConElip = new target!Diagrama();
+			diagramaSimConElip.name = "Sim" + (percentage * 100).round() + "-" + count;
+			diagramaSimConElip.elementos = new Sequence();
+			diagramaSimConElip.diagrama = diagramaSimConElip;
+			diagramaSimConElip.isRoot = true;
+			
+			for(elem in conectados){
+				var subElipseTarget = new target!Elipse();
+				var subElipseOrigen = source!Elipse.all.clone.select(x| x.name = elem.name).first();
+				subElipseTarget.conectores = new Sequence();
+				subElipseTarget.name = subElipseOrigen.name;
+				subElipseTarget.color = subElipseOrigen.color;
+				subElipseTarget.largo = subElipseOrigen.largo;
+				subElipseTarget.alto = subElipseOrigen.alto;
+				subElipseTarget.diagrama = subElipseOrigen.diagrama;
+				//subElipseTarget.conectores = subElipseOrigen.conectores.clone();
+				for(conecOrigen in subElipseOrigen.conectores.clone()){
+					var subAsociacion = new target!Asociacion();
+					subAsociacion.name = conecOrigen.name;
+					subAsociacion.grosor = conecOrigen.grosor;
+					subAsociacion.color = conecOrigen.color;
+					subAsociacion.estilo = conecOrigen.estilo;
+					subAsociacion.enrutamiento = conecOrigen.enrutamiento;
+					subAsociacion.flecha_source = conecOrigen.flecha_source;
+					subAsociacion.flecha_target = conecOrigen.flecha_target;
+					subAsociacion.nameSource = conecOrigen.nameSource;
+					subAsociacion.nameTarget = conecOrigen.nameTarget;
+					subAsociacion.source = conecOrigen.source;
+					subAsociacion.target = conecOrigen.target;
+					subAsociacion.diagrama = conecOrigen.diagrama;
+ 					subElipseTarget.conectores.add(subAsociacion);
+				}
+				//subElipseTarget.conectores = subElipseOrigen.conectores.clone();
+				if (subElipseOrigen.isTypeOf(target!Elipse)){
+					diagramaSimConElip.elementos.add(subElipseTarget);
+				}
+			}
+			
+			//for(elem in conectados){
+				//var subElipse = source!Elipse.all.select(x| x.name = elem.name).first();
+				//if (subElipse.isTypeOf(target!Elipse)){
+				//	clase.elipses.add(subElipse);	
+				//}
+			//}
+			clase.diagrama = diagramaSimConElip;
+			clase.~conectores= cluster.~conectores;
+			simplificado.elementos.add(clase);
+			count = count + 1;
+		}		
+	}
+	
+	"\n\tGenerarRelaciones".println();
+	generarRelacionesDiagramaSimplificado(simplificado);
+}
+
+operation target!Elipse darConectados(percentage : Real, visitados : Set) : Set {
+	var conjunto = new Set;
+	conjunto.add(self);
+	visitados.add(self);
+	self.~conectores = new Set;
+	
+	".".print();
+	for (conector in self.conectores->select(c | c.source = self)) {
+		var percentageMeasureSource = conector.nameSource.split("%")->first().asReal() / 100;
+		var percentageMeasureTarget = conector.nameTarget.split("%")->first().asReal() / 100;
+		if(percentageMeasureSource > percentage or percentageMeasureTarget > percentage) {
+			if (visitados->includes(conector.target)) {
+				continue;
+			}
+			conjunto.add(conector.target);
+			visitados.add(conector.target);
+			conjunto.addAll(conector.target.darConectados(percentage, visitados));
+		} else {
+			self.~conectores.add(conector.target.name);
+		}
+	}
+	return conjunto;
+}
+operation generarDiagramaRelacionEntreClusters(origen : target!Elipse, destino : target!Elipse) : target!Diagrama {
+	var clasesCreadasOrigen = Sequence {};
+	var clasesCreadasDestino = Sequence {};
+	var diagramaRelacion = new target!Diagrama();
+	diagramaRelacion.name = "Sim" + (percentage * 100).round() + " " + origen.name + " - " + destino.name;
+	diagramaRelacion.elementos = new Sequence();
+	diagramaRelacion.diagrama = diagramaRelacion;
+	diagramaRelacion.isRoot = true;
+	//Se recorren los diagramas que componen cada cluster iniciando por el origen
+	for(claseDiagramaOrigen in origen.diagrama.elementos) 
+	{
+		" claseDiagramaOrigen".println(claseDiagramaOrigen.name);
+		var diagramaEJBOrigen = source!Diagrama.all.select(x| x.name == claseDiagramaOrigen.name).first();
+		" DiagramaOrigen".println(diagramaEJBOrigen.name);
+		//Se recorren los diagramas que componen cada cluster del destino
+		for(claseDiagramaDestino in destino.diagrama.elementos) 
+		{
+			" claseDiagramaDestino".println(claseDiagramaDestino.name);
+			var diagramaEJBDestino = source!Diagrama.all.select(x| x.name == claseDiagramaDestino.name).first();
+			" DiagramaDestino".println(diagramaEJBDestino.name);	
+			//Se recorren las clases que tiene un EJB en el cluster origen
+			for(claseEnEJBOrigen in diagramaEJBOrigen.elementos) 
+			{						
+				" claseOrigen".println(claseEnEJBOrigen.name);
+				//Se recorren las clases que tiene un EJB en el cluster destino
+				for(claseEnEJBDestino in diagramaEJBDestino.elementos) 
+				{								
+					" claseDestino".println(claseEnEJBDestino.name);
+					//Se recorren todos los conectores de la clase origen
+					for(conectorEnEJBOrigen in claseEnEJBOrigen.conectores) 
+					{		
+						" CantidadInvoca".println(conectorEnEJBOrigen.invocacionesV.size());	
+						//Se recorren todas las invocacioness de cada uno de los conectores de la clase origen
+						for(invocacionEnEJBOrigen in conectorEnEJBOrigen.invocacionesV) 
+						{
+							//Si existe una invocacion a una clase del cluster destino es por que se esta llamando un metodo entre clusters							
+							if (invocacionEnEJBOrigen.toMethod.nombreClase == claseEnEJBDestino.name){
+								var clasO;
+								var clasD;
+								if(clasesCreadasOrigen.select(x| x.name == invocacionEnEJBOrigen.fromMethod.nombreClase).isEmpty()){
+									var claseOrigen  = new target!Clase();
+									claseOrigen.elementos = new Sequence();
+									claseOrigen.name = invocacionEnEJBOrigen.fromMethod.nombreClase;
+									claseOrigen.diagrama = claseOrigen;
+									clasO = claseOrigen;
+									clasesCreadasOrigen.add(claseOrigen);
+								}
+								else {
+									clasO = clasesCreadasOrigen.select(x| x.name == invocacionEnEJBOrigen.fromMethod.nombreClase).first();
+								}
+								
+								var itemOrigen = new target!Item(); 
+								itemOrigen.name = invocacionEnEJBOrigen.fromMethod.nombreMetodo;
+								itemOrigen.icono = "MessageSynchCallCreation";				
+								clasO.elementos.add(itemOrigen);
+								
+								if(clasesCreadasDestino.select(x| x.name == invocacionEnEJBOrigen.toMethod.nombreClase).isEmpty()){
+									var claseDestino  = new target!Clase();
+									claseDestino.elementos = new Sequence();
+									claseDestino.name = invocacionEnEJBOrigen.toMethod.nombreClase;
+									claseDestino.diagrama = claseDestino;
+									clasD = claseDestino;
+									clasesCreadasDestino.add(claseDestino);	
+								}
+								else {
+									clasD = clasesCreadasDestino.select(x| x.name == invocacionEnEJBOrigen.toMethod.nombreClase).first();
+								}								
+								var itemDestino = new target!Item(); 
+								itemDestino.name = invocacionEnEJBOrigen.toMethod.nombreMetodo;
+								itemDestino.icono = "MessageSynchCallCreation";
+								clasD.elementos.add(itemOrigen);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	for (elementoOrigen in clasesCreadasOrigen){
+		diagramaRelacion.elementos.add(elementoOrigen);
+	}
+	for (elementoDestino in clasesCreadasDestino){
+		diagramaRelacion.elementos.add(elementoDestino);
+	}	
+	
+	return diagramaRelacion;
+}
+
+operation generarRelacionesDiagramaSimplificado(simplificado : target!Diagrama) {
+	for(clase in simplificado.elementos) {
+		var asociaciones = new Set;
+		for (conector in clase.~conectores) {
+			for (relacionado in simplificado.elementos->select(e | e <> clase)) {
+				if (relacionado.conectores->select(c | c.target = clase).isEmpty()) {
+					" prim".println(relacionado);
+					for (item in relacionado.diagrama.elementos) {
+						if (item.name == conector) {
+							var asociacion = new target!Asociacion;
+							asociacion.grosor = 2;
+							asociacion.enrutamiento = target!TipoEnrutamiento#DIRECTO;
+							asociacion.source = clase;
+							asociacion.target = relacionado;
+							if (not(asociaciones.select(x | x.source = clase and x.target = relacionado).isEmpty())){
+								"".println("ya existo");
+							}
+							else {
+								"".println("no existo");
+								asociacion.diagrama = generarDiagramaRelacionEntreClusters(clase,relacionado);
+								asociaciones.add(asociacion);
+							}
+						}
+					}
+				}
+			}
+		}
+			
+		clase.conectores = asociaciones;
+	}
+}
+
+post {
+	var invocacion = new source!Invocacion();
+	"prueba".println(invocacion.toMethod);
+	"\n\nGenerarDiagramaSimplificado".println();
+	var index : Real = 1.0;
+	while (index > 0.0) {
+		percentage = index;
+		generarDiagramaSimplificado();
+		index = index - 0.05;	
+	}
+	"\n\nDone".println();
+}

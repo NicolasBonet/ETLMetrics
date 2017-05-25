@@ -1,0 +1,82 @@
+-- Debemos crear una unica base de datos para todos
+pre {
+      var db : new DB!Database;
+}
+-- Esta regla se encarga de todo!
+rule MarketPlace2Relacional
+      transform
+            c : mp!ClassUnit
+      to
+            t : DB!Table
+            {
+                  -- Asignamos la tabla creada a la base de datos inicializada al comienzo y le ponemos el nombre de la clase sin el Entity
+                  guard : c.codeRelation.select(cr|cr.isTypeOf(mp!HasValue)).select(cr|cr.annotation.size() > 0).select(a|a.`to`.Name = "Entity").size() > 0
+                  t.database = db;
+                  t.name = c.name.replace("Entity", "");
+                  var cols = c.codeElement.select(ce|ce.isTypeOf(mp!StorableUnit)).equivalent("StorableUnit2Column");
+                  var keys = c.codeElement.select(ce|ce.isTypeOf(mp!StorableUnit)).equivalent("StorableUnit2PrimaryKey");
+                  var superclase = c.superClase();
+                  if (superclase.isDefined())
+                  {
+                        var superClaseKeys = superclase.codeElement.select(ce|ce.isTypeOf(mp!StorableUnit)).equivalent("StorableUnit2PrimaryKey");
+                        keys = keys.includingAll(superClaseKeys);
+                        var superClaseCols = superclase.codeElement.select(ce|ce.isTypeOf(mp!StorableUnit)).equivalent("StorableUnit2Column");
+                        cols = cols.includingAll(superClaseCols);                  
+                  }
+                  for (c in cols)
+                  {
+                        c.table = t;
+                  }                
+                  for (k in keys)
+                  {
+                        k.table = t;
+                  }                      
+                  t.primaryKeys = keys;              
+         }
+operation mp!ClassUnit superClase(): mp!ClassUnit
+{
+      return self.codeRelation.select(s|s.isTypeOf(mp!Extends)).`to`.first();
+}
+@lazy
+rule StorableUnit2PrimaryKey
+      transform
+            s : mp!StorableUnit
+      to
+            k : DB!Column
+            {
+                  guard : s.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size() > 0).select(a|a.`to`.Name = "Id").size() > 0
+                  k.database = db;
+                  k.name = s.name;
+                  k.notNull = true;
+                  k.type = s.type.getType();
+            }
+@lazy
+rule StorableUnit2Column
+      transform
+            s : mp!StorableUnit
+      to
+            k : DB!Column
+            {
+                  guard : s.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size() > 0).select(a|a.`to`.Name = "Id").size() = 0 and s.isPrimitiveType()
+                  k.database = db;
+                  k.name = s.name;
+                  k.notNull = false;
+                  k.type = s.type.getType();
+            }
+operation InterfaceUnit getType()
+{
+      switch (self.name) {
+            case "Long" : return DB!DataType#int;
+            case "Integer" : return DB!DataType#int;
+            case "String" : return DB!DataType#varchar;
+            default : return DB!DataType#unknown;
+      }
+}
+operation StorableUnit isPrimitiveType()
+{
+      if(self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size()>0).select(a|a.`to`.Name = "PrimaryKeyJoinColumn").size()=0)
+      {
+            return true;
+      }
+      return false;
+}

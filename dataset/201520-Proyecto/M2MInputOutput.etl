@@ -1,0 +1,112 @@
+pre{
+var csharp =new CSharp!CSharp;
+var  androidCore =new  AndroidOut!AndroidCore;
+	
+}
+
+rule Clase2Controlador
+	transform clase: CSharp!Clase
+	to controlador: AndroidOut!Controlador
+	{
+		guard: (clase.nombre.endsWith("Controller"))
+		//asigno el nombre al controlador
+			controlador.nombre=clase.nombre;
+			//para llenar los atributos del controlador
+			for(atrib in clase.atributos){
+				switch (atrib.nombre){
+				case  "Domain":
+					controlador.domain=atrib.valor;
+				case "RoutePrefix":
+					controlador.RoutePrefix= atrib.valor;
+				case "Main":
+					controlador.main=true;
+				}	
+			}
+			//para llenar los metodos
+			for (metod in clase.metodos){
+				var metodo= new AndroidOut!Metodo;
+				//asigno el nombre al metodo
+				metodo.nombre=metod.nombre;
+				//asigno los atributos del metodo
+				for (atribInMetod in metod.atributos){
+					switch(atribInMetod.nombre){
+					case "Route":
+						metodo.ruta=atribInMetod.valor;
+					case "ViewType":
+						metodo.viewType=atribInMetod.valor;
+					case "Title":
+						metodo.titulo=atribInMetod.valor;
+					case "GetId":
+						metodo.getID=atribInMetod.valor;
+					case "HttpGet":
+						metodo.verbo=AndroidOut!VerboEnum#HttpGet;
+					case "HttpPost":
+						metodo.verbo=AndroidOut!VerboEnum#HttpPost;
+					case "HttpPut":
+						metodo.verbo=AndroidOut!VerboEnum#HttpPut;
+					case "HttpDelete":
+						metodo.verbo=AndroidOut!VerboEnum#HttpDelete;	
+					}
+
+				}
+				
+				//para llenar los parametros al metodo
+				for (paramInMetod in metod.parametros){
+				var parametro= new AndroidOut!Parametro;
+				parametro.nombre=paramInMetod.nombre;
+				
+				parametro.tipo= paramInMetod.tipo;	
+				
+				metodo.parametros=parametro;			
+				}
+			
+				controlador.metodos.add(metodo);
+			}
+			
+			
+			
+			//agrego el controlador completo al androidCore
+			androidCore.controllers.add(controlador);
+			
+	}
+		
+rule Clase2DTO
+ transform clase: CSharp!Clase
+ to dto: AndroidOut!DTO
+ {
+  guard: (clase.nombre.endsWith("DTO"))
+   
+   dto.nombre=clase.nombre;
+   androidCore.activities.add(dto);
+   for(prop in clase.propiedades){
+    var propiedad= new AndroidOut!Propiedad;
+    propiedad.nombre= prop.nombre;
+    propiedad.label= prop.nombre;
+    for(atributo in prop.atributos){
+     if(atributo.nombre.equals("Hide")){
+      propiedad.esOculto = true;
+     }else{
+      propiedad.esOculto = false;
+     }
+    
+     var formElementc;
+     switch (atributo.nombre){
+     case  "Textbox":
+       formElementc= new AndroidOut!EditText;
+     case "Textarea":
+           formElement= new AndroidOut!EditText;
+     case "Combobox":
+        formElementc= new AndroidOut!Spinner;
+     case "Checkbox":
+        formElement= new AndroidOut!CheckBox;       
+     case "Radiobutton":
+        formElementc= new AndroidOut!Radiobutton;    
+         
+    } 
+     
+     propiedad.formElement = formElementc;
+    }
+    dto.propiedades.add(propiedad); 
+   }
+   
+ }

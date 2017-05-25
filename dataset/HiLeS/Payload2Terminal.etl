@@ -1,0 +1,58 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: Payload.etl 163 2011-09-13 14:20:08Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+
+/****r* HiLeSToVDHLAMS/Payload2Terminal
+ * SUMMARY
+ *   Transform a HiLeS:Port into a Vhdl:Port. The specific type of port would
+ *  depend on the type of the payload that connects to the port. ($Rev: 829 $)
+ * DESCRIPTION 
+ *  // Create a signal to represent payloads that connect. Only Payloads that go
+// from a HiLeS!Port to a HiLeS!Port and are Discrete Type are transformed into signals
+ * SEE ALSO
+ *
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *   	* Vhdl   - http://hiles.uniandes.edu.co/1.1/vhdl-ams
+ *
+ *****
+ */
+@greedy
+rule Payload2Terminal
+	transform pl : HiLeS!Payload
+	to s : Vhdl!Signal	{
+		
+		guard : pl.source.isTypeOf(HiLeS!Port) and pl.target.isTypeOf(HiLeS!Port) 
+				and pl.type.isTerminalType()
+		
+		s.identifier = pl.name;
+		s.subtype = new Vhdl!Subtype;
+		switch( pl.type)
+			{
+				case("electrical") : s.subnature.nature = Vhdl!Natures#electrical;
+				case("magnetic") : s.subnature.nature = Vhdl!Natures#magnetic;
+				case("translational") : s.subnature.nature = Vhdl!Natures#translational;
+				case("radiant") : s.subnature.nature = Vhdl!Natures#radiant;
+				case("tranlational_v") : s.subnature.nature = Vhdl!Natures#tranlational_v;
+				case("fluidic") : s.subnature.nature = Vhdl!Natures#fluidic;
+				case("rotational_v") : s.subnature.nature = Vhdl!Natures#rotational_v;
+				case("thermal") : s.nature.subnature = Vhdl!Natures#thermal;
+				case("rotational") : s.nature.subnature = Vhdl!Natures#rotational;
+			}
+		if(pl.size <> 1)
+		{
+			s.subnature.range = new Vhdl!Range;
+			s.subnature.range.begin = pl.size-1;
+			s.subnature.range.direction = Vhdl!RangeDirection#downto;
+			s.subnature.range.end = 0;
+		}
+		
+	}

@@ -1,0 +1,126 @@
+-- Debemos crear una unica base de datos para todos
+pre {
+	("Iniciando transformación de Class a Sql").println();
+	var db : new DB!Database;
+}
+
+-- Esta regla se encarga de todo!
+rule MarketPlace2Relacional
+	transform
+		c : mp!ClassUnit
+	to
+		t : DB!Table
+		{
+			guard: (c.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0).select(a|a.`to`.Name = "Entity").size()>0 )
+		   		t.database = db;
+			   	t.name = c.name.replace("Entity", "");
+			   	var propiedades : Collection := c.codeElement.select(ce|ce.isTypeOf(mp!StorableUnit));
+			   	for(superclase in c.codeRelation.select(s|s.isTypeOf(mp!Extends)))
+				{
+					propiedades := propiedades.includingAll(superclase.`to`.codeElement.select(ce|ce.isTypeOf(mp!StorableUnit)));
+				}
+			   	var primarykeys : Collection := propiedades->select(p|p.isPrimaryKey());
+			   	var primitives : Collection := propiedades->select(p|p.isNotPrimaryKey())->select(p|p.isPrimitiveType());
+			   	var foreignKeys : Collection := propiedades->select(p|p.isForeignKey());
+									
+			   	t.columns = primitives.equivalent("StorableUnit2Column");
+			   	
+			   	var columnasHuerfanas : Collection := primarykeys.equivalent("StorableUnit2Column");
+			   	for (colHuer in columnasHuerfanas) { 
+					colHuer.table = t;
+				}
+				
+				t.primaryKeys = columnasHuerfanas;
+				
+				for(foreignkey in foreignKeys)
+				{
+					var fk : DB!ForeignKey := foreignkey.equivalent("StorableUnit2ForeignKey");
+				}
+	   } 
+	   
+@lazy	   
+rule StorableUnit2Column
+	transform
+		s : mp!StorableUnit
+	to
+		t : DB!Column{
+			t.name = s.name;
+			t.type = s.type.getType();
+			t.database = db;
+	   }
+
+@lazy
+rule StorableUnit2ForeignKey
+	transform
+		s : mp!StorableUnit
+	to
+		t : DB!ForeignKey{
+			t.parent = s.equivalent("StorableUnit2Column");
+			var annotation : HasValue = s.getAnnotation("PrimaryKeyJoinColumn");
+			var tableName : String = s.type.name.replace("IdEntity","");
+			var tableKey : String = annotation.attribute.select(a|a.tag = "referencedColumnName").first().value.replace('"', '');
+			var key : String = annotation.attribute.select(a|a.tag = "name").first().value.replace('"', '');
+			t.name = tableName +"["+tableKey+"]:"+key;
+			t.database = db; 
+		}
+
+	   
+//devuelve el tipo
+operation InterfaceUnit getType()
+{
+	switch (self.name) {
+		case "Long" : return DB!DataType#int;
+		case "Integer" : return DB!DataType#int;
+		case "String" : return DB!DataType#varchar;
+		default : return DB!DataType#unknow;
+	}
+}
+
+operation ClassUnit getType()
+{
+	return DB!DataType#int;
+}
+
+// Devuelve si es llave primaria o no
+operation StorableUnit isPrimitiveType()
+{
+	if(self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size()>0).select(a|a.`to`.Name = "PrimaryKeyJoinColumn").size()=0)
+	{
+		return true;
+	}
+	
+	return false;
+}
+
+operation StorableUnit isPrimaryKey()
+{
+	if(self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size() > 0).select(a|a.`to`.Name = "Id").size()>0){
+		return true;
+	}
+	
+	return false;
+}
+
+operation StorableUnit isNotPrimaryKey()
+{
+	if(self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size() > 0).select(a|a.`to`.Name = "Id").size()==0){
+		return true;
+	}
+	
+	return false;
+}
+
+operation StorableUnit getAnnotation(name : String)
+{
+	return self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size() > 0).select(a|a.`to`.Name = name).first(); // Se asume que solo hay una anotacion
+}
+
+operation StorableUnit isForeignKey()
+{
+	if(self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size()>0).select(a|a.`to`.Name = "PrimaryKeyJoinColumn").size()>0)
+	{
+	  	return true;
+	}
+	 
+	return false;
+}

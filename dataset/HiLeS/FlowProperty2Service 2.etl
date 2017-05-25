@@ -1,0 +1,321 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: FlowProperty2Service.etl 807 2012-06-08 21:09:51Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+import "FlowProperty2Point.etl";
+
+// ============================= IN/OUT PORTS =================================
+/****r* FlowProperty2Point/FlowProperty2Service
+ * SUMMARY
+ *   Transform a SysML:FlowProperty to a HiLeS:Service. ($Rev: 807 $)
+ * DESCRIPTION
+ * |html <B>@abstract</B>
+ *   These rules extends FlowProperty2Point and assigns the correct direction type
+ * the the Service. 
+ * 
+ * DERIVED FROM
+ *  * FlowProperty2Point
+ * DERIVED BY
+ *  * FlowProperty2ServiceSingle
+ *	* FlowProperty2ServiceVector
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@abstract
+rule FlowProperty2Service
+	transform flowProperty : SysML!FlowProperty
+	to point : HiLeS!Service
+	extends FlowProperty2Point
+	{
+		if(flowProperty.direction = SysML!FlowDirection#`in`) {
+			point.direction = HiLeS!PointDirection#from;
+		} else {
+			if(flowProperty.direction = SysML!FlowDirection#out) {
+				point.direction = HiLeS!PointDirection#`to`;
+			}	
+		}
+		//flowProperty.base_Property.name.println("FlowProperty2Service: ");
+		//flowProperty.id.println();
+	}
+
+/****r* FlowProperty2Point/FlowPropertyConjugated2Service
+ * SUMMARY
+ *   Transform a SysML:FlowProperty to a HiLeS:Service. ($Rev: 807 $)
+ * DESCRIPTION
+ * |html <B>@abstract</B>
+ *   These rules extends FlowProperty2Point and assigns the correct direction type
+ * the the Service. In a Conjugated FlowProperty, the Direction of the
+ * FlowProperties of the Flow Specification of the FlowProperty are inverted,
+ * i.e. an input FlowProperty is transformed into an output Service.
+ * 
+ * DERIVED FROM
+ *  * FlowProperty2Point
+ * DERIVED BY
+ *  * FlowPropertyConjugated2ServiceSingle
+ *	* FlowPropertyConjugated2ServiceVector
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@abstract
+rule FlowProperty2ServiceConjugated
+	transform flowProperty : SysML!FlowProperty
+	to point : HiLeS!Service
+	extends FlowProperty2Point
+	{
+
+		if(flowProperty.direction = SysML!FlowDirection#`in`) {
+			point.direction = HiLeS!PointDirection#`to`;
+		} else {
+			if(flowProperty.direction = SysML!FlowDirection#out) {
+				point.direction = HiLeS!PointDirection#from;
+			}	
+		}
+	}
+
+/****r* FlowProperty2Service/FlowProperty2ServiceSingle
+ * SUMMARY
+ *   Transform a SysML:FlowProperty to a HiLeS:Service. ($Rev: 807 $)
+ * DESCRIPTION 
+ * |html <B>@lazy</B>
+ *   These rules extends FlowProperty2Service and assigns the correct size (1) to the
+ * port. These rules are all lazy because they must be invoked only for cloned
+ * FlowProperties.
+ * DERIVED FROM
+ *   * FlowProperty2Service
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule FlowProperty2ServiceSingle
+	transform flowProperty : SysML!FlowProperty
+	to point : HiLeS!Service
+	extends FlowProperty2Service
+	{
+		
+		guard : flowProperty.base_Property.type.isTypeOf(SysML!PrimitiveType)
+		
+		point.size = 1;
+	}
+
+/****r* FlowProperty2Service/FlowPropertyConjugated2ServiceSingle
+ * SUMMARY
+ *   Transform a SysML:FlowProperty to a HiLeS:Service. ($Rev: 807 $)
+ * DESCRIPTION 
+ * |html <B>@lazy</B>
+ *   These rules extends FlowPropertyConjugated2Service and assigns the correct
+ * size (1) to the Service. These rules are all lazy because they must be invoked
+ * only for cloned FlowProperties.
+ * DERIVED FROM
+ *   * FlowPropertyConjugated2Service
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */		
+@lazy
+rule FlowProperty2ServiceSingleConjugated
+	transform flowProperty : SysML!FlowProperty
+	to point : HiLeS!Service
+	extends FlowProperty2ServiceConjugated
+	{
+		
+		guard : flowProperty.base_Property.type.isTypeOf(SysML!PrimitiveType)
+		
+		point.size = 1;
+	}
+
+/****r* FlowProperty2Service/FlowProperty2ServiceVector
+ * SUMMARY
+ *   Transform a SysML:FlowProperty to a HiLeS:Service. ($Rev: 807 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *   These rules extends FlowProperty2Service and assigns the correct size to the
+ * port depending on the size of the Logic or Analog vector that types the port.
+ * The rule is lazy because it must be invoked only for cloned FlowPropertys.
+ * DERIVED FROM
+ *   * FlowProperty2Service
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule FlowProperty2ServiceVector
+	transform flowProperty : SysML!FlowProperty
+	to point : HiLeS!Service
+	extends FlowProperty2Service
+	{
+	
+		guard : not flowProperty.base_Property.type.isTypeOf(SysML!PrimitiveType)
+				and flowProperty.base_Property.type.generalization.collect(g
+					| g.general).exists(grl
+						| grl.name = "LogicVector" or grl.name = "AnalogVector"
+						)
+		
+		/* The size of the Service is multiplicity of the owned attribute of the
+		 * flowProperty.type that subsets the slot property of the LogicVector
+		 * datatype of the HiLeS library */
+		point.size = flowProperty.base_Property.type.ownedAttribute.selectOne(oa
+				| oa.subsettedProperty.one(sp 
+					| sp.name = "slot")).upperValue.value;
+	}
+
+/****r* FlowProperty2Service/FlowPropertyConjugated2ServiceVector
+ * SUMMARY
+ *   Transform a SysML:FlowProperty to a HiLeS:Service. ($Rev: 807 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *   These rules extends FlowPropertyConjugated2Service and assigns the correct
+ * size to the port depending on the size of the Logic or Analog vector that
+ * types the port. The rule is lazy because it must be invoked only for cloned
+ * FlowPropertys.
+ * DERIVED FROM
+ *   * FlowPropertyConjugated2Service
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule FlowProperty2ServiceVectorConjugated
+	transform flowProperty : SysML!FlowProperty
+	to point : HiLeS!Service
+	extends FlowProperty2ServiceConjugated
+	{
+	
+		guard : not flowProperty.base_Property.type.isTypeOf(SysML!PrimitiveType)
+				and flowProperty.base_Property.type.generalization.collect(g
+					| g.general).exists(grl
+						| grl.name = "LogicVector" or grl.name = "AnalogVector"
+						)
+		
+		/* The size of the Service is multiplicity of the owned attribute of the
+		 * flowProperty.type that subsets the slot property of the LogicVector
+		 * datatype of the HiLeS library */
+		point.size = flowProperty.base_Property.type.ownedAttribute.selectOne(oa
+				| oa.subsettedProperty.one(sp 
+					| sp.name = "slot")).upperValue.value;
+	}
+	
+
+//================================= INOUT ====================================
+// For inout the conjugated property makes no diference
+/****r* FlowPropertyInout2Point/FlowPropertyInout2Service
+ * SUMMARY
+ *   Transform a SysML:FlowProperty to two HiLeS:Service. ($Rev: 807 $)
+ * DESCRIPTION
+ * |html <B>@abstract</B>
+ *   These rules extends FlowPropertyInout2Point and assigns the correct
+ * direction type to the Service. Each port is assigned a distinct name that
+ * includes the direction. The rule is lazy because it must be invoked only for
+ * cloned FlowPropertys.
+ * DERIVED FROM
+ *   * FlowPropertyInout2Point
+ * DERIVED BY
+ *  * FlowPropertyInout2ServiceSingle
+ *	* FlowPropertyInout2ServiceVector
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@abstract
+rule FlowPropertyInout2Service
+	transform flowProperty : SysML!FlowProperty
+	to pointIn : HiLeS!Service, pointOut : HiLeS!Service
+	extends FlowPropertyInout2Point
+	{
+		
+		pointIn.name = pointIn.name + "From";
+		pointOut.name = pointOut.name + "To";
+		pointIn.direction = HiLeS!PointDirection#from;	
+		pointOut.direction = HiLeS!PointDirection#`to`;
+	}
+	
+/****r* FlowPropertyInout2Service/FlowPropertyInout2ServiceSingle
+ * SUMMARY
+ *   Transform a SysML:FlowProperty to two HiLeS:Service. ($Rev: 807 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *   These rules extends FlowPropertyInout2Service and assigns the correct size (1)
+ * to the ports. The rule is lazy because it must be invoked only for cloned
+ * FlowPropertys.
+ * DERIVED FROM
+ *   * FlowPropertyInout2Service
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule FlowPropertyInout2ServiceSingle
+	transform flowProperty : SysML!FlowProperty
+	to pointIn : HiLeS!Service, pointOut : HiLeS!Service
+	extends FlowPropertyInout2Service
+	{
+		
+		guard : flowProperty.base_Property.type.isTypeOf(SysML!PrimitiveType)
+		
+		pointIn.size = 1;
+		pointOut.size = 1;
+	}
+
+/****r* FlowPropertyInout2Service/FlowPropertyInout2ServiceVector
+ * SUMMARY
+ *   Transform a SysML:FlowProperty to two HiLeS:Service. ($Rev: 807 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *   These rules extends FlowPropertyInout2Service and assigns the correct size to
+ * the port depending on the size of the Logic or Analog vector that types the
+ * port. The rule is lazy because it must be invoked only for cloned
+ * FlowPropertys.
+ * DERIVED FROM
+ *   * FlowPropertyInout2Service
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule FlowPropertyInout2ServiceVector
+	transform flowProperty : SysML!FlowProperty
+	to pointIn : HiLeS!Service, pointOut : HiLeS!Service
+	extends FlowPropertyInout2Service
+	{
+	
+		guard : not flowProperty.base_Property.type.isTypeOf(SysML!PrimitiveType)
+				and flowProperty.base_Property.type.generalization.collect(g
+					| g.general).exists(grl
+						| grl.name = "LogicVector" or grl.name = "AnalogVector"
+						)
+		
+		/* The size of the Service is multiplicity of the owned attribute of the
+		 * flowProperty.type that subsets the slot property of the LogicVector
+		 * datatype of the HiLeS library */
+		pointIn.size = flowProperty.base_Property.type.ownedAttribute.selectOne(oa
+				| oa.subsettedProperty.one(sp 
+					| sp.name = "slot")).upperValue.value;
+		pointOut.size = pointIn.size;
+	}

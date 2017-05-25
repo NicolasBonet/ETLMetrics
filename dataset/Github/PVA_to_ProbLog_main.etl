@@ -1,0 +1,348 @@
+import "../Constants.eol";
+import "../problog/ProbLogUtil.eol";
+import "../problog/ProbLogRuleUtil.eol";
+import "PVA_Templates.etl";
+import "Probcode_to_ProbLog.etl";
+
+pre {
+	"Starting transformation of PVA to ProbLog...".println();
+	cleanup();
+	
+	//Store a global reference to the PVA model
+	var pvaContainer = PVA!PVAContainer->all->first();
+}
+
+//Remove pre-existing ProbLog entities 
+operation cleanup(){
+	//use safe copy to avoid ConcurrentModificationException
+	for(p in ProbLog.allContents()->asSet()){
+		p.println("Deleting old ");
+		delete p;
+	}
+}
+
+post {
+	"Transformation completed!".println();
+}
+
+
+//
+// ProbLog generation rules and operations
+//
+
+//Instantiates the problog program container
+rule containers
+	transform pva : PVA!PVAContainer
+	to pp : ProbLog!ProbLogProgram {
+		pp.~idcounter = 0l;
+}
+
+
+//concereteConnections(Label,SourceType,TargetType).
+@abstract
+rule concreteConnections
+	transform concreteType : PVA!ConcreteType
+	to out : List<ProbLog!Rule>{
+		for(connection in concreteType.connectedTo){
+			var dbRule = new ProbLog!Rule();
+			dbRule.atomArgumentFact(const().~CONCRETE_CONNECTION, List{connection.label,concreteType.name, connection.target.name});
+			out.add(dbRule);
+		}
+		program().statements.addAll(out);
+}
+
+rule assetTypeConnections
+	transform concreteType : PVA!AssetType
+	to out : List<ProbLog!Rule> extends concreteConnections {}
+	
+rule defenceTypeConnections
+	transform concreteType : PVA!DefenceType
+	to out : List<ProbLog!Rule> extends concreteConnections {}
+
+rule attackStepTypeConnections
+	transform concreteType : PVA!AttackStepType
+	to out : List<ProbLog!Rule> extends concreteConnections {}
+
+
+rule virtualConnections
+	transform connection : PVA!VirtualConnection
+	to dbRule : ProbLog!Rule {
+		var kind = const().~VIRTUAL_CONNECTION.prologize(); 
+		if(connection.reversed){ //flip path if the virtual connection is inversed
+			kind = const().~REVERSE_VIRTUAL_CONNECTION.prologize();	
+		}
+			
+		cheat(
+			kind + "(" +
+			connection.label.prologize() +
+			", " + connection.eContainer().name.prologize() +
+			", " + connection.target.name.prologize() +
+			", [" +
+				connection.path->collect(p | "("+p.label.prologize() + ", "+p.target.name.prologize() + ")").joinToString(", ") + 
+			"]" +
+			")."
+		);
+}
+
+
+
+//assetType(X).
+rule assetTypes
+	transform assetType : PVA!AssetType
+	to stat : ProbLog!Rule {
+		stat.atomArgumentFact(const().~ASSET_TYPE,assetType.name);
+		program().statements.add(stat);
+}
+
+//defendedBy(Asset,Defence).
+rule assetDefences
+	transform assetType : PVA!AssetType
+	to statements : List<ProbLog!Rule> {
+		for(defence in assetType.defendedBy){
+			var dbRule = new ProbLog!Rule();
+			dbRule.atomArgumentFact(const().~DEFENDED_BY, List{assetType.name, defence.name});
+			statements.add(dbRule);
+		}
+		program().statements.addAll(statements);
+}
+
+//attackedBy(AssetType,AttackStepType)
+rule assetThreats
+	transform attackStepType : PVA!AttackStepType
+	to rules: List<ProbLog!Rule> {
+		guard : attackStepType.target <> null
+		
+		var targetName = attackStepType.target.name;
+		var term = getTerm(const().~ATTACKED_BY,2);
+		var termi = term.getInstance(List{
+				getAtom(attackStepType.target.name), 
+				getAtom(attackStepType.name)
+		});
+		var newRule = createRule(List{termi});
+		
+		rules.add(newRule);
+		program().statements.addAll(rules);
+}
+
+rule assetThreatsIllegal
+	transform attackStepType : PVA!AttackStepType
+	to dbRule: ProbLog!Rule {
+		guard : attackStepType.target == null
+		attackStepType.name.println("Warning, attackstep type without a target: ");
+}
+
+
+//defenceType(X).	
+rule defenceTypes
+	transform defenceType : PVA!DefenceType
+	to stat : ProbLog!Rule {
+		stat.atomArgumentFact(const().~DEFENCE_TYPE,defenceType.name);
+		program().statements.add(stat);
+}
+
+//defenceIsFunctioning(instance(defenceType,DID,DefenceType,DTI)) :- 
+//	instance(asset,AID,AssetType,TInstance), 
+//	instance(defence,DID,DefenceType,TInstance2),
+//	%defendedBy(AssetType,DefenceType), 
+//	%concreteConnectionInstance(_,(Defence),(Asset)),
+//	code.
+rule defenceFunctioning
+	transform defenceType : PVA!DefenceType
+	to stat : List<ProbLog!Rule> {
+		var property = defenceType.functioning->equivalent();
+		var propertyName = property.~rootName;
+		var def = defenceType.eClass().name.prologize();
+		var defid = "DefenceID";
+		var newRule = createRule(
+			List{
+				getTerm(const().~DEFENCE_INSTANCE_ISFUNCTIONING,1).getInstance(List{
+					getTerm(const().~INSTANCE,4).getInstance(List{
+						getAtom(const().~DEFENCE_TYPE),
+						getVariable(defid),
+						getAtom(defenceType.name),
+						getVariable(const().~TEMPLATE_INSTANCE)
+					})
+				})
+			}
+		,
+			List{
+				getTerm(const().~INSTANCE,4).getInstance(List{
+					getAtom(const().~DEFENCE_TYPE),
+					getVariable(defid),
+					getAtom(defenceType.name),
+					getVariable(const().~TEMPLATE_INSTANCE)
+				}),
+				getNot().getInstance(List{
+					getTerm(const().~HARD_EVIDENCE_FALSE,1).getInstance(List{
+						getTerm(const().~INSTANCE,4).getInstance(List{
+							getAtom(const().~DEFENCE_TYPE),
+							getVariable(defid),
+							getAtom(defenceType.name),
+							getVariable(const().~TEMPLATE_INSTANCE)
+						})
+					})
+				}),
+				getTerm(propertyName,1).getInstance(List{
+					getTerm(const().~INSTANCE,4).getInstance(List{
+						getAtom(const().~DEFENCE_TYPE),
+						getVariable(defid),
+						getAtom(defenceType.name),
+						getVariable(const().~TEMPLATE_INSTANCE)
+					})
+				})
+			}
+			
+		); 
+
+		//Add the main rule
+		stat.add(newRule);
+		
+		//Add the evidence-true rule
+		var evidenceRule = createRule(
+			List{
+				getTerm(const().~DEFENCE_INSTANCE_ISFUNCTIONING,1).getInstance(List{
+					getTerm(const().~INSTANCE,4).getInstance(List{
+						getAtom(const().~DEFENCE_TYPE),
+						getVariable("DefenceID"),
+						getAtom(defenceType.name),
+						getVariable(const().~TEMPLATE_INSTANCE)
+					})
+				})
+			}
+		,
+			List{
+				getTerm(const().~HARD_EVIDENCE_TRUE,1).getInstance(List{
+					getTerm(const().~INSTANCE,4).getInstance(List{
+						getAtom(const().~DEFENCE_TYPE),
+						getVariable("DefenceID"),
+						getAtom(defenceType.name),
+						getVariable(const().~TEMPLATE_INSTANCE)
+					})
+				})
+			}
+		);
+		stat.add(evidenceRule);
+		
+		//Add the property code
+		stat.addAll(property);
+		
+		program().statements.addAll(stat);
+}
+
+//attackStepType(X).	
+rule attackStepTypes
+	transform attackStepType : PVA!AttackStepType
+	to stat : ProbLog!Rule {
+		stat.atomArgumentFact(const().~ATTACKSTEP_TYPE,attackStepType.name);
+		program().statements.add(stat);
+}
+
+//enables(ASType,Enabler). 
+rule attackStepPrerequisites
+	transform asType : PVA!AttackStepType
+	to stats : List<ProbLog!Rule> {
+		for(target in asType.enables){
+			var newStat = new ProbLog!Rule();
+			newStat.atomArgumentFact(const().~ATTACKSTEP_ENABLED,List{asType.name,target.name});
+			stats.add(newStat);
+		}
+		program().statements.addAll(stats);
+}
+
+//attackStepSucceeded(AssetInstance, exploitCommandInjection, TemplateInstance) :-
+//	instance(assetType, AssetID, AssetInstance, TemplateInstance), 
+//	instance(attackStepType, AssetInstance, exploitCommandInjection, TemplateInstance),
+// 	somePathToAttackStep(attackStepType, AssetInstance, exploitCommandInjection, TemplateInstance),
+//	property_200(instance(attackStepType, AssetInstance, exploitCommandInjection, TemplateInstance)).
+rule attackStepSuccess
+	transform asType : PVA!AttackStepType
+	to stat : List<ProbLog!Rule> {
+		var property = asType.succeeded->equivalent();
+		var somePath = "somePathToAttackStep".prologize();
+		var newRule = createRule(List{
+			getTerm(const().~ATTACKSTEP_SUCCEEDED,3).getInstance(List{
+				getVariable(const().~ASSET_INSTANCE),
+				getVariable(const().~ASSET_TYPE),
+				getAtom(asType.name),
+				getVariable(const().~TEMPLATE_INSTANCE)
+			})
+		}, List{
+			getTerm(const().~INSTANCE,4).getInstance(List{
+				getAtom("attackStepType"),
+				getVariable(const().~ASSET_INSTANCE),
+				getAtom(asType.name),
+				getVariable(const().~TEMPLATE_INSTANCE)
+			}),
+			getTerm(const().~INSTANCE,4).getInstance(List{
+				getAtom("assetType"),
+				getVariable(const().~ASSET_INSTANCE),
+				getVariable(const().~ASSET_TYPE),
+				getVariable(const().~TEMPLATE_INSTANCE)
+			}),			
+			getNot().getInstance(List{
+				getTerm(const().~HARD_EVIDENCE_FALSE,1).getInstance(List{
+					getTerm(const().~INSTANCE,4).getInstance(List{
+						getAtom("attackStepType"),
+						getVariable(const().~ASSET_INSTANCE),
+						getAtom(asType.name),
+						getVariable(const().~TEMPLATE_INSTANCE)
+					})
+				})
+			}),
+			getTerm(somePath,4).getInstance(List{
+				getAtom("attackStepType"),
+				getVariable(const().~ASSET_INSTANCE),
+				getAtom(asType.name),
+				getVariable(const().~TEMPLATE_INSTANCE)
+			}),
+			getTerm(property.~rootName,1).getInstance(List{
+				getTerm(const().~INSTANCE,4).getInstance(List{
+					getAtom("attackStepType"),
+					getVariable(const().~ASSET_INSTANCE),
+					getAtom(asType.name),
+					getVariable(const().~TEMPLATE_INSTANCE)
+				})
+			})
+		});
+		
+		var evidenceRule = createRule(List{
+			getTerm(const().~ATTACKSTEP_SUCCEEDED,3).getInstance(List{
+				getVariable(const().~ASSET_INSTANCE),
+				getVariable(const().~ASSET_TYPE),
+				getAtom(asType.name),
+				getVariable(const().~TEMPLATE_INSTANCE)
+			})
+		}, List{
+			getTerm(const().~INSTANCE,4).getInstance(List{
+				getAtom("attackStepType"),
+				getVariable(const().~ASSET_INSTANCE),
+				getAtom(asType.name),
+				getVariable(const().~TEMPLATE_INSTANCE)
+			}),
+			getTerm(const().~INSTANCE,4).getInstance(List{
+				getAtom("assetType"),
+				getVariable(const().~ASSET_INSTANCE),
+				getVariable(const().~ASSET_TYPE),
+				getVariable(const().~TEMPLATE_INSTANCE)
+			}),			
+			getTerm(const().~HARD_EVIDENCE_TRUE,1).getInstance(List{
+				getTerm(const().~INSTANCE,4).getInstance(List{
+					getAtom("attackStepType"),
+					getVariable(const().~ASSET_INSTANCE),
+					getAtom(asType.name),
+					getVariable(const().~TEMPLATE_INSTANCE)
+				})
+			})
+		});
+			
+		stat.add(newRule);
+		stat.add(evidenceRule);
+		stat.addAll(property);	
+		program().statements.addAll(stat);
+}
+
+//Method used to obtain the problog container, as its global reference is not kept
+@cached
+operation program() : ProbLog!ProbLogProgram {
+	return pvaContainer->equivalent();
+}

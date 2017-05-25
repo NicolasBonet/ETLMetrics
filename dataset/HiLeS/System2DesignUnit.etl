@@ -1,0 +1,54 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: System2DesignUnit.etl 973 2013-11-07 22:58:54Z ra.caliz70@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+
+/*
+ * HiLeS to VHDL-AMS.
+ * This file consolidates the set of sources that conform the transfor-
+ * mation from a HiLeS model to a VHDL-AMS model.
+ * @model hiles The HiLeS Model (@conformsTo http://hiles.uniandes.edu.co/1.1/HiLeS)
+ * @model vhdl The VHDL-AMS Model (@conformsTo http://hiles.uniandes.edu.co/1.0/VHDL-AMS)
+ * @import DesignUnit.etl
+ * @depends Structural.etl
+ * @depends Functional.etl
+*/ 
+ // Create a DesingUnit from a HiLeS System
+rule System2DesignUnit
+	transform system : HiLeS!HilesSystem
+	to unit : Vhdl!DesignUnit {
+		
+		//system.name.println("System: ");
+		unit.identifier = system.name;
+		// Context
+		unit.contextClause = new Vhdl!ContextClause;
+		var library = new Vhdl!LibraryClause;
+		//library.logicalName.add(hiles);		// Should only be added for SB
+		library.logicalName.add("ieee_proposed;");
+		unit.contextClause.contextItem.add(library);
+		var use = new Vhdl!UseClause;
+		//uses.selectedName.add("hiles.petrinet.all");	// Should only be added for SB
+		use.selectedName.add("ieee.std_logic_1164.all");
+		use.selectedName.add("ieee_proposed.electrical_systems.all; ");
+		unit.contextClause.contextItem.add(use);
+		// Primary Units
+		var entity = new Vhdl!Entity;
+		entity.identifier = system.name;
+		// The system does not have any ports
+		unit.libraryUnit.add(entity);
+		// Add Vhdl Architectures for the initial system archirecture to the
+		// library units
+		var a = system.initialArchitecture.equivalent();
+		a.entity = entity;		// Do it this way to avoid circular loop
+		unit.libraryUnit.add(a);
+		
+		
+		
+	}

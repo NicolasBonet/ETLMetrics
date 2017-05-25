@@ -1,0 +1,141 @@
+-- Debemos crear una unica base de datos para todos
+pre {
+	var db : new DB!Database;
+}
+
+-- Esta regla se encarga de todo!
+rule MarketPlace2Relacional
+	transform
+		c : mp!ClassUnit
+	to
+		t : DB!Table
+		{	
+			// to es una palabra reservada del lenguaje por lo tanto se debe usar con el escape `to` para qu elo tome en el modelo
+			guard : (c.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0).select(a|a.`to`.Name = "Entity").size() > 0 
+			 or c.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0).select(a|a.`to`.Name = "MappedSuperclass").size() > 0) 
+			 and c.codeElement.select(ce|ce.isTypeOf(mp!StorableUnit)).size() > 0
+					
+			//"Clase".println();
+			//c.name.println();
+			//c.codeRelation.select(s|s.isTypeOf(mp!Extends)).size().println();
+			
+			-- Asignamos la tabla creada a la base de datos inicializada al comienzo y le ponemos el nombre de la clase sin el Entity
+	   		t.database = db;
+		   	t.name = c.name.replace("Entity", "");
+		   	t.name = c.name.replace("_", "");
+		   //	c.name.println();
+			
+			/*
+				El equivalent funciona ya que tanto la relación que sigue de clase (codeElement) se puede comparar
+				en atributos a las columnas (columns) que está relacionadas a la tabla 
+			*/
+		   	t.columns = c.codeElement.equivalent();	
+		   	
+		   	
+
+		   	t.primaryKeys = t.columns.select(col | col.notNull == true);
+		   	
+		   	
+			//t.columns.println();
+		   	
+		   	//t.primaryKeys = c.codeElement.equivalent();
+		   	
+	   }
+
+/*
+Esta regla solo será llamada cuando el equivalent ese refiera a su salida
+por ejemplo t.columns = c.codeElement.equivalent();	 al llamar colums busca 
+si existe alguna regla relacionada con este y lo invoca
+*/		
+@Lazy
+rule attributeToColum
+	transform
+		su: mp!StorableUnit
+	to
+		col: DB!Column
+		{
+	
+		guard: su.eContainer.isTypeOf(mp!ClassUnit) 
+			and (su.eContainer.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0).select(a|a.`to`.Name = "Entity").size() > 0
+			 or su.eContainer.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0).select(a|a.`to`.Name = "MappedSuperclass").size() > 0)
+			and su.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0).select(a|a.`to`.Name = "Id").size() == 0
+			
+			//"---".println(); su.name.println();
+			col.name = su.name;
+			
+			// Segun el tipo de dato se asigna uno del enum que se tiene en el modelo de DB
+			switch(su.type.name){
+				
+				case 'String' : col.type = DB!DataType#varchar;
+					 break;
+				case 'Long' : col.type = DB!DataType#int; 
+					 break;
+				case 'Integer' : col.type = DB!DataType#int;
+					 break;
+				default :  col.type = DB!DataType#unknown;
+			}
+		}				 		
+		 	
+@Lazy
+rule attributeToPrimaryKey
+	transform
+		su: mp!StorableUnit
+	to
+		col: DB!Column
+		{
+	
+		guard: su.eContainer.isTypeOf(mp!ClassUnit) 
+			and (su.eContainer.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0).select(a|a.`to`.Name = "Entity").size() > 0
+			 or su.eContainer.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0).select(a|a.`to`.Name = "MappedSuperclass").size() > 0)
+			 and su.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0).select(a|a.`to`.Name = "Id").size() > 0
+				//"PK".println();
+				
+			 //su.println();
+			 
+			 col.name = su.name;
+			
+			// Segun el tipo de dato se asigna uno del enum que se tiene en el modelo de DB
+			switch(su.type.name){
+				
+				case 'String' : col.type = DB!DataType#varchar;
+					 break;
+				case 'Long' : col.type = DB!DataType#int; 
+					 break;
+				case 'Integer' : col.type = DB!DataType#int;
+					 break;
+				default :  col.type = DB!DataType#unknown;
+			}
+			
+			col.notNull = true;
+		}	
+		
+	/*
+rule attributeToForeingKey
+	transform
+		su: mp!StorableUnit
+	to
+		col: DB!ForeignKey
+		{
+	
+		guard: su.eContainer.isTypeOf(mp!ClassUnit) 
+			and (su.eContainer.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0).select(a|a.`to`.Name = "Entity").size() > 0
+			 or su.eContainer.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0).select(a|a.`to`.Name = "MappedSuperclass").size() > 0)
+			 and su.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0).select(a|a.`to`.Name = "PrimaryKeyJoinColumn").size() > 0
+				"FK".println();
+				
+			 for(a in  su.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0).select(a|a.`to`.Name = "PrimaryKeyJoinColumn")){
+			 	a.println();
+			 }
+			 
+		}	
+
+*/					 		
+		 		
+operation StorableUnit isPK()
+{
+	if(self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size() > 0).select(a|a.`to`.Name = "Id").size()>0){
+		return true;
+	}
+	
+	return false;
+}

@@ -1,0 +1,69 @@
+pre{
+}
+
+rule App2App
+	transform s : crud!Application
+	to t : angular!Application {
+	("App2App"+s.name).println();
+	t.name = s.name; 
+	t.services = s.entities.equivalent();
+	t.cruds = s.getCruds(t.services,s.entities);
+	
+}
+
+operation crud!Application getCruds(services,entities){
+
+	
+	var cruds : Sequence = Sequence {};
+	//cruds = angular!Application.cruds;
+	
+	for(entity in entities){
+		var crud = new angular!Crud();
+		if(not (entity.crud == null)){
+			crud.allowCreate = entity.crud.allowCreate;
+			crud.allowRead = entity.crud.allowRead;
+			crud.allowUpdate = entity.crud.allowUpdate;
+			crud.allowDelete = entity.crud.allowDelete;
+			for (service in services){
+				if(service.name == entity.name.toLowerCase().firstToUpperCase().replace(' ','')){
+					crud.service = service;	
+				}
+			}
+			
+			crud.fields = entity.crud.fields.select(f|f.isKindOf(crud!PrimitiveField)).equivalent();
+		}
+		crud.println();
+		cruds.add(crud);
+	}
+	
+	return cruds;
+}
+
+@lazy
+rule Entity2Service
+	transform s : crud!Entity
+	to t : angular!Service {
+	("  Entity2Service: "+s.name).println();
+	t.name = s.name.toLowerCase().firstToUpperCase().replace(' ',''); 
+	t.filters = s.atributes.equivalent();
+	t.url = "admin/"+s.name.toLowerCase().replace(' ','')+"s";
+}
+
+@lazy
+rule PrimitiveField2Field
+	transform s : crud!PrimitiveField
+	to t : angular!Field {
+	("    PrimitiveField2Field: "+s.attribute.name).println();
+	t.key = s.attribute.name.toLowerCase().replace(' ','_');
+	t.dataType=convertDataType(s.attribute.dataType);
+}
+
+operation convertDataType(dataType){
+	switch(dataType){
+		case crud!DataType#int: return angular!DataType#int;
+		case crud!DataType#string:  return angular!DataType#string;
+		case crud!DataType#text:  return  angular!DataType#text;
+		case crud!DataType#decimal: return  angular!DataType#decimal;
+		case crud!DataType#dateTime: return angular!DataType#dateTime;
+	}
+}

@@ -1,0 +1,208 @@
+
+rule InformationOperator2application
+	transform
+	   s:dominio!InformationOperator
+	to 
+	   t:arquitectura!Application {
+	   		t.payingrule = s.payingRules.equivalent();
+	   		crearVistasTemplates(s,t);
+	   		
+/*	   		for (modelo in s.businessEntities) {
+	   			var modelo = new arquitectura!Model;	   			
+	   			for (attributos in modelo.fields) { 
+					var atributo = new arquitectura!Field; 
+				}
+				var modelo = new arquitectura!Model;
+	   			modelo.name = s.businessEntities.name.at(i);
+	   			modelo.fields = s.businessEntities.attribute.equivalent();
+	   			modelo.fields.dataType = s.businessEntities.attribute.dataType;
+	   			t.models.add(modelo);
+	   			i++;
+			}*/
+			t.models =s.businessEntities.equivalent();
+	   		t.roles = s.businessEntities.equivalent();
+	   }
+	   
+rule businessEntity2Model
+	transform
+		s:dominio!BusinessEntity
+	to
+		t:arquitectura!Model{
+			t.name =s.name;
+			t.fields = s.attribute.equivalent();
+		} 
+
+rule arquitecturaRole
+	transform
+		s:dominio!BusinessEntity
+	to
+		t:arquitectura!Role{
+			t.name = s.name;
+		}
+	   
+rule Attribute2Field
+	transform
+	   s:dominio!Attribute
+	to 
+	   t:arquitectura!Field {
+	   		t.dataType = s.dataType.equivalent();
+	   		t.name = s.name;
+	   		t.length = s.length;
+	   		t.regularExpression = s.regularExpression;
+	   		t.mandatory = s.mandatory;
+	   		t.choices = s.possibleValues.equivalent();
+	   }
+	   
+rule value2choice
+	transform
+	   s:dominio!Value
+	to 
+	   t:arquitectura!Choice {
+	   		t.label =s.code;
+	   		t.value =s.value;
+	   		t.valitations = s.rules.equivalent(); 
+	   }
+	   
+rule domPayingRule2arqPayingRule
+	transform
+		s:dominio!PayingRule
+	to
+	t:arquitectura!PayingRule{
+		t.name = s.name;
+		t.category = s.category;
+		t.conditionsCollection = s.conditionsCollection.equivalent();
+	}
+
+rule domConditions2arqConditions
+	transform
+		s:dominio!ConditionsCollection
+	to
+	t:arquitectura!ConditionsCollection{
+		t.logicOperation = s.logicOperation.equivalent();
+		t.conditions = s.conditions.equivalent();
+		t.formulaPositive = s.formulaPossitive.equivalent();
+		t.formulaNegative = s.formulaNegative.equivalent();
+	}
+	
+rule domCondition2arqCondition
+	transform
+		s:dominio!Condition
+	to
+		t:arquitectura!Condition{
+			t.left = s.left.equivalent();
+			t.right = s.right.equivalent();
+		}
+		
+rule domInstruction2arqInstruction
+	transform
+		s:dominio!Instruction
+	to
+		t:arquitectura!Instruction{
+			t.compOperation = s.compOperation.equivalent();
+		}		
+		
+rule AttributeCondition2FieldCondition
+	transform
+		s:dominio!AttributeCondition
+	to
+		t:arquitectura!FieldCondition{
+			t.fieldCondition = s.attributeCondition.equivalent();
+		}
+		
+rule ReferenceValue2ReferenceValue
+	transform
+		s:dominio!ReferenceValue
+	to
+		t:arquitectura!ReferenceValue{
+			t.value = s.value;
+		}
+
+rule domFormula2arqFormula
+	transform
+		s:dominio!Formula
+	to
+		t:arquitectura!Formula{
+			t.expression = s.expression.equivalent();
+		}
+		
+rule domExpression2arqExpression
+	transform
+		s:dominio!Expression
+	to
+		t:arquitectura!Expression{
+			t.left = s.left.equivalent();
+			t.right = s.right.equivalent();
+		}
+		
+rule domArithmetic2arqArithmetic
+	transform
+		s:dominio!ArithmeticOperation
+	to
+		t:arquitectura!ArithmeticOperation{
+			t.operationType = s.operationType.equivalent();
+		}		
+		
+rule domConstant2arqConstant
+	transform
+		s:dominio!Constant
+	to
+		t:arquitectura!Constant{
+			t.value = s.value;
+		}
+		
+rule AttributeLiteral2FieldLiteral
+	transform
+		s:dominio!AttributeLiteral
+	to
+		t:arquitectura!FieldLiteral{
+			t.fieldCalculate = s.attributeCalculate.equivalent();
+		}
+		
+		
+
+operation crearVistasTemplates (s,t){
+	   		var i=0;
+	   		for (businessEntity in s.businessEntities)
+	   		{
+	   			var view = new arquitectura!View;
+	   			view.type = arquitectura!ViewType#UPDATE;
+	   			view.name = s.businessEntities.name.at(i);
+	   			view.template = new arquitectura!Template;
+	   			view.template.name=s.businessEntities.name.at(i)+"UpdateView";
+	   			t.views.add(view);
+	   			var view = new arquitectura!View;
+	   			view.type = arquitectura!ViewType#LIST;
+	   			view.name = s.businessEntities.name.at(i);
+	   			view.template = new arquitectura!Template;
+	   			view.template.name=s.businessEntities.name.at(i)+"ListView";
+	   			t.views.add(view);
+	   			var view = new arquitectura!View;
+	   			view.type = arquitectura!ViewType#CREATE;
+	   			view.name = s.businessEntities.name.at(i);
+	   			view.template = new arquitectura!Template;
+	   			view.template.name=s.businessEntities.name.at(i)+"CreateView";
+	   			t.views.add(view);
+	   			i++;
+	   		}
+}
+
+operation crearModelos(s,t){
+	   		var i=0;	   		
+	   		for (businessEntity in s.businessEntities) { 
+				var modelo = new arquitectura!Model;				
+	   			modelo.name = s.businessEntities.name.at(i);
+	   			t.models.add(modelo);
+	   			i++;
+			}
+}
+
+operation crearFields(t,s,modelo){
+	for (field in modelo.fields) { 
+	 	field.dataType = s.businessEntities.attribute.dataType.equivalent();
+	 	field.length =s.businessEntities.attribute.length;
+	 	field.regularExpression = s.businessEntities.attribute.regularExpression;
+	 	field.mandatory = s.businessEntities.attribute.mandatory;
+	 	field.name = s.businessEntities.attribute.name;			
+	} 	
+ 	/*modelo.fields.choices =*/	
+}

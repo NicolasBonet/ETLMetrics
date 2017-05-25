@@ -1,0 +1,69 @@
+/** Transforms an SDF3 root element to a SenseModel.
+  * TODO: the xsi:noNamespaceSchemaLocation attribute needs to be set
+  * Currently I don't know how to do that 
+  */
+rule Model2Root
+		transform mIn: In!SenseModel
+		to root: Out!DocumentRoot {
+	// Create sdf tag with actors and channels
+	var sdf = new Out!SdfType;
+	sdf.name = "example";
+	sdf.type = "Example";
+	sdf.actor ::= In!Actor.all();
+	sdf.channel ::= In!Channel.all();
+	// Create application graph
+	var appGraph = new Out!ApplicationGraphType;
+	appGraph.name = "example-app";
+	appGraph.sdf = sdf;
+	appGraph.sdfProperties = new Out!SdfPropertiesType;
+	appGraph.sdfProperties.actorProperties ::= Capability.all();
+	// Create root element
+	root.sdf3 = new Out!Sdf3Type;
+	root.sdf3.type = "sdf";
+	root.sdf3.version = "1.0";
+	root.xSISchemaLocation.put(null, "http://www.es.ele.tue.nl/sdf3/xsd/sdf3-sdf.xsd");
+	root.sdf3.applicationGraph = appGraph;
+}
+
+rule Actor2Actor
+		transform aIn: In!Actor
+		to aOut: Out!ActorType {
+	aOut.name = aIn.name;
+	aOut.type = aIn.name;
+}
+
+rule Channel2Channel
+		transform cIn: In!Channel
+		to cOut: Out!ChannelType {
+	cOut.name = cIn.name;
+	cOut.initialTokens = cIn.initialTokens;
+	// Create source port
+	var srcPort = new Out!PortType;
+	srcPort.type = "out";
+	srcPort.name = cIn.name + "_" + srcPort.type;
+	srcPort.rate = cIn.sourceRate;
+	cOut.srcActor = cIn.source.name;
+	cOut.srcPort = srcPort.name;
+	// Create destination port
+	var dstPort = new Out!PortType;
+	dstPort.type = "in";
+	dstPort.name = cIn.name + "_" + dstPort.type;
+	dstPort.rate = cIn.targetRate;
+	cOut.dstActor = cIn.target.name;
+	cOut.dstPort = dstPort.name;
+	// Add respective ports to source and target actors
+	cIn.source.equivalent().port.add(srcPort);
+	cIn.target.equivalent().port.add(dstPort);
+}
+
+rule Capability2ActorProps
+		transform etIn: In!Capability
+		to apOut: Out!ActorPropertiesType {
+	apOut.actor = etIn.performs.name;
+	var proc = new Out!ProcessorType;
+	proc.`default` = "true";
+	proc.type = etIn.processor.name;
+	proc.executionTime = new Out!ExecutionTimeType;
+	proc.executionTime.time = etIn.time;
+	apOut.processor.add(proc);
+}

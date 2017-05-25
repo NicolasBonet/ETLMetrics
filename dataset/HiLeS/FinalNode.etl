@@ -1,0 +1,96 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: FinalNode.etl 1003 2015-05-03 00:30:47Z kd.sanchez21@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+ 
+/****r* Behavior/ActivityNode2HCN
+ * SUMMARY
+ *  Transfotrm a SysML!ActivityNode into its HiLeS Control Net
+ *  representation. ($Rev: 1003 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *  An ActivityFinalNode is just transformed into a place.
+ * SEE ALSO
+ *  * MainBlock2HCN
+ *	* ActivityPartition2Block
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule ActivityFinalNode2HCN
+	transform node : SysML!ActivityFinalNode
+	to p : HiLeS!Place
+	{
+		guard : not node.~ap.isDefined() and not SysML!ActivityPartition.all().one(ap
+				| ap = node.~ap
+				)
+		println("ActivityFinalNode2HCN");	
+		if(node.~ap.isDefined())
+		{
+			p.name = node.~ap.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P1";
+		}
+		else
+		{
+			p.name = node.owner.name.toCamelCase("\\s") + node.name.toCamelCase("\\s") + "_P1";
+		}	
+		println("EndActivityFinalNode2HCN");	
+ 	}
+
+/****r* Behavior/ActivityFinalNodeHCNDeep
+ * SUMMARY
+ *  Transfotrm a SysML!ActivityNode into its HiLeS Control Net
+ *  representation. ($Rev: 1003 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *  An ActivityFinalNode is just transformed into a place. For initial nodes in
+ * the deeper structural blocks, the final place must be connected to the HCN
+ * output service with an arc 
+ * SEE ALSO
+ *  * ActivityFinalNode2HCN
+ *  * MainBlock2HCN
+ *	* ActivityPartition2Block
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule ActivityFinalNodeHCNDeep
+	transform node : SysML!ActivityFinalNode
+	to p : HiLeS!Place, a : HiLeS!Arc
+	{
+	
+		guard : node.~ap.isDefined() and SysML!ActivityPartition.all().one(ap
+				| ap = node.~ap
+				)
+		println("ActivityFinalNodeHCNDeep");
+ 		if(node.~ap.isDefined())
+		{
+			p.name = node.~ap.name + node.name + "_P1";
+		}
+		else
+		{
+			p.name = node.owner.name + node.name + "_P1";
+		}
+ 		a.fromNode = p;
+ 		// Connect the final node to the HCN output service
+		a.toPoint = SysML!ActivityPartition.all().selectOne(ap
+				| ap = node.~ap
+				).equivalents().selectOne(p : HiLeS!Service
+					| p.direction = HiLeS!PointDirection#`to`
+					); 
+		println("EndActivityFinalNodeHCNDeep");
+ 	}

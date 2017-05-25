@@ -1,0 +1,78 @@
+pre{
+	var html: new Html5!html;
+	var divContainer=null;
+	var divContainerTrans=null;
+	
+}
+
+rule jpanelToDiv 
+transform j : Swing!ClassUnit
+to h : Html5!div {
+	
+	guard : j.getSuperClass().select(s|s.`to`.name = 'JFrame').size() > 0
+	
+	
+	//html.container.add(h);
+	//h.class='container';
+
+	for (panel in j.getAllPropertiesPanels()) {
+		panel.println();
+		divContainer = new Html5!div;
+		divContainer.class = 'row';
+		html.container.add(divContainer);
+	
+	}
+	
+	//j.name.println();
+	//j.getProperties().println();
+	
+	//j.codeElement.select(ce|ce.isTypeOf(Swing!MethodUnit)).select(mu | mu.name = j.name).println();
+}
+
+
+/*
+@Lazy
+rule jpanelToDiv
+transform jp : Swing!StorableUnit
+to con : Html5!div {
+	
+	guard : jp.type.codeRelation.select(s | s.isTypeOf(Swing!Extends)).select(sc | sc.`to`.name = 'JPanel').size() > 0
+	jp.println();
+	jp.type.println();
+}
+*/
+
+
+
+// Se devuelve las SuperClases de una Clase FIX: Deberia ser recursiva para recorrer jerarquias de herencias
+operation Swing!ClassUnit getSuperClass() : Set
+{
+	return self.codeRelation.select(s|s.isTypeOf(Swing!Extends)); 
+}
+
+// Operacion para obtener las propiedades de un ClassUnit y sus superclases
+operation ClassUnit getAllProperties()
+{
+	return self.getProperties().includingAll(self.getSuperClass()->collect(s|s.`to`.getProperties())->flatten());
+}
+
+// Operacion para obtener las propiedades de un ClassUnit y sus superclases
+operation ClassUnit getAllPropertiesPanels()
+{
+	return self.codeElement.select(ce|ce.isTypeOf(Swing!StorableUnit)).select(su | su.type.getSuperClass().size() > 0);
+}
+
+// Operacion para obtener las propiedades de un ClassUnit
+operation ClassUnit getProperties()
+{
+	return self.codeElement.select(ce|ce.isTypeOf(Swing!StorableUnit));
+}
+
+// Operacion que permite obtener los llamados a metodos que se encuentran en el constructor de la clase
+operation ClassUnit getMethodsAdd()
+{
+	return self.codeElement.select(ce|ce.isTypeOf(Swing!MethodUnit)).select(mu | mu.name = self.name).
+	codeElement.last().select(os | os.isTypeOf(Swing!BlockUnit)).codeElement.last().
+	codeElement.select(ce | ce.first.name = 'method invocation').actionRelation.`to`.
+	select(mu | mu.name.first.first = 'add');
+}

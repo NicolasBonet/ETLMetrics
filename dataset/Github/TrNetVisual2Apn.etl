@@ -1,0 +1,87 @@
+import "UtilsAlpina.eol";
+
+pre {
+  "Translating TrNet to Apn...".println();
+  
+}
+
+rule TrNetModel2ApnModel
+  transform eIn : VisualModel!TrNetModel
+  to eOut : ApnModel!APN{
+	eOut.name = eIn.id;
+	eOut.ownedNodes.addAll(eIn.patterns.equivalent().select(obj | obj.isKindOf(ApnModel!Place)));
+	eOut.ownedNodes.addAll(eIn.operators.equivalent());
+	eOut.ownedArcs.addAll(eIn.operands.equivalent().select(obj | obj.isKindOf(ApnModel!Arc)));
+	eOut.ownedArcs.addAll(eIn.results.equivalent());
+	eOut.ownedImports.addAll(getAllImports(eIn));
+	eOut.ownedVariables.addAll(eIn.patterns.equivalent().select(obj | obj.isKindOf(ApnModel!Variable)));
+	
+}
+
+
+rule pattern2Place
+  transform eIn : VisualModel!Pattern
+  to eOut : ApnModel!Place,
+  eOutVar : ApnModel!Variable
+  {
+  
+  	guard: isConnectedPattern(eIn)
+  
+	eOut.name = eIn.id + "Place";
+	eOutVar.name = eIn.id + "Var";
+	eOutVar.variableSort = new ApnModel!AtomicSort;
+	
+	eOut.sort = new ApnModel!AtomicSort;
+	
+	eOut.ownedPlaceMultiset = getPlaceMultiset(eIn);
+	
+}
+
+rule Combinator2Transition
+  transform eIn : VisualModel!Combinator
+  to eOut : ApnModel!Transition{
+	eOut.name = eIn.id + "Transition";
+	
+	eOut.ownedGuard = getTransitionGuard(eIn);
+	
+}
+
+rule AnyOperand2Arc
+  transform eIn : VisualModel!AnyOperand
+  to eOut : ApnModel!Arc, eOutMarkDuplicate : ApnModel!Arc, isMarkedEquation: ApnModel!Equation {
+  	
+  	guard : isInternalOperand(eIn)
+	
+	eOut.from = eIn.pattern.equivalent();
+	eOut.`to` = eIn.operator.equivalent();
+	
+	eOut.ownedArcMultiset = getArcOperandMultiset(eIn);
+	
+	eOutMarkDuplicate.from = eIn.operator.equivalent();
+	eOutMarkDuplicate.`to` = eIn.pattern.equivalent();
+	
+	eOutMarkDuplicate.ownedArcMultiset = getArcOperandMarkDuplicateMultiset(eIn);
+	
+}
+
+rule AnyResult2Arc
+  transform eIn : VisualModel!AnyResult
+  to eOut : ApnModel!Arc{
+  
+  	guard : isInternalResult(eIn)
+  
+	eOut.from = eIn.operator.equivalent();
+	eOut.`to` = eIn.pattern.equivalent();
+	
+	eOut.ownedArcMultiset = getArcResultMultiset(eIn);
+}
+
+post {
+  
+  // force storage
+  ApnModel.store("./TrNetCompilation/alpina/generated/ApnTrNetComplete.apnmm");
+  
+  "Translating TrNet to Apn... DONE".println();
+  
+}
+

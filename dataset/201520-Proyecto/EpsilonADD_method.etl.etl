@@ -1,0 +1,37 @@
+pre{
+var activity2= new AndroidPlatformMM!Activity;
+
+}
+rule Application2AndroidApplication
+transform ap : MultiplatformMM!Application
+ to  app : AndroidPlatformMM!AndroidApplication
+ {
+  app.name=ap.name;
+  //es la referencia de androidapplication a activity
+  app.activity=activity2;
+ }
+
+
+rule Content2Fragment
+transform content:MultiplatformMM!Content
+ to fragment:AndroidPlatformMM!Fragment
+ {
+  guard: (content.mainContentIsHTML==false)
+  for(c in content){
+   fragment.title=c.title;
+   fragment.content=c.mainContent;
+   activity2.fragments.add(fragment);
+  }
+ }
+
+rule Content2WebFragment
+transform content:MultiplatformMM!Content
+ to webFragment:AndroidPlatformMM!WebFragment
+ {
+  guard: (content.mainContentIsHTML==true)
+  for(c in content){
+   webFragment.title=c.title;
+   webFragment.htmlContent=c.mainContent;
+   activity2.webfragments.add(webFragment);
+  }
+ }

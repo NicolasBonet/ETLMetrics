@@ -1,0 +1,104 @@
+
+rule Diagrama2DiagramaER
+	transform c : Clases!Diagrama 
+	to t : DB!DiagramaER {
+	
+	for (clase in c.clases){
+		var entidad := new DB!Entidad();
+		entidad.name := clase.nombre;
+			
+		for (atributo in clase.atributos){ 
+			
+			var at := new DB!Atributo;
+			at.nombre := atributo.nombre;
+			
+			if(atributo.tipo.name == 'String'){
+				at.tipo := 'String'.transformaTipoDB();
+				
+			}else if(atributo.tipo.name == 'int'){
+				at.tipo := 'int'.transformaTipoDB();
+				
+			}else if(atributo.tipo.name == 'boolean'){
+				at.tipo := 'boolean'.transformaTipoDB();
+				
+			}else if(atributo.tipo.name == 'float'){
+				at.tipo := 'float'.transformaTipoDB();
+				
+			}else if(atributo.tipo.name == 'double'){
+				at.tipo := 'double'.transformaTipoDB();
+				
+			}else if(atributo.tipo.name == 'long'){
+				at.tipo := 'long'.transformaTipoDB();
+				
+			}else if(atributo.tipo.name == 'char'){
+				at.tipo := 'char'.transformaTipoDB();
+			}	
+				
+			entidad.atts.add(at);
+		}
+		
+		var bool = false;
+		
+		//Busco en referencias
+		for (referencia in c.referencias){ //1.1
+		
+			if(entidad.name == referencia.origen.nombre){	
+				bool = true;
+			
+				var enlace := new DB!Enlace();
+				enlace.source := entidad;
+				enlace.source.name := entidad.name;
+				enlace.source.name.println();
+			
+				enlace.target := new DB!Relacion();
+				enlace.target.name := referencia.destino.nombre;
+				enlace.cardinalidad := "1";
+				enlace.target.name.println();
+				enlace.source.name.println();
+			
+				t.links.add(enlace);
+				t.relations.add(enlace.target);
+			}
+		}
+		
+		if(bool== false){
+			for(agregacion in c.agregaciones){
+			
+				var enlace2 := new DB!Enlace();
+				enlace2.source := entidad;
+				enlace2.source.name := entidad.name;
+			
+				enlace2.target := new DB!Relacion();
+				enlace2.target.name := agregacion.destino.nombre;
+				enlace2.target.name.println();
+				enlace2.cardinalidad = "N";
+				t.links.add(enlace2);
+				t.relations.add(enlace2.target);
+			}
+		}
+			
+	t.nodes.add(entidad);	
+	}
+	
+}	
+
+	
+operation String transformaTipoDB(){
+	if(self = 'String'){
+		return DB!EnumTipos#String;
+	}else if(self = 'int'){
+		return DB!EnumTipos#int;
+	}else if(self = 'boolean'){
+		return DB!EnumTipos#boolean;
+	}else if(self = 'float'){
+		return DB!EnumTipos#float;
+	}else if(self = 'double'){
+		return DB!EnumTipos#double;
+	}else if(self = 'long'){
+		return DB!EnumTipos#long;
+	}else if(self = 'char'){
+		return DB!EnumTipos#char;
+	}
+}
+	
+

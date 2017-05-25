@@ -1,0 +1,116 @@
+pre {
+	// Mapping from processor type names to the defining In!ProcessorType instance
+	var inProcessorMap;
+	// Mapping from actor name to the corresponding In!ActorType instance
+	var inActorMap;
+}
+
+/** Transforms an SDF3 root element to a SenseModel. */
+rule Graph2Model
+		transform gIn: In!Sdf3Type
+		to mOut: Out!SenseModel {
+	mOut.actors ::= In!ActorType.all();
+	mOut.channels ::= In!ChannelType.all();
+	mOut.processors ::= In!ProcessorType.all();
+	mOut.capabilities ::= In!ActorPropertiesType.all();
+}
+
+rule Actor2Actor
+		transform aIn: In!ActorType
+		to aOut: Out!Actor {
+	aOut.name = aIn.name;
+}
+
+rule Channel2Channel
+		transform cIn: In!ChannelType
+		to cOut: Out!Channel {
+	cOut.name = cIn.name;
+	if (cIn.initialTokens.isDefined()) {
+		cOut.initialTokens = cIn.initialTokens;
+	}
+	// Assign source actor and rate
+	var srcActorIn : In!ActorType = getInActor(cIn.srcActor);
+	cOut.source ::= srcActorIn;
+	cOut.sourceRate = srcActorIn.getInPort(cIn.srcPort).rate;
+	// Assign target actor and rate
+	var dstActorIn : In!ActorType = getInActor(cIn.dstActor);
+	cOut.target ::= dstActorIn;
+	cOut.targetRate = dstActorIn.getInPort(cIn.dstPort).rate;
+}
+
+rule ActorProps2Capability
+		transform apIn: In!ActorPropertiesType
+		to etOut: Out!Capability {
+	etOut.performs ::= getInActor(apIn.actor);
+	// look up the default ProcessorType
+	var pIn : In!ProcessorType = apIn.getProcessorType();
+	etOut.processor ::= pIn;
+	etOut.time = pIn.executionTime.time;
+}
+
+/** Defines a link between some ActorProperties instances and ProcessorTypes. */
+rule Processor2Processor
+		transform pIn: In!ProcessorType
+		to pOut: Out!ProcessorType {
+	guard : pIn.isDefiningInstance()
+	pOut.name = pIn.type;
+	pOut.count = In!ActorType.size() + 1;
+}
+
+/** Returns the In!Actor instance with a given name. */
+operation getInActor(name: String) : In!ActorType {
+	if (inActorMap.isUndefined()) {
+		// create the map
+		inActorMap = new Map;
+		// fill the map
+		for (a in In!ActorType) {
+			inActorMap.put(a.name, a);
+		}
+	}
+	return inActorMap.get(name);
+}
+
+/** Returns the defining In!ProcessorType instance for a given processor type name. */
+operation getInProcessor(name: String) : In!ProcessorType {
+	if (inProcessorMap.isUndefined()) {
+		// create the map
+		inProcessorMap = new Map;
+		// fill the map
+		for (p in In!ProcessorType) {
+			// put this in the map if it is the default type
+			// and we do not have a defining instance for this type
+			if (p.isDefault() and not inProcessorMap.containsKey(p.type)) {
+				inProcessorMap.put(p.type, p);
+			}
+		}
+	}
+	return inProcessorMap.get(name);
+}
+
+/** Returns the port of this actor type with a given name. */
+operation In!ActorType getInPort(name : String) : In!PortType {
+	if (self.~portMap.isUndefined()) {
+		// create the map
+		self.~portMap = new Map;
+		for (p in self.port) {
+			self.~portMap.put(p.name, p);
+		}
+	}
+	return self.~portMap.get(name);
+}
+
+/** Tests if this processor type has the default property. */
+operation In!ProcessorType isDefault() : Boolean {
+	return self.`default` == "true";
+}
+
+/** Tests if this processor type is a defining instance. */
+operation In!ProcessorType isDefiningInstance() : Boolean {
+	return getInProcessor(self.type) == self;
+}
+
+/** Returns the defining processor type for this action properties instance. */
+operation In!ActorPropertiesType getProcessorType() : In!ProcessorType {
+	var type : String = self.processor.selectOne(p | p.isDefault()).type;
+	return getInProcessor(type);
+}

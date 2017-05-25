@@ -1,0 +1,151 @@
+pre {
+  	"Running Tablas Repetidas Transformationd".println();
+	var microservicios = source!Microservicio.allInstances();	
+	var rangoColores = Sequence {target!Color#blue, target!Color#green, target!Color#yellow, target!Color#orange, target!Color#red, target!Color#purple, target!Color#gray};  
+	var simplificado = new target!Diagrama();
+	simplificado.name = "MicroserviciosTablasRepetidas";
+	simplificado.elementos = new Sequence();
+	simplificado.isRoot = true;
+}
+
+post transformacionSimplificacion {
+	generarDiagramaSimplificado();
+}
+
+operation generarDiagramaSimplificado() {		
+	"Numero microservicios obtenidos: ".println(microservicios.size());
+
+	var countColor = 1;
+	
+	//Creando Microservicios Visuales
+	for (microservicio in microservicios) {
+			
+			("Generando Microservicio " + microservicio.name).println();
+		
+			var elipseMs  = new target!Elipse();
+			if (countColor == 7){
+				countColor = 0;
+			}
+			
+			elipseMs.color = rangoColores.get(countColor);
+			countColor = countColor + 1;
+			elipseMs.largo = 8;
+			elipseMs.alto = 8;
+			elipseMs.name = microservicio.name;
+			elipseMs.elipses = new Sequence();	
+			simplificado.elementos.add(elipseMs);
+	}
+	
+	var asociacion = null;
+	var tablaDestino = null;
+	var elipseOrigen = null;
+	var tablasEnMicros = new Set();
+	
+	//Creando Tablas Visuales
+	for (microservicio in microservicios) {		
+		for(relacion in microservicio.relaciones.select(r | r.tipos.first().isTypeOf(source!Create))){
+			("Generando Relacion " + relacion.source.name + " Tabla " + relacion.target.name + ' CREATE ').println();
+			tablaDestino  = tablasEnMicros.select(c | c.name = relacion.target.name).first();
+			if (not tablaDestino.isDefined()) {
+				tablaDestino = new target!Clase();
+				tablaDestino.elementos = new Set();
+				tablaDestino.conectores = new Set();
+				tablaDestino.name =  relacion.target.name;							
+				tablasEnMicros.add(tablaDestino);	
+				simplificado.elementos.add(tablaDestino);
+			}
+			elipseOrigen = simplificado.elementos.select(e | e.name = relacion.source.name and e.isTypeOf(target!Elipse)).first();
+			asociacion = new target!Asociacion();
+			asociacion.grosor = 3;
+			asociacion.color = target!Color#purple;
+			asociacion.estilo = target!EstiloLinea#SOLIDA;
+			asociacion.enrutamiento = target!TipoEnrutamiento#DIRECTO;
+			asociacion.flecha_source = target!TipoFlecha#NO_TIENE;
+			asociacion.flecha_target = target!TipoFlecha#SENCILLA;					
+			asociacion.source = elipseOrigen;
+			asociacion.target = tablaDestino;
+			asociacion.nameSource = "".toString();
+			asociacion.nameTarget = "C".toString();
+			elipseOrigen.conectores.add(asociacion);
+		}
+		for(relacion in microservicio.relaciones.select(r | r.tipos.first().isTypeOf(source!Read))){
+			("Generando Relacion " + relacion.source.name + " Tabla " + relacion.target.name + ' SELECT ').println();
+			tablaDestino  = tablasEnMicros.select(c | c.name = relacion.target.name).first();
+			if (not tablaDestino.isDefined()) {
+				tablaDestino = new target!Clase();
+				tablaDestino.elementos = new Set();
+				tablaDestino.conectores = new Set();
+				tablaDestino.name =  relacion.target.name;							
+				tablasEnMicros.add(tablaDestino);	
+				simplificado.elementos.add(tablaDestino);
+			}
+			elipseOrigen = simplificado.elementos.select(e | e.name = relacion.source.name and e.isTypeOf(target!Elipse)).first();
+			asociacion = new target!Asociacion();
+			asociacion.grosor = 1;
+			asociacion.color = target!Color#green;
+			asociacion.estilo = target!EstiloLinea#SOLIDA;
+			asociacion.enrutamiento = target!TipoEnrutamiento#DIRECTO;
+			asociacion.flecha_source = target!TipoFlecha#NO_TIENE;
+			asociacion.flecha_target = target!TipoFlecha#SENCILLA;					
+			asociacion.source = elipseOrigen;
+			asociacion.target = tablaDestino;
+			asociacion.nameSource = "".toString();
+			asociacion.nameTarget = "R".toString();
+			elipseOrigen.conectores.add(asociacion);			
+		}
+		for(relacion in microservicio.relaciones.select(r | r.tipos.first().isTypeOf(source!Update))){
+			("Generando Relacion " + relacion.source.name + " Tabla " + relacion.target.name + ' UPDATE ').println();
+			tablaDestino  = tablasEnMicros.select(c | c.name = relacion.target.name).first();
+			if (not tablaDestino.isDefined()) {
+				tablaDestino = new target!Clase();
+				tablaDestino.elementos = new Set();
+				tablaDestino.conectores = new Set();
+				tablaDestino.name =  relacion.target.name;							
+				tablasEnMicros.add(tablaDestino);	
+				simplificado.elementos.add(tablaDestino);
+			}
+			elipseOrigen = simplificado.elementos.select(e | e.name = relacion.source.name and e.isTypeOf(target!Elipse)).first();
+			asociacion = new target!Asociacion();
+			asociacion.grosor = 2;
+			asociacion.color = target!Color#orange;
+			asociacion.estilo = target!EstiloLinea#SOLIDA;
+			asociacion.enrutamiento = target!TipoEnrutamiento#DIRECTO;
+			asociacion.flecha_source = target!TipoFlecha#NO_TIENE;
+			asociacion.flecha_target = target!TipoFlecha#SENCILLA;					
+			asociacion.source = elipseOrigen;
+			asociacion.target = tablaDestino;
+			asociacion.nameSource = "".toString();
+			asociacion.nameTarget = "U".toString();	
+			elipseOrigen.conectores.add(asociacion);		
+		}
+		for(relacion in microservicio.relaciones.select(r | r.tipos.first().isTypeOf(source!Delete))){
+			("Generando Relacion " + relacion.source.name + " Tabla " + relacion.target.name + ' DELETE ').println();
+			tablaDestino  = tablasEnMicros.select(c | c.name = relacion.target.name).first();
+			if (not tablaDestino.isDefined()) {
+				tablaDestino = new target!Clase();
+				tablaDestino.elementos = new Set();
+				tablaDestino.conectores = new Set();
+				tablaDestino.name =  relacion.target.name;							
+				tablasEnMicros.add(tablaDestino);	
+				simplificado.elementos.add(tablaDestino);
+			}
+			elipseOrigen = simplificado.elementos.select(e | e.name = relacion.source.name and e.isTypeOf(target!Elipse)).first();
+			asociacion = new target!Asociacion();
+			asociacion.grosor = 4;
+			asociacion.color = target!Color#red;
+			asociacion.estilo = target!EstiloLinea#SOLIDA;
+			asociacion.enrutamiento = target!TipoEnrutamiento#DIRECTO;
+			asociacion.flecha_source = target!TipoFlecha#NO_TIENE;
+			asociacion.flecha_target = target!TipoFlecha#SENCILLA;					
+			asociacion.source = elipseOrigen;
+			asociacion.target = tablaDestino;
+			asociacion.nameSource = "".toString();
+			asociacion.nameTarget = "D".toString();
+			elipseOrigen.conectores.add(asociacion);
+		}
+	}
+}
+
+post {
+	"\n\nDone".println();
+}

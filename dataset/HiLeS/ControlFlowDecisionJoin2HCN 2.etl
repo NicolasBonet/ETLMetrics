@@ -1,0 +1,69 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: ControlFlowDecisionJoin2HCN.etl 1003 2015-05-03 00:30:47Z kd.sanchez21@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+
+/****r* Behavior/ControlFlow2HCN
+ * SUMMARY
+ *  Transfotrm a SysML!ActivityNode into its HiLeS Control Net
+ *  representation. ($Rev: 1003 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *  If the control flow comes from a decision node, apart from the HCN elements
+ * a HiLeS!Port is created to represent the possible execution path coming from
+ * the HiLeS!Decision block (from the DecisionNode transformation). In addition to
+ * a normal ControlFlow we require an arc to connect the "on execution" place
+ * to the transition that represents the HCN flowpath of the control flow. If
+ * additionaly the control flow goes to a Join Node, we need an extra place.
+ * SEE ALSO
+ *  * ActivityNode2HCN
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+@lazy
+rule ControlFlowDecisionJoin2HCN
+	transform edge : SysML!ControlFlow
+	to a1 : HiLeS!Arc, a2 : HiLeS!Arc, a3 : HiLeS!Arc, t : HiLeS!Transition,
+	   p2 : HiLeS!Place, a4 : HiLeS!Arc, p : HiLeS!Port
+	{
+		guard : edge.source.isTypeOf(SysML!DecisionNode) and 
+				edge.target.isTypeOf(SysML!JoinNode) and edge.target.~pIsAssigned = true
+		println('ControlFlowDecisionJoin2HCN');
+		if(edge.~ap.isDefined())
+		{
+			t.name = edge.~ap.name.toCamelCase("\\s") + edge.name.toCamelCase("\\s") + "_T";
+		}
+		else
+		{
+			t.name = edge.~ap.name.toCamelCase("\\s") + edge.name.toCamelCase("\\s") + "_T";
+		}
+		
+		a1.fromNode = edge.source.equivalents().selectOne(p : HiLeS!Place | p.name.endsWith("P2"));
+		a1.toNode = t;
+		p.direction = HiLeS!PointDirection#output;
+		edge.source.equivalents().selectOne(b | b.isTypeOf(HiLeS!Decision)).port.add(p);
+		p.name = "HcnOutGuard" + edge.source.equivalents().selectOne(b
+				| b.isTypeOf(HiLeS!Decision)
+				).port.select(p
+					| p.direction = HiLeS!PointDirection#output
+					).size();
+		a2.fromPoint = p;
+		a2.toNode = t;
+		a3.fromNode = t;
+		a3.toNode = p2;
+		p2.name = edge.owner.name.toCamelCase("\\s") + edge.name.toCamelCase("\\s") + "_P";
+		a4.fromNode = p2;
+		a4.toNode = edge.target.equivalents().selectOne(t : HiLeS!Transition | t.name.endsWith("T1"));
+		println('EndControlFlowDecisionJoin2HCN');
+	}

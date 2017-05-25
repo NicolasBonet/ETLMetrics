@@ -1,0 +1,216 @@
+pre {
+  "Running Simplification Transformation".println();
+    eliminarDiagramasDuplicados();
+	var microservicios = source!Microservicio.allInstances();	
+	var rangoColores = Sequence {target!Color#blue, target!Color#green, target!Color#yellow, target!Color#orange, target!Color#red, target!Color#purple, target!Color#gray};  
+	var simplificado = new target!Diagrama();
+	simplificado.name = "Microservicios";
+	simplificado.elementos = new Sequence();
+	simplificado.isRoot = true;
+}
+
+operation eliminarDiagramasDuplicados() {
+	delete target!ElementoDiagrama.allInstances();
+	delete target!Asociacion.allInstances();
+	
+}
+
+
+operation generarDiagramaSimplificado() {	
+	"Numero microservicios obtenidos: ".print();
+	microservicios.size().println();
+	
+	
+	var countColor = 1;
+	var elipsesEjb = new Set();
+	
+	for (microservicio in microservicios) {
+			
+			("Conviertiendo " + microservicio.name).println();
+		
+			var elipseMs  = new target!Elipse();
+			if (countColor == 7){
+				countColor = 0;
+			}
+			
+			elipseMs.color = rangoColores.get(countColor);
+			countColor = countColor + 1;
+			elipseMs.largo = 8;
+			elipseMs.alto = 8;
+			elipseMs.name = microservicio.name;
+			elipseMs.elipses = new Sequence();	
+			for (ejb in microservicio.elementos) {
+				var elipseClusterEjb =  new target!Rombo();
+				elipseClusterEjb.largo = 10;
+				elipseClusterEjb.alto = 10;				
+				elipseClusterEjb.name = ejb.name;
+				elipseMs.elipses.add(elipseClusterEjb);		
+				elipsesEjb.add(elipseClusterEjb);					
+			}
+			var cant = 0;
+			for(relacion in microservicio.relaciones){
+				var microDestino = microservicios.select(e | e.name = relacion.target.name and e.isTypeOf(source!Microservicio)).first();
+				var invocacionesToMs = microservicio.invocacionesServicios.select(i | i.toMethod.microservicio = microDestino.name);
+				cant = cant + invocacionesToMs.size();
+			}			
+			elipseMs.largo = elipseMs.largo + cant;
+			elipseMs.alto = elipseMs.alto + cant;
+			simplificado.elementos.add(elipseMs);
+				
+	}
+
+	// conectores entre elipses de microservicios
+	for (microservicio in microservicios) {
+		
+		var clasesMicroservicio = new Set;
+		for (clase in microservicio.clases) {
+			clasesMicroservicio.add(clase.name);
+		}
+		
+		var elipseSource = simplificado.elementos.select(e | e.name = microservicio.name and e.isTypeOf(target!Elipse)).first();
+		elipseSource.conectores = new Set;	
+		
+		
+		for(relacion in microservicio.relaciones){
+					var elipseDestino = simplificado.elementos.select(e | e.name = relacion.target.name and e.isTypeOf(target!Elipse)).first(); 
+					var asociacion = new target!Asociacion();					
+					asociacion.color = target!Color#black;
+					asociacion.estilo = target!EstiloLinea#SOLIDA;
+					asociacion.enrutamiento = target!TipoEnrutamiento#DIRECTO;
+					asociacion.flecha_source = target!TipoFlecha#NO_TIENE;
+					asociacion.flecha_target = target!TipoFlecha#SENCILLA;					
+					asociacion.source = elipseSource;
+					asociacion.target = elipseDestino; 				
+					
+					asociacion.diagrama = new target!Diagrama;
+					asociacion.diagrama.name = "Conector " + asociacion.source.name + " - " + asociacion.target.name;
+					asociacion.diagrama.elementos = new Sequence();
+					asociacion.diagrama.isRoot = false;												
+					
+					//obtiene todas las invocaciones al ms relacionado.
+					var invocacionesToMs = microservicio.invocacionesServicios.select(i | i.toMethod.microservicio = asociacion.target.name);
+					var clasesFuente = new Set;
+					var clasesDestino = new Set;
+					asociacion.nameTarget = invocacionesToMs.size().toString();
+					for (invocacion in invocacionesToMs) {
+					
+						var nombreClaseOrigen = "(" + invocacion.fromMethod.microservicio + ") " + invocacion.fromMethod.clase.name ;
+						var claseFuente  = clasesFuente.select(c | c.name = nombreClaseOrigen).first();
+						if (not claseFuente.isDefined()) {
+							claseFuente  = clasesDestino.select(c | c.name = nombreClaseOrigen).first();
+						}
+						if (not claseFuente.isDefined()) {
+							claseFuente = new target!Clase();
+							claseFuente.elementos = new Set();
+							claseFuente.conectores = new Set();
+							claseFuente.name =  nombreClaseOrigen;							
+							clasesFuente.add(claseFuente);	
+							asociacion.diagrama.elementos.add(claseFuente);	
+						}
+						
+							
+						var invocacionMetodo = new target!Item(); 
+						invocacionMetodo.name = invocacion.fromMethod.nombreMetodo + "--> (" + invocacion.toMethod.microservicio + ") " + invocacion.toMethod.clase.name + "." + invocacion.toMethod.nombreMetodo ;
+						invocacionMetodo.icono = "MessageSynchCallCreation";
+						claseFuente.elementos.add(invocacionMetodo);					
+						
+						
+						var nombreClaseDestino = "(" + invocacion.toMethod.microservicio + ") " + invocacion.toMethod.clase.name ;					
+						var claseDestino  = clasesDestino.select(c | c.name = nombreClaseDestino).first();		
+						if (not claseDestino.isDefined()) {
+							claseDestino  = clasesFuente.select(c | c.name = nombreClaseDestino).first();
+						}		
+						if (not claseDestino.isDefined()) {
+							claseDestino  = new target!Clase();
+							claseDestino.elementos = new Set();			
+							claseDestino.conectores = new Set();							
+							claseDestino.name = nombreClaseDestino;					
+							clasesDestino.add(claseDestino);	
+							asociacion.diagrama.elementos.add(claseDestino);						
+						}
+						
+						var asociacionYaExiste = claseFuente.conectores.select(a | a.target.name = claseDestino.name ).first();
+						if (not asociacionYaExiste.isDefined()) {
+							var asociacionClases = new target!Asociacion();					
+							asociacionClases.color = target!Color#black;
+							asociacionClases.estilo = target!EstiloLinea#SOLIDA;
+							asociacionClases.enrutamiento = target!TipoEnrutamiento#DIRECTO;
+							asociacionClases.flecha_source = target!TipoFlecha#NO_TIENE;
+							asociacionClases.flecha_target = target!TipoFlecha#SENCILLA;					
+							asociacionClases.source = claseFuente;
+							asociacionClases.target = claseDestino;							
+							claseFuente.conectores.add(asociacionClases);
+						}
+					}		
+																		
+ 					elipseSource.conectores.add(asociacion);
+		}						
+	}
+	
+	// conectores entre elipses de clusters EJB (los cuales estan dentro de las elipses de micros)
+	for (ejb in source!Cluster.allInstances()) {
+		var ejbAsociados = new Set;
+		var elipseSource = elipsesEjb.select(e | e.name = ejb.name and e.isTypeOf(target!Rombo)).first();
+		if (elipseSource.isDefined()) {			
+			elipseSource.conectores = new Set;	
+			for(relacion in ejb.relaciones){
+						
+						var asociacion = new target!Asociacion();					
+						asociacion.color = target!Color#black;
+						asociacion.estilo = target!EstiloLinea#SOLIDA;
+						asociacion.enrutamiento = target!TipoEnrutamiento#DIRECTO;
+						asociacion.flecha_source = target!TipoFlecha#NO_TIENE;
+						asociacion.flecha_target = target!TipoFlecha#NO_TIENE;					
+						asociacion.source = elipseSource;
+						asociacion.target = elipsesEjb.select(e | e.name = relacion.target.name and e.isTypeOf(target!Rombo)).first(); 
+						//subAsociacion.diagrama = conecOrigen.diagrama; 					
+	 					if (ejbAsociados->includes(asociacion.target.name)) {
+							continue;
+						}
+						if (asociacion.source.name = asociacion.target.name ) {
+							continue;
+						}
+													
+						
+						ejbAsociados.add(asociacion.target.name);
+						elipseSource.conectores.add(asociacion);
+						
+	 					
+			}		
+		}				
+	}
+	
+	/*
+	// todas las clases del microservicio
+	var clasesModelo = new Set;
+	for (microservicio in microservicios) {
+	
+	  var elipseMicroservicio = simplificado.elementos.select(e | e.name = microservicio.name and e.isTypeOf(target!Elipse)).first();
+	
+	  var  diagramaClases = new target!Diagrama;
+	  diagramaClases.name = "Clases " + microservicio.name;
+	  diagramaClases.elementos = new Sequence();
+	  diagramaClases.isRoot = false;	
+	  elipseMicroservicio.diagrama = 	diagramaClases;	
+	 
+	 
+	  for(clusterEjb in microservicio.elementos) {
+	  	for (claseR in clusterEjb.elementos) {	  
+			var claseV = clasesModelo.select(c | c.name = claseR.name).first();	
+	  		 if (not claseV.isDefined()) {	  		 	
+	  		 	claseV  = new target!Clase();
+				claseV.elementos = new Set();
+				claseV.name = claseR.name ;	
+				clasesModelo.add(claseV);
+				
+	  		 }
+			diagramaClases.elementos.add(claseV);
+	  	}
+	  }
+	}*/
+	
+}
+
+post {
+	generarDiagramaSimplificado();
+}

@@ -1,0 +1,84 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: MainBlock2HCN.etl 1003 2015-05-03 00:30:47Z kd.sanchez21@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+ 
+ /****r* Behavior/MainBlock2HCN
+ * SUMMARY
+ *   Transform a SysML:MainBlock into a HiLeS:Structural block with the required
+ * ports and inner architecture (services, payloads and nested blocks)
+ * ($Rev: 1003 $)
+ * DESCRIPTION 
+ *   Copies the name from the SysML!MainBlock and adds a HiLeS!Architeture.
+ * A Petri Net is added to the architecture to represent the behavior of the
+ * block. For the ownedAttributes of the SysML!MainBlock's base_Class that are
+ * typed by a class (i.e. blocks) a HiLeS!Structural or HiLeS!Functional block is 
+ * created appropriately.
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+rule MainBlock2HCN
+	transform mainBlock : SysML!HiLeS::MainBlock
+	to blk : HiLeS!Structural 
+	{
+		println("MainBlock2HCN");
+		// No ports, we only are interested in the HCN
+		blk.name = mainBlock.base_Class.name.toCamelCase("\\s");
+		var arch = new HiLeS!Architecture;
+		arch.name = blk.name;
+		var pn = new HiLeS!PetriNet;
+		println("MainBlock2HCNActivityAll");
+		println("MainBlock2HCNActivityAllNode");
+		pn.element.addAll(SysML!Activity.all().selectOne(a | a.owner = mainBlock.base_Class).node.equivalent().select(e | e.isTypeOf(HiLeS!Arc) or e.isTypeOf(HiLeS!Transition) or e.isTypeOf(HiLeS!Place) ));
+		//pn.element.addAll(SysML!Activity.all().selectOne(a | a.owner = mainBlock.base_Class).node.equivalent());
+		println("EndMainBlock2HCNActivityAllNode");
+		println("MainBlock2HCNActivityAllEdge");
+		pn.element.addAll(SysML!Activity.all().selectOne(a | a.owner = mainBlock.base_Class).edge.equivalent().select(e | e.isTypeOf(HiLeS!Arc) or e.isTypeOf(HiLeS!Transition) or e.isTypeOf(HiLeS!Place) ));
+		//pn.element.addAll(SysML!Activity.all().selectOne(a | a.owner = mainBlock.base_Class).edge.equivalent());
+		println("EndMainBlock2HCNActivityAllEdge");
+		println("EndMainBlock2HCNActivityAll");
+		// Mark the initial node P1 place
+		pn.element.selectOne(p : HiLeS!Place | "InitialNode".isSubstringOf(p.name)).hasToken = true;
+		arch.petriNet = pn;
+		// Add sttructural blocks to build the hierarchy
+		println("MainBlock2HCNStructural");
+		
+		arch.block.addAll(SysML!Activity.all().selectOne(a | a.owner = mainBlock.base_Class).`group`.equivalent().select(b
+				| b.isKindOf(HiLeS!Structural) or b.isTypeOf(HiLeS!Functional) ));
+		//Completed in order to create correctly a decision node into a MainBlock		
+		arch.block.addAll(SysML!Activity.all().selectOne(a | a.owner = mainBlock.base_Class).node.equivalent().select(b
+				| b.isKindOf(HiLeS!Structural) or b.isTypeOf(HiLeS!Functional) or b.isTypeOf(HiLeS!Decision)));
+		/*arch.block.addAll(SysML!Activity.all().selectOne(a | a.owner = mainBlock.base_Class).edge.equivalent().select(b
+				| b.isKindOf(HiLeS!Structural) or b.isTypeOf(HiLeS!Functional) or b.isTypeOf(HiLeS!Decision)));*/
+						
+		blk.port.addAll(SysML!Activity.all().selectOne(a | a.owner = mainBlock.base_Class).node.select(n|not n.isTypeOf(SysML!DecisionNode)).equivalent().select(b
+				| b.isKindOf(HiLeS!Port) ));
+		/*blk.port.addAll(SysML!Activity.all().selectOne(a | a.owner = mainBlock.base_Class).edge.equivalent().select(b
+				| b.isKindOf(HiLeS!Port) ));*/
+				
+		arch.service.addAll(SysML!Activity.all().selectOne(a | a.owner = mainBlock.base_Class).node.equivalent().select(b
+				| b.isKindOf(HiLeS!Service)));
+		arch.service.addAll(SysML!Activity.all().selectOne(a | a.owner = mainBlock.base_Class).edge.equivalent().select(b
+				| b.isKindOf(HiLeS!Service)));
+		
+		arch.payload.addAll(SysML!Activity.all().selectOne(a | a.owner = mainBlock.base_Class).ownedParameter.equivalent().select(b
+				| b.isKindOf(HiLeS!Payload)));
+		arch.payload.addAll(SysML!Activity.all().selectOne(a | a.owner = mainBlock.base_Class).edge.equivalent().select(b
+				| b.isKindOf(HiLeS!Payload)));
+		arch.payload.addAll(SysML!Activity.all().selectOne(a | a.owner = mainBlock.base_Class).node.equivalent().select(b
+				| b.isKindOf(HiLeS!Payload)));
+		
+		blk.innerArchitecture = arch;
+		println("EndMainBlock2HCNStructural");
+		println("EndMainBlock2HCN");
+	}

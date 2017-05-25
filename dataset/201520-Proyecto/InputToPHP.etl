@@ -1,0 +1,65 @@
+pre
+{
+	var csharp= new cs!CSharp;
+	var phpcore= new php!PHPcore;
+}
+
+rule Clase2Clase
+	transform 
+		clase: cs!Clase
+	to
+		clasep:php!Clase
+	{
+		guard: (clase.nombre.endsWith("Controller"))
+			clasep.name=clase.nombre;
+			phpcore.clases.add(clasep);
+			clasep.metodos=clase.metodos.equivalent();
+			
+	
+	}
+
+rule Clase2DTO
+	transform 
+		clase: cs!Clase
+	to
+		dto: php!DTO
+	{
+		guard: (clase.nombre.endsWith("DTO"))
+			dto.name=clase.nombre;
+			phpcore.dtos.add(dto);
+			for(atr in clase.propiedades)
+			{
+				var atributo= new php!Atributo;
+				atributo.name=atr.nombre;
+				dto.atributos.add(atributo);
+			}
+	}
+
+rule Metodo2Metodo
+	transform 
+		metodo: cs!Metodo
+	to
+		metodop: php!Metodo
+	{
+			guard: (metodo.atributos.nombre.startsWith("Http"))
+			metodop.name=metodo.nombre;
+			metodop.verbo=metodo.atributos.nombre;
+			metodop.verbo=metodo.atributos.nombre;
+			metodop.parametros=metodo.parametros.equivalent();
+	}
+	
+rule Parametro2Parametro
+	transform
+		parmetro: cs!Parametro
+	to
+		parametrop: php!Parametro
+	{
+		parametrop.name=parametro.nombre;
+		parametrop.valores=parametro
+	}
+
+		
+			
+			
+			
+	 

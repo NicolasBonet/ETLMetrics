@@ -1,0 +1,103 @@
+
+//Pre block
+pre {
+	"Running ETL".println();
+	model1!TaskList.all.collect(d|d.getEmpresa());
+}
+
+operation model1!TaskList getEmpresa() : model2!Empresa {
+	var e = new model2!Empresa;
+	e.trabajadores = self.getTrabajadores();
+	e.equiposDesarrollo = self.getEquipos();
+	return e;
+}
+
+operation model1!TaskList getTrabajadores() : Collection(model2!Persona) {
+	self.println();
+	var trabajadores: Sequence = Sequence{};
+	for (t in self.tasks) {
+		if (not trabajadores->exists (v | v.nombre = t.assignedTo)) {
+			trabajadores.add(t.getPersona());
+		}
+	}
+	return trabajadores;
+}
+
+operation model1!TaskList getEquipos() : Collection(model2!EquipoDesarrollo) {
+	var equipos: Sequence = Sequence{};
+	for (t in self.tasks) {
+		if (not equipos->exists (v | v.nombre = t.taskList)) {
+			equipos.add(t.getEquipo());
+		}
+	}
+	return equipos;
+}
+
+operation model1!Task getPersona() : model2!Persona {
+	self.println();
+	var p = new model2!Persona;
+	p.nombre = self.assignedTo;
+	return p;
+}
+
+operation model1!Task getEquipo() : model2!EquipoDesarrollo {
+	var e = new model2!EquipoDesarrollo;
+	e.nombre = self.taskList;
+	e.proyectos = self.getProyectos();
+	return e;
+}
+
+operation model1!Task getProyectos() : Collection(model2!Proyecto) {
+	var proyectos: Sequence = Sequence{};
+	var p = new model2!Proyecto;
+	p.nombre = self.taskList;
+	p.tareas = self.getTareas();
+	proyectos.add(p);
+	return proyectos;
+}
+
+operation model1!Task getTareas() : Collection(model2!Tarea) {
+	var tareas: Sequence = Sequence{};
+	for (t in Task.all) {
+		if (self.taskList = t.taskList and t.parentTask = 0) {
+			tareas.add(t.getTarea());
+		}
+	}
+	return tareas;
+}
+
+operation model1!Task getTarea() : model2!Tarea {
+	self.println();
+	
+	var t = new model2!Tarea;
+	t.nombre = self.name;
+	t.fechaInicio = self.dateCreated;
+	t.fechaFin = self.completedDate;
+	t.tiempoEstimado = self.estimatedTime;
+	//t.responsable = self.getResponsable();
+	t.reproceso = self.getReprocesos();
+	t.tiempoEjecutado = self.loggedMimutes;
+	if (self.estimatedTime <> 0) {
+		t.eficiencia = (self.loggedMimutes / self.estimatedTime) * 10.0;
+	} else {
+		t.eficiencia = 0.0;
+	}
+	
+	return t;
+}
+
+operation model1!Task getReprocesos() : Collection(model2!Tarea) {
+	var reproceso: Sequence = Sequence{};
+	for (t in Task.all) {
+		if (self.taskId = t.parentTask) {
+			reproceso.add(t.getTarea());
+		}
+	}
+	return reproceso;
+}
+
+operation model1!Task getResponsable() : model2!Persona {
+	var r = new model2!Persona;
+	r.nombre = self.assignedTo;
+	return r;
+}

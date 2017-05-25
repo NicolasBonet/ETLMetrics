@@ -1,0 +1,47 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: TransitionToTransition.etl 823 2012-06-22 16:50:00Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+ 
+ /****r* HiLeS2TimePetriNet/TransitionToTransition
+ * SUMMARY
+ *   Transform a HiLeS Transition to a TPN Transition ($Rev: 823 $)
+ * DESCRIPTION
+ *   Create a TPN Transition with the information from the HiLes Transition
+ * SEE ALSO
+ *		* 
+ *
+ * DOMAIN
+ * 		* HiLeS	 	- http://hiles.uniandes.edu.co/1.1/HiLeS
+ * 		* tpn		- http://hiles.uniandes.edu.co/1.0/TimePetriNet
+ * SPECIFICATION
+		relation TransitionToTransition
+   		{
+    		checkonly domain HiLeS ht:Transition {
+				name = htn,
+				min = htmin,
+				max = htmax,
+				unit = htu,
+			}
+			enforce domain tpn t:Transition {
+				name = tpn,
+				eft =  teft,
+				lft = tlft, 
+			}
+ *		
+ ******
+ */
+rule TransitionToTransition
+	transform ht : HiLeS!Transition
+	to t : tpn!Transition {
+		t.name = ht.name;
+		t.eft = ht.min;
+		t.lft = ht.max;
+	}

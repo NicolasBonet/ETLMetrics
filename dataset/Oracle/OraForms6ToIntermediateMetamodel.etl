@@ -1,0 +1,1181 @@
+
+
+pre{
+
+var masters:Sequence = new Sequence;
+var webForms:Sequence = new Sequence;
+var selectableValues:Sequence = new Sequence;
+}
+
+
+rule AppOra6TAppMMi
+
+transform t : OraForms6!App
+to n : MMi!Application{
+
+	"===PARSING TABLES===".println();
+	n.name = appName;
+	n.basePackage = basePackage;
+	var colEn:Sequence = new Sequence;
+	//t.databaseObject.first().databaseTables.size().println();
+	for(enti in t.databaseObject.first().databaseTables){
+		//enti.println();
+		if(enti.eClass.Name == 'Table'){
+			colEn.add(enti.equivalent('TableToEntity'));
+		}
+	}
+	
+	n.entities = colEn;
+	
+	
+	var conpo:Sequence = new Sequence;
+	var singl:Sequence = new Sequence;
+	var fm = 1;
+		"===PARSING FORMS===".println();
+	for(forms in t.forms){
+		("["+fm+"|"+t.forms.size()+"]"+forms.name).println();
+		var wf = forms.equivalent('FormToWebForm');
+		n.forms.add(wf);
+		
+		webForms.add(wf);
+		fm = fm+1;
+		
+	
+	}
+	
+	"===PARSING MENUS===".println();
+	
+	if(MenuModule.allInstances().first() <> null)	{
+	for(modulm in MenuModule.allInstances()){
+		var mm = new MMi!MenuItem();
+		mm.name = modulm.name;
+		for(mainm in findRootMenus(modulm) ){
+		
+			mm.subMenus.addAll(transformMenu(mainm));
+		}
+		
+		n.menus.add(mm);
+	}
+	}
+	
+	n.masters.addAll(masters);	
+	n.listOfValues.addAll(selectableValues);
+
+	('===DONE===').println();
+
+}
+ 
+@lazy
+rule FormToWebForm
+transform t : OraForms6!Form
+to n : MMi!WebForm{
+
+	n.name = t.name;
+	if(t.functionalAttributes.name <> ''){
+	n.label = t.functionalAttributes.name;
+	}else{
+	n.label = t.name;
+	}
+	n.originalFormPath = t.originalFilePath;
+	var displayitems = new Sequence;
+	var datadefs = new Sequence;
+    //t.name.println();
+	for(cnvs in t.canvases){
+		
+		if(cnvs.eClass.name == 'TabCanvas'){
+		
+			for(tab in cnvs.tabs){
+				
+				displayitems.add(tab.equivalent('TabCanvasToDisplayItem'));
+			}
+		}else if(cnvs.eClass.name == 'ContentCanvas'){
+		
+			displayitems.add(cnvs.equivalent('ContentCanvasToDisplayItem'));
+			
+		}else if(cnvs.eClass.name == 'StackedCanvas'){
+		
+			displayitems.add(cnvs.equivalent('StackedCanvasToDisplayItem'));
+		
+		}
+	} 
+	
+	var cacheblcks = new Sequence;
+	
+
+	
+	for(blcks in t.blocks){
+		
+		if(blcks.blockDatabase.queryDataSourceName <> null){
+			if(isValidDatablock(blcks)){
+			
+				//var datadef = 
+				//datadefs.add(datadef);
+				//masters.add(datadef);
+				cacheblcks.add(blcks);
+				var found:Boolean = false;
+				for(itm in blcks.dataBlockItems){
+				
+					if(not found){
+						
+						for(dspl in displayitems){
+							
+							if(itm.canvas <> null){
+														
+							if(itm.canvas.eClass.name == 'TabCanvas'){
+								
+								
+								if(itm.canvasTabPage <> null){
+									if(itm.canvasTabPage.name == dspl.name and not found){
+										//(itm.canvasTabPage.name +'-'+ dspl.name + ' ->' + blcks.name).println();
+									
+										if(isDetail(blcks,cacheblcks)){
+											dspl.dataDefinition.add(blcks.equivalent('DatablockToDetail'));
+										}else{
+											dspl.dataDefinition.add(blcks.equivalent('DatablockToMaster'));
+										}
+									
+										found =true;
+								
+									}
+								}else{
+									if(isDetail(blcks,cacheblcks)){
+											dspl.dataDefinition.add(blcks.equivalent('DatablockToDetail'));
+									}else{
+											dspl.dataDefinition.add(blcks.equivalent('DatablockToMaster'));
+									}
+									
+										found =true;
+								}
+								
+							
+							}else{
+								if(itm.canvas.name == dspl.name and not found){
+									//(itm.canvas.name +'-'+ dspl.name+ ' ->' + blcks.name).println();
+									
+									if(isDetail(blcks,cacheblcks)){
+										dspl.dataDefinition.add(blcks.equivalent('DatablockToDetail'));
+									}else{
+										dspl.dataDefinition.add(blcks.equivalent('DatablockToMaster'));
+									}
+									
+									found =true;
+								
+								}
+							}
+							
+							
+							
+							}
+						}
+									
+					}
+				
+				}	
+				
+			
+			}
+		}
+				
+	}
+	
+	connectMasterDetails(cacheblcks, displayitems);
+	for(di in displayitems){
+		if(di.dataDefinition.isEmpty()){
+			delete di;
+		}
+	}
+	
+	n.displayItems.addAll(displayitems);//-> select(e|e.dataDefinition -> size() > 0));
+	
+	
+	
+	
+	
+	
+
+
+}
+
+@lazy
+rule BasicAttributeToForeignAtribute
+transform t : MMi!BasicAttribute
+to n : MMi!ForeignAttribute{
+
+n.name = 'FK_'+t.name;
+n.label = t.name;
+
+}
+
+operation connectMasterDetails(blcks:Sequence, dspls:Sequence){
+
+	for(t in blcks){
+	var actualDD = findDataDefinition(t.name, dspls);
+	var dtls:Sequence = new Sequence;
+	var inmstrs:Sequence = new Sequence;
+	
+	
+	for(det in t.relations){
+	
+				
+		if(det.detailDataBlock <> null){
+			if(det.detailDataBlock.relations.size() > 0){
+				
+				if(det.detailDataBlock.blockDatabase.queryDataSourceName <> null){
+				if(isValidDatablock(det.detailDataBlock)){
+				
+					var ddef = findDataDefinition(det.detailDataBlock.name, dspls);
+					
+					var flds = det.joinCondition.split('=');
+					var detFld;
+					var mstFld;
+					for (fld in flds) { 
+						for (df in ddef.displayFields) { 
+							if(fld.toLowerCase().matches('[A-Za-z0-9:.,_ ]*'+df.name.toLowerCase()+'[A-Za-z0-9:.,_ ]*')){
+								detFld = df;
+													
+							}
+						}
+						
+						for (mf in actualDD.displayFields) { 
+							if(fld.toLowerCase().matches('[A-Za-z0-9:.,_ ]*'+mf.name.toLowerCase()+'[A-Za-z0-9:.,_ ]*')){
+								
+								mstFld = mf;
+							}
+						}
+					}
+					if(not(mstFld == null or detFld == null)){
+					var end = ddef.mainEntity;
+					var en = actualDD.mainEntity;
+					var fndfk = false;
+					for(atr in en.attributes){
+						if(atr.name == ('FK_'+detFld.entityAttribute.name)){
+							fndfk = true;
+							ddef.referencedDetailAttribute = atr;
+						}
+					}
+					if(not fndfk){
+						var na = detFld.entityAttribute.equivalent('BasicAttributeToForeignAtribute');
+						na.foreignEntity = end;		
+						var relai = new MMi!AttributeRelation;
+								
+								
+						relai.sourceAttribute = mstFld.entityAttribute;
+						mstFld.entityAttribute.isPrimaryKey = true;	
+						relai.targetAttribute = detFld.entityAttribute;	
+						na.relationDefinition.add(relai);					
+						en.attributes.add(na);
+						ddef.referencedDetailAttribute = na;
+					}						
+					}				
+					actualDD.innerMasters.add(ddef);
+					actualDD.referencedEntities.add(ddef.mainEntity);
+					
+					if(det.deleteRecordBehavior == OraForms6!DataBlockRelationDeleteRecordBehavior#cascading){
+						ddef.referenceRelationType = MMi!ReferenceType#composition;
+					}else{
+						ddef.referenceRelationType = MMi!ReferenceType#reference;
+					}
+						
+				}
+				}
+			}else{
+				if(det.detailDataBlock.blockDatabase.queryDataSourceName <> null){
+				if(isValidDatablock(det.detailDataBlock)){
+				
+									
+					var ddef = findDataDefinition(det.detailDataBlock.name, dspls);
+					
+					var flds = det.joinCondition.split('=');
+					
+					var detFld;
+					var mstFld;
+					for (fld in flds) { 
+						for (df in ddef.displayFields) { 
+							if(fld.toLowerCase().matches('[A-Za-z0-9:.,_ ]*'+df.name.toLowerCase()+'[A-Za-z0-9:.,_ ]*')){
+								detFld = df;
+													
+							}
+						}
+						
+						for (mf in actualDD.displayFields) { 
+							if(fld.toLowerCase().matches('[A-Za-z0-9:.,_ ]*'+mf.name.toLowerCase()+'[A-Za-z0-9:.,_ ]*')){
+								
+								mstFld = mf;
+							}
+						}
+					}
+					if(not(mstFld == null or detFld == null)){
+					var end = ddef.mainEntity;
+					var en = actualDD.mainEntity;
+					var fndfk = false;
+					for(atr in en.attributes){
+						if(atr.name == ('FK_'+detFld.entityAttribute.name)){
+							fndfk = true;
+							ddef.referencedDetailAttribute = atr;
+						}
+					}
+					if(not fndfk){
+						var na = detFld.entityAttribute.equivalent('BasicAttributeToForeignAtribute');
+						na.foreignEntity = end;		
+						var relai = new MMi!AttributeRelation;
+								
+								
+						relai.sourceAttribute = mstFld.entityAttribute;
+						mstFld.entityAttribute.isPrimaryKey = true;	
+						relai.targetAttribute = detFld.entityAttribute;	
+						na.relationDefinition.add(relai);					
+						en.attributes.add(na);
+						ddef.referencedDetailAttribute = na;
+					}						
+									
+					}
+					
+					actualDD.details.add(ddef);
+					actualDD.referencedEntities.add(ddef.mainEntity);
+					
+						
+					if(det.deleteRecordBehavior == OraForms6!DataBlockRelationDeleteRecordBehavior#cascading){
+						ddef.referenceRelationType = MMi!ReferenceType#composition;
+					}else{
+						ddef.referenceRelationType = MMi!ReferenceType#reference;
+					}				
+					
+					
+				}
+				}
+			}
+		
+		}
+	
+	}
+	}
+}
+operation findDataDefinition(name:String, dspls:Sequence): MMi!DataDefinition{
+ //("IN:>" + name).println();
+	for(dsp in dspls){
+		for(dd in dsp.dataDefinition){
+			//("CPT:>" + dd.name).println();
+			if(dd.name == name){
+			//("fnd->"+dd.name+ " - "+ name).println();
+			return dd;
+			}
+		}
+	}
+		
+	
+	return null;
+}
+
+
+@lazy
+rule TabCanvasToDisplayItem
+transform t : OraForms6!TabCanvasTab
+to n : MMi!DisplayItem{
+
+	n.label = t.label;
+	n.name = t.name;
+
+}
+
+@lazy
+rule ContentCanvasToDisplayItem
+transform t : OraForms6!ContentCanvas
+to n : MMi!DisplayItem{
+
+	n.label = t.name;
+	n.name = t.name;
+
+}
+
+
+@lazy
+rule StackedCanvasToDisplayItem
+transform t : OraForms6!ContentCanvas
+to n : MMi!DisplayItem{
+
+	n.label = t.name;
+	n.name = t.name;
+
+}
+
+
+
+@lazy
+rule LOVtoSelectableValue
+transform t : OraForms6!FormLOV
+to n : MMi!ListOfValues{
+	
+	n.name = t.name;
+	
+	
+	
+	if(t.title.isDefined()){
+		n.label = t.title;
+	}else{
+		n.label = t.name;
+	}
+	
+	
+	//('	LOV->').println();
+	if(t.recordGroup <> null){
+	
+	
+	
+	
+		if(t.recordGroup.recordTypeGroup = OraForms6!FormRecordGroupRecordGroupType#static){
+		n.type = MMi!LOVType#static;
+		}else{
+		n.type = MMi!LOVType#query;
+		}	
+		var ct = 0;
+		var maxCt = t.recordGroup.columns.get(0).staticValues.size(); 
+		
+		//maxCt.println();
+		while(ct < maxCt){
+		
+		var lsr = new MMi!LovStaticRow;
+		
+		//('RW>'+ct).println();
+		
+		for(clmn in t.recordGroup.columns){
+		 	
+		 			 	
+			 	var lcv = new MMi!LovStaticColumn;
+			 	
+			 	
+			 	if(clmn.staticValues.size() <= maxCt){ 
+			 	lcv.value = clmn.staticValues.get(ct).value;
+			 	}else{
+			 	
+			 	lcv.value = '';
+			 	}
+			 	
+			 	lsr.columns.add(lcv);
+			 
+			 
+			
+			
+		}
+		
+		n.staticRows.add(lsr);
+			 ct = ct +1;
+		
+		}
+		
+		
+		
+		
+		
+		
+		for(clmns in t.columnMappings.columns){
+		  	///('	   >>'+clmns.columnMapping).println();
+			 n.usedColumns.add(clmns.equivalent('ColumnMappingToBasicAtribute'));
+			 
+					 
+			
+			
+		}
+		
+		
+		
+	
+		
+		n.databaseQuery = t.recordGroup.recordGroupQuery;
+	}
+	
+	
+}
+
+@lazy
+rule ColumnMappingToBasicAtribute
+transform t : OraForms6!FormLOVColumnMappingPropertiesColumn
+to n : MMi!BasicAttribute{
+
+	n.name = t.columnMapping;
+	n.label = t.name;
+
+}
+/*
+@lazy
+rule FormToBasicWebForm
+transform t : OraForms6!Form
+to n : MMi!BasicWebForm{
+
+	
+	for(blcks in t.blocks){
+		
+		if(blcks.blockDatabase.queryDataSourceName <> null){
+			if(isValidDatablock(blcks)){
+			
+			n.mainMaster = blcks.equivalent('DatablockToMaster');
+			break;
+			
+			}
+		}
+	}
+	
+
+
+	n.name = t.name;
+
+
+}
+
+@lazy
+rule DataBlockToBasicWebForm
+transform t : OraForms6!FormDataBlock
+to n : MMi!BasicWebForm{
+
+	n.name = t.name;
+	n.mainMaster = t.equivalent('DatablockToMaster');
+
+}
+
+
+
+@lazy
+rule FormToComposedWebForm
+transform t : OraForms6!Form
+to n : MMi!ComposedWebForm{
+
+
+	var chlds:Sequence = new Sequence;
+
+	for(blcks in t.blocks){
+		
+		if(blcks.blockDatabase.queryDataSourceName <> null){
+			if(isValidDatablock(blcks)){
+			
+				chlds.add(blcks.equivalent('DatablockToDisplayItem'));
+				
+			}
+		}
+	}
+	
+
+    n.children = chlds;
+	n.name = t.name;
+	
+	
+	
+
+
+}
+
+
+rule DatablockToDisplayItem
+transform t : OraForms6!FormDataBlock
+to n : MMi!DisplayItem{
+
+	
+	n.label= t.name;
+	
+	n.webForm = t.equivalent('DataBlockToBasicWebForm');
+				
+				
+}
+*/
+
+operation addDisplayFieldToDataDefinition(itm:OraForms6!FormItem, dd:MMi!DataDefinition){
+
+	var df;
+	if(itm.eClass.name == 'ItemCheckBox'){
+	df = itm.equivalent('ItemCheckBoxToDisplayField');
+	}else if(itm.eClass.name == 'ItemTextItem'){
+	df = itm.equivalent('ItemTextItemToDisplayField');
+	}else if(itm.eClass.name == 'ItemDisplayItem'){
+	df = itm.equivalent('ItemDisplayItemToDisplayField');
+	}
+	
+	
+	var en = findEntity(dd.mainEntity.name);
+
+
+		
+	for(clmn in en.attributes){
+	
+		if(itm.databaseProperties.columnName == clmn.name){
+			df.entityAttribute = clmn;
+			clmn.maxLength = df.maxLength;
+			clmn.isPrimaryKey = itm.databaseProperties.isPrimaryKey;
+		}
+	}
+	
+	if(df.listOfValues <> null){
+		
+		df.listOfValues.valueAttribute = df.entityAttribute;
+		df.listOfValues.name = df.listOfValues.name + df.name;
+	
+	}
+	
+	dd.displayFields.add(df);
+	
+	
+	 
+}
+operation addTriggerToDataDefinition(dd:MMi!DataDefinition, trg:OraForms6!Trigger, itmName:String, origName:String){
+	
+			
+			
+	if(trg.name.toUpperCase() == 'PRE-QUERY'){
+		var evt = trg.equivalent('TriggerToEvent');
+		evt.name = origName.toLowerCase()+ '_' + 'preQuery';
+		dd.preQuery = evt;	
+	
+	}else if(trg.name.toUpperCase() == 'POST-QUERY'){
+		var evt = trg.equivalent('TriggerToEvent');
+		evt.name = origName.toLowerCase()+ '_' + 'postQuery';
+		dd.postQuery= evt;	
+		
+	}/*else if(trg.name.toUpperCase() == 'PRE-COMMIT'){
+		var evt = trg.equivalent('TriggerToEvent');
+		evt.name = origName.toLowerCase()+ '_' + 'preCommit';
+		dd.preCommit = evt;	
+		
+	}else if(trg.name.toUpperCase() == 'POST-FORM-COMMIT'){
+		var evt = trg.equivalent('TriggerToEvent');
+		evt.name = origName.toLowerCase()+ '_' + 'postCommit';
+		dd.postCommit = evt;
+			
+	}*/else if(trg.name.toUpperCase() == 'PRE-INSERT'){
+		var evt = trg.equivalent('TriggerToEvent');
+		evt.name = origName.toLowerCase()+ '_' + 'preInsert';
+		dd.preInsert = evt;	
+		
+	}else if(trg.name.toUpperCase() == 'POST-INSERT'){
+		var evt = trg.equivalent('TriggerToEvent');
+		evt.name = origName.toLowerCase()+ '_' + 'postInsert';
+		dd.postInsert = evt;	
+		
+	}else if(trg.name.toUpperCase() == 'PRE-UPDATE'){
+		var evt = trg.equivalent('TriggerToEvent');
+		evt.name = origName.toLowerCase()+ '_' +'preUpdate';
+		dd.preUpdate = evt;	
+		
+	}else if(trg.name.toUpperCase() == 'PRE-DELETE'){
+		var evt = trg.equivalent('TriggerToEvent');
+		evt.name = origName.toLowerCase()+ '_' + 'preDelete';
+		dd.preDelete = evt;	
+	}else if(trg.name.toUpperCase() == 'POST-DELETE'){
+		var evt = trg.equivalent('TriggerToEvent');
+		evt.name = origName.toLowerCase()+ '_' + 'postDelete';
+		dd.postDelete = evt;	
+		
+	}else if(trg.name.toUpperCase() == 'WHEN-VALIDATE-ITEM'){
+		
+		var evt = trg.equivalent('TriggerToEvent');
+		evt.name = origName.toLowerCase()+ '_' + itmName + "_whenValidateItem";	
+		dd.whenValidateItems.add(evt);
+				
+		
+	}else if(trg.name.toUpperCase().matches('[A-Za-z0-9:.,_ -]*KEY[A-Za-z0-9:.,_ -]*')){
+		
+		if(itmName <> ''){
+		var evt = trg.equivalent('TriggerToEvent');
+		evt.name = origName.toLowerCase() + '_' + itmName.toLowerCase() + '_' + trg.name.toLowerCase();	
+		dd.keyTriggers.add(evt);
+		}else{
+			var evt = trg.equivalent('TriggerToEvent');
+			evt.name = origName.toLowerCase()+ '_' + trg.name.toLowerCase();
+			dd.keyTriggers.add(evt);
+		}
+		
+		
+		
+	}else if(trg.name.toUpperCase().matches('[A-Za-z0-9:.,_ -]*PRE[A-Za-z0-9:.,_ -]*')){
+		
+		if(itmName <> ''){
+		var evt = trg.equivalent('TriggerToEvent');
+		evt.name = origName.toLowerCase() + '_' + itmName.toLowerCase() + '_' + trg.name.toLowerCase();	
+		dd.otherPreTriggers.add(evt);
+		}else{
+			var evt = trg.equivalent('TriggerToEvent');
+			evt.name = origName.toLowerCase()+ '_' + trg.name.toLowerCase();
+			dd.otherPreTriggers.add(evt);
+		}
+		
+		
+		
+	}else{
+	
+		if(itmName <> ''){
+		var evt = trg.equivalent('TriggerToEvent');
+		evt.name = origName.toLowerCase() + '_' + itmName.toLowerCase() + '_' + trg.name.toLowerCase();	
+		dd.otherTriggers.add(evt);
+		}else{
+			var evt = trg.equivalent('TriggerToEvent');
+			evt.name = origName.toLowerCase()+ '_' + trg.name.toLowerCase();
+			dd.otherTriggers.add(evt);
+		}
+	}
+}
+
+@lazy
+rule TriggerToEvent
+transform t : OraForms6!Trigger
+to n : MMi!Event{
+
+	n.name = t.name;
+	n.body = t.triggerFunctionalAttributes.triggerText;
+
+
+}
+
+@lazy
+rule DatablockToMaster
+transform t : OraForms6!FormDataBlock
+to n : MMi!Master{
+	var att:Sequence = new Sequence;
+	
+	/*var dtls:Sequence = new Sequence;
+	var inmstrs:Sequence = new Sequence;
+	
+	
+	for(det in t.relations){
+	
+				
+		if(det.detailDataBlock <> null){
+			if(det.detailDataBlock.relations.size() > 0){
+				
+				if(det.detailDataBlock.blockDatabase.queryDataSourceName <> null){
+				if(isValidDatablock(det.detailDataBlock)){
+				inmstrs.add(det.detailDataBlock.equivalent('DatablockToMaster'));
+				}
+				}
+			}else{
+				if(det.detailDataBlock.blockDatabase.queryDataSourceName <> null){
+				if(isValidDatablock(det.detailDataBlock)){
+				dtls.add(det.detailDataBlock.equivalent('DatablockToDetail'));
+				}
+				}
+			}
+		
+		}
+	
+	}
+	*/
+	n.mainEntity = findEntity(t.blockDatabase.queryDataSourceName.master.name);
+	n.whereClause = t.blockDatabase.WHEREClause;
+	n.orderbyClause = t.blockDatabase.ORDERBYClause;
+	n.insertAllowed = t.blockDatabase.insertAllowed;
+	n.updateAllowed = t.blockDatabase.updateAllowed;
+	n.deleteAllowed = t.blockDatabase.deleteAllowed;
+	n.readAllowed = t.blockDatabase.queryAllowed;
+	
+	for(tr2 in t.eContainer().triggers){
+		addTriggerToDataDefinition(n, tr2, '',t.name.toLowerCase());
+	}
+	for(trg in t.triggers){
+	
+		addTriggerToDataDefinition(n, trg, '',t.name.toLowerCase());
+	}
+	for(itm in t.dataBlockItems){
+	
+		if(isValidItem(itm)){
+					
+			//itm.equivalent('ItemTextItemToBasicAttribute').name.println();
+			//n.attributes.add(itm.equivalent('ItemTextItemToBasicAttribute'));
+			addDisplayFieldToDataDefinition(itm, n);
+			
+			for(trg in itm.triggers){
+	
+				addTriggerToDataDefinition(n, trg, itm.name,t.name.toLowerCase());
+			}
+		
+		}
+	
+	}
+	
+	/*
+	n.attributes = att;
+	n.details = dtls;
+	n.innerMasters = inmstrs;
+	 */
+	
+	n.name = t.name;
+	n.label = t.name;
+	
+	masters.add(n);
+	
+   //Composisci�n para cada detalle
+   
+}
+
+@lazy
+rule DatablockToDetail
+transform t : OraForms6!FormDataBlock
+to n : MMi!Detail{
+
+
+	var att:Sequence = new Sequence;
+
+	//t.eContainer.name.println();
+	//t.name.println();
+	n.mainEntity = findEntity(t.blockDatabase.queryDataSourceName.master.name);
+	
+	for(trg in t.triggers){
+	
+		addTriggerToDataDefinition(n, trg, '',t.name.toLowerCase());
+	}
+	
+	for(itm in t.dataBlockItems){
+	
+		if(isValidItem(itm)){
+			//itm.equivalent('ItemTextItemToBasicAttribute').name.println();
+			//n.attributes.add(itm.equivalent('ItemTextItemToBasicAttribute'));
+			addDisplayFieldToDataDefinition(itm, n);
+			//att.add();
+			for(trg in itm.triggers){
+	
+				addTriggerToDataDefinition(n, trg, itm.name,t.name.toLowerCase());
+			}
+		}
+	
+	}
+	n.insertAllowed = t.blockDatabase.insertAllowed;
+	n.updateAllowed = t.blockDatabase.updateAllowed;
+	n.deleteAllowed = t.blockDatabase.deleteAllowed;
+	n.readAllowed = t.blockDatabase.queryAllowed;
+	
+	n.whereClause = t.blockDatabase.WHEREClause;
+	n.orderbyClause = t.blockDatabase.ORDERBYClause;
+	
+	n.name = t.name;
+	n.label = t.name;
+	
+}
+
+
+@lazy
+rule ColumnToBasicAttribute
+transform t : OraForms6!Column
+to n : MMi!BasicAttribute{
+
+
+	n.name = t.name;
+	n.dbColumnName = t.name;
+	
+	if(t.type <> null){
+		putValidDataTypeOnAttribute(t.type.dataType,n);
+	}
+
+}
+
+
+
+@lazy
+rule ItemTextItemToDisplayField
+transform t : OraForms6!ItemTextItem
+to n : MMi!DisplayField{
+
+	n.name = t.name;
+	if(t.prompt <> ''){
+		n.label	 = t.prompt;
+	}else{
+		
+		n.label = t.name;
+	
+	}
+	
+	n.formatMask = t.dataProperties.formatMask;
+	n.defaultValue = t.dataProperties.initialValue;
+	n.required = t.dataProperties.required;
+	
+	if(t.concealData = true){
+	n.type = MMi!FieldType#Password;
+	}
+	
+	
+	
+	n.maxLength = t.dataProperties.maximumLenght;
+	if(t.calculationProperties.calculationMode.literal <> 'none'){
+	var legProps = new MMi!DisplayFieldLegacyProperties();
+	legProps.calculationMode = "Calculation Mode: "+ t.calculationProperties.calculationMode.literal + " - formula: "+t.calculationProperties.formula+"- SummaryFunction:"+ t.calculationProperties.summaryFunction.literal+" - SumarizedBlock:"+t.calculationProperties.summarizedBlock+" - SummarizedItem: "+t.calculationProperties.summarizedItem;
+	n.legacyProperties = legProps;
+	}
+
+	
+	
+	
+	n.enableEdition = not t.databaseProperties.queryOnly;
+	
+	n.type = MMi!FieldType#Text;
+	
+	if(t.lov <> null){
+		var sv = t.lov.equivalent('LOVtoSelectableValue');
+		
+		//sv.valueAttribute = n;
+		
+		n.listOfValues = sv;
+		selectableValues.add(sv);
+	}
+
+}
+
+
+
+@lazy
+rule ItemDisplayItemToDisplayField
+transform t : OraForms6!ItemDisplayItem
+to n : MMi!DisplayField{
+
+	n.name = t.name;
+	n.label = t.name;
+	
+	if(t.prompt <> ''){
+		n.label	 = t.prompt;
+	}else{
+		
+		n.label = t.name;
+	
+	}
+	
+
+
+	if(t.calculationProperties.calculationMode.literal <> 'none'){
+	var legProps = new MMi!DisplayFieldLegacyProperties();
+	legProps.calculationMode = "Calculation Mode: "+ t.calculationProperties.calculationMode.literal + " - formula: "+t.calculationProperties.formula+"- SummaryFunction:"+ t.calculationProperties.summaryFunction.literal+" - SumarizedBlock:"+t.calculationProperties.summarizedBlock+" - SummarizedItem: "+t.calculationProperties.summarizedItem;
+	n.legacyProperties = legProps;
+	}
+
+	
+	
+	
+	n.enableEdition = false;
+	
+	n.type = MMi!FieldType#Text;
+	
+	
+
+}
+
+
+
+@lazy
+rule ItemCheckBoxToDisplayField
+transform t : OraForms6!ItemCheckBox
+to n : MMi!DisplayField{
+
+	n.name = t.name;
+	if(t.prompt <> ''){
+		n.label	 = t.prompt;
+	}else{
+		
+		n.label = t.name;
+	
+	}
+
+	n.type = MMi!FieldType#Check;
+	
+
+}
+
+
+@lazy
+rule MenuToMenuItem
+transform t : OraForms6!MenuItem
+to n : MMi!MenuItem{
+
+	n.name = t.name;
+	n.label = t.functionalProperties.label;
+	if (t.functionalProperties.commandType == OraForms6!CommandMenuType#MENU){
+			if(t.functionalProperties.subMenu <> null){
+				n.subMenus.addAll(transformMenu(t.functionalProperties.subMenu));
+			}
+	}else if (t.functionalProperties.commandType == OraForms6!CommandMenuType#PLSQL){
+		
+		for(ex in t.excutedForms){
+		
+			n.webform = getEquivalentForm(n,ex.executedForm.name) ;
+		}
+	}
+	
+
+
+}
+
+operation isDetail(t:FormDataBlock, formblocks:Sequence) : Boolean{
+
+	for(fb in formblocks){
+	for(det in fb.relations){
+	
+				
+		if(det.detailDataBlock <> null){
+			if(det.detailDataBlock.relations.size() == 0){
+			
+				if(det.detailDataBlock.blockDatabase.queryDataSourceName <> null){
+				if(isValidDatablock(det.detailDataBlock) and t.name = det.detailDataBlock.name){
+				return true;
+				}
+				}
+			
+		
+			}
+	
+	}
+	}
+	}
+	return false;
+}
+
+operation transformMenu(men:Menu) : Sequence{
+
+	var ist:Sequence = new Sequence;
+	for(itms in men.menuItems){
+		ist.add(itms.equivalent('MenuToMenuItem'));
+	}
+	
+	return ist;
+}
+
+
+
+operation  findEntity(name:String) : MMi!Entity{
+
+	for(en in MMi!Entity.allInstances()){
+		if(en.name == name){
+			return en;
+		}
+	
+	}
+	
+	return null;
+
+}
+
+operation isValidDatablock(blcks:FormDataBlock):Boolean{
+	
+	return blcks.blockDatabase.queryDataSourceName.eClass.name == 'MasterRelation' and blcks.blockDatabase.queryDataSourceName.master.eClass.name == 'Table';
+
+}
+
+operation isValidItem(itm:FormItem):Boolean{
+
+	
+		if(itm.databaseProperties <> null){
+		
+			if(itm.databaseProperties.databaseItem){
+			
+				
+					if(itm.eClass.name == 'ItemTextItem' or itm.eClass.name == 'ItemCheckBox' or itm.eClass.name == 'ItemDisplayItem'){
+					
+						return true;
+					
+					
+					
+					}
+				
+			
+			}
+		}
+	
+	return false;
+}
+
+operation getEquivalentForm(call:MMi!MenuItem,name:String) :  MMi!WebForm{
+
+
+	for(en in webForms){
+	
+		
+		if(en.name == name){
+			//en.menuItem = call; 
+			return en;
+		}
+	
+	}
+	
+	return null;
+
+} 
+
+
+operation findRootMenus(menum:MenuModule) : Sequence{
+		
+	var roots:Sequence = new Sequence;
+	
+		for (menuc in menum.menus) {
+			var notRoot = 0;
+			for (menu in menum.menus) {
+				for (mi in menu.menuItems) {
+					if (mi.functionalProperties.commandType == OraForms6!CommandMenuType#MENU) {
+						if(mi.functionalProperties.subMenu <> null){
+						if (mi.functionalProperties.subMenu.name
+								== menuc.name) {
+							notRoot = 1;
+						}
+						}
+					}
+				}
+			}
+
+			if (notRoot = 0 ) {
+				roots.add(menuc);
+			}
+
+		}
+		
+		return roots;
+	
+}
+
+
+@lazy
+rule TableToEntity
+transform t : OraForms6!Table
+to n : MMi!Entity{
+
+
+	n.name = t.name;
+	n.label = t.name;
+	n.dbTableName = t.name;
+	var colEn:Sequence = new Sequence;
+	for(clmn in t.col){
+		
+		
+			colEn.add(clmn.equivalent('ColumnToBasicAttribute'));
+		
+	}
+	n.attributes = colEn;
+
+}
+
+
+
+operation putValidDataTypeOnAttribute(code:String, atr:MMi!BasicAttribute){
+//code.println();
+switch(code){
+case '0':
+atr.type = MMi!BasicType#String;
+case '1':
+atr.type = MMi!BasicType#Long;
+case '2':
+atr.type = MMi!BasicType#Date;
+case '3':
+atr.type = MMi!BasicType#String;
+case '4':
+atr.type = MMi!BasicType#Integer;
+case '5':
+atr.type = MMi!BasicType#DateTime;
+case '6':
+atr.type = MMi!BasicType#Long;
+case '7':
+atr.type = MMi!BasicType#Double;
+case '8':
+atr.type = MMi!BasicType#Date;
+case '9':
+atr.type = MMi!BasicType#Date;
+case '10':
+atr.type = MMi!BasicType#DateTime;
+case '11':
+atr.type = MMi!BasicType#Double;
+case '12':
+atr.type = MMi!BasicType#String;
+case '13':
+atr.type = MMi!BasicType#String;
+
+default:
+atr.type = MMi!BasicType#String;
+}
+
+}

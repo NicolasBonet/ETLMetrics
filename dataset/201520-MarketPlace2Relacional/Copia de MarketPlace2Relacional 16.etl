@@ -1,0 +1,138 @@
+-- Debemos crear una unica base de datos para todos
+pre {
+	("Iniciando transformación de Class a Sql").println();
+	var db : new DB!Database;
+}
+
+-- Esta regla se encarga de todo!
+rule MarketPlace2Relacional
+	transform
+		c : mp!ClassUnit
+	to
+		t : DB!Table
+		{
+			-- Asignamos la tabla creada a la base de datos inicializada al comienzo y le ponemos el nombre de la clase sin el Entity
+			guard: (c.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0).select(a|a.`to`.Name = "Entity").size()>0 )
+		   		("Procesando clase: ").println(); (c.name).println();
+		   		t.database = db;
+			   	t.name = c.name.replace("Entity", "");
+			   	var propiedades : Collection := c.codeElement.select(ce|ce.isTypeOf(mp!StorableUnit));
+			   	("Recorriendo superclases: ").println();
+			   	for(superclase in c.codeRelation.select(s|s.isTypeOf(mp!Extends)))
+				{
+					propiedades := propiedades.includingAll(superclase.`to`.codeElement.select(ce|ce.isTypeOf(mp!StorableUnit)));
+				}
+				
+			   	var primarykeys : Collection := propiedades.select(p|p.isPrimaryKey()).equivalent();
+			   	
+			   	var primitives : Collection := propiedades->select(p|p.isNotPrimaryKey())->select(p|p.isPrimitiveType());
+			   	
+			   	var foreignKeys : Collection := propiedades->select(p|p.isNotPrimaryKey())->select(p|p.isNotPrimitiveType());
+				
+				t.columns = primitives.equivalent();
+				
+				for (foreign in foreignKeys) { 
+					var foraneaConverted = foreign.equivalent("StorableUnit2FKey");
+					foraneaConverted.child.table = t;
+				}
+
+				t.primaryKeys = primarykeys;
+				
+			   	
+	   } 
+	   
+@lazy	   
+rule StorableUnit2Column
+	transform
+		c : mp!StorableUnit
+	to
+		t : DB!Column{
+			t.name = c.name.replace("Entity", "");
+			t.type = c.type.getType();
+	   }
+	   
+//devuelve el tipo
+operation InterfaceUnit getType()
+{
+	switch (self.name) {
+		case "Long" : return DB!DataType#int;
+		case "Integer" : return DB!DataType#int;
+		case "String" : return DB!DataType#varchar;
+		default : return DB!DataType#unknow;
+	}
+}
+operation ClassUnit getType()
+{
+	return DB!DataType#int;
+}
+
+// Devuelve si es llave primaria o no
+operation StorableUnit isPrimitiveType()
+{
+	if(self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size()>0).select(a|a.`to`.Name = "PrimaryKeyJoinColumn").size()=0)
+	{
+		return true;
+	}
+	
+	return false;
+}
+operation StorableUnit isNotPrimitiveType()
+{
+	if(self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size()>0).select(a|a.`to`.Name = "PrimaryKeyJoinColumn").size()>0)
+	{
+		return true;
+	}
+	
+	return false;
+}
+
+operation StorableUnit isPrimaryKey()
+{
+	if(self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size() > 0).select(a|a.`to`.Name = "Id").size()>0){
+		return true;
+	}
+	
+	return false;
+}
+
+operation StorableUnit isNotPrimaryKey()
+{
+	if(self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size() > 0).select(a|a.`to`.Name = "Id").size()==0){
+		return true;
+	}
+	
+	return false;
+}
+
+operation DB!Column setTable(table) {
+	self.table = table;
+}
+
+
+@lazy    
+rule StorableUnit2FKey
+ transform
+  c : mp!StorableUnit
+ to
+	fk : DB!ForeignKey, fkCol : DB!Column{
+	guard: (not c.isPrimitiveType())
+   //Variables
+	var parentNameColumn = c.getAnnotation("PrimaryKeyJoinColumn").attribute.select(a|a.tag = "referencedColumnName").first().value.replace('"', '');
+	fkCol.table = c.type.equivalent("MarketPlace2Relacional");
+	fkCol.name = parentNameColumn;
+	fkCol.type = DB!DataType#int;
+	fk.parent = fkCol;
+	fk.child = c.equivalent("StorableUnit2Column");
+	fk.name = fk.child.name+"_"+fk.parent.table.name+"Id";
+	fk.database = db;
+}
+
+operation ForeignKey getFKConverted(){
+	("Iniciando getFKConverted").println();
+	(self).println;
+}
+
+operation StorableUnit getAnnotation(name : String)
+{
+	return self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size() > 0).select(a|a.`to`.Name = name).first(); // Se asume que solo hay una anotacion
+}

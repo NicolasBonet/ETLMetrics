@@ -1,0 +1,40 @@
+-- Debemos crear una unica base de datos para todos
+pre {
+	var db : new DB!Database;
+}
+
+-- Esta regla se encarga de todo!
+rule MarketPlace2Relacional
+	transform
+		c : mp!ClassUnit
+	to
+		t : DB!Table
+		{
+			guard: (c.codeRelation.select(r|r.isTypeOf(mp!HasValue) and r.annotation.size() > 0 and (r.`to`.name = "Entity" or r.`to`.name = "MappedSuperclass")).size() > 0)
+			-- Asignamos la tabla creada a la base de datos inicializada al comienzo y le ponemos el nombre de la clase sin el Entity
+	   		t.database = db;
+		   	t.name = c.name.replace("Entity", "");
+		   	
+		   	if (c.codeElement.select(e|e.isTypeOf(StorableUnit)).size() > 0){
+		   		for (atributo in c.codeElement.select(e|e.isTypeOf(StorableUnit))){
+		   			
+		   			var columna : new DB!Column;
+		   			columna.name = atributo.name;
+		   			if (atributo.type.name.contains("String")){
+		   				columna.type = DB!DataType#varchar;
+		   			}else if(atributo.type.name.contains("Long") or atributo.type.name.contains("Integer")){
+		   				columna.type = DB!DataType#int;
+		   			}else {
+		   				columna.type = DB!DataType#unknown;
+		   			}
+	
+					if(atributo.codeRelation.select(r|r.`to`.name = "Id").size() > 0){
+ 						var columnaPk : new DB!Column;
+		   				columnaPk.name = atributo.name;
+		   				columnaPk.notNull = true;
+		   				t.primaryKeys.add(columnaPk);
+					}
+		   			t.columns.add(columna);
+		   		} 
+		   	}
+	   }

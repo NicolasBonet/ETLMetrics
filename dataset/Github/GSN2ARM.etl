@@ -1,0 +1,224 @@
+pre{
+	//creates a global case which will contains all the elements that will be
+	//transformed with the current transformation
+	var c:= new ARM!Case;
+}
+
+//this rule transforms the GSNs TaggedValue to the ARMs TaggedValue
+rule TaggedValue2TaggedValue
+
+	transform s : GSN1!TaggedValue
+	to t : ARM!TaggedValue {
+	t.key := s.key;
+	t.value := s.value;
+}
+
+//this rule transforms the GSNs Goal to the ARMs Claim
+rule Goal2Claim
+	transform s:GSN1!Goal
+	to t : ARM!Claim{
+	t.identifier:=s.identifier;
+	t.description:=s.description;
+ 	s.addIsTagged(t);
+ 	
+	if(s.toBeDeveloped==true){
+		t.toBeSupported:=true;
+	}
+	else{
+		t.toBeSupported:=false;
+	}
+ 
+	c.contains.add(t);
+ 		
+	}
+//this rule transforms the GSNs Solution to the ARMs InformationElement
+rule Solution2InformationElement
+	transform s : GSN1!Solution
+	to t : ARM!InformationElement {
+ 	t.identifier:=s.identifier;
+	t.description:=s.description;
+  	s.addIsTagged(t);
+	c.contains.add(t);
+ 
+}
+//this rule transforms the GSNs solvedBy(when the child element is not the solution) 
+//to the ARMs AssertedInference
+rule SolvedBy2AssertedInference
+	transform s : GSN1!SolvedBy
+	to t : ARM!AssertedInference  {
+	guard : not s.childSpinalelement.isTypeOf(GSN1!Solution)
+	t.source.add(s.parentSpinalElement.equivalent());
+	t.target.add(s.childSpinalelement.equivalent());
+	//set as identifier the name of the source spinalelement
+	t.identifier=s.parentSpinalElement.equivalent().identifier;
+	c.contains.add(t);
+}
+
+//this rule transforms the GSNs solvedBy(when the child element is a solution)
+// to the ARMs AssertedEvidence
+rule SolvedBy2AssertedEvidence
+	transform s : GSN1!SolvedBy
+	to t : ARM!AssertedEvidence  {
+	
+	guard : s.childSpinalelement.isTypeOf(GSN1!Solution)
+ 	t.source.add(s.parentSpinalElement.equivalent());
+	t.target.add(s.childSpinalelement.equivalent());
+	//set as identifier the name of the source spinalelement
+	t.identifier=s.parentSpinalElement.equivalent().identifier;
+	c.contains.add(t);
+
+}
+	
+//this rule transforms the GSNs incontextOf to the ARMs AssertedContext
+rule InContextOf2AssertedContext
+	transform s : GSN1!InContextOf
+	to t : ARM!AssertedContext {
+	
+	t.source.add(s.contextOfSpinalElement.equivalent());
+ 
+	t.target.add(s.contextualElement.equivalent());
+		//set as identifier the name of the source spinalelement
+	t.identifier=s.contextOfSpinalElement.equivalent().identifier;
+	c.contains.add(t);
+
+}
+//this rule transforms the GSNs Strategy to the ARMs ArgumentReasoning
+rule Strategy2ArgumentReasoning
+	transform s : GSN1!Strategy
+	to t : ARM!ArgumentReasoning {
+ 	t.identifier:=s.identifier;
+	t.description:=s.description;
+	s.addIsTagged(t);
+	for(i in s.parentSolvedBy){
+		t.describes.add(i.equivalent());
+	}
+	c.contains.add(t);
+
+}
+
+//this rule transforms the GSNs Context to the ARMs InformationElement
+rule Context2InformationElement
+	transform s : GSN1!Context
+	to t : ARM!InformationElement {
+ 	t.identifier:=s.identifier;
+	t.description:=s.description;
+	s.addIsTagged(t);
+	c.contains.add(t);
+	
+}
+
+//this rule transforms the GSNs Justification to the ARMs InformationElement
+rule Justification2InformationElement
+	transform s : GSN1!Justification
+	to t : ARM!InformationElement {
+ 	t.identifier:=s.identifier;
+	t.description:=s.description;
+	s.addIsTagged(t);
+	c.contains.add(t);
+	
+}
+
+//this rule transforms the GSNs Assumption to the ARMs InformationElement
+rule Assumption2InformationElement
+	transform s : GSN1!Assumption
+	to t : ARM!InformationElement {
+ 	t.identifier:=s.identifier;
+	t.description:=s.description;
+	s.addIsTagged(t);
+	c.contains.add(t);
+	
+}
+//this rule transforms the GSNs AwayGoal to the ARMs CitiationElement
+rule AwayGoal2CitiationElement
+	transform s: GSN1!AwayGoal
+	to t: ARM!CitiationElement{
+	t.identifier:=s.identifier;
+	t.description:=s.description;
+	s.addIsTagged(t);
+	c.contains.add(t);
+	t.refersToArgumentElement:=s.pointsTo.equivalent();
+	}
+//this rule transforms the GSNs AwaySolution to the ARMs CitiationElement
+rule AwaySolution2CitiationElement
+	transform s: GSN1!AwaySolution
+	to t: ARM!CitiationElement{
+	t.identifier:=s.identifier;
+	t.description:=s.description;
+	s.addIsTagged(t);
+	c.contains.add(t);
+	t.refersToArgumentElement:=s.pointsTo.equivalent();
+	}
+//this rule transforms the GSNs AwayContext to the ARMs CitiationElement
+rule AwayContext2CitiationElement
+	transform s: GSN1!AwayContext
+	to t: ARM!CitiationElement{
+	t.identifier:=s.identifier;
+	t.description:=s.description;
+	s.addIsTagged(t);
+	c.contains.add(t);
+	t.refersToArgumentElement:=s.pointsTo.equivalent();
+	}
+//this rule transforms the GSNs ArgumentModule to the ARMs Argument
+rule ArgumentModule2Argument
+	transform s : GSN1!ArgumentModule
+	to t : ARM!Argument {
+	
+	t.identifier:=s.identifier;
+	t.description:=s.description;
+  	s.addIsTagged(t);
+  	for(i in s.containsElement){
+  		t.containsArgumentElement.add(i.equivalent());
+  	}
+  	for(i in s.parentModuleOf){
+ 		t.containsArgument.add(i.equivalent());
+ 	}
+ 	for(i in t.containsArgumentElement){
+ 		for(j in ARM!ArgumentLink.allInstances){
+ 			if(j.source.contains(i)){
+ 				t.containsArgumentLink.add(j);
+ 			}
+ 		}	
+ 	}
+	c.contains.add(t);
+
+}
+
+//this rule transforms the GSNs ContractModule to the ARMs Argument
+rule ContractModule2Argument
+	transform s : GSN1!ContractModule
+	to t : ARM!Argument {
+	
+	t.identifier:=s.identifier;
+	t.description:=s.description;
+  	s.addIsTagged(t);
+  	for(i in s.containsElement){
+  		t.containsArgumentElement.add(i.equivalent());
+  	}
+  	for(i in s.parentModuleOf){
+ 		t.containsArgument.add(i.equivalent());
+ 	}
+ 	for(i in t.containsArgumentElement){
+ 		for(j in ARM!ArgumentLink.allInstances){
+ 			if(j.source.contains(i)){
+ 				t.containsArgumentLink.add(j);
+ 			}
+ 		}
+ 		
+ 	}
+	c.contains.add(t);
+
+}
+
+//if the current model element of the GSN model has tagged values,
+//these tagged values are created and added to the equal ARM model element
+operation GSN1!ModelElement addIsTagged(t: ARM!ModelElement){
+
+	if(self.containsAdditional.isDefined()){
+ 		for(i in self.containsAdditional){
+ 			var isTagged := new ARM!TaggedValue;
+ 			isTagged.key:=self.containsAdditional[i].key;
+ 			isTagged.value:=self.containsAdditional[i].value;
+ 			t.isTagged.add(isTagged);
+ 		}
+ 	}
+}

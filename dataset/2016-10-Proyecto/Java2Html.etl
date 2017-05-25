@@ -1,0 +1,531 @@
+pre{
+	//var classes = java!Packages.all.select(p|p.name.endsWith("domain")).first().classes
+	var nameApp = java!Project.all.first().name.replace("-ejb","");
+	java!Package.all.select(p|p.name.endsWith("domain")).collect(c|c.getRoot(nameApp));
+}
+
+/************************** ROOT ***************************/
+//Metodo que construye las Paginas
+operation java!Package getRoot(nameApp:String): html!Root {
+	var root = new html!Root;
+	root.pages=self.classes.collect(c|c.getPage(nameApp, self.classes));
+	root.projectName=nameApp;
+	return root;
+}
+
+/**************************  HEAD **************************/ 
+//Metodo que construye la Pagina
+operation java!Class getPage(nameApp:String, classes:Set): html!Page {
+	var pa = new html!Page;
+	var entities = new Set;
+	pa.name=self.name.toLowerCase();
+	pa.title=self.name;
+	//pa.name.println;
+	//pa.title.println;
+	pa.head=self.getHead(nameApp);
+	pa.body=self.getBody(nameApp, classes);
+	return pa;
+}
+	
+//Metodo que construye el <Head>
+operation java!Class getHead(nameApp:String): html!Head {
+	var h = new html!Head;
+	h.scripts=self.getHeadScripts(nameApp);
+	h.styles=self.getHeadStyles();
+	return h;
+}
+
+//Metodo que contruye los Scripts del Head
+operation java!Class getHeadScripts(nameApp:String): Bag {
+	var scripts = new Bag;
+	//Librerias generales
+	var s = new html!Script;
+	s.name="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js";
+	scripts.add(s);
+	s = new html!Script;
+	s.name="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js";
+	scripts.add(s);
+	s = new html!Script;
+	s.name="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js";
+	scripts.add(s);
+	s = new html!Script;
+	s.name="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-animate.min.js";
+	scripts.add(s);
+	s = new html!Script;
+	s.name="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-route.min.js";
+	scripts.add(s);
+	s = new html!Script;
+	s.name="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-aria.min.js";
+	scripts.add(s);
+	s = new html!Script;
+	s.name="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-messages.min.js";
+	scripts.add(s);
+	s = new html!Script;
+	s.name="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.7/angular-material.min.js";
+	scripts.add(s);
+	s = new html!Script;
+	s.name="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap.js";
+	scripts.add(s);
+	s = new html!Script;
+	s.name="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.js";
+	scripts.add(s);
+	s = new html!Script;
+	s.name="https://cdnjs.cloudflare.com/ajax/libs/angular-material-data-table/0.10.5/md-data-table.js";
+	scripts.add(s);
+	s = new html!Script;
+	s.name="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-resource.js";
+	scripts.add(s);
+	s = new html!Script;
+	s.name="../scripts/app.js";
+	s.path="/scripts";
+	s.content="var app = angular.module('"+nameApp.replace("-","")+"App', ['ngMaterial','ngResource','md.data.table', 'ui.bootstrap']);";
+	scripts.add(s);
+	//Librerias para cada Clase
+	s = new html!Script;
+	s.name="../scripts/service/rest-api.js";
+	s.path="/scripts/service";
+	s.content="'use strict';";
+	s.content=s.content+"\napp.constant('REST_API',  {";
+	s.content=s.content+"\n\tnamespace: '/"+nameApp+"/rest'";
+	s.content=s.content+"\n});";
+	scripts.add(s);
+	s = new html!Script;
+	s.name="../scripts/service/create-"+self.name.toLowerCase()+".js";
+	s.path="/scripts/service";
+	s.content=self.getContentCRUD("create");
+	scripts.add(s);
+	s = new html!Script;
+	s.name="../scripts/service/update-"+self.name.toLowerCase()+".js";
+	s.path="/scripts/service";
+	s.content=self.getContentCRUD("update");
+	scripts.add(s);
+	s = new html!Script;
+	s.name="../scripts/service/delete-"+self.name.toLowerCase()+".js";
+	s.path="/scripts/service";
+	s.content=self.getContentCRUD("delete");
+	scripts.add(s);
+	s = new html!Script;
+	s.name="../scripts/service/list-"+self.name.toLowerCase()+".js";
+	s.path="/scripts/service";
+	s.content=self.getContentCRUD("all");
+	scripts.add(s);
+	s = new html!Script;
+	s.name="../scripts/controller/"+self.name.toLowerCase()+".js";
+	s.path="/scripts/controller";
+	s.content=self.getContentController();
+	scripts.add(s);
+	return scripts;
+}
+
+operation java!Class getContentController(): String {
+	var cont = "";
+	var nameCont= self.name.firstToUpperCase();
+	cont="app.controller('"+self.name.toLowerCase()+"Controller', function($scope,create"+nameCont+", update"+nameCont+", delete"+nameCont+", all"+nameCont+") {";
+	cont=cont+"\n";
+	cont=cont+"\n$scope."+nameCont.toLowerCase()+"= {};";
+	for(a in self.attributes){
+		if(a.typeOf.isTypeOf(java!ArrayList)){
+			cont=cont+"\n$scope."+nameCont.toLowerCase()+"."+a.name.toLowerCase()+"= [];";
+			cont=cont+"\n$scope."+a.name.toLowerCase()+"New= {};";
+		}
+	}
+	cont=cont+"\n";
+	cont=cont+"\nall"+nameCont+".query().$promise.then(function(data) {";
+	cont=cont+"\n$scope.list"+nameCont+" = data;";
+	cont=cont+"\n});";
+	cont=cont+"\n";
+	cont=cont+"\n$scope.load"+nameCont+" = function("+self.name.toLowerCase()+") {";
+	cont=cont+"\n$scope."+self.name.toLowerCase()+"= "+self.name.toLowerCase()+";";
+	cont=cont+"\n};";
+	cont=cont+"\n$scope.delete"+nameCont+" = function("+self.name.toLowerCase()+") {";
+	cont=cont+"\nvar "+nameCont.toLowerCase()+" = "+self.name.toLowerCase()+";";
+	cont=cont+"\n"+nameCont.toLowerCase()+"= new delete"+nameCont+"("+nameCont.toLowerCase()+");";
+	cont=cont+"\n"+nameCont.toLowerCase()+".$delete(function() {";
+	cont=cont+"\nconsole.log(\"Se elimino el registro\");";
+	cont=cont+"\nalert(\"Se elimino el registro\");";
+	cont=cont+"\n$scope."+self.name.toLowerCase()+"= {};";
+	for(a in self.attributes){
+		if(a.typeOf.isTypeOf(java!ArrayList)){
+			cont=cont+"\n$scope."+self.name.toLowerCase()+"."+a.name.toLowerCase()+"= [];";
+		}
+	}
+	cont=cont+"\n$scope.list"+self.name.toLowerCase().firstToUpperCase()+".splice($scope.list"+self.name.toLowerCase().firstToUpperCase()+".indexOf("+self.name.toLowerCase()+"),1);";
+	cont=cont+"\n}, function() {";
+	cont=cont+"\nconsole.log(\"No se elimino el registro\");";
+	cont=cont+"\nalert(\"No se elimino el registro\");";
+	cont=cont+"\n});";
+	cont=cont+"\n};";
+	cont=cont+"\n";
+	cont=cont+"\n$scope.new"+nameCont+" = function() {";
+	cont=cont+"\n$scope."+self.name.toLowerCase()+"= {};";
+	for(a in self.attributes){
+		if(a.typeOf.isTypeOf(java!ArrayList)){
+			cont=cont+"\n$scope."+self.name.toLowerCase()+"."+a.name.toLowerCase()+"= [];";
+		}
+	}
+	cont=cont+"\n};";
+	cont=cont+"\n";
+	cont=cont+"\n$scope.save"+nameCont+" = function() {";
+	cont=cont+"\nvar "+nameCont.toLowerCase()+" = $scope."+nameCont.toLowerCase()+";";
+	cont=cont+"\nif($scope."+nameCont.toLowerCase()+".id == undefined){";
+	cont=cont+"\n"+nameCont.toLowerCase()+"= new create"+nameCont+"("+nameCont.toLowerCase()+");";
+	cont=cont+"\n"+nameCont.toLowerCase()+".$create(function() {";
+	cont=cont+"\nconsole.log(\"Se guardo el nuevo\");";
+	cont=cont+"\nalert(\"Se guardo el nuevo\");";
+	cont=cont+"\n$scope.list"+self.name.toLowerCase().firstToUpperCase()+".push($scope."+nameCont.toLowerCase()+");";
+	cont=cont+"\n}, function() {";
+	cont=cont+"\nconsole.log(\"No se guardo\");";
+	cont=cont+"\nalert(\"No se guardo\");";
+	cont=cont+"\n});";
+	cont=cont+"\n} else {";
+	cont=cont+"\n"+nameCont.toLowerCase()+"= new update"+nameCont+"("+nameCont.toLowerCase()+");";
+	cont=cont+"\n"+nameCont.toLowerCase()+".$update(function() {";
+	cont=cont+"\nconsole.log(\"Se actualizo\");";
+	cont=cont+"\nalert(\"Se actualizo\");";
+	cont=cont+"\n}, function() {";
+	cont=cont+"\nconsole.log(\"No se actualizo\");";
+	cont=cont+"\nalert(\"No se actualizo\");";
+	cont=cont+"\n});";
+	cont=cont+"\n}";
+	cont=cont+"\n};";
+	cont=cont+"\n";
+	for(a in self.attributes){
+		if(a.typeOf.isTypeOf(java!ArrayList)){
+			var nomC = a.name.toLowerCase();
+			cont=cont+"\n$scope.save"+nomC.firstToUpperCase()+" = function(){";
+			cont=cont+"\n$scope."+nameCont.toLowerCase()+"."+nomC+".push($scope."+nomC+"New);";
+			cont=cont+"\n$scope."+nomC+"New = {};";
+			cont=cont+"\n};";
+			cont=cont+"\n$scope.delete"+nomC.firstToUpperCase()+" = function(){";
+			cont=cont+"\nfor(var i in $scope."+nameCont.toLowerCase()+"."+nomC+"){";
+			cont=cont+"\n$scope."+nameCont.toLowerCase()+"."+nomC+".splice($scope."+nameCont.toLowerCase()+"."+nomC+".indexOf($scope."+nameCont.toLowerCase()+"."+nomC+"[i]),1);";
+			cont=cont+"\n}";
+			cont=cont+"\n};";
+		}
+	}
+	cont=cont+"\n";
+	cont=cont+"\n});";
+	return cont;
+}
+
+operation java!Class getContentCRUD(action:String): String {
+	var content = "";
+	content = "'use strict';";
+	content = content+"\napp.factory('"+action+self.name.firstToUpperCase()+"', function ($cacheFactory, $resource, REST_API) {";
+	content = content+"\nreturn $resource(REST_API.namespace+'/"+self.service.firstToLowerCase()+"/"+action+self.name.firstToUpperCase()+"', null, {";
+	if (action == "all"){
+		//content = content+"\n\t'"+action+"': {method: 'GET'}";
+		content = content+"\n'query': {method: 'GET', isArray: true }";
+	} else {
+		content = content+"\n\t'"+action+"': {method: 'PUT'}";
+	}
+	content = content+"\n});";
+	content = content+"\n});";
+	return content;
+}
+
+//Metodo que construye los Styles del Head
+operation java!Class getHeadStyles(): Set {
+	var scripts = new Set;
+	var s = new html!Style;
+	s.name="https://gitcdn.link/repo/angular/bower-material/master/angular-material.css";
+	scripts.add(s);
+	s = new html!Style;
+	s.name="https://cdnjs.cloudflare.com/ajax/libs/angular-material-data-table/0.10.5/md-data-table.css";
+	scripts.add(s);
+	s = new html!Style;
+	s.name="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css";
+	scripts.add(s);
+	s = new html!Style;
+	s.name="../css/style.css";
+	s.path="/css";
+	s.content=".tabsdemoDynamicHeight md-content {";
+  	s.content=s.content+"\nbackground-color: transparent !important; }";
+  	s.content=s.content+"\n.tabsdemoDynamicHeight md-content md-tabs {";
+    s.content=s.content+"\nbackground: #f6f6f6;";
+    s.content=s.content+"\nborder: 1px solid #e1e1e1; }";
+    s.content=s.content+"\n.tabsdemoDynamicHeight md-content md-tabs md-tabs-canvas {";
+    s.content=s.content+"\n background: white; }";
+  	s.content=s.content+"\n.tabsdemoDynamicHeight md-content h1:first-child {";
+    s.content=s.content+"\nmargin-top: 0; }";
+	scripts.add(s);
+	return scripts;
+}
+
+/**************************  BODY  **************************/
+//Metodo que construye el <Body>
+operation java!Class getBody(nameApp:String, classes:Set): html!Body {
+	var b = new html!Body;
+	b.ngApp=nameApp.replace("-","")+"App";	
+	b.elements=self.getBodyElements(classes);	
+	return b;
+}
+
+//Metodo que construye los Elementos de Formulario
+operation java!Class getBodyElements(classes:Set): Bag {
+	var elements = new Bag;	
+	//El primer elemento siempre es un DIV
+	var divCont = new html!Container;
+	divCont.ngController=self.name.toLowerCase()+"Controller";
+	divCont.type=html!ETypeContainer#div;
+	//Elementos del Div
+	var divContElements = new Bag;
+	var formCont = new html!Container;
+	formCont.name="myForm";
+	formCont.class="form-horizontal";
+	formCont.type=html!ETypeContainer#form;
+	//Elementos del form
+	var formContElements = new Bag;
+	var formContCont = new html!Container;
+	formContCont.class="container-fluid";
+	formContCont.type=html!ETypeContainer#div;
+	//El primer elemento es siempre una tabla para los maestros
+	var contDivTable = new Bag;
+	var formContTable = new html!Container;
+	formContTable.class="row";
+	formContTable.type=html!ETypeContainer#div;
+	//elementos de la fila de tabla
+	var tblCont = new html!Table;
+	tblCont.caption="Lista de "+self.name.firstToUpperCase();
+	tblCont.thead=self.getTHead(self.name.toLowerCase());
+	tblCont.tbody=self.getTBody(self.name.toLowerCase(), true);
+	formContTable.elements.add(tblCont);
+	//Elementos de boton para guardar y limpiar
+	var formContButtons = new html!Container;
+	formContButtons.class="row row-button";
+	formContButtons.type=html!ETypeContainer#div;
+	//Elementos del div de botones
+	var formContColButtons = new html!Container;
+	formContColButtons.class="col-md-6";
+	formContColButtons.type=html!ETypeContainer#div;
+	var inputs = new Bag;
+	var btn = new html!Button;
+	btn.id="btnNew"+self.name.firstToUpperCase();
+	btn.type="submit";
+	btn.class="button";
+	btn.value="Nuevo";
+	btn.name="new"+self.name.firstToUpperCase();
+	btn.ngClick="new"+self.name.firstToUpperCase()+"()";
+	inputs.add(btn);
+	btn = new html!Button;
+	btn.id="btnSave"+self.name.firstToUpperCase();
+	btn.type="submit";
+	btn.class="button";
+	btn.value="Guardar";
+	btn.name="save"+self.name.firstToUpperCase();
+	btn.ngClick="save"+self.name.firstToUpperCase()+"()";
+	inputs.add(btn);
+	formContColButtons.elements = inputs;
+	formContButtons.elements.add(formContColButtons);
+	
+	//Elementos en visualización por pestanas
+	var formContPest = new html!Container;
+	formContPest.class="panel panel-default";
+	formContPest.id="tabs-panel";
+	formContPest.type=html!ETypeContainer#div;
+	//elementos uib-tabset
+	var formContUibPest = new html!Container;
+	formContUibPest.class="panel-body";
+	formContUibPest.type=html!ETypeContainer#uibTabSet;
+	//elemento uib-tab de detalle informacion maestros
+	var formContUibTabPest = new html!Container;
+	formContUibTabPest.heading="Detalle";
+	formContUibTabPest.type=html!ETypeContainer#uibTab;
+	
+	//por cada atributo se crean varios containers
+	for (a in self.attributes){
+		if(a.typeOf.isTypeOf(java!ArrayList) == false
+		and a.name <> "id"){
+			var div1 = new html!Container;
+			div1.class="row row-field";
+			div1.type=html!ETypeContainer#div;
+			var divCol1 = new html!Container;
+			divCol1.class="col-md-6";
+			divCol1.type=html!ETypeContainer#div;
+			var divControlCol1 = new html!Container;
+			divControlCol1.class="control-group form-group";
+			divControlCol1.type=html!ETypeContainer#div;
+			
+			var lbl = new html!Label;
+			lbl.fors="input"+a.name.firstToUpperCase();
+			lbl.class="control-label";
+			lbl.value=a.name.firstToUpperCase();
+			divControlCol1.elements.add(lbl);
+			
+			divCol1.elements.add(divControlCol1);
+			var divCol2 = new html!Container;
+			divCol2.class="col-md-6";
+			divCol2.type=html!ETypeContainer#div;
+			var divControlCol2 = new html!Container;
+			divControlCol2.class="control-group form-group";
+			divControlCol2.type=html!ETypeContainer#div;
+			
+			var txt = new html!InputText;
+			txt.type="text";
+			txt.id="input"+a.name.firstToUpperCase();
+			txt.name="txt"+a.name.firstToUpperCase();
+			txt.ngModel=self.name.toLowerCase()+"."+a.name;
+			divControlCol2.elements.add(txt);
+			
+			divCol2.elements.add(divControlCol2);
+			div1.elements.add(divCol1);
+			div1.elements.add(divCol2);
+			formContUibTabPest.elements.add(div1);
+		}
+	}
+	
+	formContUibPest.elements.add(formContUibTabPest);
+	
+	//elementos uib-tab para los detalles o "hijos" de la entidad
+	//por cada atributo se crean varios containers
+	for (a in self.attributes){
+		if(a.typeOf.isTypeOf(java!ArrayList)){
+			//elemento uib-tab de detalle informacion maestros
+			var formContUibTabPest = new html!Container;
+			var classRef = new java!Class;
+			formContUibTabPest.heading=a.name.firstToUpperCase();
+			formContUibTabPest.type=html!ETypeContainer#uibTab;
+			
+			for(c in classes){
+				if(c.name.toLowerCase()==a.name.toLowerCase()){
+					classRef=c;
+					break;
+				}
+			}
+			
+			for (at in classRef.attributes){
+				if (at.name.toLowerCase() <> self.name.toLowerCase() 
+					and at.name.toLowerCase() <> "id"){
+					var div1 = new html!Container;
+					div1.class="row row-field";
+					div1.type=html!ETypeContainer#div;
+					var divCol1 = new html!Container;
+					divCol1.class="col-md-6";
+					divCol1.type=html!ETypeContainer#div;
+					var divControlCol1 = new html!Container;
+					divControlCol1.class="control-group form-group";
+					divControlCol1.type=html!ETypeContainer#div;
+					
+					var lbl = new html!Label;
+					lbl.fors="input"+at.name.firstToUpperCase();
+					lbl.class="control-label";
+					lbl.value=at.name.firstToUpperCase();
+					divControlCol1.elements.add(lbl);
+					
+					divCol1.elements.add(divControlCol1);
+					var divCol2 = new html!Container;
+					divCol2.class="col-md-6";
+					divCol2.type=html!ETypeContainer#div;
+					var divControlCol2 = new html!Container;
+					divControlCol2.class="control-group form-group";
+					divControlCol2.type=html!ETypeContainer#div;
+					
+					var txt = new html!InputText;
+					txt.type="text";
+					txt.id="input"+at.name.firstToUpperCase();
+					txt.name="txt"+at.name.firstToUpperCase();
+					txt.ngModel=classRef.name.toLowerCase()+"New."+at.name;
+					divControlCol2.elements.add(txt);
+					
+					divCol2.elements.add(divControlCol2);
+					div1.elements.add(divCol1);
+					div1.elements.add(divCol2);
+					formContUibTabPest.elements.add(div1);
+					
+				}
+			}
+			
+			var div1 = new html!Container;
+			div1.class="row row-field";
+			div1.type=html!ETypeContainer#div;
+			var divCol1 = new html!Container;
+			divCol1.class="col-md-6";
+			divCol1.type=html!ETypeContainer#div;
+			
+			
+			var btn = new html!Button;
+			btn.id="btnSave"+classRef.name.firstToUpperCase();
+			btn.type="button";
+			btn.class="button";
+			btn.value="A&ntilde;adir";
+			btn.name="save"+classRef.name.firstToUpperCase();
+			btn.ngClick="save"+classRef.name.firstToUpperCase()+"()";
+			divCol1.elements.add(btn);
+			
+			var tblCont = new html!Table;
+			tblCont.caption="Lista de "+classRef.name.firstToUpperCase();
+			tblCont.thead=classRef.getTHead(self.name.toLowerCase());
+			tblCont.tbody=classRef.getTBody(self.name.toLowerCase(), false);
+			
+			div1.elements.add(divCol1);
+			formContUibTabPest.elements.add(div1);
+			formContUibTabPest.elements.add(tblCont);
+			formContUibPest.elements.add(formContUibTabPest);
+		}
+	}
+	
+	
+	formContPest.elements.add(formContUibPest);
+	contDivTable.add(formContTable);
+	contDivTable.add(formContButtons);
+	contDivTable.add(formContPest);
+	formContElements.add(formContCont);
+	divContElements.add(formCont);
+	formContCont.elements=contDivTable;
+	formCont.elements = formContElements;
+	divCont.elements = divContElements;
+	elements.add(divCont);
+	return elements;
+}
+
+operation java!Class getTHead(classRef:String): html!Thead {
+	var thead = new html!Thead;
+	var tr = new html!Tr;
+	var ths = new Bag;
+	for (a in self.attributes){
+		if (a.typeOf.isTypeOf(java!ArrayList) == false
+			and a.name <> "id"
+			and a.name.toLowerCase() <> classRef){
+			var td = new html!Td;
+			td.value=a.name.firstToUpperCase();
+			ths.add(td);
+		}
+	}
+	tr.td=ths;
+	thead.tr=tr;
+	return thead;
+}
+
+operation java!Class getTBody(classRef:String, isEditable): html!Tbody {
+	var tbody = new html!Tbody;
+	var tr = new html!Tr;
+	if(isEditable){
+		tr.ngRepeat=self.name.toLowerCase()+"Cursor in list"+self.name.firstToUpperCase();
+	} else {
+	//Las no editables son el detalle
+		tr.ngRepeat=self.name.toLowerCase()+"Cursor in "+classRef.toLowerCase()+"."+self.name.toLowerCase();
+	}
+	var tds = new Bag;
+	for (a in self.attributes){
+		if (a.typeOf.isTypeOf(java!ArrayList) == false
+			and a.name <> "id"
+			and a.name.toLowerCase() <> classRef){
+			var td = new html!Td;
+			td.value="{{ "+self.name.toLowerCase()+"Cursor."+a.name+" }}";
+			tds.add(td);
+		}
+	}
+	//TD para la edición de la columna
+	if(isEditable){
+		var td = new html!Td;
+		td.value="<a ng-href=\"#\" ng-click=\"load"+self.name.firstToUpperCase()+"("+self.name.toLowerCase()+"Cursor)\"><span>Editar</span></a>&nbsp;";
+		tds.add(td);
+	}
+	//opcion de eliminar
+	var td = new html!Td;
+	td.value="<a ng-href=\"#\" ng-click=\"delete"+self.name.firstToUpperCase()+"("+self.name.toLowerCase()+"Cursor)\"><span>Eliminar</span></a>&nbsp;";
+	tds.add(td);
+	tr.td=tds;
+	tbody.tr.add(tr);
+	return tbody;
+}

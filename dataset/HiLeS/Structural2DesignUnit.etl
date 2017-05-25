@@ -1,0 +1,96 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: Structural2DesignUnit.etl 1002 2015-05-03 00:29:43Z kd.sanchez21@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+import "Block2DesignUnit.etl"; // Extended rule
+
+/****r* HiLeSToVDHLAMS/Structural2DesignUnit
+ * SUMMARY
+ *   Transform a HiLeS:Structural into a Vhdl:DesignUnit.  ($Rev: 1002 $)
+ * DESCRIPTION 
+ *   Additional ports are created to connect the PN elements' control and 
+ * monitoring signals.
+ * DERIVED FROM
+ * 	* Block2DesignUnit
+ * 
+ *
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *   	* Vhdl   - http://hiles.uniandes.edu.co/1.1/vhdl-ams
+ *
+ ******
+ */
+rule Structural2DesignUnit
+	transform block : HiLeS!Structural
+	to unit : Vhdl!DesignUnit	
+	extends  Block2DesignUnit
+	{
+		unit.identifier = "Structural" + block.name;
+		var entity = unit.libraryUnit.selectOne(l | l.isTypeOf(Vhdl!Entity));
+		// To the header ports we must add:
+		// 1. init_pl, for PN initialization
+		var init_pl = new Vhdl!InterfaceSignal;
+		init_pl.identifier = "init_pl";
+		init_pl.mode = Vhdl!Mode#`in`;
+		init_pl.subtype = new Vhdl!Subtype;
+		init_pl.subtype.type = Vhdl!Types#std_logic;
+		entity.header.port.add(init_pl);
+		// 2. tr_cond for transition enable.
+		var tr_cond = new Vhdl!InterfaceSignal;
+		tr_cond.identifier = "tr_cond";
+		tr_cond.mode = Vhdl!Mode#`in`;
+		tr_cond.subtype = new Vhdl!Subtype;
+		tr_cond.subtype.type = Vhdl!Types#std_logic;
+		entity.header.port.add(tr_cond);
+		// 3. mark_tr vector (place marks), which size is equal to the number of
+		// places in the block's architectur PN
+		var mark_tr = new Vhdl!InterfaceSignal;
+		mark_tr.identifier = "mark_tr";
+		mark_tr.mode = Vhdl!Mode#out;
+		mark_tr.subtype = new Vhdl!Subtype;
+		mark_tr.subtype.type = Vhdl!Types#std_logic_vector;
+		mark_tr.subtype.range = new Vhdl!Range;
+		mark_tr.subtype.range.begin = (block.innerArchitecture.petriNet.element.select(n | n.isTypeOf(HiLeS!Place)).size()-1);
+		mark_tr.subtype.range.end = 0;
+		mark_tr.subtype.range.direction = Vhdl!RangeDirection#downto;
+		
+		
+		var ret_jeton_PNOut = new Vhdl!InterfaceSignal;
+		ret_jeton_PNOut.identifier = "ret_jeton_"+block.name+"_HcnOut";
+		ret_jeton_PNOut.mode = Vhdl!Mode#`in`;
+		ret_jeton_PNOut.subtype = new Vhdl!Subtype;
+		ret_jeton_PNOut.subtype.type = Vhdl!Types#std_logic;
+		entity.header.port.add(ret_jeton_PNOut);
+		
+		
+		entity.header.port.add(mark_tr);
+		entity.header.port.addAll(block.port.equivalent());
+		// Add Vhdl Architectures for HiLeS Archirectures to the library units
+		block.innerArchitecture.equivalent().entity=entity;
+		unit.libraryUnit.add(block.innerArchitecture.equivalent());
+		
+		
+		if(block.parentArchitecture.isDefined() and block.parentArchitecture.name="LogicalSolution")
+		{
+		var signal=new Vhdl!InterfaceSignal;
+		signal.identifier =  "marque_"+block.name+"_HcnOut";
+		signal.mode = Vhdl!Mode#`out`;
+		signal.subtype = new Vhdl!Subtype;
+		signal.subtype.type = Vhdl!Types#std_logic;
+		entity.header.port.add(signal);
+		}
+		
+		
+	}
+
+
+
+
+

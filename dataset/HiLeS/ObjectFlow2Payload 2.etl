@@ -1,0 +1,249 @@
+/*******************************************************************************
+ * Copyright (c) 2012 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: ObjectFlow2Payload.etl 1003 2015-05-03 00:30:47Z kd.sanchez21@UANDES $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+
+/****r* Behavior/ObjectFlow2Payload
+ * SUMMARY
+ *  Transfotrm a SysML!ObjectFlow into a HiLeS!Payload ($Rev: 1003 $)
+ * DESCRIPTION
+ * |html <B>@abstract</B>
+ *  An ObjectFlow is transformed into a HiLeS!Payload. Derived rules specify
+ * the specific type of Payload.
+ * DERIVED BY
+ * 	* ObjectFlow2NodePayload
+ * 	* ObjectFlow2TerminalPayload
+ * 	* ObjectFlow2DigitalPayload
+ * 	* ObjectFlow2DigitalVectorPayload
+ * 	* ObjectFlow2DigitalAnalogPayload
+ * SEE ALSO
+ *  * MainBlock2HCN
+ *	* ActivityPartition2Block
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */ 
+@abstract
+ rule ObjectFlow2Payload
+ 	transform of : SysML!ObjectFlow
+ 	to payload : HiLeS!Payload
+ 	{
+ 		guard : of.source.isTypeOf(SysML!ActivityParameterNode)
+ 		println("ObjectFlow2Payload");
+ 		payload.source = of.source.equivalents().selectOne(s | s.isTypeOf(HiLeS!Service));
+ 		payload.target = of.target.equivalents().selectOne(p : HiLeS!Port
+ 				| p.name.endsWith("DecisionInput"));
+ 		println("EndObjectFlow2Payload");
+ 	}
+
+/****r* Behavior/ObjectFlow2Payload
+ * SUMMARY
+ *  Transfotrm a SysML!ObjectFlow into a HiLeS!NodePayload ($Rev: 1003 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *  Extends ObjectFlow2Payload to generate NodePayloads.
+ * DERIVED FROM
+ * 	* ObjectFlow2Payload
+ * SEE ALSO
+ *  * MainBlock2HCN
+ *	* ActivityPartition2Block
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */ 
+@lazy
+rule ObjectFlow2NodePayload
+	transform of : SysML!ObjectFlow
+	to payload : HiLeS!NodePayload
+	extends ObjectFlow2Payload
+	{
+
+		/* The source ActivityParamter is typed with a class which isTypeOf(HiLeS!Node).
+		*/
+		guard : of.source.type.generalization.one(g
+					| g.general.name = "Node"
+					)
+		println("ObjectFlow2NodePayload");			
+		payload.type = of.source.type.name;
+		println("EndObjectFlow2NodePayload");	
+		// TODO: Nodes may be defined by the user. If the role.type's name is not a primitiveType
+		// of the HiLeS Library, then the across and through values must be extracted and assigned
+		// to the payload.
+	}
+
+/****r* Behavior/ObjectFlow2TerminalPayload
+ * SUMMARY
+ *  Transfotrm a SysML!ObjectFlow into a HiLeS!TerminalPayload ($Rev: 1003 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *  Extends ObjectFlow2Payload to generate TerminalPayloads.
+ * DERIVED FROM
+ * 	* ObjectFlow2Payload
+ * SEE ALSO
+ *  * MainBlock2HCN
+ *	* ActivityPartition2Block
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */ 	
+@lazy
+rule ObjectFlow2TerminalPayload
+	transform of : SysML!ObjectFlow
+	to payload : HiLeS!TerminalPayload
+	extends ObjectFlow2Payload
+	{
+
+		/* The source ActivityParamter is typed with a class which isTypeOf(HiLeS!Terminal).
+		*/
+		guard : of.source.type.generalization.one(g
+					| g.general.name = "Terminal"
+					)
+		println("ObjectFlow2TerminalPayload");			
+		payload.type = of.source.type.name;
+		println("EndObjectFlow2TerminalPayload");
+		// TODO: Terminals may be defined by the user. If the role.type's name is not a primitiveType
+		// of the HiLeS Library, then the across and through values must be extracted and assigned
+		// to the payload.
+	}
+	
+/****r* Behavior/ObjectFlow2DigitalPayload
+ * SUMMARY
+ *  Transfotrm a SysML!ObjectFlow into a HiLeS!DigitalPayload ($Rev: 1003 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *  Extends ObjectFlow2Payload to generate DigitalPayloads.
+ * DERIVED FROM
+ * 	* ObjectFlow2Payload
+ * SEE ALSO
+ *  * MainBlock2HCN
+ *	* ActivityPartition2Block
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */ 
+@lazy
+rule ObjectFlow2DigitalPayload
+	transform of : SysML!ObjectFlow
+	to payload : HiLeS!DigitalPayload
+	extends ObjectFlow2Payload
+	{
+
+		/* The source ActivityParamter is typed with a class which isTypeOf(HiLeS!Terminal).
+		*/
+		guard : of.source.type.name = "Logic" or
+			 of.source.type.name = "Boolean" 
+		println("ObjectFlow2DigitalPayload");			
+		payload.type = of.source.type.name;
+		// TODO: Terminals may be defined by the user. If the role.type's name is not a primitiveType
+		// of the HiLeS Library, then the across and through values must be extracted and assigned
+		// to the payload.
+		println("EndObjectFlow2DigitalPayload");	
+	}
+
+/****r* Behavior/ObjectFlow2DigitalVectorPayload
+ * SUMMARY
+ *  Transfotrm a SysML!ObjectFlow into a HiLeS!DigitalPayload which is a vector
+ * ($Rev: 1003 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *  Extends ObjectFlow2Payload to generate DigitalPayloads.
+ * DERIVED FROM
+ * 	* ObjectFlow2Payload
+ * SEE ALSO
+ *  * MainBlock2HCN
+ *	* ActivityPartition2Block
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */ 
+@lazy
+rule ObjectFlow2DigitalVectorPayload
+	transform of : SysML!ObjectFlow
+	to payload : HiLeS!DigitalPayload
+	extends ObjectFlow2Payload
+	{
+
+		/* The source ActivityParamter is typed with a class which isTypeOf(HiLeS!Terminal).
+		*/
+		guard : of.source.type.generalization.one(g
+					| g.general.name = "LogicVector"
+					)
+		println("ObjectFlow2DigitalVectorPayload");				
+		payload.type = of.source.type.ownedAttribute.selectOne(oa
+					| oa.subsettedProperty.exists(sp
+						| sp.name = "slot"
+						)
+					).type.name;
+		payload.size = of.source.type.ownedAttribute.selectOne(oa
+					| oa.subsettedProperty.exists(sp
+						| sp.name = "slot"
+						)
+					).upperValue.value;
+		println("EndObjectFlow2DigitalVectorPayload");
+	}
+
+/****r* Behavior/ObjectFlow2DigitalAnalogPayload
+ * SUMMARY
+ *  Transfotrm a SysML!ObjectFlow into a HiLeS!AnalogPayload which is a vector
+ * ($Rev: 1003 $)
+ * DESCRIPTION
+ * |html <B>@lazy</B>
+ *  Extends ObjectFlow2Payload to generate DigitalPayloads.
+ * DERIVED FROM
+ * 	* ObjectFlow2Payload
+ * SEE ALSO
+ *  * MainBlock2HCN
+ *	* ActivityPartition2Block
+ *
+ * DOMAIN
+ *   	* SysML  - http://www.eclipse.org/papyrus/0.7.0/SysML
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */ 
+@lazy
+rule ObjectFlow2DigitalAnalogPayload
+	transform of : SysML!ObjectFlow
+	to payload : HiLeS!AnalogPayload
+	extends ObjectFlow2Payload
+	{
+
+		/* The source ActivityParamter is typed with a class which isTypeOf(HiLeS!Terminal).
+		*/
+		guard : of.source.type.generalization.one(g
+					| g.general.name = "AnalogVector"
+					)
+					
+		payload.type = of.source.type.ownedAttribute.selectOne(oa
+					| oa.subsettedProperty.exists(sp
+						| sp.name = "slot"
+						)
+					).type.name;
+		payload.size = of.source.type.ownedAttribute.selectOne(oa
+					| oa.subsettedProperty.exists(sp
+						| sp.name = "slot"
+						)
+					).upperValue.value;
+	}

@@ -1,0 +1,56 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: Block2DesignUnit.etl 866 2012-07-18 14:29:53Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+import "Block2DesignUnit.etl"; // Extended rule
+
+/****r* HiLeSToVDHLAMS/Decision2DesignUnit
+ * SUMMARY
+ *   Transform a HiLeS:Decision into a Vhdl:DesignUnit. There is an additional
+ * statement to define the default decision execution path ($Rev: 866 $).
+ * DESCRIPTION 
+ *   
+ * DERIVED FROM
+ * 	* Block2DesignUnit
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *   	* Vhdl   - http://hiles.uniandes.edu.co/1.1/vhdl-ams
+ *
+ ******
+ */
+ rule Decision2DesignUnit
+	transform block : HiLeS!Decision
+	to unit : Vhdl!DesignUnit	
+	extends  Block2DesignUnit
+	{
+
+		unit.identifier = "Decision" + block.name;
+		
+		var process = new Vhdl!Process;
+		//process.sensitivity.add(block.port.selectOne(p | p.name = "HcnIn").equivalent());
+		// Do we need any more info for the process?
+		// Hacer que la salida default se ponga en uno?
+		process.declarative = new Vhdl!ProcessDeclarativePart;
+		process.statementPart =  new Vhdl!ProcessStatementPart;
+		var defaultHcn = new Vhdl!SignalAssignmentStatement;
+		//defaultHcn.target = block.port.selectOne(p | p.name = "HcnOut").equivalent().identifier;
+		defaultHcn.waveform = "1";
+		process.statementPart.statement.add(defaultHcn);
+		
+		// Create an emtpy architecture for functional blocks with a process
+		// that is sensitive to the Petri Net Input
+		var arch = new Vhdl!Architecture;
+		arch.identifier = "behavior";
+		arch.entity = unit.libraryUnit.selectOne(l | l.isTypeOf(Vhdl!Entity));
+		arch.statement.add(process);
+		
+		unit.libraryUnit.add(arch);
+		
+	}

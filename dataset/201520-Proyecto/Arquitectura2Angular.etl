@@ -1,0 +1,131 @@
+rule Sistema2Aplicacion
+	transform sistema:mm_arquitectura!Sistema
+	to aplicacion:angular!Aplicacion{
+	
+		aplicacion.nombre = sistema.nombre;
+		
+		for ( vista in sistema.proyecto_web.capa_presentacion.vistas ){
+		
+			var _vista = new angular!Vista();
+			
+			
+			if ( vista.tipo ==  mm_arquitectura!ETipoVista#LISTA){
+				
+				var entidad = vista.entidad;
+			
+				_vista.tipo = angular!ETipoVista#LISTA;
+				
+				// si la vista es de tipo LISTA debo crear un controlador con un servicio de tipo lista
+				
+				var controlador = new angular!Controlador();
+				controlador.nombre = vista.nombre + 'Ctrl';
+				
+				var servicio = new angular!Servicio();
+				
+				servicio.entidad = entidad.nombre; 
+				servicio.tipoServicio = angular!TipoServicio#LISTAR;
+				servicio.nombre = entidad.nombre + "Listar";
+				controlador.servicios.add(servicio);
+				
+				_vista.controlador = controlador;
+				
+				// creo la seccion de la lista
+				
+				var seccionLista = new angular!Seccion();
+				seccionLista.nombre = "Lista";
+				seccionLista.tipoSeccion = angular!TipoSeccion#LISTA;
+				
+				_vista.secciones.add(seccionLista);
+				
+				var elementoTabla = new angular!Elemento();
+				elementoTabla.nombre = entidad.nombre + " Tabla";
+				elementoTabla.tipoElemento = angular!TipoElemento#TABLA;
+				
+				seccionLista.elementos.add(elementoTabla);
+				
+				// creo las columnas de la tabla por cada atributo de la entidad
+				
+				for ( atributo in entidad.atributos ){
+					var col = new angular!Elemento();
+					col.nombre = atributo.nombre;
+					col.tipoElemento = angular!TipoElemento#COLUMNA;
+					elementoTabla.hijos.add(col);			
+				
+				}
+				
+				
+				
+			}
+			
+			if ( vista.tipo ==  mm_arquitectura!ETipoVista#DETALLE or vista.tipo ==  mm_arquitectura!ETipoVista#AGREGAR or vista.tipo ==  mm_arquitectura!ETipoVista#MODIFICAR or vista.tipo ==  mm_arquitectura!ETipoVista#ELIMINAR ){
+				_vista.tipo = angular!ETipoVista#FORMULARIO;
+				var entidad = vista.entidad;
+				
+				// si la vista es de tipo FORMULARIO debo crear un controlador con un servicio de tipo lista
+				
+				var controlador = new angular!Controlador();
+				controlador.nombre = vista.nombre + 'Ctrl';
+				
+				var servicio = new angular!Servicio();
+				
+				servicio.entidad = entidad.nombre; 
+				servicio.tipoServicio = angular!TipoServicio#CONSULTAR;
+				servicio.nombre = entidad.nombre + "Detalle";
+				controlador.servicios.add(servicio);
+				
+				_vista.controlador = controlador;
+				
+				// creo la seccion de la lista
+				
+				var seccion = new angular!Seccion();
+				seccion.nombre = "Detalle";
+				seccion.tipoSeccion = angular!TipoSeccion#FORMULARIO;
+				
+				_vista.secciones.add(seccion);
+				
+				
+				// creo las columnas de la tabla por cada atributo de la entidad
+				
+				for ( atributo in entidad.atributos ){
+					var el = new angular!Elemento();
+					el.nombre = atributo.nombre;
+					el.tipoElemento = angular!TipoElemento#TEXTOSALIDA;
+					el.valor = atributo.nombre;
+					seccion.elementos.add(el);	
+				
+				}
+				
+				var relacionesCombo = entidad.relaciones.select(r|r.tipo == mm_arquitectura!ETipoRelacion#AGREGACION );
+				
+				for ( rel in relacionesCombo ){
+					var el = new angular!Elemento();
+					el.nombre = rel.nombre;
+					el.tipoElemento = angular!TipoElemento#COMBO;
+					el.valor = rel.nombre;
+					
+					var servicio = new angular!Servicio();
+					servicio.tipoServicio = angular!TipoServicio#LISTAR;
+					servicio.nombre = rel.destino.nombre;
+					servicio.entidad = rel.destino.nombre; 					
+					controlador.servicios.add(servicio);
+					el.servicio = servicio;
+					seccion.elementos.add(el);
+						
+				
+				}
+				
+			}
+			
+			_vista.nombre = vista.nombre; 
+			
+			
+			
+			
+			aplicacion.aplicaciones.add(_vista);
+			
+			
+		
+		}
+		
+	
+	}

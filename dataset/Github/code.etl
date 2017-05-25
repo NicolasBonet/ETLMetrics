@@ -1,0 +1,288 @@
+pre {
+  var expectedCoveragePercentage = 75;
+
+	var robot = new Octopus!Robot;
+	robot.behaviour = new Octopus!Behaviour;
+	
+	var branch_coverage = new Map;
+	branch_coverage.put("StaticBehaviour2Actions_if1_b1", 0);
+	branch_coverage.put("StaticBehaviour2Actions_if1_b2", 0);
+	branch_coverage.put("StaticBehaviour2Actions_if2_b1", 0);
+	branch_coverage.put("StaticBehaviour2Actions_if2_b2", 0);
+	branch_coverage.put("willNotOverlap_if1_b1", 0);
+	branch_coverage.put("willNotOverlap_if1_b2", 0);
+	
+	var condition_coverage = new Map;
+	condition_coverage.put("Size2Dimension_d1_t", 0);
+	condition_coverage.put("Size2Dimension_d1_f", 0);
+	condition_coverage.put("Size2Dimension_d2_t", 0);
+	condition_coverage.put("Size2Dimension_d2_f", 0);
+	condition_coverage.put("Area2Zone_d1_t", 0);
+	condition_coverage.put("Area2Zone_d1_f", 0);
+	condition_coverage.put("Area2Zone_d2_t", 0);
+	condition_coverage.put("Area2Zone_d2_f", 0);
+	condition_coverage.put("isInTheWorld_d1_t", 0);
+	condition_coverage.put("isInTheWorld_d1_f", 0);
+	condition_coverage.put("isInTheWorld_d2_t", 0);
+	condition_coverage.put("isInTheWorld_d2_f", 0);
+	condition_coverage.put("isInTheWorld_d3_t", 0);
+	condition_coverage.put("isInTheWorld_d3_f", 0);
+	condition_coverage.put("isInTheWorld_d4_t", 0);
+	condition_coverage.put("isInTheWorld_d4_f", 0);
+	condition_coverage.put("overlapsWith_d1_t", 0);
+	condition_coverage.put("overlapsWith_d1_f", 0);
+	condition_coverage.put("overlapsWith_d2_t", 0);
+	condition_coverage.put("overlapsWith_d2_f", 0);
+	condition_coverage.put("overlapsWith_d3_t", 0);
+	condition_coverage.put("overlapsWith_d3_f", 0);
+	condition_coverage.put("overlapsWith_d4_t", 0);
+	condition_coverage.put("overlapsWith_d4_f", 0);
+}
+
+post {
+	var proportion_coverage = new Map;
+	proportion_coverage.put("z_proportion_t", 0);
+	proportion_coverage.put("z_proportion_f", 0);
+	
+	var coveredArea = 0.0;
+	
+	for (zone in Octopus!Zone.all) {
+		coveredArea = coveredArea + zone.dimensions.area();
+	}
+
+	var coveredPercentage = 0;
+	if (Octopus!World.all.size > 0 and Octopus!World.all.first.dimensions.isDefined()) {
+		coveredPercentage = (coveredArea / Octopus!World.all.first.dimensions.area()) * 100;
+	}
+
+	if (coveredPercentage >= expectedCoveragePercentage) {
+		proportion_coverage.put("z_proportion_t", 1);
+	} else {
+		proportion_coverage.put("z_proportion_f", 1);
+	}	
+}
+
+rule World2World 
+	transform s : Wildebeest!World
+	to t : Octopus!World {
+	
+	robot.world = t;
+	t.dimensions = s.size.equivalent();
+	t.zone = s.area.equivalent();
+}
+
+rule Size2Dimension
+	transform s : Wildebeest!Size
+	to t: Octopus!Rectangle {
+
+	guard {
+		if (s.width > 0) {
+			condition_coverage.put("Size2Dimension_d1_t", 1);
+		} else {
+			condition_coverage.put("Size2Dimension_d1_f", 1);
+		}
+		
+		if (s.length > 0) {
+			condition_coverage.put("Size2Dimension_d2_t", 1);
+		} else {
+			condition_coverage.put("Size2Dimension_d2_f", 1);
+		}
+		
+		return s.width > 0 and s.length > 0;
+	}
+
+	t.topLeft = createPoint(0, s.length);
+	t.bottomRight = createPoint(s.width, 0);	
+}
+
+rule AreaEvent2ZoneEntry
+	transform s : Wildebeest!AreaEvent
+	to t : Octopus!DetectZoneEntry {
+	
+	guard: s.type == Wildebeest!AreaEventType#Enter
+	
+	robot.behaviour.triggers.add(t);
+	t.zone = s.areaName.equivalent();
+	t.actions = s.eContainer().behavior.equivalent();
+}
+
+rule AreaEvent2ZoneExit
+	transform s : Wildebeest!AreaEvent
+	to t : Octopus!DetectZoneExit {
+	
+	guard: s.type == Wildebeest!AreaEventType#Exit
+	
+	robot.behaviour.triggers.add(t);
+	t.zone = s.areaName.equivalent();
+	t.actions = s.eContainer().behavior.equivalent();
+}
+
+// Would like this rule to be fired at least 3 times
+// Could use a "coverage" annotation to encode this constraint? 
+rule Area2Zone
+	transform s : Wildebeest!Area
+	to t : Octopus!Zone { 
+	
+	guard {
+		if (s.isInTheWorld()) {
+			condition_coverage.put("Area2Zone_d1_t", 1);
+		} else {
+			condition_coverage.put("Area2Zone_d1_f", 1);
+		}
+		
+		if (s.willNotOverlap()) {
+			condition_coverage.put("Area2Zone_d2_t", 1);
+		} else {
+			condition_coverage.put("Area2Zone_d2_f", 1);
+		}
+	
+		return s.isInTheWorld() and s.willNotOverlap();
+	}
+	
+	t.name = s.name;
+	t.dimensions = new Octopus!Rectangle;
+	t.dimensions.topLeft = createPoint(s.tl.x, s.tl.y);
+	t.dimensions.bottomRight = createPoint(s.br.x, s.br.y);
+}
+
+rule StaticBehaviour2Actions
+	transform s : Wildebeest!StaticBehaviour
+	to ts : Sequence(Octopus!Action) {
+	
+	if (s.initial.isDefined()) {
+		ts.addAll(s.initial.equivalent());
+		branch_coverage.put("StaticBehaviour2Actions_if1_b1", 1);
+	} else {
+		branch_coverage.put("StaticBehaviour2Actions_if1_b2", 1);
+	}
+	
+	if (s.next.isDefined()) { 
+		ts.addAll(s.next.equivalent());
+		branch_coverage.put("StaticBehaviour2Actions_if2_b1", 1); 
+	} else {
+		branch_coverage.put("StaticBehaviour2Actions_if2_b2", 1);
+	}
+}
+
+rule DynamicBehaviour2Actions
+	transform s : Wildebeest!DynamicBehaviour
+	to ts : Sequence(Octopus!Action) {
+	
+	// Walk
+	ts.add(new Octopus!MoveLegs);
+}
+
+rule FinalBehaviour2Actions
+	transform s : Wildebeest!FinalBehaviour
+	to ts : Sequence(Octopus!Action) {
+	
+	// End
+	ts.add(new Octopus!PlaySound);
+}
+
+rule Sweep2MoveLegs
+	transform s : Wildebeest!Sweep
+	to ts : Sequence(Octopus!Action) {
+	
+	// Sweep left
+	ts.add(new Octopus!MoveLegs);
+	// Sweep right
+	ts.add(new Octopus!MoveLegs);
+}
+
+rule Pause2Noop
+	transform s : Wildebeest!Pause
+	to ts : Sequence(Octopus!Action) {
+	
+	// empty sequence
+}
+
+operation createPoint(x : Integer, y : Integer) {
+	var p = new Octopus!Point;
+	p.x = x;
+	p.y = y;	
+	return p;
+}
+
+operation Wildebeest!Area isInTheWorld() {
+	var world = self.eContainer();
+	
+	if (self.tl.x >= 0) {
+		condition_coverage.put("isInTheWorld_d1_t", 1);
+	} else {
+		condition_coverage.put("isInTheWorld_d1_f", 1);
+	}
+	
+	if (self.br.y >= 0) {
+		condition_coverage.put("isInTheWorld_d2_t", 1);
+	} else {
+		condition_coverage.put("isInTheWorld_d2_f", 1);
+	}
+	
+	if (self.tl.y <= world.size.length) {
+		condition_coverage.put("isInTheWorld_d3_t", 1);
+	} else {
+		condition_coverage.put("isInTheWorld_d3_f", 1);
+	}
+	
+	if (self.br.x <= world.size.length) {
+		condition_coverage.put("isInTheWorld_d4_t", 1);
+	} else {
+		condition_coverage.put("isInTheWorld_d4_f", 1);
+	}
+	
+	return self.tl.x >= 0 and self.br.y >= 0 and
+	       self.tl.y <= world.size.length and self.br.x <= world.size.width;
+}
+
+operation Wildebeest!Area willNotOverlap() {
+	var others = Wildebeest!Area.all.reject(a|a==self);
+	var overlappingAreas = others.select(a|self.overlapsWith(a));
+	
+	if (overlappingAreas.isEmpty()) {
+		branch_coverage.put("willNotOverlap_if1_b1", 1);
+		return true;
+	} else {
+		branch_coverage.put("willNotOverlap_if1_b2", 1);
+		return overlappingAreas.forAll(a|self.index() < a.index()); 
+	}
+}
+
+operation Wildebeest!Area overlapsWith(other : Wildebeest!Area) {
+	if (self.tl.x < other.br.x) {
+		condition_coverage.put("overlapsWith_d1_t", 1);
+	} else {
+		condition_coverage.put("overlapsWith_d1_f", 1);
+	}
+	
+	if (self.br.x > other.tl.x) {
+		condition_coverage.put("overlapsWith_d2_t", 1);
+	} else {
+		condition_coverage.put("overlapsWith_d2_f", 1);
+	}
+	
+	if (self.tl.y > other.br.y) {
+		condition_coverage.put("overlapsWith_d3_t", 1);
+	} else {
+		condition_coverage.put("overlapsWith_d3_f", 1);
+	}
+	
+	if (self.br.y < other.tl.y) {
+		condition_coverage.put("overlapsWith_d4_t", 1);
+	} else {
+		condition_coverage.put("overlapsWith_d4_f", 1);
+	}
+
+	return (self.tl.x < other.br.x and self.br.x > other.tl.x and 
+	        self.tl.y > other.br.y and self.br.y < other.tl.y);
+}
+
+@cached
+operation Wildebeest!Area index() {
+	return Wildebeest!Area.all.indexOf(self);
+}
+
+operation Octopus!Rectangle area() {
+	return (self.topLeft.y - self.bottomRight.y) *
+	       (self.bottomRight.x - self.topLeft.x);
+}";

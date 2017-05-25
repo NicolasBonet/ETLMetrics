@@ -1,0 +1,1603 @@
+<?xml version="1.0" encoding="ASCII"?>
+<etl:ETLModule xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:eol="http://www.eclipse.org/epsilon/eol" xmlns:etl="http://www.eclipse.org/epsilon/etl">
+  <region>
+    <start line="1"/>
+    <end line="50" column="1"/>
+  </region>
+  <operations container="/">
+    <region>
+      <start line="22"/>
+      <end line="25" column="1"/>
+    </region>
+    <contextType xsi:type="eol:AnyType" container="//@operations.0">
+      <region>
+        <start line="22" column="10"/>
+        <end line="22" column="39"/>
+      </region>
+    </contextType>
+    <returnType xsi:type="eol:ModelElementType" container="//@operations.0" modelName="Input" elementName="EReference">
+      <region>
+        <start line="22" column="93"/>
+        <end line="22" column="109"/>
+      </region>
+    </returnType>
+    <body container="//@operations.0">
+      <region>
+        <start line="22" column="109"/>
+        <end line="25" column="1"/>
+      </region>
+      <statements xsi:type="eol:AssignmentStatement" container="//@operations.0/@body">
+        <region>
+          <start line="23" column="1"/>
+          <end line="23" column="100"/>
+        </region>
+        <lhs xsi:type="eol:VariableDeclarationExpression" container="//@operations.0/@body/@statements.0">
+          <region>
+            <start line="23" column="1"/>
+            <end line="23" column="14"/>
+          </region>
+          <resolvedType xsi:type="eol:AnyType" container="//@operations.0/@body/@statements.0/@lhs">
+            <region>
+              <start line="23" column="1"/>
+              <end line="23" column="14"/>
+            </region>
+          </resolvedType>
+          <name container="//@operations.0/@body/@statements.0/@lhs" name="reference">
+            <region>
+              <start line="23" column="5"/>
+              <end line="23" column="14"/>
+            </region>
+          </name>
+        </lhs>
+        <rhs xsi:type="eol:MethodCallExpression" container="//@operations.0/@body/@statements.0">
+          <region>
+            <start line="23" column="17"/>
+            <end line="23" column="99"/>
+          </region>
+          <target xsi:type="eol:FOLMethodCallExpression" container="//@operations.0/@body/@statements.0/@rhs">
+            <region>
+              <start line="23" column="17"/>
+              <end line="23" column="91"/>
+            </region>
+            <target xsi:type="eol:PropertyCallExpression" container="//@operations.0/@body/@statements.0/@rhs/@target">
+              <region>
+                <start line="23" column="17"/>
+                <end line="23" column="45"/>
+              </region>
+              <target xsi:type="eol:NameExpression" container="//@operations.0/@body/@statements.0/@rhs/@target/@target" name="relationClass">
+                <region>
+                  <start line="23" column="17"/>
+                  <end line="23" column="30"/>
+                </region>
+              </target>
+              <property container="//@operations.0/@body/@statements.0/@rhs/@target/@target" name="eAllReferences">
+                <region>
+                  <start line="23" column="31"/>
+                  <end line="23" column="45"/>
+                </region>
+              </property>
+            </target>
+            <iterator container="//@operations.0/@body/@statements.0/@rhs/@target">
+              <region>
+                <start line="23" column="53"/>
+                <end line="23" column="54"/>
+              </region>
+              <resolvedType xsi:type="eol:AnyType" container="//@operations.0/@body/@statements.0/@rhs/@target/@iterator">
+                <region>
+                  <start line="23" column="53"/>
+                  <end line="23" column="54"/>
+                </region>
+              </resolvedType>
+              <name container="//@operations.0/@body/@statements.0/@rhs/@target/@iterator" name="r">
+                <region>
+                  <start line="23" column="53"/>
+                  <end line="23" column="54"/>
+                </region>
+              </name>
+            </iterator>
+            <conditions xsi:type="eol:NotEqualsOperatorExpression" container="//@operations.0/@body/@statements.0/@rhs/@target">
+              <region>
+                <start line="23" column="55"/>
+                <end line="23" column="90"/>
+              </region>
+              <lhs xsi:type="eol:MethodCallExpression" container="//@operations.0/@body/@statements.0/@rhs/@target/@conditions.0">
+                <region>
+                  <start line="23" column="55"/>
+                  <end line="23" column="83"/>
+                </region>
+                <target xsi:type="eol:NameExpression" container="//@operations.0/@body/@statements.0/@rhs/@target/@conditions.0/@lhs" name="r">
+                  <region>
+                    <start line="23" column="55"/>
+                    <end line="23" column="56"/>
+                  </region>
+                </target>
+                <arguments xsi:type="eol:NameExpression" container="//@operations.0/@body/@statements.0/@rhs/@target/@conditions.0/@lhs" name="annotation">
+                  <region>
+                    <start line="23" column="72"/>
+                    <end line="23" column="82"/>
+                  </region>
+                </arguments>
+                <method container="//@operations.0/@body/@statements.0/@rhs/@target/@conditions.0/@lhs" name="getEAnnotation">
+                  <region>
+                    <start line="23" column="57"/>
+                    <end line="23" column="83"/>
+                  </region>
+                </method>
+              </lhs>
+              <rhs xsi:type="eol:NameExpression" container="//@operations.0/@body/@statements.0/@rhs/@target/@conditions.0" name="null">
+                <region>
+                  <start line="23" column="86"/>
+                  <end line="23" column="90"/>
+                </region>
+              </rhs>
+            </conditions>
+            <method container="//@operations.0/@body/@statements.0/@rhs/@target" name="select">
+              <region>
+                <start line="23" column="46"/>
+                <end line="23" column="91"/>
+              </region>
+            </method>
+          </target>
+          <method container="//@operations.0/@body/@statements.0/@rhs" name="first">
+            <region>
+              <start line="23" column="92"/>
+              <end line="23" column="99"/>
+            </region>
+          </method>
+        </rhs>
+      </statements>
+      <statements xsi:type="eol:ReturnStatement" container="//@operations.0/@body">
+        <region>
+          <start line="24" column="1"/>
+          <end line="24" column="18"/>
+        </region>
+        <expression xsi:type="eol:NameExpression" container="//@operations.0/@body/@statements.1" name="reference">
+          <region>
+            <start line="24" column="8"/>
+            <end line="24" column="17"/>
+          </region>
+        </expression>
+      </statements>
+    </body>
+    <name container="//@operations.0" name="getRefEndpointByRelationClass">
+      <region>
+        <start line="22" column="10"/>
+        <end line="22" column="39"/>
+      </region>
+    </name>
+    <parameters container="//@operations.0">
+      <region>
+        <start line="22" column="40"/>
+        <end line="22" column="68"/>
+      </region>
+      <resolvedType xsi:type="eol:ModelElementType" container="//@operations.0/@parameters.0" modelName="Input" elementName="EClass">
+        <region>
+          <start line="22" column="56"/>
+          <end line="22" column="68"/>
+        </region>
+      </resolvedType>
+      <name container="//@operations.0/@parameters.0" name="relationClass">
+        <region>
+          <start line="22" column="40"/>
+          <end line="22" column="53"/>
+        </region>
+      </name>
+    </parameters>
+    <parameters container="//@operations.0">
+      <region>
+        <start line="22" column="70"/>
+        <end line="22" column="89"/>
+      </region>
+      <resolvedType xsi:type="eol:StringType" container="//@operations.0/@parameters.1">
+        <region>
+          <start line="22" column="83"/>
+          <end line="22" column="89"/>
+        </region>
+      </resolvedType>
+      <name container="//@operations.0/@parameters.1" name="annotation">
+        <region>
+          <start line="22" column="70"/>
+          <end line="22" column="80"/>
+        </region>
+      </name>
+    </parameters>
+    <self>
+      <resolvedType xsi:type="eol:AnyType" container="//@operations.0">
+        <region>
+          <start line="22" column="10"/>
+          <end line="22" column="39"/>
+        </region>
+      </resolvedType>
+      <name name="self">
+        <resolvedType xsi:type="eol:AnyType" container="//@operations.0">
+          <region>
+            <start line="22" column="10"/>
+            <end line="22" column="39"/>
+          </region>
+        </resolvedType>
+      </name>
+    </self>
+    <_result>
+      <resolvedType xsi:type="eol:ModelElementType" container="//@operations.0" modelName="Input" elementName="EReference">
+        <region>
+          <start line="22" column="93"/>
+          <end line="22" column="109"/>
+        </region>
+      </resolvedType>
+      <name name="_result">
+        <resolvedType xsi:type="eol:ModelElementType" container="//@operations.0" modelName="Input" elementName="EReference">
+          <region>
+            <start line="22" column="93"/>
+            <end line="22" column="109"/>
+          </region>
+        </resolvedType>
+      </name>
+    </_result>
+  </operations>
+  <operations container="/">
+    <region>
+      <start line="27"/>
+      <end line="35" column="1"/>
+    </region>
+    <contextType xsi:type="eol:AnyType" container="//@operations.1">
+      <region>
+        <start line="27" column="10"/>
+        <end line="27" column="16"/>
+      </region>
+    </contextType>
+    <returnType xsi:type="eol:ModelElementType" container="//@operations.1" modelName="Input" elementName="EReference">
+      <region>
+        <start line="27" column="70"/>
+        <end line="27" column="86"/>
+      </region>
+    </returnType>
+    <body container="//@operations.1">
+      <region>
+        <start line="27" column="86"/>
+        <end line="35" column="1"/>
+      </region>
+      <statements xsi:type="eol:AssignmentStatement" container="//@operations.1/@body">
+        <region>
+          <start line="28" column="1"/>
+          <end line="28" column="100"/>
+        </region>
+        <lhs xsi:type="eol:VariableDeclarationExpression" container="//@operations.1/@body/@statements.0">
+          <region>
+            <start line="28" column="1"/>
+            <end line="28" column="14"/>
+          </region>
+          <resolvedType xsi:type="eol:AnyType" container="//@operations.1/@body/@statements.0/@lhs">
+            <region>
+              <start line="28" column="1"/>
+              <end line="28" column="14"/>
+            </region>
+          </resolvedType>
+          <name container="//@operations.1/@body/@statements.0/@lhs" name="reference">
+            <region>
+              <start line="28" column="5"/>
+              <end line="28" column="14"/>
+            </region>
+          </name>
+        </lhs>
+        <rhs xsi:type="eol:MethodCallExpression" container="//@operations.1/@body/@statements.0">
+          <region>
+            <start line="28" column="17"/>
+            <end line="28" column="99"/>
+          </region>
+          <target xsi:type="eol:FOLMethodCallExpression" container="//@operations.1/@body/@statements.0/@rhs">
+            <region>
+              <start line="28" column="17"/>
+              <end line="28" column="91"/>
+            </region>
+            <target xsi:type="eol:PropertyCallExpression" container="//@operations.1/@body/@statements.0/@rhs/@target">
+              <region>
+                <start line="28" column="17"/>
+                <end line="28" column="45"/>
+              </region>
+              <target xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.0/@rhs/@target/@target" name="relationClass">
+                <region>
+                  <start line="28" column="17"/>
+                  <end line="28" column="30"/>
+                </region>
+              </target>
+              <property container="//@operations.1/@body/@statements.0/@rhs/@target/@target" name="eAllReferences">
+                <region>
+                  <start line="28" column="31"/>
+                  <end line="28" column="45"/>
+                </region>
+              </property>
+            </target>
+            <iterator container="//@operations.1/@body/@statements.0/@rhs/@target">
+              <region>
+                <start line="28" column="53"/>
+                <end line="28" column="54"/>
+              </region>
+              <resolvedType xsi:type="eol:AnyType" container="//@operations.1/@body/@statements.0/@rhs/@target/@iterator">
+                <region>
+                  <start line="28" column="53"/>
+                  <end line="28" column="54"/>
+                </region>
+              </resolvedType>
+              <name container="//@operations.1/@body/@statements.0/@rhs/@target/@iterator" name="r">
+                <region>
+                  <start line="28" column="53"/>
+                  <end line="28" column="54"/>
+                </region>
+              </name>
+            </iterator>
+            <conditions xsi:type="eol:NotEqualsOperatorExpression" container="//@operations.1/@body/@statements.0/@rhs/@target">
+              <region>
+                <start line="28" column="55"/>
+                <end line="28" column="90"/>
+              </region>
+              <lhs xsi:type="eol:MethodCallExpression" container="//@operations.1/@body/@statements.0/@rhs/@target/@conditions.0">
+                <region>
+                  <start line="28" column="55"/>
+                  <end line="28" column="83"/>
+                </region>
+                <target xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.0/@rhs/@target/@conditions.0/@lhs" name="r">
+                  <region>
+                    <start line="28" column="55"/>
+                    <end line="28" column="56"/>
+                  </region>
+                </target>
+                <arguments xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.0/@rhs/@target/@conditions.0/@lhs" name="annotation">
+                  <region>
+                    <start line="28" column="72"/>
+                    <end line="28" column="82"/>
+                  </region>
+                </arguments>
+                <method container="//@operations.1/@body/@statements.0/@rhs/@target/@conditions.0/@lhs" name="getEAnnotation">
+                  <region>
+                    <start line="28" column="57"/>
+                    <end line="28" column="83"/>
+                  </region>
+                </method>
+              </lhs>
+              <rhs xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.0/@rhs/@target/@conditions.0" name="null">
+                <region>
+                  <start line="28" column="86"/>
+                  <end line="28" column="90"/>
+                </region>
+              </rhs>
+            </conditions>
+            <method container="//@operations.1/@body/@statements.0/@rhs/@target" name="select">
+              <region>
+                <start line="28" column="46"/>
+                <end line="28" column="91"/>
+              </region>
+            </method>
+          </target>
+          <method container="//@operations.1/@body/@statements.0/@rhs" name="first">
+            <region>
+              <start line="28" column="92"/>
+              <end line="28" column="99"/>
+            </region>
+          </method>
+        </rhs>
+      </statements>
+      <statements xsi:type="eol:AssignmentStatement" container="//@operations.1/@body">
+        <region>
+          <start line="29" column="1"/>
+          <end line="29" column="100"/>
+        </region>
+        <lhs xsi:type="eol:VariableDeclarationExpression" container="//@operations.1/@body/@statements.1">
+          <region>
+            <start line="29" column="1"/>
+            <end line="29" column="14"/>
+          </region>
+          <resolvedType xsi:type="eol:AnyType" container="//@operations.1/@body/@statements.1/@lhs">
+            <region>
+              <start line="29" column="1"/>
+              <end line="29" column="14"/>
+            </region>
+          </resolvedType>
+          <name container="//@operations.1/@body/@statements.1/@lhs" name="reference">
+            <region>
+              <start line="29" column="5"/>
+              <end line="29" column="14"/>
+            </region>
+          </name>
+        </lhs>
+        <rhs xsi:type="eol:MethodCallExpression" container="//@operations.1/@body/@statements.1">
+          <region>
+            <start line="29" column="17"/>
+            <end line="29" column="99"/>
+          </region>
+          <target xsi:type="eol:FOLMethodCallExpression" container="//@operations.1/@body/@statements.1/@rhs">
+            <region>
+              <start line="29" column="17"/>
+              <end line="29" column="91"/>
+            </region>
+            <target xsi:type="eol:PropertyCallExpression" container="//@operations.1/@body/@statements.1/@rhs/@target">
+              <region>
+                <start line="29" column="17"/>
+                <end line="29" column="45"/>
+              </region>
+              <target xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.1/@rhs/@target/@target" name="relationClass">
+                <region>
+                  <start line="29" column="17"/>
+                  <end line="29" column="30"/>
+                </region>
+              </target>
+              <property container="//@operations.1/@body/@statements.1/@rhs/@target/@target" name="eAllReferences">
+                <region>
+                  <start line="29" column="31"/>
+                  <end line="29" column="45"/>
+                </region>
+              </property>
+            </target>
+            <iterator container="//@operations.1/@body/@statements.1/@rhs/@target">
+              <region>
+                <start line="29" column="53"/>
+                <end line="29" column="54"/>
+              </region>
+              <resolvedType xsi:type="eol:AnyType" container="//@operations.1/@body/@statements.1/@rhs/@target/@iterator">
+                <region>
+                  <start line="29" column="53"/>
+                  <end line="29" column="54"/>
+                </region>
+              </resolvedType>
+              <name container="//@operations.1/@body/@statements.1/@rhs/@target/@iterator" name="r">
+                <region>
+                  <start line="29" column="53"/>
+                  <end line="29" column="54"/>
+                </region>
+              </name>
+            </iterator>
+            <conditions xsi:type="eol:NotEqualsOperatorExpression" container="//@operations.1/@body/@statements.1/@rhs/@target">
+              <region>
+                <start line="29" column="55"/>
+                <end line="29" column="90"/>
+              </region>
+              <lhs xsi:type="eol:MethodCallExpression" container="//@operations.1/@body/@statements.1/@rhs/@target/@conditions.0">
+                <region>
+                  <start line="29" column="55"/>
+                  <end line="29" column="83"/>
+                </region>
+                <target xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.1/@rhs/@target/@conditions.0/@lhs" name="r">
+                  <region>
+                    <start line="29" column="55"/>
+                    <end line="29" column="56"/>
+                  </region>
+                </target>
+                <arguments xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.1/@rhs/@target/@conditions.0/@lhs" name="annotation">
+                  <region>
+                    <start line="29" column="72"/>
+                    <end line="29" column="82"/>
+                  </region>
+                </arguments>
+                <method container="//@operations.1/@body/@statements.1/@rhs/@target/@conditions.0/@lhs" name="getEAnnotation">
+                  <region>
+                    <start line="29" column="57"/>
+                    <end line="29" column="83"/>
+                  </region>
+                </method>
+              </lhs>
+              <rhs xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.1/@rhs/@target/@conditions.0" name="null">
+                <region>
+                  <start line="29" column="86"/>
+                  <end line="29" column="90"/>
+                </region>
+              </rhs>
+            </conditions>
+            <method container="//@operations.1/@body/@statements.1/@rhs/@target" name="select">
+              <region>
+                <start line="29" column="46"/>
+                <end line="29" column="91"/>
+              </region>
+            </method>
+          </target>
+          <method container="//@operations.1/@body/@statements.1/@rhs" name="first">
+            <region>
+              <start line="29" column="92"/>
+              <end line="29" column="99"/>
+            </region>
+          </method>
+        </rhs>
+      </statements>
+      <statements xsi:type="eol:AssignmentStatement" container="//@operations.1/@body">
+        <region>
+          <start line="30" column="1"/>
+          <end line="30" column="100"/>
+        </region>
+        <lhs xsi:type="eol:VariableDeclarationExpression" container="//@operations.1/@body/@statements.2">
+          <region>
+            <start line="30" column="1"/>
+            <end line="30" column="14"/>
+          </region>
+          <resolvedType xsi:type="eol:AnyType" container="//@operations.1/@body/@statements.2/@lhs">
+            <region>
+              <start line="30" column="1"/>
+              <end line="30" column="14"/>
+            </region>
+          </resolvedType>
+          <name container="//@operations.1/@body/@statements.2/@lhs" name="reference">
+            <region>
+              <start line="30" column="5"/>
+              <end line="30" column="14"/>
+            </region>
+          </name>
+        </lhs>
+        <rhs xsi:type="eol:MethodCallExpression" container="//@operations.1/@body/@statements.2">
+          <region>
+            <start line="30" column="17"/>
+            <end line="30" column="99"/>
+          </region>
+          <target xsi:type="eol:FOLMethodCallExpression" container="//@operations.1/@body/@statements.2/@rhs">
+            <region>
+              <start line="30" column="17"/>
+              <end line="30" column="91"/>
+            </region>
+            <target xsi:type="eol:PropertyCallExpression" container="//@operations.1/@body/@statements.2/@rhs/@target">
+              <region>
+                <start line="30" column="17"/>
+                <end line="30" column="45"/>
+              </region>
+              <target xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.2/@rhs/@target/@target" name="relationClass">
+                <region>
+                  <start line="30" column="17"/>
+                  <end line="30" column="30"/>
+                </region>
+              </target>
+              <property container="//@operations.1/@body/@statements.2/@rhs/@target/@target" name="eAllReferences">
+                <region>
+                  <start line="30" column="31"/>
+                  <end line="30" column="45"/>
+                </region>
+              </property>
+            </target>
+            <iterator container="//@operations.1/@body/@statements.2/@rhs/@target">
+              <region>
+                <start line="30" column="53"/>
+                <end line="30" column="54"/>
+              </region>
+              <resolvedType xsi:type="eol:AnyType" container="//@operations.1/@body/@statements.2/@rhs/@target/@iterator">
+                <region>
+                  <start line="30" column="53"/>
+                  <end line="30" column="54"/>
+                </region>
+              </resolvedType>
+              <name container="//@operations.1/@body/@statements.2/@rhs/@target/@iterator" name="r">
+                <region>
+                  <start line="30" column="53"/>
+                  <end line="30" column="54"/>
+                </region>
+              </name>
+            </iterator>
+            <conditions xsi:type="eol:NotEqualsOperatorExpression" container="//@operations.1/@body/@statements.2/@rhs/@target">
+              <region>
+                <start line="30" column="55"/>
+                <end line="30" column="90"/>
+              </region>
+              <lhs xsi:type="eol:MethodCallExpression" container="//@operations.1/@body/@statements.2/@rhs/@target/@conditions.0">
+                <region>
+                  <start line="30" column="55"/>
+                  <end line="30" column="83"/>
+                </region>
+                <target xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.2/@rhs/@target/@conditions.0/@lhs" name="r">
+                  <region>
+                    <start line="30" column="55"/>
+                    <end line="30" column="56"/>
+                  </region>
+                </target>
+                <arguments xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.2/@rhs/@target/@conditions.0/@lhs" name="annotation">
+                  <region>
+                    <start line="30" column="72"/>
+                    <end line="30" column="82"/>
+                  </region>
+                </arguments>
+                <method container="//@operations.1/@body/@statements.2/@rhs/@target/@conditions.0/@lhs" name="getEAnnotation">
+                  <region>
+                    <start line="30" column="57"/>
+                    <end line="30" column="83"/>
+                  </region>
+                </method>
+              </lhs>
+              <rhs xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.2/@rhs/@target/@conditions.0" name="null">
+                <region>
+                  <start line="30" column="86"/>
+                  <end line="30" column="90"/>
+                </region>
+              </rhs>
+            </conditions>
+            <method container="//@operations.1/@body/@statements.2/@rhs/@target" name="select">
+              <region>
+                <start line="30" column="46"/>
+                <end line="30" column="91"/>
+              </region>
+            </method>
+          </target>
+          <method container="//@operations.1/@body/@statements.2/@rhs" name="first">
+            <region>
+              <start line="30" column="92"/>
+              <end line="30" column="99"/>
+            </region>
+          </method>
+        </rhs>
+      </statements>
+      <statements xsi:type="eol:AssignmentStatement" container="//@operations.1/@body">
+        <region>
+          <start line="31" column="1"/>
+          <end line="31" column="100"/>
+        </region>
+        <lhs xsi:type="eol:VariableDeclarationExpression" container="//@operations.1/@body/@statements.3">
+          <region>
+            <start line="31" column="1"/>
+            <end line="31" column="14"/>
+          </region>
+          <resolvedType xsi:type="eol:AnyType" container="//@operations.1/@body/@statements.3/@lhs">
+            <region>
+              <start line="31" column="1"/>
+              <end line="31" column="14"/>
+            </region>
+          </resolvedType>
+          <name container="//@operations.1/@body/@statements.3/@lhs" name="reference">
+            <region>
+              <start line="31" column="5"/>
+              <end line="31" column="14"/>
+            </region>
+          </name>
+        </lhs>
+        <rhs xsi:type="eol:MethodCallExpression" container="//@operations.1/@body/@statements.3">
+          <region>
+            <start line="31" column="17"/>
+            <end line="31" column="99"/>
+          </region>
+          <target xsi:type="eol:FOLMethodCallExpression" container="//@operations.1/@body/@statements.3/@rhs">
+            <region>
+              <start line="31" column="17"/>
+              <end line="31" column="91"/>
+            </region>
+            <target xsi:type="eol:PropertyCallExpression" container="//@operations.1/@body/@statements.3/@rhs/@target">
+              <region>
+                <start line="31" column="17"/>
+                <end line="31" column="45"/>
+              </region>
+              <target xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.3/@rhs/@target/@target" name="relationClass">
+                <region>
+                  <start line="31" column="17"/>
+                  <end line="31" column="30"/>
+                </region>
+              </target>
+              <property container="//@operations.1/@body/@statements.3/@rhs/@target/@target" name="eAllReferences">
+                <region>
+                  <start line="31" column="31"/>
+                  <end line="31" column="45"/>
+                </region>
+              </property>
+            </target>
+            <iterator container="//@operations.1/@body/@statements.3/@rhs/@target">
+              <region>
+                <start line="31" column="53"/>
+                <end line="31" column="54"/>
+              </region>
+              <resolvedType xsi:type="eol:AnyType" container="//@operations.1/@body/@statements.3/@rhs/@target/@iterator">
+                <region>
+                  <start line="31" column="53"/>
+                  <end line="31" column="54"/>
+                </region>
+              </resolvedType>
+              <name container="//@operations.1/@body/@statements.3/@rhs/@target/@iterator" name="r">
+                <region>
+                  <start line="31" column="53"/>
+                  <end line="31" column="54"/>
+                </region>
+              </name>
+            </iterator>
+            <conditions xsi:type="eol:NotEqualsOperatorExpression" container="//@operations.1/@body/@statements.3/@rhs/@target">
+              <region>
+                <start line="31" column="55"/>
+                <end line="31" column="90"/>
+              </region>
+              <lhs xsi:type="eol:MethodCallExpression" container="//@operations.1/@body/@statements.3/@rhs/@target/@conditions.0">
+                <region>
+                  <start line="31" column="55"/>
+                  <end line="31" column="83"/>
+                </region>
+                <target xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.3/@rhs/@target/@conditions.0/@lhs" name="r">
+                  <region>
+                    <start line="31" column="55"/>
+                    <end line="31" column="56"/>
+                  </region>
+                </target>
+                <arguments xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.3/@rhs/@target/@conditions.0/@lhs" name="annotation">
+                  <region>
+                    <start line="31" column="72"/>
+                    <end line="31" column="82"/>
+                  </region>
+                </arguments>
+                <method container="//@operations.1/@body/@statements.3/@rhs/@target/@conditions.0/@lhs" name="getEAnnotation">
+                  <region>
+                    <start line="31" column="57"/>
+                    <end line="31" column="83"/>
+                  </region>
+                </method>
+              </lhs>
+              <rhs xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.3/@rhs/@target/@conditions.0" name="null">
+                <region>
+                  <start line="31" column="86"/>
+                  <end line="31" column="90"/>
+                </region>
+              </rhs>
+            </conditions>
+            <method container="//@operations.1/@body/@statements.3/@rhs/@target" name="select">
+              <region>
+                <start line="31" column="46"/>
+                <end line="31" column="91"/>
+              </region>
+            </method>
+          </target>
+          <method container="//@operations.1/@body/@statements.3/@rhs" name="first">
+            <region>
+              <start line="31" column="92"/>
+              <end line="31" column="99"/>
+            </region>
+          </method>
+        </rhs>
+      </statements>
+      <statements xsi:type="eol:AssignmentStatement" container="//@operations.1/@body">
+        <region>
+          <start line="32" column="1"/>
+          <end line="32" column="100"/>
+        </region>
+        <lhs xsi:type="eol:VariableDeclarationExpression" container="//@operations.1/@body/@statements.4">
+          <region>
+            <start line="32" column="1"/>
+            <end line="32" column="14"/>
+          </region>
+          <resolvedType xsi:type="eol:AnyType" container="//@operations.1/@body/@statements.4/@lhs">
+            <region>
+              <start line="32" column="1"/>
+              <end line="32" column="14"/>
+            </region>
+          </resolvedType>
+          <name container="//@operations.1/@body/@statements.4/@lhs" name="reference">
+            <region>
+              <start line="32" column="5"/>
+              <end line="32" column="14"/>
+            </region>
+          </name>
+        </lhs>
+        <rhs xsi:type="eol:MethodCallExpression" container="//@operations.1/@body/@statements.4">
+          <region>
+            <start line="32" column="17"/>
+            <end line="32" column="99"/>
+          </region>
+          <target xsi:type="eol:FOLMethodCallExpression" container="//@operations.1/@body/@statements.4/@rhs">
+            <region>
+              <start line="32" column="17"/>
+              <end line="32" column="91"/>
+            </region>
+            <target xsi:type="eol:PropertyCallExpression" container="//@operations.1/@body/@statements.4/@rhs/@target">
+              <region>
+                <start line="32" column="17"/>
+                <end line="32" column="45"/>
+              </region>
+              <target xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.4/@rhs/@target/@target" name="relationClass">
+                <region>
+                  <start line="32" column="17"/>
+                  <end line="32" column="30"/>
+                </region>
+              </target>
+              <property container="//@operations.1/@body/@statements.4/@rhs/@target/@target" name="eAllReferences">
+                <region>
+                  <start line="32" column="31"/>
+                  <end line="32" column="45"/>
+                </region>
+              </property>
+            </target>
+            <iterator container="//@operations.1/@body/@statements.4/@rhs/@target">
+              <region>
+                <start line="32" column="53"/>
+                <end line="32" column="54"/>
+              </region>
+              <resolvedType xsi:type="eol:AnyType" container="//@operations.1/@body/@statements.4/@rhs/@target/@iterator">
+                <region>
+                  <start line="32" column="53"/>
+                  <end line="32" column="54"/>
+                </region>
+              </resolvedType>
+              <name container="//@operations.1/@body/@statements.4/@rhs/@target/@iterator" name="r">
+                <region>
+                  <start line="32" column="53"/>
+                  <end line="32" column="54"/>
+                </region>
+              </name>
+            </iterator>
+            <conditions xsi:type="eol:NotEqualsOperatorExpression" container="//@operations.1/@body/@statements.4/@rhs/@target">
+              <region>
+                <start line="32" column="55"/>
+                <end line="32" column="90"/>
+              </region>
+              <lhs xsi:type="eol:MethodCallExpression" container="//@operations.1/@body/@statements.4/@rhs/@target/@conditions.0">
+                <region>
+                  <start line="32" column="55"/>
+                  <end line="32" column="83"/>
+                </region>
+                <target xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.4/@rhs/@target/@conditions.0/@lhs" name="r">
+                  <region>
+                    <start line="32" column="55"/>
+                    <end line="32" column="56"/>
+                  </region>
+                </target>
+                <arguments xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.4/@rhs/@target/@conditions.0/@lhs" name="annotation">
+                  <region>
+                    <start line="32" column="72"/>
+                    <end line="32" column="82"/>
+                  </region>
+                </arguments>
+                <method container="//@operations.1/@body/@statements.4/@rhs/@target/@conditions.0/@lhs" name="getEAnnotation">
+                  <region>
+                    <start line="32" column="57"/>
+                    <end line="32" column="83"/>
+                  </region>
+                </method>
+              </lhs>
+              <rhs xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.4/@rhs/@target/@conditions.0" name="null">
+                <region>
+                  <start line="32" column="86"/>
+                  <end line="32" column="90"/>
+                </region>
+              </rhs>
+            </conditions>
+            <method container="//@operations.1/@body/@statements.4/@rhs/@target" name="select">
+              <region>
+                <start line="32" column="46"/>
+                <end line="32" column="91"/>
+              </region>
+            </method>
+          </target>
+          <method container="//@operations.1/@body/@statements.4/@rhs" name="first">
+            <region>
+              <start line="32" column="92"/>
+              <end line="32" column="99"/>
+            </region>
+          </method>
+        </rhs>
+      </statements>
+      <statements xsi:type="eol:AssignmentStatement" container="//@operations.1/@body">
+        <region>
+          <start line="33" column="1"/>
+          <end line="33" column="100"/>
+        </region>
+        <lhs xsi:type="eol:VariableDeclarationExpression" container="//@operations.1/@body/@statements.5">
+          <region>
+            <start line="33" column="1"/>
+            <end line="33" column="14"/>
+          </region>
+          <resolvedType xsi:type="eol:AnyType" container="//@operations.1/@body/@statements.5/@lhs">
+            <region>
+              <start line="33" column="1"/>
+              <end line="33" column="14"/>
+            </region>
+          </resolvedType>
+          <name container="//@operations.1/@body/@statements.5/@lhs" name="reference">
+            <region>
+              <start line="33" column="5"/>
+              <end line="33" column="14"/>
+            </region>
+          </name>
+        </lhs>
+        <rhs xsi:type="eol:MethodCallExpression" container="//@operations.1/@body/@statements.5">
+          <region>
+            <start line="33" column="17"/>
+            <end line="33" column="99"/>
+          </region>
+          <target xsi:type="eol:FOLMethodCallExpression" container="//@operations.1/@body/@statements.5/@rhs">
+            <region>
+              <start line="33" column="17"/>
+              <end line="33" column="91"/>
+            </region>
+            <target xsi:type="eol:PropertyCallExpression" container="//@operations.1/@body/@statements.5/@rhs/@target">
+              <region>
+                <start line="33" column="17"/>
+                <end line="33" column="45"/>
+              </region>
+              <target xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.5/@rhs/@target/@target" name="relationClass">
+                <region>
+                  <start line="33" column="17"/>
+                  <end line="33" column="30"/>
+                </region>
+              </target>
+              <property container="//@operations.1/@body/@statements.5/@rhs/@target/@target" name="eAllReferences">
+                <region>
+                  <start line="33" column="31"/>
+                  <end line="33" column="45"/>
+                </region>
+              </property>
+            </target>
+            <iterator container="//@operations.1/@body/@statements.5/@rhs/@target">
+              <region>
+                <start line="33" column="53"/>
+                <end line="33" column="54"/>
+              </region>
+              <resolvedType xsi:type="eol:AnyType" container="//@operations.1/@body/@statements.5/@rhs/@target/@iterator">
+                <region>
+                  <start line="33" column="53"/>
+                  <end line="33" column="54"/>
+                </region>
+              </resolvedType>
+              <name container="//@operations.1/@body/@statements.5/@rhs/@target/@iterator" name="r">
+                <region>
+                  <start line="33" column="53"/>
+                  <end line="33" column="54"/>
+                </region>
+              </name>
+            </iterator>
+            <conditions xsi:type="eol:NotEqualsOperatorExpression" container="//@operations.1/@body/@statements.5/@rhs/@target">
+              <region>
+                <start line="33" column="55"/>
+                <end line="33" column="90"/>
+              </region>
+              <lhs xsi:type="eol:MethodCallExpression" container="//@operations.1/@body/@statements.5/@rhs/@target/@conditions.0">
+                <region>
+                  <start line="33" column="55"/>
+                  <end line="33" column="83"/>
+                </region>
+                <target xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.5/@rhs/@target/@conditions.0/@lhs" name="r">
+                  <region>
+                    <start line="33" column="55"/>
+                    <end line="33" column="56"/>
+                  </region>
+                </target>
+                <arguments xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.5/@rhs/@target/@conditions.0/@lhs" name="annotation">
+                  <region>
+                    <start line="33" column="72"/>
+                    <end line="33" column="82"/>
+                  </region>
+                </arguments>
+                <method container="//@operations.1/@body/@statements.5/@rhs/@target/@conditions.0/@lhs" name="getEAnnotation">
+                  <region>
+                    <start line="33" column="57"/>
+                    <end line="33" column="83"/>
+                  </region>
+                </method>
+              </lhs>
+              <rhs xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.5/@rhs/@target/@conditions.0" name="null">
+                <region>
+                  <start line="33" column="86"/>
+                  <end line="33" column="90"/>
+                </region>
+              </rhs>
+            </conditions>
+            <method container="//@operations.1/@body/@statements.5/@rhs/@target" name="select">
+              <region>
+                <start line="33" column="46"/>
+                <end line="33" column="91"/>
+              </region>
+            </method>
+          </target>
+          <method container="//@operations.1/@body/@statements.5/@rhs" name="first">
+            <region>
+              <start line="33" column="92"/>
+              <end line="33" column="99"/>
+            </region>
+          </method>
+        </rhs>
+      </statements>
+      <statements xsi:type="eol:ReturnStatement" container="//@operations.1/@body">
+        <region>
+          <start line="34" column="1"/>
+          <end line="34" column="18"/>
+        </region>
+        <expression xsi:type="eol:NameExpression" container="//@operations.1/@body/@statements.6" name="reference">
+          <region>
+            <start line="34" column="8"/>
+            <end line="34" column="17"/>
+          </region>
+        </expression>
+      </statements>
+    </body>
+    <name container="//@operations.1" name="called">
+      <region>
+        <start line="27" column="10"/>
+        <end line="27" column="16"/>
+      </region>
+    </name>
+    <parameters container="//@operations.1">
+      <region>
+        <start line="27" column="17"/>
+        <end line="27" column="45"/>
+      </region>
+      <resolvedType xsi:type="eol:ModelElementType" container="//@operations.1/@parameters.0" modelName="Input" elementName="EClass">
+        <region>
+          <start line="27" column="33"/>
+          <end line="27" column="45"/>
+        </region>
+      </resolvedType>
+      <name container="//@operations.1/@parameters.0" name="relationClass">
+        <region>
+          <start line="27" column="17"/>
+          <end line="27" column="30"/>
+        </region>
+      </name>
+    </parameters>
+    <parameters container="//@operations.1">
+      <region>
+        <start line="27" column="47"/>
+        <end line="27" column="66"/>
+      </region>
+      <resolvedType xsi:type="eol:StringType" container="//@operations.1/@parameters.1">
+        <region>
+          <start line="27" column="60"/>
+          <end line="27" column="66"/>
+        </region>
+      </resolvedType>
+      <name container="//@operations.1/@parameters.1" name="annotation">
+        <region>
+          <start line="27" column="47"/>
+          <end line="27" column="57"/>
+        </region>
+      </name>
+    </parameters>
+    <self>
+      <resolvedType xsi:type="eol:AnyType" container="//@operations.1">
+        <region>
+          <start line="27" column="10"/>
+          <end line="27" column="16"/>
+        </region>
+      </resolvedType>
+      <name name="self">
+        <resolvedType xsi:type="eol:AnyType" container="//@operations.1">
+          <region>
+            <start line="27" column="10"/>
+            <end line="27" column="16"/>
+          </region>
+        </resolvedType>
+      </name>
+    </self>
+    <_result>
+      <resolvedType xsi:type="eol:ModelElementType" container="//@operations.1" modelName="Input" elementName="EReference">
+        <region>
+          <start line="27" column="70"/>
+          <end line="27" column="86"/>
+        </region>
+      </resolvedType>
+      <name name="_result">
+        <resolvedType xsi:type="eol:ModelElementType" container="//@operations.1" modelName="Input" elementName="EReference">
+          <region>
+            <start line="27" column="70"/>
+            <end line="27" column="86"/>
+          </region>
+        </resolvedType>
+      </name>
+    </_result>
+  </operations>
+  <operations container="/">
+    <region>
+      <start line="45"/>
+      <end line="50" column="1"/>
+    </region>
+    <contextType xsi:type="eol:AnyType" container="//@operations.2">
+      <region>
+        <start line="45" column="10"/>
+        <end line="45" column="20"/>
+      </region>
+    </contextType>
+    <returnType xsi:type="eol:AnyType" container="//@operations.2">
+      <region>
+        <start line="45" column="10"/>
+        <end line="45" column="20"/>
+      </region>
+    </returnType>
+    <body container="//@operations.2">
+      <region>
+        <start line="45" column="89"/>
+        <end line="50" column="1"/>
+      </region>
+      <statements xsi:type="eol:AssignmentStatement" container="//@operations.2/@body">
+        <region>
+          <start line="46" column="1"/>
+          <end line="46" column="34"/>
+        </region>
+        <lhs xsi:type="eol:VariableDeclarationExpression" container="//@operations.2/@body/@statements.0">
+          <region>
+            <start line="46" column="1"/>
+            <end line="46" column="12"/>
+          </region>
+          <resolvedType xsi:type="eol:AnyType" container="//@operations.2/@body/@statements.0/@lhs">
+            <region>
+              <start line="46" column="1"/>
+              <end line="46" column="12"/>
+            </region>
+          </resolvedType>
+          <name container="//@operations.2/@body/@statements.0/@lhs" name="measure">
+            <region>
+              <start line="46" column="5"/>
+              <end line="46" column="12"/>
+            </region>
+          </name>
+        </lhs>
+        <rhs xsi:type="eol:NewExpression" container="//@operations.2/@body/@statements.0">
+          <region>
+            <start line="46" column="15"/>
+            <end line="46" column="33"/>
+          </region>
+          <resolvedType xsi:type="eol:ModelElementType" container="//@operations.2/@body/@statements.0/@rhs" modelName="Data" elementName="Measure">
+            <region>
+              <start line="46" column="19"/>
+              <end line="46" column="31"/>
+            </region>
+          </resolvedType>
+        </rhs>
+      </statements>
+      <statements xsi:type="eol:AssignmentStatement" container="//@operations.2/@body">
+        <region>
+          <start line="47" column="1"/>
+          <end line="47" column="37"/>
+        </region>
+        <lhs xsi:type="eol:PropertyCallExpression" container="//@operations.2/@body/@statements.1">
+          <region>
+            <start line="47" column="1"/>
+            <end line="47" column="29"/>
+          </region>
+          <target xsi:type="eol:NameExpression" container="//@operations.2/@body/@statements.1/@lhs" name="measure">
+            <region>
+              <start line="47" column="1"/>
+              <end line="47" column="8"/>
+            </region>
+          </target>
+          <property container="//@operations.2/@body/@statements.1/@lhs" name="visualCharacteristic">
+            <region>
+              <start line="47" column="9"/>
+              <end line="47" column="29"/>
+            </region>
+          </property>
+        </lhs>
+        <rhs xsi:type="eol:NameExpression" container="//@operations.2/@body/@statements.1" name="type">
+          <region>
+            <start line="47" column="32"/>
+            <end line="47" column="36"/>
+          </region>
+        </rhs>
+      </statements>
+      <statements xsi:type="eol:AssignmentStatement" container="//@operations.2/@body">
+        <region>
+          <start line="48" column="1"/>
+          <end line="48" column="35"/>
+        </region>
+        <lhs xsi:type="eol:PropertyCallExpression" container="//@operations.2/@body/@statements.2">
+          <region>
+            <start line="48" column="1"/>
+            <end line="48" column="20"/>
+          </region>
+          <target xsi:type="eol:NameExpression" container="//@operations.2/@body/@statements.2/@lhs" name="measure">
+            <region>
+              <start line="48" column="1"/>
+              <end line="48" column="8"/>
+            </region>
+          </target>
+          <property container="//@operations.2/@body/@statements.2/@lhs" name="measureName">
+            <region>
+              <start line="48" column="9"/>
+              <end line="48" column="20"/>
+            </region>
+          </property>
+        </lhs>
+        <rhs xsi:type="eol:NameExpression" container="//@operations.2/@body/@statements.2" name="measureName">
+          <region>
+            <start line="48" column="23"/>
+            <end line="48" column="34"/>
+          </region>
+        </rhs>
+      </statements>
+      <statements xsi:type="eol:ExpressionStatement" container="//@operations.2/@body">
+        <region>
+          <start line="49" column="1"/>
+          <end line="49" column="41"/>
+        </region>
+        <expression xsi:type="eol:MethodCallExpression" container="//@operations.2/@body/@statements.3">
+          <region>
+            <start line="49" column="1"/>
+            <end line="49" column="41"/>
+          </region>
+          <target xsi:type="eol:PropertyCallExpression" container="//@operations.2/@body/@statements.3/@expression">
+            <region>
+              <start line="49" column="1"/>
+              <end line="49" column="27"/>
+            </region>
+            <target xsi:type="eol:NameExpression" container="//@operations.2/@body/@statements.3/@expression/@target" name="visualElement">
+              <region>
+                <start line="49" column="1"/>
+                <end line="49" column="14"/>
+              </region>
+            </target>
+            <property container="//@operations.2/@body/@statements.3/@expression/@target" name="measurements">
+              <region>
+                <start line="49" column="15"/>
+                <end line="49" column="27"/>
+              </region>
+            </property>
+          </target>
+          <arguments xsi:type="eol:NameExpression" container="//@operations.2/@body/@statements.3/@expression" name="measure">
+            <region>
+              <start line="49" column="32"/>
+              <end line="49" column="39"/>
+            </region>
+          </arguments>
+          <method container="//@operations.2/@body/@statements.3/@expression" name="add">
+            <region>
+              <start line="49" column="28"/>
+              <end line="49" column="40"/>
+            </region>
+          </method>
+        </expression>
+      </statements>
+    </body>
+    <name container="//@operations.2" name="addMeasure">
+      <region>
+        <start line="45" column="10"/>
+        <end line="45" column="20"/>
+      </region>
+    </name>
+    <parameters container="//@operations.2">
+      <region>
+        <start line="45" column="21"/>
+        <end line="45" column="25"/>
+      </region>
+      <resolvedType xsi:type="eol:AnyType" container="//@operations.2/@parameters.0">
+        <region>
+          <start line="45" column="21"/>
+          <end line="45" column="25"/>
+        </region>
+      </resolvedType>
+      <name container="//@operations.2/@parameters.0" name="type">
+        <region>
+          <start line="45" column="21"/>
+          <end line="45" column="25"/>
+        </region>
+      </name>
+    </parameters>
+    <parameters container="//@operations.2">
+      <region>
+        <start line="45" column="28"/>
+        <end line="45" column="48"/>
+      </region>
+      <resolvedType xsi:type="eol:StringType" container="//@operations.2/@parameters.1">
+        <region>
+          <start line="45" column="42"/>
+          <end line="45" column="48"/>
+        </region>
+      </resolvedType>
+      <name container="//@operations.2/@parameters.1" name="measureName">
+        <region>
+          <start line="45" column="28"/>
+          <end line="45" column="39"/>
+        </region>
+      </name>
+    </parameters>
+    <parameters container="//@operations.2">
+      <region>
+        <start line="45" column="50"/>
+        <end line="45" column="88"/>
+      </region>
+      <resolvedType xsi:type="eol:ModelElementType" container="//@operations.2/@parameters.2" modelName="Data" elementName="MeasurableElement">
+        <region>
+          <start line="45" column="66"/>
+          <end line="45" column="88"/>
+        </region>
+      </resolvedType>
+      <name container="//@operations.2/@parameters.2" name="visualElement">
+        <region>
+          <start line="45" column="50"/>
+          <end line="45" column="63"/>
+        </region>
+      </name>
+    </parameters>
+    <self>
+      <resolvedType xsi:type="eol:AnyType" container="//@operations.2">
+        <region>
+          <start line="45" column="10"/>
+          <end line="45" column="20"/>
+        </region>
+      </resolvedType>
+      <name name="self">
+        <resolvedType xsi:type="eol:AnyType" container="//@operations.2">
+          <region>
+            <start line="45" column="10"/>
+            <end line="45" column="20"/>
+          </region>
+        </resolvedType>
+      </name>
+    </self>
+    <_result>
+      <resolvedType xsi:type="eol:AnyType" container="//@operations.2">
+        <region>
+          <start line="45" column="10"/>
+          <end line="45" column="20"/>
+        </region>
+      </resolvedType>
+      <name name="_result">
+        <resolvedType xsi:type="eol:AnyType" container="//@operations.2">
+          <region>
+            <start line="45" column="10"/>
+            <end line="45" column="20"/>
+          </region>
+        </resolvedType>
+      </name>
+    </_result>
+  </operations>
+  <transformationRules container="/">
+    <region>
+      <start line="1"/>
+      <end line="7" column="1"/>
+    </region>
+    <name container="//@transformationRules.0" name="Entity2Layout">
+      <region>
+        <start line="1" column="5"/>
+        <end line="1" column="18"/>
+      </region>
+    </name>
+    <source container="//@transformationRules.0">
+      <region>
+        <start line="2" column="10"/>
+        <end line="2" column="35"/>
+      </region>
+      <resolvedType xsi:type="eol:ModelElementType" container="//@transformationRules.0/@source" modelName="business" elementName="BusinessEntity">
+        <region>
+          <start line="2" column="12"/>
+          <end line="2" column="35"/>
+        </region>
+      </resolvedType>
+      <name container="//@transformationRules.0/@source" name="b">
+        <region>
+          <start line="2" column="10"/>
+          <end line="2" column="11"/>
+        </region>
+      </name>
+    </source>
+    <targets container="//@transformationRules.0">
+      <region>
+        <start line="3" column="3"/>
+        <end line="3" column="15"/>
+      </region>
+      <resolvedType xsi:type="eol:ModelElementType" container="//@transformationRules.0/@targets.0" modelName="gui" elementName="Layout">
+        <region>
+          <start line="3" column="5"/>
+          <end line="3" column="15"/>
+        </region>
+      </resolvedType>
+      <name container="//@transformationRules.0/@targets.0" name="g">
+        <region>
+          <start line="3" column="3"/>
+          <end line="3" column="4"/>
+        </region>
+      </name>
+    </targets>
+    <body container="//@transformationRules.0">
+      <region>
+        <start line="4" column="1"/>
+        <end line="6" column="58"/>
+      </region>
+      <statements xsi:type="eol:AssignmentStatement" container="//@transformationRules.0/@body">
+        <region>
+          <start line="4" column="1"/>
+          <end line="4" column="18"/>
+        </region>
+        <lhs xsi:type="eol:PropertyCallExpression" container="//@transformationRules.0/@body/@statements.0">
+          <region>
+            <start line="4" column="1"/>
+            <end line="4" column="7"/>
+          </region>
+          <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.0/@lhs" name="g">
+            <region>
+              <start line="4" column="1"/>
+              <end line="4" column="2"/>
+            </region>
+          </target>
+          <property container="//@transformationRules.0/@body/@statements.0/@lhs" name="name">
+            <region>
+              <start line="4" column="3"/>
+              <end line="4" column="7"/>
+            </region>
+          </property>
+        </lhs>
+        <rhs xsi:type="eol:PropertyCallExpression" container="//@transformationRules.0/@body/@statements.0">
+          <region>
+            <start line="4" column="11"/>
+            <end line="4" column="17"/>
+          </region>
+          <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.0/@rhs" name="b">
+            <region>
+              <start line="4" column="11"/>
+              <end line="4" column="12"/>
+            </region>
+          </target>
+          <property container="//@transformationRules.0/@body/@statements.0/@rhs" name="name">
+            <region>
+              <start line="4" column="13"/>
+              <end line="4" column="17"/>
+            </region>
+          </property>
+        </rhs>
+      </statements>
+      <statements xsi:type="eol:AssignmentStatement" container="//@transformationRules.0/@body">
+        <region>
+          <start line="5" column="1"/>
+          <end line="5" column="37"/>
+        </region>
+        <lhs xsi:type="eol:PropertyCallExpression" container="//@transformationRules.0/@body/@statements.1">
+          <region>
+            <start line="5" column="1"/>
+            <end line="5" column="21"/>
+          </region>
+          <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.1/@lhs" name="g">
+            <region>
+              <start line="5" column="1"/>
+              <end line="5" column="2"/>
+            </region>
+          </target>
+          <property container="//@transformationRules.0/@body/@statements.1/@lhs" name="graphicalcomponent">
+            <region>
+              <start line="5" column="3"/>
+              <end line="5" column="21"/>
+            </region>
+          </property>
+        </lhs>
+        <rhs xsi:type="eol:MethodCallExpression" container="//@transformationRules.0/@body/@statements.1">
+          <region>
+            <start line="5" column="24"/>
+            <end line="5" column="36"/>
+          </region>
+          <method container="//@transformationRules.0/@body/@statements.1/@rhs" name="addMeasure">
+            <region>
+              <start line="5" column="24"/>
+              <end line="5" column="36"/>
+            </region>
+          </method>
+        </rhs>
+      </statements>
+      <statements xsi:type="eol:AssignmentStatement" container="//@transformationRules.0/@body">
+        <region>
+          <start line="6" column="1"/>
+          <end line="6" column="58"/>
+        </region>
+        <lhs xsi:type="eol:PropertyCallExpression" container="//@transformationRules.0/@body/@statements.2">
+          <region>
+            <start line="6" column="1"/>
+            <end line="6" column="23"/>
+          </region>
+          <target xsi:type="eol:NameExpression" container="//@transformationRules.0/@body/@statements.2/@lhs" name="g">
+            <region>
+              <start line="6" column="1"/>
+              <end line="6" column="2"/>
+            </region>
+          </target>
+          <property container="//@transformationRules.0/@body/@statements.2/@lhs" name="graphicalcomponewfwe">
+            <region>
+              <start line="6" column="3"/>
+              <end line="6" column="23"/>
+            </region>
+          </property>
+        </lhs>
+        <rhs xsi:type="eol:MethodCallExpression" container="//@transformationRules.0/@body/@statements.2">
+          <region>
+            <start line="6" column="26"/>
+            <end line="6" column="57"/>
+          </region>
+          <method container="//@transformationRules.0/@body/@statements.2/@rhs" name="getRefEndpointByRelationClass">
+            <region>
+              <start line="6" column="26"/>
+              <end line="6" column="57"/>
+            </region>
+          </method>
+        </rhs>
+      </statements>
+    </body>
+  </transformationRules>
+  <transformationRules container="/">
+    <region>
+      <start line="9"/>
+      <end line="14" column="1"/>
+    </region>
+    <name container="//@transformationRules.1" name="Entity2Layout2">
+      <region>
+        <start line="9" column="5"/>
+        <end line="9" column="19"/>
+      </region>
+    </name>
+    <source container="//@transformationRules.1">
+      <region>
+        <start line="10" column="10"/>
+        <end line="10" column="35"/>
+      </region>
+      <resolvedType xsi:type="eol:ModelElementType" container="//@transformationRules.1/@source" modelName="business" elementName="BusinessEntity">
+        <region>
+          <start line="10" column="12"/>
+          <end line="10" column="35"/>
+        </region>
+      </resolvedType>
+      <name container="//@transformationRules.1/@source" name="b">
+        <region>
+          <start line="10" column="10"/>
+          <end line="10" column="11"/>
+        </region>
+      </name>
+    </source>
+    <targets container="//@transformationRules.1">
+      <region>
+        <start line="11" column="3"/>
+        <end line="11" column="15"/>
+      </region>
+      <resolvedType xsi:type="eol:ModelElementType" container="//@transformationRules.1/@targets.0" modelName="gui" elementName="Layout">
+        <region>
+          <start line="11" column="5"/>
+          <end line="11" column="15"/>
+        </region>
+      </resolvedType>
+      <name container="//@transformationRules.1/@targets.0" name="g">
+        <region>
+          <start line="11" column="3"/>
+          <end line="11" column="4"/>
+        </region>
+      </name>
+    </targets>
+    <body container="//@transformationRules.1">
+      <region>
+        <start line="12" column="1"/>
+        <end line="13" column="10"/>
+      </region>
+      <statements xsi:type="eol:AssignmentStatement" container="//@transformationRules.1/@body">
+        <region>
+          <start line="12" column="1"/>
+          <end line="12" column="18"/>
+        </region>
+        <lhs xsi:type="eol:PropertyCallExpression" container="//@transformationRules.1/@body/@statements.0">
+          <region>
+            <start line="12" column="1"/>
+            <end line="12" column="7"/>
+          </region>
+          <target xsi:type="eol:NameExpression" container="//@transformationRules.1/@body/@statements.0/@lhs" name="g">
+            <region>
+              <start line="12" column="1"/>
+              <end line="12" column="2"/>
+            </region>
+          </target>
+          <property container="//@transformationRules.1/@body/@statements.0/@lhs" name="name">
+            <region>
+              <start line="12" column="3"/>
+              <end line="12" column="7"/>
+            </region>
+          </property>
+        </lhs>
+        <rhs xsi:type="eol:PropertyCallExpression" container="//@transformationRules.1/@body/@statements.0">
+          <region>
+            <start line="12" column="11"/>
+            <end line="12" column="17"/>
+          </region>
+          <target xsi:type="eol:NameExpression" container="//@transformationRules.1/@body/@statements.0/@rhs" name="b">
+            <region>
+              <start line="12" column="11"/>
+              <end line="12" column="12"/>
+            </region>
+          </target>
+          <property container="//@transformationRules.1/@body/@statements.0/@rhs" name="name">
+            <region>
+              <start line="12" column="13"/>
+              <end line="12" column="17"/>
+            </region>
+          </property>
+        </rhs>
+      </statements>
+      <statements xsi:type="eol:ExpressionStatement" container="//@transformationRules.1/@body">
+        <region>
+          <start line="13" column="1"/>
+          <end line="13" column="10"/>
+        </region>
+        <expression xsi:type="eol:MethodCallExpression" container="//@transformationRules.1/@body/@statements.1">
+          <region>
+            <start line="13" column="1"/>
+            <end line="13" column="10"/>
+          </region>
+          <method container="//@transformationRules.1/@body/@statements.1/@expression" name="called">
+            <region>
+              <start line="13" column="1"/>
+              <end line="13" column="10"/>
+            </region>
+          </method>
+        </expression>
+      </statements>
+    </body>
+  </transformationRules>
+</etl:ETLModule>

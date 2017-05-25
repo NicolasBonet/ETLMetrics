@@ -1,0 +1,85 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: Payload.etl 163 2011-09-13 14:20:08Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+
+/****r* HiLeSToVDHLAMS/Payload2Quantity
+ * SUMMARY
+ *   Transform a HiLeS:Port into a Vhdl:Port. The specific type of port would
+ *  depend on the type of the payload that connects to the port. ($Rev: 829 $)
+ * DESCRIPTION 
+ *  // Create a signal to represent payloads that connect. Only Payloads that go
+// from a HiLeS!Port to a HiLeS!Port and are Discrete Type are transformed into signals
+ * SEE ALSO
+ *
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *   	* Vhdl   - http://hiles.uniandes.edu.co/1.1/vhdl-ams
+ *
+ *****
+ */
+// Create a signal to represent payloads that connect. Only Payloads that go
+// from a HiLeS!Port to a HiLeS!Port and are Discrete Type are transformed into signals
+@greedy
+rule Payload2Quantity
+	transform pl : HiLeS!Payload
+	to s : Vhdl!FreeQuantity	{
+		
+		guard : pl.source.isTypeOf(HiLeS!Port) and pl.target.isTypeOf(HiLeS!Port) 
+				and pl.type.isQuantityType()
+		
+		s.identifier = pl.name;
+		s.subtype = new Vhdl!Subtype;
+		switch( pl.type)
+			{
+				case("Voltage") : s.subtype.type = Vhdl!Types#voltage;
+				case("Current") : s.subtype.type = Vhdl!Types#curent;
+				case("capacitance") : s.subtype.type = Vhdl!Types#capacitance;
+				case("charge") : s.subtype.type = Vhdl!Types#charge;
+				case("inductance") : s.subtype.type = Vhdl!Types#inductance;
+				case("mmf") : s.subtype.type = Vhdl!Types#mmf;
+				case("curent") : s.subtype.type = Vhdl!Types#curent;
+				case("voltage") : s.subtype.type = Vhdl!Types#voltage;
+				case "resistance" : s.subtype.type = Vhdl!Types#resistance;
+			    case "flux" : s.subtype.type = Vhdl!Types#flux;
+			    case "displacement" : s.subtype.type = Vhdl!Types#displacement;
+			    case "velocity" : s.subtype.type = Vhdl!Types#velocity;
+			    case "mass" : s.subtype.type = Vhdl!Types#mass;
+			    case "acceleration" : s.subtype.type = Vhdl!Types#acceleration;
+			    case "force" : s.subtype.type = Vhdl!Types#force;
+			    case "angle" : s.subtype.type = Vhdl!Types#angle;
+			    case "torque" : s.subtype.type = Vhdl!Types#torque;
+			    case "angular_velocity" : s.subtype.type = Vhdl!Types#angular_velocity;
+			    case "angular_acceleration" : s.subtype.type = Vhdl!Types#angular_acceleration;
+			    case "stiffness" : s.subtype.type = Vhdl!Types#stiffness;
+			    case "damping" : s.subtype.type = Vhdl!Types#damping;
+			    case "mmoment_i" : s.subtype.type = Vhdl!Types#mmoment_i;
+			    case "volume" : s.subtype.type = Vhdl!Types#volume;
+			    case "pressure" : s.subtype.type = Vhdl!Types#pressure;
+			    case "viscocity" : s.subtype.type = Vhdl!Types#viscocity;
+			    case "density" : s.subtype.type = Vhdl!Types#density;
+			    case "fcapacitance" : s.subtype.type = Vhdl!Types#fcapacitance;
+			    case "fresistance" : s.subtype.type = Vhdl!Types#fresistance;
+			    case "inertance" : s.subtype.type = Vhdl!Types#inertance;
+			    case "vflow_rate" : s.subtype.type = Vhdl!Types#vflow_rate;
+			    case "temperature" : s.subtype.type = Vhdl!Types#temperature;
+			    case "heat_flow" : s.subtype.type = Vhdl!Types#heat_flow;
+			    case "illuminance" : s.subtype.type = Vhdl!Types#illuminance;
+			    case "optic_flux" : s.subtype.type = Vhdl!Types#optic_flux;
+			}
+		if(pl.size <> 1)
+		{
+			s.subtype.range = new Vhdl!Range;
+			s.subtype.range.begin = pl.size-1;
+			s.subtype.range.direction = Vhdl!RangeDirection#downto;
+			s.subtype.range.end = 0;
+		}
+		
+	}

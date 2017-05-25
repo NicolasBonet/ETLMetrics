@@ -1,0 +1,86 @@
+-- Debemos crear una unica base de datos para todos
+pre {
+	var db : new DB!Database;
+}
+
+-- Esta regla se encarga de todo!
+rule MarketPlace2Relacional
+	transform
+		c : mp!ClassUnit
+	to
+		t : DB!Table
+		{
+			-- Asignamos la tabla creada a la base de datos inicializada al comienzo y le ponemos el nombre de la clase sin el Entity
+			guard : (c.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0)->select(a|a.`to`.Name = "Entity").size() > 0)
+	   		t.database = db;
+	   		t.name = c.name.replace("Entity", "");
+		   	var propiedades:Collection:=c.codeElement.select(ce|ce.isTypeOf(mp!StorableUnit));
+			for(superclase in c.codeRelation.select(s|s.isTypeOf(mp!Extends)))
+			{
+				propiedades := propiedades.includingAll(superclase.`to`.getProperties());
+			}
+			
+			var foreignKeys : Collection := propiedades->select(p|not p.isPrimitiveType());
+			
+			
+			if(foreignKeys.size > 0)
+			{
+			foreignKeys.println();
+			}
+			
+			
+			var primarykeys : Collection := propiedades->select(p|p.isPrimaryKey());
+			t.primaryKeys = primarykeys.equivalent();
+			
+		   	t.columns = propiedades.equivalent();
+	   }
+	   
+@Lazy
+rule StorableUnit2Column
+	transform c : mp!StorableUnit
+	to
+		t : DB!Column
+		{
+		guard: c.eContainer.isTypeOf(mp!ClassUnit) 
+			and (c.eContainer.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0).select(a|a.`to`.Name = "Entity").size() > 0
+			 or c.eContainer.codeRelation.select(cr|cr.isTypeOf(mp!HasValue))->select(cr|cr.annotation.size()>0).select(a|a.`to`.Name = "MappedSuperclass").size() > 0)
+		t.name = c.name;
+		switch(c.type.name){
+				case 'String' : t.type = DB!DataType#varchar;
+					 break;
+				case 'Long' : t.type = DB!DataType#int; 
+					 break;
+				case 'Integer' : t.type = DB!DataType#int;
+					 break;
+				default :  t.type = DB!DataType#unknown;
+			}
+		}
+		
+operation ClassUnit getProperties()
+{
+	return self.codeElement.select(ce|ce.isTypeOf(mp!StorableUnit));
+}
+
+operation StorableUnit isPrimaryKey()
+{
+	if(self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size() > 0).select(a|a.`to`.Name = "Id").size()>0){
+		return true;
+	}
+	
+	return false;
+}
+
+operation StorableUnit isPrimitiveType()
+{
+	if(self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size()>0).select(a|a.`to`.Name = "PrimaryKeyJoinColumn").size()=0)
+	{
+		return true;
+	}
+	
+	return false;
+}
+
+operation StorableUnit getAnnotation(name : String)
+{
+	return self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size() > 0).select(a|a.`to`.Name = name).first(); // Se asume que solo hay una anotacion
+}

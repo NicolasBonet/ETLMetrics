@@ -1,0 +1,109 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: PortToInterfaceSignal.etl 829 2012-06-26 16:20:24Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+import "helpers/HiLeS2VhdlTypes.eol";
+
+/****r* HiLeSToVDHLAMS/PortToInterfaceQuantity
+ * SUMMARY
+ *   Transform a HiLeS:Port into a Vhdl:Port. The specific type of port would
+ *  depend on the type of the payload that connects to the port. ($Rev: 829 $)
+ * DESCRIPTION 
+ *   Create a vhdl!Port for each hiles!Port The actual port type would depend 
+ * on the type of the payload that connects to the port and is decided
+ * by guard on derived rules.
+ * SEE ALSO
+ *
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *   	* Vhdl   - http://hiles.uniandes.edu.co/1.1/vhdl-ams
+ *
+ *****
+ */
+rule PortToInterfaceQuantity
+	transform port : HiLeS!Port
+	to signal : Vhdl!InterfaceQuantity
+	{
+		// If the port owner is a strucutral, the type of signal is retreived
+		// from the type of a payload in the block's inner architecure that
+		// connects to the port's matching service. If the block is a functional
+		// then the type of signal is retreived from the type of a payload in the
+		// block's parent architecture that is connected to the port. 
+		guard
+		{
+			if(port.owner.isTypeOf(HiLeS!Functional) or port.owner.isTypeOf(HiLeS!Decision))
+			{
+				pl = port.owner.parentArchitecture.payload.selectOne(pl
+						| (pl.target = port) or (pl.source = port)
+						);
+				return pl.isDefined() and pl.type.isQuantityType();
+			}
+			else
+			{
+				pl = port.owner.innerArchitecture.payload.selectOne(pl
+						| (pl.target.name = port.name) or (pl.source.name = port.name)
+						);
+				return pl.isDefined() and pl.type.isQuantityType();
+			}
+			
+		}
+		signal.identifier = port.name;
+		switch (port.direction)
+		{
+			case(HiLeS!PointDirection#input) : signal.mode = Vhdl!Mode#`in`;
+			case(HiLeS!PointDirection#output) : signal.mode = Vhdl!Mode#out;
+		}
+		signal.subtype = new Vhdl!Subtype;
+		switch( pl.type)
+			{
+				case("Voltage") : signal.subtype.type = Vhdl!Types#voltage;
+				case("Current") : signal.subtype.type = Vhdl!Types#curent;
+				case("capacitance") : signal.subtype.type = Vhdl!Types#capacitance;
+				case("charge") : signal.subtype.type = Vhdl!Types#charge;
+				case("inductance") : signal.subtype.type = Vhdl!Types#inductance;
+				case("mmf") : signal.subtype.type = Vhdl!Types#mmf;
+				case("curent") : signal.subtype.type = Vhdl!Types#curent;
+				case("voltage") : signal.subtype.type = Vhdl!Types#voltage;
+				case "resistance" : signal.subtype.type = Vhdl!Types#resistance;
+			    case "flux" : signal.subtype.type = Vhdl!Types#flux;
+			    case "displacement" : signal.subtype.type = Vhdl!Types#displacement;
+			    case "velocity" : signal.subtype.type = Vhdl!Types#velocity;
+			    case "mass" : signal.subtype.type = Vhdl!Types#mass;
+			    case "acceleration" : signal.subtype.type = Vhdl!Types#acceleration;
+			    case "force" : signal.subtype.type = Vhdl!Types#force;
+			    case "angle" : signal.subtype.type = Vhdl!Types#angle;
+			    case "torque" : signal.subtype.type = Vhdl!Types#torque;
+			    case "angular_velocity" : signal.subtype.type = Vhdl!Types#angular_velocity;
+			    case "angular_acceleration" : signal.subtype.type = Vhdl!Types#angular_acceleration;
+			    case "stiffness" : signal.subtype.type = Vhdl!Types#stiffness;
+			    case "damping" : signal.subtype.type = Vhdl!Types#damping;
+			    case "mmoment_i" : signal.subtype.type = Vhdl!Types#mmoment_i;
+			    case "volume" : signal.subtype.type = Vhdl!Types#volume;
+			    case "pressure" : signal.subtype.type = Vhdl!Types#pressure;
+			    case "viscocity" : signal.subtype.type = Vhdl!Types#viscocity;
+			    case "density" : signal.subtype.type = Vhdl!Types#density;
+			    case "fcapacitance" : signal.subtype.type = Vhdl!Types#fcapacitance;
+			    case "fresistance" : signal.subtype.type = Vhdl!Types#fresistance;
+			    case "inertance" : signal.subtype.type = Vhdl!Types#inertance;
+			    case "vflow_rate" : signal.subtype.type = Vhdl!Types#vflow_rate;
+			    case "temperature" : signal.subtype.type = Vhdl!Types#temperature;
+			    case "heat_flow" : signal.subtype.type = Vhdl!Types#heat_flow;
+			    case "illuminance" : signal.subtype.type = Vhdl!Types#illuminance;
+			    case "optic_flux" : signal.subtype.type = Vhdl!Types#optic_flux;
+			}
+		if(port.size <> 1)
+		{
+			signal.subtype.range = new Vhdl!Range;
+			signal.subtype.range.begin = port.size-1;
+			signal.subtype.range.direction = Vhdl!RangeDirection#downto;
+			signal.subtype.range.end = 0;
+		}
+	}
+ 

@@ -1,0 +1,272 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: PlaceComponentInstance.etl 459 2011-10-26 23:39:45Z carcos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+ 
+/****r* HiLeSToVDHLAMS/Place2ComponentInstantiation
+ * SUMMARY
+ *   Transform a HiLeS:Place into a Vhdl:ComponentInstantiation and a Vhdl:Signal
+ * to connect the place marking to output transitions or ports.  ($Rev: 866 $).
+ * DESCRIPTION 
+ * 	The Vhdl:ComponentInstantiation creates a component instance of a Petri Place
+ * and connects it to the appropriate signals/ports. Since the place can have 
+ * multiple outgoing arcs, a marque signal (Vhdl!Signal) is created to connect
+ * the place's marque port to all the targets. 
+
+ * 
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *   	* Vhdl   - http://hiles.uniandes.edu.co/1.1/vhdl-ams
+ *
+ ******
+ */
+@lazy
+rule Place2ComponentInstantiation
+	transform p : HiLeS!Place
+	to ci : Vhdl!ComponentInstantiation, sMarque : Vhdl!Signal {
+		
+		/*guard {
+				var architecture : HiLeS!Architecture  = HiLeS!PetriNet.all().select(pn | pn.elements.includes(p)).first().parentArchitecture.owner.parentArchitecture;				
+				if (architecture.owner.isDefined()) {
+					return true;
+				} else {
+					return false;
+				}
+		}*/
+		
+		//p.name.println("PlaceComponentInstance: ");
+		ci.identifier = p.name;
+		ci.instantiatedUnit = new Vhdl!EntityInstance;
+		ci.instantiatedUnit.entityName = "work.PetriPlace";
+		ci.instantiatedUnit.architecture = "Behavior";
+		/*Genericmap
+		  generic(	nb_entrees   : natural:= 1;
+           			nb_sorties   : natural:= 1);*/
+        ci.genericMap = new Vhdl!GenericAssociation;
+        var nb_entrees = new Vhdl!AssociationElement;
+        nb_entrees.formalPart = new Vhdl!FormalPart;
+		nb_entrees.formalPart.designator = "nb_entrees";
+		nb_entrees.actualPart = new Vhdl!ActualPart;
+		// The number of entrees depends on the number of input arcs
+		nb_entrees.actualPart.expression = HiLeS!PetriNet.all().selectOne(pn
+				| pn.element.includes(p)
+				).element.select(a : HiLeS!Arc
+				| a.toNode = p
+				).size().asString();
+		//In case of a 0 value in the expression we need almost one 
+		if(nb_entrees.actualPart.expression='0')
+		{
+			nb_entrees.actualPart.expression='1';
+		}
+		ci.genericMap.element.add(nb_entrees);
+		
+		var nb_sorties = new Vhdl!AssociationElement;
+		nb_sorties.formalPart = new Vhdl!FormalPart;
+		nb_sorties.formalPart.designator = "nb_sorties";
+		nb_sorties.actualPart = new Vhdl!ActualPart;
+		nb_sorties.actualPart.expression = HiLeS!PetriNet.all().selectOne(pn
+				| pn.element.includes(p)
+				).element.select(a : HiLeS!Arc
+				| a.fromNode = p
+				).size().asString();
+		if(nb_sorties.actualPart.expression='0')
+		{
+			nb_sorties.actualPart.expression='1';
+		}
+		ci.genericMap.element.add(nb_sorties);
+		
+		/*Portmap
+		  port(	init   : in std_logic;
+       			ini_jetons   : in std_logic;
+       			aj_jetons   : in std_logic_vector(nb_entrees-1 downto 0);
+       			ret_jetons   : in std_logic_vector(nb_sorties-1 downto 0);
+		 		marque   : out std_logic);*/
+        ci.portMap = new Vhdl!PortAssociation;
+        /* init */
+        var init = new Vhdl!AssociationElement;
+        init.formalPart = new Vhdl!FormalPart;
+        init.formalPart.designator = "init";
+        init.formalPart.designatorPosition = -1;
+		init.actualPart = new Vhdl!ActualPart;
+		// The init signal should be connected to the PetriNet's parent architecture
+        // parent block init_pl port
+        init.actualPart.designator="init_pl";
+        init.actualPart.designatorPosition=-1;
+        /*init.actualPart.designator = HiLeS!Structural.all().selectOne(b
+        		| b.innerArchitecture.petriNet.isDefined()
+        			and b.innerArchitecture.petriNet.element.includes(p)
+        		).equivalent().port.selectOne(port | port.identifier = "init_pl").identifier;*/
+        ci.portMap.element.add(init);
+        /* ini_jetons */
+        var ini_jetons = new Vhdl!AssociationElement;
+        ini_jetons.formalPart = new Vhdl!FormalPart;
+        ini_jetons.formalPart.designator = "ini_jetons";
+        ini_jetons.formalPart.designatorPosition=-1;
+        ini_jetons.actualPart = new Vhdl!ActualPart;
+        if(p.hasToken) {
+        	ini_jetons.actualPart.expression = "'1'";
+        } else {
+        	ini_jetons.actualPart.expression = "'0'";
+        }
+        ci.portMap.element.add(ini_jetons);
+        /* aj_jetons, each incoming arc is transformed into one signal. A
+		   port_map has to be created for each */
+		 var ajJetonsCount=0;
+		for(arc in HiLeS!PetriNet.all().selectOne(pn
+				| pn.element.includes(p)
+				).element.select(a : HiLeS!Arc
+				| a.toNode = p
+				))
+		{
+			ajJetonsCount=ajJetonsCount+1;
+			var aj_jetons = new Vhdl!AssociationElement;
+	        aj_jetons.formalPart = new Vhdl!FormalPart;
+	        //aj_jetons.formalPart.designator = "aj_jetons(" + (loopCount-1).asString() + ")";
+	        aj_jetons.formalPart.designator = "aj_jetons";
+	        //Added in order to manage the designator position despite only the designator
+	        aj_jetons.formalPart.designatorPosition=(loopCount);
+	        
+	        aj_jetons.actualPart = new Vhdl!ActualPart;
+	        // If the place is created form an initial node, there is
+	        // no signal for the arcs and the map should be done to the block's
+	        // HcnIn port
+	        if("InitialNode".isSubstringOf(p.name))
+	        {
+	        	aj_jetons.actualPart.designator = arc.fromPoint.name;
+	        }
+	        else
+	        {	
+	        	println(p.name);
+	        	aj_jetons.actualPart.designator = arc.equivalent().identifier;
+	        }
+	        aj_jetons.actualPart.designatorPosition = -1;
+	        ci.portMap.element.add(aj_jetons);
+		}
+		//We have to instatie the aj jetons when it is the beggining of the hole petri net
+		if(ajJetonsCount=0)
+		{
+			var aj_jetons = new Vhdl!AssociationElement;
+	        aj_jetons.formalPart = new Vhdl!FormalPart;
+	        //aj_jetons.formalPart.designator = "aj_jetons(" + (loopCount-1).asString() + ")";
+	        aj_jetons.formalPart.designator = "aj_jetons";
+	        //Added in order to manage the designator position despite only the designator
+	        aj_jetons.formalPart.designatorPosition=(1);
+	         
+	        
+	        aj_jetons.actualPart = new Vhdl!ActualPart;
+	        aj_jetons.actualPart.expression ="'0'";
+	         aj_jetons.actualPart.designatorPosition = -1;
+	         ci.portMap.element.add(aj_jetons);
+		}
+        /* ret_jetons, each outgoing arc is transformed into one signal. A
+			port_map has to be created for each */
+		 var retJetonsCount=0;
+		for(arc in HiLeS!PetriNet.all().selectOne(pn
+				| pn.element.includes(p)
+				).element.select(a : HiLeS!Arc
+				| a.fromNode = p
+				))
+		{
+			//retJetonsCount=retJetonsCount+1;
+			var ret_jetons = new Vhdl!AssociationElement;
+	        ret_jetons.formalPart = new Vhdl!FormalPart;
+	        //ret_jetons.formalPart.designator = "ret_jetons(" + (loopCount-1).asString() + ")";
+	        ret_jetons.formalPart.designator = "ret_jetons";
+	        //Added in order to manage the designator position despite only the designator
+	        ret_jetons.formalPart.designatorPosition=(retJetonsCount+1);
+	        ret_jetons.actualPart = new Vhdl!ActualPart;
+	        ret_jetons.actualPart.designatorPosition=-1;
+	        // If the place is created form a final node, there is
+	        // no signal for the arcs and the map should be done to the block's
+	        // port
+	        
+	        if("FinalNode".isSubstringOf(p.name))
+	        {
+	        	ret_jetons.actualPart.designator = arc.toPoint.name.replace("marque","ret_jeton");	// Vhdl ports have the same name as the hiles ports that have the same name as the service
+	        }
+	        else
+	        {
+	        	ret_jetons.actualPart.designator = arc.equivalent().identifier;
+	        }
+	        ci.portMap.element.add(ret_jetons);
+	        retJetonsCount=retJetonsCount+1;
+		}
+		//We have to instatie the ret jetons when it is the beggining or the endding of the hole petri net
+		if(retJetonsCount=0)
+		{
+			var ret_jetons = new Vhdl!AssociationElement;
+	        ret_jetons.formalPart = new Vhdl!FormalPart;
+	        //ret_jetons.formalPart.designator = "ret_jetons(" + (loopCount-1).asString() + ")";
+	        ret_jetons.formalPart.designator = "ret_jetons";
+	        //Added in order to manage the designator position despite only the designator
+	        ret_jetons.formalPart.designatorPosition=1;
+	        ret_jetons.actualPart = new Vhdl!ActualPart;
+	        ret_jetons.actualPart.designatorPosition=-1;
+	        
+	        var petri=HiLeS!PetriNet.all().selectOne(pn
+				| pn.element.includes(p)
+				);
+				
+			var archi=HiLeS!Architecture.all().selectOne(ar
+				| ar.petrinet=(petri)
+				);
+	        ret_jetons.actualPart.designator = "ret_jeton_"+archi.name+"_HcnOut";
+	        ci.portMap.element.add(ret_jetons);
+		}
+		/*if(retJetonsCount=0)
+		{
+			var ret_jetons = new Vhdl!AssociationElement;
+	        ret_jetons.formalPart = new Vhdl!FormalPart;
+	        ret_jetons.formalPart.designator = "ret_jetons";
+	        //Added in order to manage the designator position despite only the designator
+	        ret_jetons.formalPart.designatorPosition=(1);
+	         ret_jetons.actualPart = new Vhdl!ActualPart;
+	        ret_jetons.actualPart.expression ="'0'";
+	         ret_jetons.actualPart.designatorPosition = -1;
+	         ci.portMap.element.add(ret_jetons);
+		}*/
+		
+		
+   		/* marque */
+   		// Singal to connect the place to all its targets
+		sMarque.identifier = "marque" + p.name;
+		sMarque.subtype = new Vhdl!Subtype;
+		sMarque.subtype.type = Vhdl!Types#std_logic;
+		
+		
+        var marque = new Vhdl!AssociationElement;
+        marque.formalPart = new Vhdl!FormalPart;
+        marque.formalPart.designator = "marque";
+        marque.formalPart.designatorPosition = -1;
+        marque.actualPart = new Vhdl!ActualPart;
+        if("FinalNode".isSubstringOf(p.name))
+	    {
+	     var petri=HiLeS!PetriNet.all().selectOne(pn
+				| pn.element.includes(p)
+				);
+				
+			var archi=HiLeS!Architecture.all().selectOne(ar
+				| ar.petrinet=(petri)
+				);
+				
+		marque.actualPart.designator = "marque_"+archi.name+"_HcnOut";
+		marque.actualPart.designatorPosition=-1;
+		ci.portMap.element.add(marque);
+		}
+		else
+		{
+		marque.actualPart.designator = sMarque.identifier;
+		marque.actualPart.designatorPosition=-1;
+		ci.portMap.element.add(marque);
+		}
+		
+		
+		
+	}

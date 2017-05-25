@@ -1,0 +1,1011 @@
+pre {
+  "Running Representacion Transformation".println();
+ ("		" + kdmMicro!CodeModel.allInstances().size()).println();
+  //Se crean los tipos de relacion
+  var dependencia = new target!Dependencia();
+  var asociacion = new target!Asociacion();
+  var create = new target!Create();
+  var read = new target!Read();
+  var update = new target!Update();
+  var deleteR = new target!Delete();
+  var composicion = new target!Composicion();
+  var agregacion = new target!Agregacion();
+  var generalizacion = new target!Generalizacion();
+  
+  var Codemodel = kdmMicro!CodeModel.allInstances().first();
+  var app = new target!Aplicacion();
+  
+  var porcentajeAcoplamientoMicroservicios = 
+  	System.user.promptInteger("Digite porcentaje(0-100) minimo de acomplamiento entre EJBs para calcular Microservicios", 100);
+  app.name = Codemodel.name;
+  
+  var rutaLogsSQL = 
+  	System.user.prompt("Digite ruta absoluta del archivo de logs SQL (opcional)", "");
+  	//crearTablasAccedidasClase();
+  	//crearTablasCompartidasMicroservicios();
+}
+
+post {
+    "Creando dependencias clases".println();
+    CreateDependecies();
+    "Creando dependencias Cluster".println();
+    CreateDependeciesCluster();	
+    "Calculando Microservicios a partir de relaciones EJB".println();
+    crearMicroservivios();
+    "Creando tablas accedidas por las clases".println();
+    crearTablasAccedidasClase();
+    "Creando tablas compartidas por las microservicios".println();
+    crearTablasCompartidasMicroservicios();
+	"Done".println();
+}
+
+//creacion cluster con sus paquetes y clases
+rule Cluster2Cluster
+transform t: kdmMicro!Cluster
+to o: target!Cluster{
+  o.name = t.name;
+  //adiciona paquetes y las clases del cluster
+  for(codeItem in t.codeElement)
+  {
+  	var ListClases = target!ClaseR.allInstances();
+  	if( not ListClases.exists(x| x.name == codeItem.name))
+  	{
+	  	var class = new target!ClaseR();
+	  	class.name = codeItem.name;
+	  	class.isService = codeItem.isService;
+	    class.compartida = "false";
+	    if (codeItem.isTypeOf(kdmMicro!InterfaceUnit)) {
+	    	 class.isInterface = "true";
+	    }
+	    else {
+	    	 class.isInterface = "false";
+	    }
+	    
+	  	class.AddMetricsClass(codeItem);
+	  	
+	  	class.AddElementsToClass(codeItem);
+	  	AddClassToPackage(class, codeItem);
+	  	o.elementos.add(class);
+  	}
+  	else{
+  		var class = ListClases.select(x| x.name == codeItem.name).first();
+  		class.compartida = "true";
+  	 	o.elementos.add(class);
+  	}
+  }
+  
+  //adiciona las metricas del cluster
+  var mofCluster = kdmMicro!MofElement.allInstances().select(x| x.element.isTypeOf(kdmMicro!Cluster) and x.element.equals(t)).first();
+  if(mofCluster.isDefined())
+  {
+  	for(measurant in mofCluster.measurant)
+  	{
+  		var metrica = new target!Metrica();
+  		metrica.SetTipoMetrics(measurant.measure, "");
+  		metrica.valor = measurant.value;
+  		o.metricas.add(metrica);
+  	}
+  }
+  
+  app.hijos.add(o);
+}
+
+//Adiciona metodos y atributos a las clases
+operation target!ClaseR AddElementsToClass(codeItem : kdmMicro!CodeItem){
+	var methods = codeItem.codeElement.select(x | x.isTypeOf(kdmMicro!MethodUnit));
+	
+	//var atributesIn = signatures.parameterUnit.select(x | (x.isTypeOf(kmdMicro!ParameterUnit)) and (x.name<>''));
+	var atributes = codeItem.codeElement.select(x | x.isTypeOf(kdmMicro!StorableUnit));
+	
+	for(met in methods)
+	{
+		var newMethod =  new target!Metodo();
+		newMethod.name = met.name;
+
+		var signatures = met.codeElement.select(x | x.type.name="Signature");
+		for(sig in signatures)
+		{
+			var atributesIn = sig.parameterUnit.select(x | (x.isTypeOf(kdmMicro!ParameterUnit)) and x.name <> "");
+			for(atrIn in sig.parameterUnit)
+			{
+				if (atrIn.name.isDefined())
+				{
+					if (atrIn.type.isDefined())
+					{
+							if (atrIn.type.name.isDefined())
+							{
+									var newAtributeIn = new target!AtributoCM();
+									//" atrIn".println(atrIn);
+									newAtributeIn.name = atrIn.name;
+									//" atrInName".println(atrIn.name);
+									newAtributeIn.type = atrIn.type.name;
+									//" atrTypName".println(atrIn.type.name);
+									newMethod.atributosIn.add(newAtributeIn);
+							}
+							else{
+								//" NAME".println(codeItem.name);
+								//" TYPENAME".println(met.name);
+							}
+						}
+						else{
+							//" TYPE".println(met.name);
+						}
+				}
+				else{
+					if (atrIn.type.isDefined()){
+						newMethod.returnType = atrIn.type.name;
+					}
+					else {
+						newMethod.returnType = "void";
+					}
+					//" NAME".println(codeItem.name);
+					//" NAME".println(met.name);
+				}
+			}
+		}		
+		self.hijos.add(newMethod);
+	}
+	
+	for(atr in atributes)
+	{
+		var newAtribute =  new target!Atributo();
+		newAtribute.name = atr.name;
+		self.hijos.add(newAtribute);
+	}
+	
+}
+
+//Adiciona a la clase de un cluster las metricas obtenidas en subkdm
+operation target!ClaseR AddMetricsClass(class : kdmMicro!CodeItem){
+  var mofClass = kdmMicro!MofElement.allInstances().select(x| (x.element.isTypeOf(kdmMicro!ClassUnit) or x.element.isTypeOf(kdmMicro!InterfaceUnit)) and x.element.equals(class)).first();
+  if(mofClass.isDefined())
+  {
+  	for(measurant in mofClass.measurant)
+  	{
+  		var metrica = new target!Metrica();
+  		metrica.SetTipoMetrics(measurant.measure, "");
+  		metrica.valor = measurant.value;
+  		self.metricas.add(metrica);
+  	}
+  }
+}
+
+//Obtiene el tipo de metrica
+operation target!Metrica SetTipoMetrics(tipoMeasure: kdmMicro!Measure, tipoPor: String){
+	var mensaje = "";
+	if(tipoMeasure.isTypeOf(kdmMicro!CouplingBetweenObjectsMeasure))
+	{
+		mensaje = "CouplingBetweenObjectsMeasure";
+		self.tipo = target!TipoMetrica#CouplingBetweenObjects;
+	}
+	else if(tipoMeasure.isTypeOf(kdmMicro!WeightedMethodsPerClassMeasure))
+	{
+		mensaje = "WeightedMethodsPerClassMeasure";
+		self.tipo = target!TipoMetrica#WeightedMethodsPerClass;
+	}
+	else if(tipoMeasure.isTypeOf(kdmMicro!NumberOfUsesMeasure))
+	{
+		mensaje = "NumberOfUsesMeasure";
+		self.tipo = target!TipoMetrica#NumberOfUses;
+	}
+	else if(tipoMeasure.isTypeOf(kdmMicro!NumberOfContainmentsMeasure))
+	{
+		mensaje = "NumberOfContainmentsMeasure";
+		self.tipo = target!TipoMetrica#NumberOfContainments;
+	}
+	else if(tipoMeasure.isTypeOf(kdmMicro!CalculatedCouplingMeasure))
+	{
+		mensaje = "CalculatedCouplingMeasure";
+		self.tipo = target!TipoMetrica#CalculatedCoupling;
+	}
+	else if(tipoMeasure.isTypeOf(kdmMicro!NumberOfClassesMeasure))
+	{
+		mensaje = "NumberOfClassesMeasure";
+		self.tipo = target!TipoMetrica#NumberOfClassesMeasure;
+	}
+	else if(tipoMeasure.isTypeOf(kdmMicro!NumberOfLinesMeasure))
+	{
+		mensaje = "NumberOfLinesMeasure";
+		self.tipo = target!TipoMetrica#NumberOfLinesMeasure;
+	}
+	else if(tipoMeasure.isTypeOf(kdmMicro!ClusterRelationConflictPercentageMeasure))
+	{
+		mensaje = "ClusterRelationConflictPercentageMeasure";
+		
+		if(tipoPor == "1")
+		{
+			self.tipo = target!TipoMetrica#ClusterRelationConflictPercentageMeasureTarget;
+		}
+		else
+		{
+			self.tipo = target!TipoMetrica#ClusterRelationConflictPercentageMeasureSource;
+		}
+	}
+}
+
+//Adiciona una clase a un paquete, si el paquete ya existe adiciona la clase
+//en caso contrario crea el nuevo paquete y adiciona la clase
+operation AddClassToPackage(class:target!ClaseR, codEl: kdmMicro!CodeItem){
+	 var packageName = codEl.GetNamePackage();
+	 var paquetes = target!Paquete.allInstances();
+	 var paquete = paquetes.select(x| x.name.equals(packageName)).first();
+	 
+	 if(paquete.isDefined())
+	 {
+	 	paquete.hijos.add(class);
+	 }
+	 else
+	 {
+	 	var package = new target!Paquete();
+    	package.name = codEl.GetNamePackage();
+    	package.hijos.add(class);
+    	app.hijos.add(package);
+	 }
+}
+
+/*obtiene el nombre completo del paquete de una clase*/
+operation kdmMicro!AbstractCodeElement GetNamePackage(): String
+{
+	var namePackage = "";
+	var container = self.eContainer();
+	
+	while (container.isTypeOf(kdmMicro!Package)){
+	   namePackage = container.name + "." + namePackage;
+	   container = container.eContainer();
+	}
+	
+	return namePackage;
+}
+
+//Crea dependencias de los clusters
+operation CreateDependeciesCluster(){
+	var classLR = kdmMicro!ClusterRelation.allInstances();
+	var nodosCluster = target!Cluster.allInstances();
+	
+	for(nodo in nodosCluster)
+	{
+		nodo.GetRelationsCluster(classLR, nodosCluster);
+	}	
+}
+
+//Particione los cluster EJB en microservicios
+operation crearMicroservivios(){
+  	
+	var ejbs = target!Cluster.allInstances();
+	var microServicios = new Map;
+	
+	var contadorMicroservicio = 1;
+	var ejbVisitados = new Set;
+	for (ejb in ejbs) {
+		if (ejbVisitados->includes(ejb.name)) {
+			continue;
+		}
+		
+		("Cluster " + ejb.name).println();
+		var ejbConectadosMicroservicio = ejb.darEjbsConectados(ejbVisitados);
+		if (not ejbConectadosMicroservicio.isEmpty()) {				
+			var ejbsMicroservicio = new Set;
+			for(ejbConectado in ejbConectadosMicroservicio){				
+				ejbsMicroservicio.add(ejbConectado);
+			}						
+			microServicios.put("Microservicio " + contadorMicroservicio, ejbsMicroservicio);				
+			contadorMicroservicio = contadorMicroservicio +1;
+		}	
+	}
+	(" Resultado particion EJBs(Clusters) en microservicios con minimo %" 
+		+ porcentajeAcoplamientoMicroservicios + " de acoplamiento: ").println();
+	for (nombreMicro in microServicios.keySet()) {
+		var ejbsMicroservicio =  microServicios.get(nombreMicro);
+		(" * " + nombreMicro).println();
+		var ms = new target!Microservicio;
+		ms.name = nombreMicro;
+		ms.elementos = ejbsMicroservicio;		
+		for(ejbConectado in ejbsMicroservicio){				
+				("   - " + ejbConectado.name).println();
+		}
+	}
+	
+	// relaciones entre microservicios
+	"Calculando asociaciones entre microservicios...".println();		
+	for (microservicio in target!Microservicio.allInstances()) {
+			microservicio.relaciones = new Set;
+			microservicio.clases = new Set;
+			microservicio.invocacionesServicios = new Set;
+			var msAsociados = new Set;
+			var clasesRMS = new Set;
+			("  ...Verificando " + microservicio.name).println();
+			
+			// Obtiene las clases/interfaces tipo Servicio en ambos MicroServicios y verifica los
+			// llamados entre ellos
+			for (cluster in microservicio.elementos) {	
+						microservicio.clases.addAll(cluster.elementos);					
+						clasesRMS.addAll(cluster.elementos.select(c| c.isService = "true" ));											
+			}
+			
+			
+			for (msTemp in target!Microservicio.allInstances().select(m | m.name <> microservicio.name)) {
+				//("  ->Comparando con " + msTemp.name).println();
+				var clasesRMSTemp = new Set;
+				for (cluster in msTemp.elementos) {	
+						clasesRMSTemp.addAll(cluster.elementos.select(c| c.isService = "true" ));						
+				}
+				
+				for (claseServicioOrigen in clasesRMS ) {
+					if (claseServicioOrigen.isInterface = "true") {
+						continue;
+					}
+					
+					for (claseServicioDestino in clasesRMSTemp) {
+						("  --->Clase orignen  " + claseServicioOrigen.name + " clase destino " + claseServicioDestino.name).println();
+						
+						
+						//en caso de que la clase destino sea una interfaz de ejb, se verifica si en el mservicio destino existe la implementacion
+						var msDestinoConImpl = true;
+						if (claseServicioDestino.isInterface = "true") {
+							msDestinoConImpl = false;
+							for (claseDest in clasesRMSTemp) {
+								var interfacesHeredadas = claseDest.clasesHeredadas;
+								if (interfacesHeredadas.isDefined()) {
+									for (interfaceHeredada in interfacesHeredadas) {
+										if (interfaceHeredada.name = claseServicioDestino.name) {
+											msDestinoConImpl = true;
+										}
+									}
+								}
+							}
+						}
+						("  ------>msDestinoConImpl " + msDestinoConImpl).println();
+						if (not msDestinoConImpl) { // el ms destino no tiene alguna implementacion de la interfaz ejb (se considera que el ms destino contiene la interfaz tambien como un llamado remoto hacia otro ms que s lo contenga)
+							continue;
+						}
+						
+						var invocacionesServicioOrigen = 
+								target!Invocacion.allInstances().select(i | i.fromMethod.clase.name = claseServicioOrigen.name and   i.toMethod.clase.name = claseServicioDestino.name);
+						("  --------->msDestinoConImpl " + invocacionesServicioOrigen).println();
+						for (invocacion in invocacionesServicioOrigen) {
+											if (not msAsociados->includes(msTemp.name)) {
+												//("  -------> agregando relacion " + microservicio.name + " a" + msTemp.name).println();
+												var arco = new target!Arco;
+												arco.target =  msTemp;
+											    arco.source = microservicio;	
+											    arco.tipos.add(asociacion);
+											    msAsociados.add(msTemp.name);									    
+											    microservicio.relaciones.add(arco);
+											}
+							invocacion.fromMethod.microservicio = microservicio.name;
+							invocacion.toMethod.microservicio =	msTemp.name;										
+							microservicio.invocacionesServicios.add(invocacion);				
+						}
+					}
+				}
+				
+			}
+			
+	}	
+			
+		
+}
+
+// Obtiene los EJB conectados al EJB actual y verifica su % de acoplamiento
+operation target!Cluster darEjbsConectados(ejbVisitados : Set) : Set {
+	var ejbConectados = new Set;
+	ejbConectados.add(self);
+	ejbVisitados.add(self.name);
+		
+	("  -> Verificando conectados de EJB " + self.name).println();
+	var metricasConexionEJBActualOut = 
+		target!Metrica.allInstances().select(m | m.tipo = target!TipoMetrica#ClusterRelationConflictPercentageMeasureSource and m.eContainer().source.name = self.name);
+	
+	var metricasConexionEJBActualIn = 
+		target!Metrica.allInstances().select(m | m.tipo = target!TipoMetrica#ClusterRelationConflictPercentageMeasureTarget and m.eContainer().target.name = self.name);
+		
+	for (metricaConexion in metricasConexionEJBActualOut) {
+		
+		
+		var porcentajeAcoplamientoActual = (metricaConexion.valor * 100).intValue();
+		var arco = metricaConexion.eContainer();		
+		var metricasConexionContraria = 
+			target!Metrica.allInstances().select(m | m.tipo = target!TipoMetrica#ClusterRelationConflictPercentageMeasureTarget and m.eContainer().source.name = self.name and  m.eContainer().target.name = arco.target.name).first();
+	
+		var porcentajeAcoplamientoActualOtroLado = (metricasConexionContraria.valor * 100).intValue();
+		
+		("  - - out " + arco.target.name + " " + metricaConexion.valor * 100 + " " + metricasConexionContraria.valor * 100).println();
+		if(porcentajeAcoplamientoActual >= porcentajeAcoplamientoMicroservicios or porcentajeAcoplamientoActualOtroLado >= porcentajeAcoplamientoMicroservicios) {
+			if (ejbVisitados->includes(arco.target.name)) {				
+				continue;
+			}
+			
+			ejbConectados.add(arco.target);
+			ejbVisitados.add(arco.target.name);
+			ejbConectados.addAll(arco.target.darEjbsConectados(ejbVisitados));
+		} 
+	}
+	
+	for (metricaConexion in metricasConexionEJBActualIn) {
+		
+		var porcentajeAcoplamientoActual = (metricaConexion.valor * 100).intValue();
+		var arco = metricaConexion.eContainer();		
+		var metricasConexionContraria = 
+			target!Metrica.allInstances().select(m | m.tipo = target!TipoMetrica#ClusterRelationConflictPercentageMeasureSource and m.eContainer().target.name = self.name and  m.eContainer().source.name = arco.source.name).first();
+	
+		var porcentajeAcoplamientoActualOtroLado = (metricasConexionContraria.valor * 100).intValue();
+		
+		("  - - in " + arco.source.name + " " + metricaConexion.valor * 100 + " " + metricasConexionContraria.valor * 100).println();
+		if(porcentajeAcoplamientoActual >= porcentajeAcoplamientoMicroservicios or porcentajeAcoplamientoActualOtroLado >= porcentajeAcoplamientoMicroservicios) {
+			if (ejbVisitados->includes(arco.source.name)) {				
+				continue;
+			}
+			
+			ejbConectados.add(arco.source);
+			ejbVisitados.add(arco.source.name);
+			ejbConectados.addAll(arco.source.darEjbsConectados(ejbVisitados));
+		} 
+	}
+	
+	return ejbConectados;
+}
+
+//Obtiene las relaciones de cada cluster 
+operation target!Cluster GetRelationsCluster(classLR: Sequence, nodosCluster: Sequence){
+	var relations = classLR.select(x | x.`from`.name == self.name);
+	
+	for(rel in relations){
+	    var dep = new target!Arco();
+	    
+	    var ClusterTarg = nodosCluster.select(x | x.name == rel.`to`.name).first();
+	    dep.target =  ClusterTarg;
+	    dep.source = self;
+	    
+	    dep.tipos.add(asociacion);
+	    dep.CreateMeasuresRelationsCluster(rel, ClusterTarg, self);   
+	    dep.CreateInterseptions(ClusterTarg, self);
+		self.relaciones.add(dep);
+	}
+}
+
+//adiciona las clases comunes entre clusters, se hace por cada relacion entre cluster existentes
+operation target!Arco CreateInterseptions (clusterTarget: target!Cluster, clusterSource: target!Cluster) {
+	var	clasesClusterTarget = clusterTarget.elementos.select(x| x.isTypeOf(target!ClaseR))->asSet();
+	var	clasesClusterSource = clusterSource.elementos.select(x| x.isTypeOf(target!ClaseR))->asSet();
+	
+ 	var intersect = new Set;	
+ 	intersect.addAll(clasesClusterTarget->select(c|clasesClusterSource->includes(c)));
+ 	var Interception = new target!Intercepcion();
+ 	Interception.name = clusterTarget.name + " - " + clusterSource.name;	
+ 	Interception.arco = self;
+ 	
+ 	for(inter in intersect){
+ 		inter.compartida = "true";
+ 		Interception.elementos.add(inter);
+ 	}
+ 	
+ 	app.hijos.add(Interception);
+}
+
+//asocia metricas de relaciones - arcos
+operation target!Arco CreateMeasuresRelationsCluster(relation: kdmMicro!ClusterRelation, clusterTarget: target!Cluster, clusterSource: target!Cluster){
+	
+	if(kdmMicro!MofElement.allInstances().exists(x | x.element.isTypeOf(kdmMicro!ClusterRelation) and x.element.equals(relation)))
+	{
+		var mofElement = kdmMicro!MofElement.allInstances().select(x | x.element.isTypeOf(kdmMicro!ClusterRelation) and x.element.equals(relation)).first();
+		var measurant = mofElement.measurant;
+		
+		for(m in measurant)
+		{  
+			var tipoPor = "";
+			var met1 = new target!Metrica();
+			met1.valor = m.value.asDouble();
+			
+			if(m.isTypeOf(kdmMicro!DimensionalToObjectMeasurement))
+			{
+				
+				if(m.object.name.equals(clusterTarget.name))
+				{
+					tipoPor = "1";
+				}
+				else if(m.object.name.equals(clusterSource.name))
+				{
+					tipoPor = "2";
+				}
+			}
+			
+			met1.SetTipoMetrics(m.measure, tipoPor);
+			
+			
+			self.metricas.add(met1);
+		}
+	}
+}
+
+//Crea las dependencias para cada clase en el modelo
+//relaciones - arcos
+operation CreateDependecies(){
+
+	var classLR = kdmMicro!ClassLevelRelation.allInstances();
+	var nodosClases = target!ClaseR.allInstances();
+	
+	for(nodo in nodosClases)
+	{	
+		nodo.GetRelationsClass(classLR, nodosClases);
+	}
+	
+	CreateClasesHeredadas();	
+}
+
+// Instancia las interfaces heradadas de cada ejb
+operation CreateClasesHeredadas(){
+
+	var ejbs = target!ClaseR.allInstances().select(c | c.isService = "true" and c.isInterface = "false");
+	for (ejb in ejbs) {
+		ejb.clasesHeredadas = new Set;		
+		var claseOriginal = kdmMicro!ClassUnit.allInstances().select(c | c.name = ejb.name).first();		
+		if (claseOriginal.clasesHeredadas.isDefined()){
+			for (interfaceOriginal in claseOriginal.clasesHeredadas) {
+				var interface = target!ClaseR.allInstances().select(c | c.name = interfaceOriginal.name).first();
+				ejb.clasesHeredadas.add(interface);
+			}
+		}
+	}
+	
+}
+
+//Obtiene las relaciones de cada clase 
+operation target!Nodo GetRelationsClass(classLR: Sequence, nodosClases: Sequence){
+	var relations = classLR.select(x | x.`from`.name == self.name);
+	for(rel in relations){
+	    var ClaseTarg = nodosClases.select(x | x.name == rel.`to`.name).first();
+	    
+	    if(ClaseTarg.isDefined())
+	    {
+	    	var dep = new target!Arco();
+		    dep.target =  ClaseTarg;
+		    dep.source = self;
+		    dep.CreateMeasuresRelations(rel);
+		    
+		    for(t in rel.typeRelations){
+		    	dep.AddTypeRelation(t);
+		    	if (t.name = 'Uses' and t.esEntreMetodos = 'true') {
+		    	        ('*********Llamado metodos*******').println();
+				    	var call = t.call;
+				    	var callTo = call.`to`;
+						var callFrom = call.`from`.getMethodUnit();
+						var callFromClass = call.`from`.getClassUnit();
+						var callToClass = call.`to`.getClassUnit();
+						var callToType = callTo.`type`.`parameterUnit`;
+						var callFromType = callFrom.`type`.`parameterUnit`;
+			
+						var parametrosFrom = new Set;
+						for (pu in callFromType->select(p | p.isTypeOf(kdmMicro!ParameterUnit) and not (p.name = null or p.name = '') and not p.type.isTypeOf(kdmMicro!VoidType))){				  
+						   var class = pu.`type`;
+						   if (class.isTypeOf(kdmMicro!PrimitiveType) or class.isTypeOf(kdmMicro!TemplateParameter) or class.isTypeOf(kdmMicro!FloatType) or class.isTypeOf(kdmMicro!IntegerType)  or class.isTypeOf(kdmMicro!TemplateType) or class.isTypeOf(kdmMicro!ClassUnit) or class.isTypeOf(kdmMicro!InterfaceUnit) or class.isTypeOf(kdmMicro!TemplateUnit) ) {
+							   var paquete = class.getPackage();
+							   var atributoCM = new target!AtributoCM();
+							   atributoCM.name = pu.name;
+							   atributoCM.type = paquete + class.name;
+							   parametrosFrom.add(atributoCM);					  
+						   }						   
+						   else if (not class.isTypeOf(kdmMicro!VoidType)) {
+						   		class.println();
+						   	   var atributoCM = new target!AtributoCM();
+							   atributoCM.name = pu.name;
+							   atributoCM.type = 'UK';
+							   parametrosFrom.add(atributoCM);
+						   }
+						}
+				
+						var typoRetornoFrom = '';			
+						for (pu in callFromType->select(p | p.isTypeOf(kdmMicro!ParameterUnit) and (p.name = '' or p.name = null))){				  
+						   var class = pu.`type`;
+						   if (class.isTypeOf(kdmMicro!PrimitiveType) or class.isTypeOf(kdmMicro!TemplateParameter) or class.isTypeOf(kdmMicro!FloatType) or class.isTypeOf(kdmMicro!IntegerType)  or class.isTypeOf(kdmMicro!TemplateType) or class.isTypeOf(kdmMicro!ClassUnit) or class.isTypeOf(kdmMicro!InterfaceUnit) or class.isTypeOf(kdmMicro!TemplateUnit)  ) {
+							   typoRetornoFrom = class.getPackage() + class.name;					  				  
+						   }
+						   else if (class.isTypeOf(kdmMicro!VoidType)) {
+						   		typoRetornoFrom = 'void';
+						   }
+						   
+						   else  {
+						   
+						   	typoRetornoFrom = 'UK';
+						   }
+						   
+						}	
+				
+						var parametrosTo= new Set;						
+						for (pu in callToType->select(p | p.isTypeOf(kdmMicro!ParameterUnit) and not (p.name = '' or p.name = null) and not p.type.isTypeOf(kdmMicro!VoidType))){
+						  
+						   var class = pu.`type`;
+						  					  				  
+						   if (class.isTypeOf(kdmMicro!PrimitiveType) or class.isTypeOf(kdmMicro!TemplateParameter) or class.isTypeOf(kdmMicro!FloatType) or class.isTypeOf(kdmMicro!IntegerType) or class.isTypeOf(kdmMicro!TemplateType) or class.isTypeOf(kdmMicro!ClassUnit) or class.isTypeOf(kdmMicro!InterfaceUnit) or class.isTypeOf(kdmMicro!TemplateUnit)) {
+							   var paquete = class.getPackage();
+							   var atributoCM = new target!AtributoCM();
+							   atributoCM.name = pu.name;
+							   atributoCM.type = paquete + class.name;
+							   parametrosTo.add(atributoCM);
+						   }
+						   else {
+						   	   var atributoCM = new target!AtributoCM();
+							   atributoCM.name = pu.name;
+							   atributoCM.type = 'UK';
+							   parametrosTo.add(atributoCM);
+						   }
+						}
+				
+						var typoRetornoTo = '';		
+						for (pu in callToType->select(p | p.isTypeOf(kdmMicro!ParameterUnit) and (p.name = '' or p.name = null))){
+						  
+						   var class = pu.`type`;
+						  
+						   if (class.isTypeOf(kdmMicro!PrimitiveType) or class.isTypeOf(kdmMicro!TemplateParameter) or class.isTypeOf(kdmMicro!FloatType) or class.isTypeOf(kdmMicro!IntegerType) or class.isTypeOf(kdmMicro!TemplateType) or class.isTypeOf(kdmMicro!ClassUnit) or class.isTypeOf(kdmMicro!InterfaceUnit) or class.isTypeOf(kdmMicro!TemplateUnit) ) {
+							   typoRetornoTo = class.getPackage() + class.name;
+						   }
+						    else if (class.isTypeOf(kdmMicro!VoidType)) {
+						   		typoRetornoTo = 'void';
+						   }
+						   else {
+						   	typoRetornoTo = 'UK';
+						   }
+						}
+				
+						var visibilidadFrom = callFrom.export + '';
+						var visibilidadTo = callTo.export + '';
+				
+						('- Metodo invocador (clase ' + callFromClass.name+ ' ): ').println();
+						(visibilidadFrom + ' ' + typoRetornoFrom + ' ' + callFrom.name + '(' ).println();
+						for (atr in parametrosFrom) {
+							(' ' + atr.type + ' ' + atr.name ).println();
+						}
+						');'.println();
+						
+						('- Metodo invocado: (clase ' + callToClass.name+ ' ): ').println();
+						(visibilidadTo + ' ' + typoRetornoTo + ' ' + callTo.name + '(' ).println();
+						for (atr in parametrosTo) {
+							(' ' + atr.type + ' ' + atr.name ).println();
+						}
+						');'.println();
+						
+		    	
+			    		var inv = new target!Invocacion();
+			    		
+			    		var metodoFrom = new target!Metodo();
+			    		var metodoTo = new target!Metodo();
+			    		
+			    		metodoFrom.nombreMetodo = callFrom.name;
+			    		metodoFrom.clase = self;
+			    		metodoFrom.visibility = visibilidadFrom;
+			    		metodoFrom.returnType = typoRetornoFrom;
+			    		metodoFrom.atributosIn = parametrosFrom;
+			    		
+			    		metodoTo.nombreMetodo = callTo.name;
+			    		metodoTo.clase = ClaseTarg;
+			    		metodoTo.visibility = visibilidadTo;
+			    		metodoTo.returnType = typoRetornoTo;
+			    		metodoTo.atributosIn = parametrosTo;
+			    		
+			    		inv.fromMethod = metodoFrom;
+			    		inv.toMethod = metodoTo;
+		    		
+		    			dep.invocaciones.add(inv);
+		    	}
+		    	
+		    }	    
+		   
+			self.relaciones.add(dep);
+	    }
+	}
+}
+
+//Obtiene la clase "CodeItem" que contiene o a la que pertenece el AbstractCodeElement 
+operation kdmMicro!AbstractCodeElement getParentClassUnit() : kdmMicro!CodeItem{
+	var class = self;
+	while (not (class.isTypeOf(kdmMicro!PrimitiveType) or class.isTypeOf(kdmMicro!TemplateParameter) or class.isTypeOf(kdmMicro!FloatType) or class.isTypeOf(kdmMicro!IntegerType) or class.isTypeOf(kdmMicro!VoidType) or class.isTypeOf(kdmMicro!TemplateType) or class.isTypeOf(kdmMicro!ClassUnit) or class.isTypeOf(kdmMicro!InterfaceUnit) or class.isTypeOf(kdmMicro!TemplateUnit))){
+			class = class.eContainer();
+	}
+	return class;
+}
+
+ 
+operation kdmMicro!AbstractCodeElement getMethodUnit() : kdmMicro!CodeItem{
+	var class = self;
+	while (not (class.isTypeOf(kdmMicro!MethodUnit))){
+			class = class.eContainer();
+	}
+	return class;
+}
+
+operation kdmMicro!AbstractCodeElement getClassUnit() : kdmMicro!CodeItem{
+	var class = self;
+	while (not (class.isTypeOf(kdmMicro!TemplateType) or class.isTypeOf(kdmMicro!ClassUnit) or class.isTypeOf(kdmMicro!InterfaceUnit) or class.isTypeOf(kdmMicro!TemplateUnit))){
+			class = class.eContainer();
+	}
+	return class;
+}
+
+
+operation kdmMicro!AbstractCodeElement getPackage() : String{
+	var paquete = '';
+	var pack = self.eContainer();
+	while ((pack.isTypeOf(kdmMicro!Package))){			
+			paquete = pack.name + "." + paquete ;
+			pack = pack.eContainer();
+	}
+	return paquete;
+}
+
+
+//asocia metricas de relaciones - arcos
+operation target!Arco CreateMeasuresRelations(relation: kdmMicro!ClassLevelRelation){
+	
+	if(kdmMicro!MofElement.allInstances().exists(x | x.element.isTypeOf(kdmMicro!ClassLevelRelation) and x.element.equals(relation)))
+	{
+		var mofElement = kdmMicro!MofElement.allInstances().select(x | x.element.isTypeOf(kdmMicro!ClassLevelRelation) and x.element.equals(relation)).first();
+		var measurant = mofElement.measurant;
+		
+		for(m in measurant)
+		{
+			var met1 = new target!Metrica();
+			met1.valor = m.value.asDouble();
+			met1.SetTipoMetrics(m.measure, "");
+			self.metricas.add(met1);
+		}
+	}
+}
+
+/*Adiciona a un arco el tipo de relacion segun modelo visualizacion*/
+operation target!Arco AddTypeRelation(relation: kdmMicro!TypeRelation){
+	
+	if(relation.name == "Containment")
+	{
+		self.tipos.add(composicion);
+	}
+	else if(relation.name == "Uses")
+	{
+		self.tipos.add(dependencia);
+	}
+	else if(relation.name == "Implements")
+	{
+		self.tipos.add(generalizacion);
+	}
+	else if(relation.name == "Extends")
+	{
+		self.tipos.add(generalizacion);
+	}
+}
+
+operation crearTablasCompartidasMicroservicios() {
+	var tablasMicroservicios = new Map;
+	var microservicios = target!Microservicio.allInstances();
+	
+	for (microservicio in microservicios) {
+		for (clase in microservicio.clases) {
+			for (tabla in clase.tablasAccedidas){
+				if (tablasMicroservicios.containsKey(tabla.name)){
+					("" + tabla.name).println(" Existe Tabla");
+					tablasMicroservicios.put(tabla.name, tablasMicroservicios.get(tabla.name) + 1);
+				}
+				else{
+					("" + tabla.name).println(" No Existe Tabla");
+					tablasMicroservicios.put(tabla.name, 1);
+				}
+			}
+		}
+	}
+		
+	var arco;
+	var tabla;
+	var tablaKey;
+	var tablaCompartida;
+	var it = tablasMicroservicios.keySet().iterator();
+	while (it.hasNext()) {
+		tablaKey = it.next();
+		
+		if (tablasMicroservicios.get(tablaKey) > 1){
+			(" Es compartida Por: ").println(tablaKey);
+			tablaCompartida = new target!Tabla();
+			tablaCompartida.name = tablaKey;
+			for (microservicio in microservicios) {
+				for (clase in microservicio.clases) {
+					tabla = clase.tablasAccedidas->select(t | t.name == tablaKey).first();
+					if (tabla.isDefined()){
+						for (tipoQuery in tabla.tiposQuery) {
+							if (tipoQuery.tipo == target!TipoQueryEnum#Create){
+								if (not(microservicio.relaciones->select(r | r.target.name == tablaCompartida.name and r.tipos.first().isTypeOf(target!Create)).first().isDefined())){
+									("    ").println(microservicio.name + " - CREATE    ");
+									arco = new target!Arco;
+									arco.target =  tablaCompartida;
+								    arco.source = microservicio;
+								    arco.tipos.add(create);	
+								}	
+							}
+							else if (tipoQuery.tipo == target!TipoQueryEnum#Read){
+								if (not(microservicio.relaciones->select(r | r.target.name == tablaCompartida.name and r.tipos.first().isTypeOf(target!Read)).first().isDefined())){
+									("    ").println(microservicio.name + " - READ    ");
+									arco = new target!Arco;
+									arco.target =  tablaCompartida;
+								    arco.source = microservicio;
+								    arco.tipos.add(read);
+								}
+							}
+							else if (tipoQuery.tipo == target!TipoQueryEnum#Update){
+								if (not(microservicio.relaciones->select(r | r.target.name == tablaCompartida.name and r.tipos.first().isTypeOf(target!Update)).first().isDefined())){
+									("    ").println(microservicio.name + " - UPDATE    ");
+									arco = new target!Arco;
+									arco.target =  tablaCompartida;
+								    arco.source = microservicio;
+								    arco.tipos.add(update);
+								}
+							}
+							else if (tipoQuery.tipo == target!TipoQueryEnum#Delete){
+								if (not(microservicio.relaciones->select(r | r.target.name == tablaCompartida.name and r.tipos.first().isTypeOf(target!Delete)).first().isDefined())){
+									("    ").println(microservicio.name + " - DELETE    ");
+									arco = new target!Arco;
+									arco.target =  tablaCompartida;
+								    arco.source = microservicio;
+								    arco.tipos.add(deleteR);
+								}
+							}
+						    microservicio.relaciones.add(arco);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+// Extrae las sentencias sql del archivo de log y los asocia a la clase que la ejecuta
+operation crearTablasAccedidasClase() {
+	var i = 0;
+    var parser = new Native("clusterer.SQLParser");
+	var clasesTablas = parser.analyzeSQL(rutaLogsSQL);
+    
+    var claseR = new target!ClaseR();
+    claseR.name = "CandidatoHibernateDAO";
+    
+	var it = clasesTablas.keySet().iterator();
+	while (it.hasNext()) {
+		var claseTabla = it.next();
+		var nombreClase = claseTabla;
+
+		" ".println("Clase: " + nombreClase);
+		//Se buscan todas las ClasesR para adicionarle a todas las tablas
+		var clasesR = target!ClaseR.allInstances()->select(c | c.name == nombreClase);
+		(" " + clasesR.size()).println(" Clases Repetidas");
+		//Si encontro alguna coincidencia en las ClasesR ingresa, de lo contrario no
+		if (claseR.size() > 0){
+			//Se recorren todas las tablas a las que accede una ClaseR
+			for (relacionTabla in clasesTablas.get(claseTabla)){
+				" ".println("Tabla: " + relacionTabla.tabla + " - TipoRelacion: " + relacionTabla.tipoRelacion);
+				for(claseR in clasesR){
+					var tabla = null;
+					var tipoQuery = null;
+					//if (not(tabla.isDefined())){
+					//	"    tablaNula".println();
+					//}
+					if (claseR.tablasAccedidas.isDefined()){
+						"    TablasAccedidas definidas".println();
+						tabla = claseR.tablasAccedidas->select(c | c.name == relacionTabla.tabla).first(); 
+						if (tabla.isDefined()){
+							"    Tabla definida".println();
+						}
+						else {
+							"    Tabla no definida".println();
+							tabla = new target!Tabla();
+							tabla.name = relacionTabla.tabla;
+							tabla.tiposQuery = new Set;
+						}
+					}
+					else{
+						"    TablasAccedidas no definidas".println();
+						claseR.tablasAccedidas = new Set;
+						tabla = new target!Tabla();
+						tabla.name = relacionTabla.tabla;
+						tabla.tiposQuery = new Set;
+					}
+
+					if (relacionTabla.tipoRelacion == "select"){
+						"    Relacion Select".println();
+						tipoQuery = tabla.tiposQuery->select(c | c.tipo == target!TipoQueryEnum#Read).first();
+						if (not(tipoQuery.isDefined())){
+							"    ADD Select".println();
+							tipoQuery = new target!TipoQuery();
+							tipoQuery.cantidad = 1.asDouble();
+							tipoQuery.tipo = target!TipoQueryEnum#Read;
+							tabla.tiposQuery.add(tipoQuery);
+						}
+						else {
+							"    ADD Select EXISTE".println();
+							tipoQuery.cantidad = tipoQuery.cantidad + 1.asDouble();
+						}
+					}
+					else if(relacionTabla.tipoRelacion == "create"){
+						"    Relacion Create".println();
+						tipoQuery = tabla.tiposQuery->select(c | c.tipo == target!TipoQueryEnum#Create).first();
+						if (not(tipoQuery.isDefined())){
+							"    ADD Create".println();
+							tipoQuery = new target!TipoQuery();
+							tipoQuery.cantidad = 1.asDouble();
+							tipoQuery.tipo = target!TipoQueryEnum#Create;
+							tabla.tiposQuery.add(tipoQuery);
+						}
+						else {
+							"    ADD Create EXISTE".println();
+							tipoQuery.cantidad = tipoQuery.cantidad + 1.asDouble();
+						}
+					}
+					//else if(relacionTabla.tipoRelacion == "expression"){
+						//"Relacion Expression".println();
+						//if (not(tabla.tiposQuery->exists(c | c.isTypeOf(target!TipoInvocacion#Expression)))){
+						//	tabla.tiposQuery.add(tabla.name = target!TipoInvocacion#Expression);
+						//}
+					//}	
+					else if(relacionTabla.tipoRelacion == "replace"){
+						"    Relacion Replace1".println();
+						tipoQuery = tabla.tiposQuery->select(c | c.tipo == target!TipoQueryEnum#Update).first();
+						if (not(tipoQuery.isDefined())){
+							"    ADD Update".println();
+							tipoQuery = new target!TipoQuery();
+							tipoQuery.cantidad = 1.asDouble();
+							tipoQuery.tipo = target!TipoQueryEnum#Update;
+							tabla.tiposQuery.add(tipoQuery);
+						}
+						else {
+							"    ADD Update EXISTE".println();
+							tipoQuery.cantidad = tipoQuery.cantidad + 1.asDouble();
+						}
+					}	
+					else if(relacionTabla.tipoRelacion == "insert"){
+						"    Relacion Insert".println();
+						tipoQuery = tabla.tiposQuery->select(c | c.tipo == target!TipoQueryEnum#Create).first();
+						if (not(tipoQuery.isDefined())){
+							"    ADD Insert".println();
+							tipoQuery = new target!TipoQuery();
+							tipoQuery.cantidad = 1.asDouble();
+							tipoQuery.tipo = target!TipoQueryEnum#Create;
+							tabla.tiposQuery.add(tipoQuery);
+						}
+						else {
+							"    ADD Insert EXISTE".println();
+							tipoQuery.cantidad = tipoQuery.cantidad + 1.asDouble();
+						}
+					}	
+					else if(relacionTabla.tipoRelacion == "update"){
+						"    Relacion Update2".println();
+						tipoQuery = tabla.tiposQuery->select(c | c.tipo == target!TipoQueryEnum#Update).first();
+						if (not(tipoQuery.isDefined())){
+							"    ADD Update".println();
+							tipoQuery = new target!TipoQuery();
+							tipoQuery.cantidad = 1.asDouble();
+							tipoQuery.tipo = target!TipoQueryEnum#Update;
+							tabla.tiposQuery.add(tipoQuery);
+						}
+						else {
+							"    ADD Update EXISTE".println();
+							tipoQuery.cantidad = tipoQuery.cantidad + 1.asDouble();
+						}
+					}	
+					else if(relacionTabla.tipoRelacion == "delete"){
+						"    Relacion Delete".println();
+						tipoQuery = tabla.tiposQuery->select(c | c.tipo == target!TipoQueryEnum#Delete).first();
+						if (not(tipoQuery.isDefined())){
+							"    ADD Delete".println();
+							tipoQuery = new target!TipoQuery();
+							tipoQuery.cantidad = 1.asDouble();
+							tipoQuery.tipo = target!TipoQueryEnum#Delete;
+							tabla.tiposQuery.add(tipoQuery);
+						}
+						else {
+							"    ADD Delete EXISTE".println();
+							tipoQuery.cantidad = tipoQuery.cantidad + 1.asDouble();
+						}
+					}					
+					claseR.tablasAccedidas.add(tabla);
+					//" claseR ".println(claseR.name);
+					//" tablasAcceditas ".println(claseR.tablasAccedidas.size());
+				}
+			}
+		}
+		//" ".println("Clase: " + clase + " -> Valor: " + clasesTablas.get(clase));
+	}
+	
+	//("Resultado analisis sql: " + clasesTablas).println();
+}

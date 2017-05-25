@@ -1,0 +1,492 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: MergeUnmatched.eml 136 2011-09-09 18:42:00Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation
+ ******************************************************************************/
+ 
+/****h* Merge/Unmatched
+ *  NAME
+ *   Unmatched
+ * SUMMARY
+ *   Transofrm elements that are not matched ($Rev: 136 $).
+ * DESCRIPTION
+ *   Elements that are not matched must be transformed from the structural and
+ *  the behavior models into the merged model.
+ *
+ * DOMAIN
+ * 		* HiLeSS - http://hiles.uniandes.edu.co/1.1/HiLeS
+ * 		* HiLeSB - http://hiles.uniandes.edu.co/1.1/HiLeS
+ * 		* HiLeSM - http://hiles.uniandes.edu.co/1.1/HiLeS
+ ******
+ */
+ 
+/****r* Unmatched/UnmatchedService
+ * SUMMARY
+ *   Transfotrm a HiLeS Service to a HiLeS Service
+ * DESCRIPTION 
+ *   Unmatched Services are the ones that exist in only one of the input models. 
+ *  These Services must be copied directly to the merged model, hence the transforamtion
+ *  only performs a copy of the properties. 
+ * SEE ALSO
+ *   	* MergeArchitecture
+ * 
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ * SPECIFICATION
+ 		relation UnmatchedService
+   		{
+    		checkonly domain HiLeS umservice:Service {
+				architecture = umservicea:Architecture{}
+				name = umservicen,
+				direction = umservicedir,
+			}
+      		enforce domain HiLeS service:Service {
+				architecture = servicea:Architecture{}
+				name = umservicen,
+				direction = umservicedir,
+			}
+ 			when {
+         		MergeArchitecture(umservicea, umservicea, servicea)
+      		}
+   		}
+ *
+ ******
+ */
+rule UnmatchedService
+	transform umservice : HiLeS!Service
+	to service : HiLeSM!Service {
+		
+		service.name = umservice.name;
+		service.direction = umservice.direction;
+		service.size = umservice.size;
+	}
+	
+/****r* Unmatched/UnmatchedPort
+ * SUMMARY
+ *   Transfotrm a HiLeS Port to a HiLeS Port
+ * DESCRIPTION 
+ *   Unmatched Ports are the ones that exist in only one of the input models. 
+ *  These Ports must be copied directly to the merged model, hence the transforamtion
+ *  only performs a copy of the properties.
+ * SEE ALSO
+ *   	* MergeStructuralBlocks
+ * 
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ * SPECIFICATION
+ 		relation UnmatchedPort
+   		{
+    		checkonly domain HiLeS umport:Port {
+				block = umportb:Block{},
+				name = umportn,
+				direction = umportdir,
+			}
+      		enforce domain HiLeS port:Port {
+				block = portb:Block{},
+				name = umportn,
+				direction = umportdir,
+			}
+ 			when {
+         		MergeStructuralBlocks(umportb, umportb, port)
+      		}
+   		}
+ *
+ ******
+ */
+ rule UnmatchedPort
+	transform umport : HiLeS!Port
+	to port : HiLeSM!Port {
+	
+		port.name = umport.name;
+		port.direction = umport.direction;
+		port.size = umport.size;
+	}
+
+/****r* Unmatched/UnmatchedDigitalPayload
+ * SUMMARY
+ *   Transfotrm a HiLeS Payload to a HiLeS Payload
+ * DESCRIPTION 
+ *   Unmatched Payloads are the ones that exist in only one of the input models. 
+ *  These Payloads must be copied directly to the merged model, hence the transforamtion
+ *  only performs a copy of the properties.
+ * SEE ALSO
+ *   	* MergeArchitecture
+ *   	* MergePorts
+ *   	* MergeServices
+ * 
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+rule UnmatchedDigitalPayload
+	transform umpayload : HiLeS!DigitalPayload
+	to payload : HiLeSM!DigitalPayload {
+		
+		payload.name = umpayload.name;
+		payload.type = umpayload.type;
+		payload.source ::= umpayload.source;
+		payload.target ::= umpayload.target;
+		payload.size = umpayload.size;
+	}
+
+/****r* Unmatched/UnmatchedAnalogPayload
+ * SUMMARY
+ *   Transfotrm a HiLeS Payload to a HiLeS Payload
+ * DESCRIPTION 
+ *   Unmatched Payloads are the ones that exist in only one of the input models. 
+ *  These Payloads must be copied directly to the merged model, hence the transforamtion
+ *  only performs a copy of the properties.
+ * SEE ALSO
+ *   	* MergeArchitecture
+ *   	* MergePorts
+ *   	* MergeServices
+ * 
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+rule UnmatchedAnalogPayload
+	transform umpayload : HiLeS!AnalogPayload
+	to payload : HiLeSM!AnalogPayload {
+		
+		payload.name = umpayload.name;
+		payload.type = umpayload.type;
+		payload.source ::= umpayload.source;
+		payload.target ::= umpayload.target;
+		payload.size = umpayload.size;
+	}
+
+rule UnmatchedNodePayload
+	transform umpayload : HiLeS!NodePayload
+	to payload : HiLeSM!NodePayload {
+		
+		payload.name = umpayload.name;
+		payload.type = umpayload.type;
+		payload.source ::= umpayload.source;
+		payload.target ::= umpayload.target;
+		payload.size = umpayload.size;
+	}
+
+rule UnmatchedTerminalPayload
+	transform umpayload : HiLeS!TerminalPayload
+	to payload : HiLeSM!TerminalPayload {
+		
+		payload.name = umpayload.name;
+		payload.type = umpayload.type;
+		payload.source ::= umpayload.source;
+		payload.target ::= umpayload.target;
+		payload.size = umpayload.size;
+	}
+	
+/****r* Unmatched/UnmatchedFunctional
+ * SUMMARY
+ *   Transfotrm a HiLeS Functional to a HiLeS Functional
+ * DESCRIPTION 
+ *   Unmatched Functional are the ones that exist in the behavior model. These
+ *  Functional must be copied directly to the merged model, hence the transforamtion
+ *  only performs a copy of the properties.
+ * SEE ALSO
+ *   	* MergeArchitecture
+ *   	* MergePorts
+ *   	* MergeServices
+ * 
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ * SPECIFICATION
+ 		relation UnmatchedFunctional
+   		{
+    		checkonly domain HiLeS umfunc:Functional {
+				architecture = umfunca:Architecture{}
+				name = umfuncn,
+				id = umfuncid,
+				associated = umfuncassoc,
+				ports = umfuncpts:Port{},
+			}
+      		enforce domain HiLeS func:Functional {
+				architecture = funca:Architecture{}
+				name = umfuncn,
+				id = umfuncid,
+				associated = funcassoc,
+				ports = funcpts:Port{},
+			}
+ 			when {
+         		MergeArchitecture(umfunca, umfunca, funca)
+      		}
+			where {
+				UnmatchedPorts(umfuncpts, funcpts)
+				UnmatchedPlaces(umfuncassoc, umfuncassoc)
+			}
+   		}
+ *
+ ******
+ */
+rule UnmatchedFunctional
+	transform umfunc : HiLeS!Functional
+	to func : HiLeSM!Functional {
+		
+		func.name = umfunc.name;
+		func.associated ::= umfunc.associated;
+		func.port.addAll(umfunc.port.equivalent());
+	}
+
+/****r* Unmatched/UnmatchedDecision
+ * SUMMARY
+ *   Transfotrm a HiLeS Decision to a HiLeS Decision
+ * DESCRIPTION 
+ *   Unmatched Decision are the ones that exist in the behavior model. These
+ *  Decision must be copied directly to the merged model, hence the transforamtion
+ *  only performs a copy of the properties.
+ * SEE ALSO
+ *   	* MergeArchitecture
+ *   	* MergePorts
+ *   	* MergeServices
+ * 
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+rule UnmatchedDecision
+	transform umfunc : HiLeSB!Decision
+	to dec : HiLeSM!Decision
+	{
+		dec.name = umfunc.name;
+		dec.associated ::= umfunc.associated;
+		dec.port.addAll(umfunc.port.equivalent());
+		dec.`guard`.addAll(umfunc.`guard`.equivalent());
+	}
+
+/****r* Unmatched/UnmatchedGuard
+ * SUMMARY
+ *   Transfotrm a HiLeS Guard to a HiLeS Guard
+ * DESCRIPTION 
+ *   Unmatched Guard are the ones that exist in the behavior model. These
+ *  Guard must be copied directly to the merged model, hence the transforamtion
+ *  only performs a copy of the properties.
+ * SEE ALSO
+ *   	* MergeArchitecture
+ *   	* MergePorts
+ *   	* MergeServices
+ * 
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ *
+ ******
+ */
+rule UnmatchedGuard
+	transform umguard : HiLeSB!Guard
+	to g : HiLeSM!Guard
+	{
+		//g.name = umguard.name;
+		g.value = umguard.value;
+		g.isDefault = umguard.isDefault;
+		g.guardPort ::= umguard.guardPort;
+	} 
+	
+/****r* Unmatched/UnmatchedPetriNet
+ * SUMMARY
+ *   Transfotrm a HiLeS PetriNet to a HiLeS PetriNet
+ * DESCRIPTION 
+ *   Unmatched Petri Nets are the ones that exist in the behavior model. These
+ *  Petri Nets must be copied directly to the merged model, hence the transforamtion
+ *  only performs a copy of the elements.
+ * SEE ALSO
+ *   	* UnmatchPlaces
+ *      * UnmatchedTransitions
+ *      * UnmatchedArcs
+ * 
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ * SPECIFICATION
+ 		relation UnmatchedPetriNet
+   		{
+    		checkonly domain HiLeS umpn:PetriNet {
+				architecture = umpna:Architecture{}
+				elements = umpne:Element{},
+			}
+      		enforce domain HiLeS pn:PetriNet {
+				architecture = pna:Architecture{}
+				elements = pne:Element{},
+			}
+ 			when {
+         		MergeArchitecture(umpna, umpna, pna)
+      		}
+			where {
+				UnmatchedPlaces(umpne, pne)
+				UnmatchedTransitions(umpne, pne)
+				UnmatchedArcs(umpne, pne)
+			}
+   		}
+ *
+ ******
+ */
+rule UnmatchedPetriNet
+	transform umpn : HiLeSB!PetriNet
+	to pn : HiLeSM!PetriNet {
+		
+		pn.element.addAll(umpn.element.equivalent());
+	}
+
+/****r* Unmatched/UnmatchedTransition
+ * SUMMARY
+ *   Transfotrm a HiLeS Transition to a HiLeS Transition
+ * DESCRIPTION 
+ *   Unmatched Transitions are the ones that exist in the behavior model. These
+ *  Transitions must be copied directly to the merged model, hence the transforamtion
+ *  only performs a copy of the properties.
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ * SPECIFICATION
+ 		relation UnmatchedTransition
+   		{
+    		checkonly domain HiLeS umtran:Transition {
+				petrinet = umtranpn:PetriNet{},
+				id = umtranpnid,
+				name = umtranpnname,
+				min = umtranpnmin,
+				max = umtranpnmax,
+				unit = umtranpnunit,
+			}
+      		enforce domain HiLeS tran:Transition {
+				petrinet = tranpn:PetriNet{},
+				id = umtranpnid,
+				name = umtranpnname,
+				min = umtranpnmin,
+				max = umtranpnmax,
+				unit = umtranpnunit,
+			}
+ 			when {
+         		UnmatchPetriNet(umtranpn, tranpn)
+      		}
+   		}
+ *
+ ******
+ */
+rule Transition
+	transform umtran : HiLeSB!Transition
+	to tran : HiLeSM!Transition {
+
+		tran.name = umtran.name;
+		tran.min = umtran.min;
+		tran.max = umtran.max;
+		tran.unit = umtran.unit;
+	}
+
+/****r* Unmatched/UnmatchedPlace
+ * SUMMARY
+ *   Transfotrm a HiLeS Place to a HiLeS Place
+ * DESCRIPTION 
+ *   Unmatched Places are the ones that exist in the behavior model. These
+ *  Places must be copied directly to the merged model, hence the transforamtion
+ *  only performs a copy of the properties.
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ * SPECIFICATION
+ 		relation UnmatchedTransition
+   		{
+    		checkonly domain HiLeS umplace:Place {
+				petrinet = unplacepn:PetriNet{},
+				id = umplaceid,
+				name = umplacename,
+				hasToken = umplace,hasToken,
+			}
+      		enforce domain HiLeS place:Place {
+				petrinet = placepn:PetriNet{},
+				id = umplaceid,
+				name = umplacename,
+				hasToken = umplace,hasToken,
+			}
+ 			when {
+         		UnmatchPetriNet(untranpn, tranpn)
+      		}
+   		}
+ *
+ ******
+ */
+rule UnmatchedPlace
+	transform umplace : HiLeSB!Place
+	to place : HiLeSM!Place {
+		
+		place.name = umplace.name;
+		place.hasToken = umplace.hasToken;
+	}
+
+/****r* Unmatched/UnmatchedArc
+ * SUMMARY
+ *   Transfotrm a HiLeS Arc to a HiLeS Arc
+ * DESCRIPTION 
+ *   Unmatched Arcs are the ones that exist in the behavior model. These
+ *  Arcs must be copied directly to the merged model, hence the transforamtion
+ *  only performs a copy of the properties.
+ * DOMAIN
+ * 		* HiLeS	 - http://hiles.uniandes.edu.co/1.1/HiLeS
+ * SPECIFICATION
+ 		relation UnmatchedArc
+   		{
+    		checkonly domain HiLeS umarc:Arc {
+				petrinet = unarcpn:PetriNet{},
+				id = umarcid,
+				toNode = umarctoNode,
+				fromNode = umarcfromNode,
+				toPoint = umarctoPoint,
+				fromPoint = umarcfromPoint,
+			}
+      		enforce domain HiLeS arc:Arc {
+				petrinet = arcpn:PetriNet{},
+				id = umarc.id,
+				toNode ::= arctoNode,
+				fromNode ::= arcfromNode,
+				toPoint ::= arctoPoint,
+				fromPoint ::= arcfromPoint,
+			}
+ 			when {
+         		UnmatchPetriNet(unarcpn, arcpn)
+      		}
+			where {
+				if umarctoNode->notEmprty() then
+					UnmatchedPlace(arctoNode, umarctoNode);
+					UnmatchedTransition(arctoNode, umarctoNode);
+				endif
+				if umarcfromNode->notEmpty() then
+					UnmatchedPlace(arcfromNode, umarcfromNode);
+					UnmatchedTransition(arcfromNode, umarcfromNode);
+				endif
+				if umarctoPoint->notEmpry() then
+					UnmatchedService(arctoPoint, umarctoPoint);
+					UnmatchedPort(arctoPoint, umarctoPoint);
+				endif
+				if umarcfromPoint->notEmpty() then
+					UnmatchedService(arcfromPoint, umarcfromPoint);
+					UnmatchedPort(arcfromPoint, umarcfromPoint);
+				endif
+			}
+   		}
+ *
+ ******
+ */
+rule UnmatchedArc
+	transform umarc : HiLeSB!Arc
+	to ha : HiLeSM!Arc {
+		
+		//ha.id = umarc.id;
+		if(umarc.toNode.isDefined()) {
+			ha.toNode ::= umarc.toNode;
+		}
+		if(umarc.fromNode.isDefined()) {
+			ha.fromNode ::= umarc.fromNode;
+		}
+		if(umarc.toPoint.isDefined()) {
+			ha.toPoint ::= umarc.toPoint;
+		}
+		if(umarc.fromPoint.isDefined()) {
+			ha.fromPoint ::= umarc.fromPoint;
+		}
+	}

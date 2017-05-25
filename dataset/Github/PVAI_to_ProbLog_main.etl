@@ -1,0 +1,122 @@
+import "../problog/ProbLogUtil.eol";
+import "../problog/ProbLogRuleUtil.eol";
+import "../Constants.eol";
+
+pre {
+	"Starting transformation of PVAI to ProbLog...".println();
+	insertComment();
+	insertComment();
+	insertComment("PVAI");
+	insertComment();
+}
+
+post {
+	"Transformation completed!".println();
+}
+
+rule templateInstances
+	transform  inst : PVAI!TemplateInstance
+	to newRule : ProbLog!Rule {
+		var instId = inst.name;
+		var instTypeName = inst.definition.name;
+		newRule.atomArgumentFact(const().~TEMPLATE_INSTANCE,List{instId,instTypeName});
+		program().statements.add(newRule);
+}
+
+//concreteConnectionInstance(Role,instance(SourceKind,Source,SourceVariety,TInstance),instance(TargetKind,Target,TargetVariety,TInstance))
+//old: concreteConnectionInstance(Role,(SourceTypeInst,STemplateInst),(TargetTypeInst,TTemplateInst))
+rule templateConnections
+	transform conn : PVAI!ConnectionTemplate
+	to newRule : ProbLog!Rule {
+		var roleName = conn.definition.label;
+		var sourceTypeInstantiation = conn.source;
+		var sourceTemplateInstance = conn.eContainer(); 
+		var targetTypeInstantiation = conn.target;
+		var targetTemplateInstance = conn.targetOwner;
+		var concrete = conn.definition;
+		cheat(const().~CONCRETE_CONNECTION_INSTANCE.prologize()+"("+ 
+			roleName.prologize() + ", instance(" +
+				sourceTypeInstantiation.concretization.eClass().name.prologize() + ", " +
+				sourceTypeInstantiation.name.prologize() + ", " +
+				sourceTypeInstantiation.concretization.name.prologize() + ", " +
+				sourceTemplateInstance.name.prologize() + "), instance(" +
+				targetTypeInstantiation.concretization.eClass().name.prologize() + ", " +
+				targetTypeInstantiation.name.prologize() + ", " +
+				targetTypeInstantiation.concretization.name.prologize() + ", " +
+				targetTemplateInstance.name.prologize() + ")" + 
+			 ").");
+	}
+
+rule entryPoints
+	transform att : PVAI!Attacker
+	to /*unused*/ rules : List<ProbLog!Rule> {
+		for(ep in att.entryPoints){
+			addRuleWithAtoms(const().~ENTRYPOINT,List{ep.target.name, ep.definition.name, ep.targetTemplateInstance.name});
+		}
+}
+
+rule evidence
+	transform pvaiEv : PVAI!Evidence
+	to problogEv : List<ProbLog!Rule> {
+		var evidenceOwner = pvaiEv.eContainer();
+		var probabilisticProperty = pvaiEv.target;
+		var propOwner = pvaiEv.propertyOwner;
+		var containingConcreteType = probabilisticProperty.eContainer();
+		var evidenceTypePredicate = null;
+		if(pvaiEv.value==true){
+			evidenceTypePredicate = const().~HARD_EVIDENCE_TRUE;
+		}else{
+			evidenceTypePredicate = const().~HARD_EVIDENCE_FALSE;
+		}
+		if(containingConcreteType.isKindOf(PVAI!DefenceType)){
+			problogEv.add(
+				createRule(
+					getTerm(evidenceTypePredicate,1).getInstance(List{
+						getTerm(const().~INSTANCE,4).getInstance(List{
+							getAtom(const().~DEFENCE_TYPE),
+							getAtom(pvaiEv.propertyOwner.name),
+							getAtom(pvaiEv.propertyOwner.concretization.name),
+							getAtom(pvaiEv.eContainer().name)
+						})
+					})
+				)
+			);
+		}else if(containingConcreteType.isKindOf(PVAI!AttackStepType)){
+			problogEv.add(
+				createRule(
+					getTerm(evidenceTypePredicate,1).getInstance(List{
+						getTerm(const().~INSTANCE,4).getInstance(List{
+							getAtom(const().~ATTACKSTEP_TYPE),
+							getAtom(pvaiEv.propertyOwner.concretization.target.name),
+							getAtom(pvaiEv.propertyOwner.name),
+							getAtom(pvaiEv.eContainer().name)
+						})
+					})
+				)
+			);
+		}else{
+			containingConcreteType.println();
+			containingConcreteType.name.println();
+			throw "Unsupported evidence root: "+containingConcreteType;
+		}
+		program().statements.addAll(problogEv);
+}
+
+operation addRuleWithAtoms(term : String, args : List<String>){
+	var testRule = new ProbLog!Rule();
+	testRule.atomArgumentFact(term,args);
+	program().statements.add(testRule);
+}
+
+//
+// ProbLog generation rules and operations
+//
+
+operation program() : ProbLog!ProbLogProgram {
+	//Check whether a ProbLogProgram already exists
+	var program = ProbLog!ProbLogProgram->all()->first();
+	if(program == null){
+		program = new ProbLog!ProbLogProgram();
+	}
+	return program;
+}

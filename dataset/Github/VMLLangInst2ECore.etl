@@ -1,0 +1,99 @@
+pre {
+  var extEPackage : target!EPackage;
+  var extAction : target!EClass;
+  var extDesignator : target!EClass;
+}
+
+post {
+  -- Transfer annotations for feature model adapters
+  var fma : LIM!FeatureModelAdapter := LIM!FeatureModelAdapter.all().first();
+  var fmr : target!EClass := 
+      extEPackage.eClassifiers
+                 .select (ec : target!EClass | ec.name = 'FeatureModelRef')
+                 .first();
+  var annotation : target!EAnnotation := fmr.addAnnotation ('vml.actionSemantics');
+  annotation.addDetail ('class', fma.adapterClass);
+  annotation.addDetail ('evaluate', fma.adapterOperation);
+}
+
+rule LangInstModel2EPackage
+  transform lim:LIM!LangInstModel
+  to ep:target!EPackage {
+  
+  -- Set name
+  ep.name := lim.name;
+  ep.nsPrefix := lim.name;
+  ep.nsURI := 'http://uk.ac.lancs.comp/vml/' + lim.name;
+    
+  -- Copy core VML classifiers
+  var coreEPackage := VML!EPackage.all.first();
+  var coreClassifiers := coreEPackage.eClassifiers.clone();
+  var coreSubpackages := coreEPackage.eSubpackages.clone();
+  ep.eClassifiers.addAll(coreClassifiers);
+  ep.eSubpackages.addAll(coreSubpackages);
+  
+  -- Find the action classifier to be used later on as a super class for newly 
+  -- created actions
+  extAction := ep.eClassifiers.select (ec : target!EClass | ec.name = 'Action').first();
+--  extAction.println();
+  
+  -- Find the designator classifier to be used later on as a super class for newly 
+  -- created designators
+  extDesignator := ep.eClassifiers.select (ec : target!EClass | ec.name = 'PCDesignator').first();
+--  extDesignator.println();
+
+  -- Remember this package
+  extEPackage := ep;
+  
+--  'Created target EPackage!'.println();
+}
+
+-- For every ActionDescriptor in LIM create a corresponding Action subclass
+rule ActionDescriptor2ActionSubClass
+  transform ad:LIM!ActionDescriptor 
+  to a:target!EClass {
+  
+  extEPackage.eClassifiers.add(a);
+  
+  a.name := ad.name.firstToUpperCase() + 'Action';
+  a.eSuperTypes.add (extAction);
+  
+  -- TODO: Add Annotations to specify semantics (possibly not as we will need 
+  -- to generate the implementation source code anyway...
+  var annotation : target!EAnnotation := a.addAnnotation ('vml.actionSemantics');
+  annotation.addDetail ('class', ad.evaluatorClass);
+  annotation.addDetail ('evaluate', ad.evaluatorMethod);
+  annotation.addDetail ('check', ad.checkMethod);  
+}
+
+-- For every DesignatorDescriptor in LIM create a corresponding Designator subclass
+rule DesignatorDescriptor2DesignatorSubClass
+  transform dd:LIM!DesignatorDescriptor 
+  to d:target!EClass {
+  
+  extEPackage.eClassifiers.add(d);
+  
+  d.name := dd.name.firstToUpperCase() + 'Designator';
+  d.eSuperTypes.add (extDesignator);
+  
+  -- TODO: Add Annotations to specify semantics (possibly not as we will need 
+  -- to generate the implementation source code anyway...
+  var annotation : target!EAnnotation := d.addAnnotation ('vml.actionSemantics');
+  annotation.addDetail ('class', dd.evaluatorClass);
+  annotation.addDetail ('evaluate', dd.evaluatorMethod);
+  annotation.addDetail ('check', dd.checkMethod);
+}
+
+operation target!EObject addAnnotation (source: String) : EAnnotation {
+  var annot : new target!EAnnotation;
+  annot.source := source;
+  self.eAnnotations.add (annot);
+  return annot;
+}
+
+operation target!EAnnotation addDetail (key: String, val: String) {
+  var detail : new EStringToStringMapEntry;
+  detail.key := key;
+  detail.value := val;
+  self.details.add (detail);
+}

@@ -1,0 +1,291 @@
+pre{
+	sql!DataBase.all.collect(t|t.getProject());
+}
+
+//Metodo que construye el proyecto
+operation sql!DataBase getProject(): java!Project {
+	var p = new java!Project;
+	p.name="sql-project";
+	p.packages=self.collect(c|c.getPackage());
+	return p;
+}
+
+//Metodo que construye los paquetes
+operation sql!DataBase getPackage(): java!Package {
+	var pa = new java!Package;
+	pa.name="src.entities";
+	pa.classes=self.tables.collect(c|c.getClass(self.tables->asSequence()));
+	return pa;
+}
+
+//Metodo que construye los atributos referenciados
+operation sql!Table getAttributeRef(tb:Sequence): Sequence {
+	var annotations = new Sequence;
+	var attributes = new Sequence;
+	
+	for(table in tb) {
+	if (self.name <> table.name){
+ 		for(fk in table.foreignkeys){
+ 	    	if(self.name == fk.tableRef.name){
+ 	    		var a = new java!Attribute;
+ 	    		var cRef = new java!Class;
+ 	    		var lt = new java!ArrayList;
+ 	    		var an = new java!Annotation;
+ 	    		annotations = new Sequence;
+ 	    		an.value="@OneToMany(cascade = CascadeType.ALL, mappedBy=\"" + self.name.firstToLowerCase() + "\")";
+ 	    		annotations.add(an);
+ 	    		an = new java!Annotation;
+ 	    		an.value="@PodamExclude";
+ 	    		annotations.add(an);
+ 	    		a.annotations=annotations;
+ 	    		a.name=table.name.firstToLowerCase() + "s";
+				a.visibility=java!EVisibility#private;
+				//tipo lista
+				cRef.name = table.name;
+				lt.typeOf=cRef;
+				a.typeOf=lt;
+ 	    		attributes.add(a);
+ 	    	  	break;
+ 	    	}
+ 	    }
+ 	  }
+ 	}
+	
+	return attributes;
+}
+
+//Metodo que construye las clases
+operation sql!Table getClass(tb:Sequence): java!Class {
+	var c = new java!Class;
+	var a = new java!Annotation;
+	var annotations = new Sequence;
+	var attributes = new Sequence;
+	var fields = new Sequence;
+	var setMethods = new Sequence;
+	var getMethods = new Sequence;
+	var refAttr = new Sequence;
+	var imports = new java!Import;
+	c.name=self.name;
+	
+	//guardar las claves foraneas
+	var isForeign=false;
+	for(field in self.columns) {
+		for(fk in self.foreignkeys){
+			for(col in fk.columns){
+				if (field.name == col.name){
+					isForeign=true;
+					break;
+				}
+			}
+			if (isForeign) break;
+		}
+		if (isForeign == false){
+			attributes.add(field);
+		}
+	}
+	
+	imports.name = "javax.persistence.Id";
+	c.imports.add(imports);
+	imports = new java!Import;
+	imports.name = "javax.persistence.Entity";
+	c.imports.add(imports);
+	
+	if (isForeign == true){
+		imports = new java!Import;
+		imports.name = "javax.persistence.ManyToOne";
+		c.imports.add(imports);
+		imports = new java!Import;
+		imports.name = "javax.persistence.FetchType";
+		c.imports.add(imports);
+		imports = new java!Import;
+		imports.name = "javax.persistence.CascadeType";
+		c.imports.add(imports);
+		imports = new java!Import;
+		imports.name = "javax.persistence.PrimaryKeyJoinColumn";
+		c.imports.add(imports);
+		imports = new java!Import;
+		imports.name = "uk.co.jemos.podam.common.PodamExclude";
+		c.imports.add(imports);
+	}
+	
+	refAttr= self.getAttributeRef(tb);
+	if (refAttr.size()>0){
+		imports = new java!Import;
+		imports.name = "javax.persistence.OneToMany";
+		c.imports.add(imports);
+		imports = new java!Import;
+		imports.name = "java.util.List";
+		c.imports.add(imports);
+		
+		//Si no es Foranea, faltan por asignar los siguientes imports
+		if (isForeign == false){
+			imports = new java!Import;
+			imports.name = "uk.co.jemos.podam.common.PodamExclude";
+			c.imports.add(imports);
+			imports = new java!Import;
+			imports.name = "javax.persistence.CascadeType";
+			c.imports.add(imports);
+		}
+		
+	}
+	delete refAttr;
+	
+	fields = attributes.collect(c|c.getAttribute(self.primaryKey))
+	->includingAll(self.foreignkeys.collect(f|f.getForeignAttribute()))
+	->includingAll(self.getAttributeRef(tb));
+	
+	fields = fields->includingAll(fields.getFieldId());
+	
+	setMethods= attributes.collect(c|c.getAttribute(self.primaryKey))
+	->includingAll(self.foreignkeys.collect(f|f.getForeignAttribute()))
+	->includingAll(self.getAttributeRef(tb));
+	
+	setMethods = setMethods->includingAll(setMethods.getFieldId());
+	
+	getMethods = attributes.collect(c|c.getAttribute(self.primaryKey))
+	->includingAll(self.foreignkeys.collect(f|f.getForeignAttribute()))
+	->includingAll(self.getAttributeRef(tb));
+	
+	getMethods = getMethods->includingAll(getMethods.getFieldId());
+	
+	
+	c.attributes = fields;
+	
+	c.methods = self.getSetMethod(setMethods)
+	->includingAll(self.getGetMethod(getMethods))
+	;
+	
+	c.visibility=java!EVisibility#public;
+	a.value="@Entity";
+	annotations.add(a);
+	c.annotations=annotations;
+	return c;
+}
+
+operation Collection getFieldId():Sequence{
+	var fieldId = new Sequence;
+	//Se navega la coleccion de atributos, en busca de un campo Id
+	var attributeId = new java!Attribute;
+	var t = new java!PrimitiveType;
+	var existsId = false;
+	for (fi in self){
+		for (an in fi.annotations){
+			if (an.value=="@Id"){
+				existsId=true;
+				break;
+			}
+		}
+		if (existsId){
+			break;
+		}
+	}
+	if (existsId == false){
+		//se crea un campo Id, para compensar en el caso de la tabla CarritoItem que genera inconsistencias
+		attributeId.name="id";
+		attributeId.visibility=java!EVisibility#private;
+		//anotacion para la clave primaria
+			var an = new java!Annotation;
+			var annotations = new Sequence;
+			an.value="@Id";
+			annotations.add(an);
+			attributeId.annotations=annotations;
+		t.type=java!EJavaType#int;
+		attributeId.typeOf=t;
+		fieldId.add(attributeId);
+	} else {
+		delete t;
+		delete attributeId;
+	}
+	
+	return fieldId;
+}
+
+operation sql!Table getSetMethod(attrs:Sequence):Sequence{
+	var methods = new Sequence;
+	var m = new java!Method;
+	m.name=self.name.firstToUpperCase();
+	m.visibility=java!EVisibility#public;
+	methods.add(m);
+	for (at in attrs){
+		var params = new Sequence;
+		var m = new java!Method;
+		m.name="get"+at.name.firstToUpperCase();
+		m.visibility=java!EVisibility#public;
+		m.returns=at.typeOf;
+		methods.add(m);
+		delete at;
+	}
+	return methods;
+}
+
+operation sql!Table getGetMethod(attrs:Sequence):Sequence{
+	var methods = new Sequence;
+	for (at in attrs){
+		var params = new Sequence;
+		var m = new java!Method;
+		var t = new java!PrimitiveType;
+		t.type=java!EJavaType#void;
+		m.name="set"+at.name.firstToUpperCase();
+		m.visibility=java!EVisibility#public;
+		//El setter tiene como parametro el mismo atributo
+		params.add(at);
+		m.parameters=params;
+		m.returns=t;
+		methods.add(m);
+	}
+	return methods;
+}
+
+
+//metodo que construye los atributos
+operation sql!Column getAttribute(pk:sql!PrimaryKey): java!Attribute {
+		var a = new java!Attribute;
+		a.name=self.name;
+		a.visibility=java!EVisibility#private;
+		//anotacion para la clave primaria
+		if(pk.columns.at(0).name==a.name){
+			var an = new java!Annotation;
+			var annotations = new Sequence;
+			an.value="@Id";
+			annotations.add(an);
+			a.annotations=annotations;
+		}
+		a.typeOf=self.getPrimitiveType();
+		return a;
+}
+
+//metodo que construye los atributos ManyToOne
+operation sql!ForeignKey getForeignAttribute(): java!Attribute {
+	var a = new java!Attribute;
+	var annotations = new Sequence;
+	var an1 = new java!Annotation;
+	var cRef = new java!Class;
+	an1.value="@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)";
+	annotations.add(an1);
+	an1 = new java!Annotation;
+ 	an1.value="@PrimaryKeyJoinColumn";
+ 	annotations.add(an1);
+	a.name=self.tableRef.name.firstToLowerCase();
+	a.visibility=java!EVisibility#private;
+	a.annotations=annotations;
+	cRef.name = self.tableRef.name;
+	a.typeOf=cRef;
+	//a.modifiers=;
+	//a.typeOf=self.tableRef.name;
+	return a;
+}
+
+//Metodo para el mapeo de tipos primitivos
+operation sql!Column getPrimitiveType(): java!PrimitiveType{
+	if(self.SQLType <> null){
+	var t = new java!PrimitiveType;
+		if(self.SQLType.value == 0 or self.SQLType.value == 1){
+		//String corresponde al 0 y 1
+			t.type=java!EJavaType#String;
+		} else if (self.SQLType.value==2){
+		//int corresponde al 2
+			t.type=java!EJavaType#int;
+		}
+		return t;
+	}
+}

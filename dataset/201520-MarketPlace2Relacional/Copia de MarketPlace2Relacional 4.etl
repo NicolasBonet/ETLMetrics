@@ -1,0 +1,111 @@
+-- Debemos crear una unica base de datos para todos
+pre {
+	var db : new DB!Database;
+	"Running ETL pre".println();
+}
+
+-- Esta regla se encarga de todo!
+rule MarketPlace2Relacional
+transform
+	c : mp!ClassUnit
+to
+	t : DB!Table
+	{
+		guard: c.codeRelation.select(cr|cr.isTypeOf(mp!HasValue) and cr.getTo().name ='Entity' and cr.annotation.size()>0 ).size() > 0
+   		t.database = db;
+   		("	class "+c.name).println();
+	   	t.name = c.name.replace("Entity", "");
+	   	var properties = c.getAllProperties().select(p|p.isPrimitiveType()).equivalent();
+	   	t.primaryKeys = properties.select(p|p.notNull);
+	   	t.columns = properties;
+	}
+
+post{
+	("Linking foreign_keys").println();
+	for(table in DB!Table.allInstances()){
+		var class=mp!ClassUnit.allInstances.select(c|c.name = (table.name+'Entity')).first();
+		("	foreign property for class"+class.name).println();
+		for(property in  class.getAllProperties().select(p|not p.isPrimitiveType())){
+			("		foreign property "+property.name+" "+property.type.name).println();
+			var annotation : HasValue = property.getAnnotation("PrimaryKeyJoinColumn");
+			var column_key = table.columns.select(c|c.name = annotation.attribute.select(a|a.tag = "name").first().value.replace('"', '')).first;
+			var foreign_table = DB!Table.allInstances().select(t|t.name = property.type.name.replace("Entity","")).first;
+			var foreign_table_key = foreign_table.columns.select(c| c.name = annotation.attribute.select(a|a.tag = "referencedColumnName").first().value.replace('"', '')).first;  
+			("		found foreign relation "+column_key+" "+foreign_table+" "+foreign_table_key).println();
+			var many_to_one_annotation : HasValue = property.getAnnotation("ManyToOne");
+			var foreign_key_object = new DB!ForeignKey();
+			foreign_key_object.database = db;
+			foreign_key_object.parent = column_key;
+			foreign_key_object.child = foreign_table_key;
+			foreign_key_object.isMany=many_to_one_annotation.isDefined();
+		}
+	}
+}
+
+@lazy   
+rule Property2Column
+transform
+	property : mp!StorableUnit
+to
+	column : DB!Column
+	{
+		guard: property.isPrimitiveType()
+		("		property "+property.name).println();
+		column.name = property.name;
+		column.type = property.type.getType();
+		column.notNull = property.isPrimaryKey();
+		column.database = db;
+	}
+	
+
+
+//operations zone
+operation ClassUnit getProperties()
+{
+	return self.codeElement.select(ce|ce.isTypeOf(mp!StorableUnit));
+}
+
+operation ClassUnit getAllProperties()
+{
+	var propiedades : Collection := self.getProperties();
+	
+	for(superclase in self.codeRelation.select(s|s.isTypeOf(mp!Extends)))
+	{
+		propiedades := propiedades.includingAll(superclase.getTo().getProperties());
+	}
+	return propiedades;
+}
+
+operation InterfaceUnit getType()
+{
+	switch (self.name) {
+		case "Long" : return DB!DataType#int;
+		case "Integer" : return DB!DataType#int;
+		case "String" : return DB!DataType#varchar;
+		default : return DB!DataType#unknown;
+	}
+}
+
+operation StorableUnit isPrimaryKey()
+{
+	if(self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size() > 0).select(a|a.getTo().name = "Id").size()>0){
+		return true;
+	}
+	return false;
+}
+
+// Devuelve si es llave primaria o no
+operation StorableUnit isPrimitiveType()
+{
+	if(self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size()>0).select(a|a.getTo().name = "PrimaryKeyJoinColumn").size()=0)
+	{
+		return true;
+	}
+	
+	return false;
+}
+
+operation StorableUnit getAnnotation(name : String)
+{
+	return self.codeRelation.select(a|a.isTypeOf(mp!HasValue)).select(a|a.annotation.size() > 0).select(a|a.getTo().Name = name).first(); // Se asume que solo hay una anotacion
+}

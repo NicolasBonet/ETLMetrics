@@ -1,0 +1,347 @@
+pre {
+  "Step 3 -  Transformation -> SubKDM+SDM to Representation Model\n".println();
+  "Description:\n".println();
+  "In this part of the Transformation, Using the SubKDM with SDM create a new Representation model based on the Visualitation Metamodel.".println();
+  "Input: SubKDM+SDM Model".println();
+  "Output: Representation Model".println();
+  
+  //Se crean los tipos de relacion
+  var dependencia = new target!Dependencia();
+  var asociacion = new target!Asociacion();
+  var composicion = new target!Composicion();
+  var agregacion = new target!Agregacion();
+  var generalizacion = new target!Generalizacion();
+  
+  var Codemodel = kdmMicro!CodeModel.allInstances().first();
+  var app = new target!Aplicacion();
+  app.name = Codemodel.name;
+}
+
+post {
+    "Creando dependencias clases".println();
+    CreateDependecies();
+    "Creando dependencias Cluster".println();
+    CreateDependeciesCluster();	
+	"Done".println();
+}
+
+//creacion cluster con sus paquetes y clases
+rule Cluster2Cluster
+transform t: kdmMicro!Cluster
+to o: target!Cluster{
+  o.name = t.name;
+  //adiciona paquetes y las clases del cluster
+  for(codeItem in t.codeElement)
+  {
+  	var ListClases = target!Clase.allInstances();
+  	if(not ListClases.exists(x| x.name == codeItem.name))
+  	{
+	  	var class = new target!Clase();
+	  	class.name = codeItem.name;
+	  	class.AddMetricsClass(codeItem);
+	  	class.AddElementsToClass(codeItem);
+	  	AddClassToPackage(class, codeItem);
+	  	o.elementos.add(class);
+  	}
+  	else{
+  		var class = ListClases.select(x| x.name == codeItem.name).first();
+  	 	o.elementos.add(class);
+  	}
+  }
+  
+  //adiciona las metricas del cluster
+  var mofCluster = kdmMicro!MofElement.allInstances().select(x| x.element.isTypeOf(kdmMicro!Cluster) and x.element.equals(t)).first();
+  if(mofCluster.isDefined())
+  {
+  	for(measurant in mofCluster.measurant)
+  	{
+  		var metrica = new target!Metrica();
+  		metrica.SetTipoMetrics(measurant.measure, "");
+  		metrica.valor = measurant.value;
+  		o.metricas.add(metrica);
+  	}
+  }
+  
+  app.hijos.add(o);
+}
+
+//Adiciona metodos y atributos a las clases
+operation target!Clase AddElementsToClass(codeItem : kdmMicro!CodeItem){
+	var methods = codeItem.codeElement.select(x | x.isTypeOf(kdmMicro!MethodUnit));
+	var atributes = codeItem.codeElement.select(x | x.isTypeOf(kdmMicro!StorableUnit));
+	
+	for(met in methods)
+	{
+		var newMethod =  new target!Metodo();
+		newMethod.name = met.name;
+		self.hijos.add(newMethod);
+	}
+	
+	for(atr in atributes)
+	{
+		var newAtribute =  new target!Atributo();
+		newAtribute.name = atr.name;
+		self.hijos.add(newAtribute);
+	}
+	
+}
+
+//Adiciona a la clase de un cluster las metricas obtenidas en subkdm
+operation target!Clase AddMetricsClass(class : kdmMicro!CodeItem){
+  var mofClass = kdmMicro!MofElement.allInstances().select(x| (x.element.isTypeOf(kdmMicro!ClassUnit) or x.element.isTypeOf(kdmMicro!InterfaceUnit)) and x.element.equals(class)).first();
+  if(mofClass.isDefined())
+  {
+  	for(measurant in mofClass.measurant)
+  	{
+  		var metrica = new target!Metrica();
+  		metrica.SetTipoMetrics(measurant.measure, "");
+  		metrica.valor = measurant.value;
+  		self.metricas.add(metrica);
+  	}
+  }
+}
+
+//Obtiene el tipo de metrica
+operation target!Metrica SetTipoMetrics(tipoMeasure: kdmMicro!Measure, tipoPor: String){
+	var mensaje = "";
+	if(tipoMeasure.isTypeOf(kdmMicro!CouplingBetweenObjectsMeasure))
+	{
+		mensaje = "CouplingBetweenObjectsMeasure";
+		self.tipo = target!TipoMetrica#CouplingBetweenObjects;
+	}
+	else if(tipoMeasure.isTypeOf(kdmMicro!WeightedMethodsPerClassMeasure))
+	{
+		mensaje = "WeightedMethodsPerClassMeasure";
+		self.tipo = target!TipoMetrica#WeightedMethodsPerClass;
+	}
+	else if(tipoMeasure.isTypeOf(kdmMicro!NumberOfUsesMeasure))
+	{
+		mensaje = "NumberOfUsesMeasure";
+		self.tipo = target!TipoMetrica#NumberOfUses;
+	}
+	else if(tipoMeasure.isTypeOf(kdmMicro!NumberOfContainmentsMeasure))
+	{
+		mensaje = "NumberOfContainmentsMeasure";
+		self.tipo = target!TipoMetrica#NumberOfContainments;
+	}
+	else if(tipoMeasure.isTypeOf(kdmMicro!CalculatedCouplingMeasure))
+	{
+		mensaje = "CalculatedCouplingMeasure";
+		self.tipo = target!TipoMetrica#CalculatedCoupling;
+	}
+	else if(tipoMeasure.isTypeOf(kdmMicro!NumberOfClassesMeasure))
+	{
+		mensaje = "NumberOfClassesMeasure";
+		self.tipo = target!TipoMetrica#NumberOfClassesMeasure;
+	}
+	else if(tipoMeasure.isTypeOf(kdmMicro!NumberOfLinesMeasure))
+	{
+		mensaje = "NumberOfLinesMeasure";
+		self.tipo = target!TipoMetrica#NumberOfLinesMeasure;
+	}
+	else if(tipoMeasure.isTypeOf(kdmMicro!ClusterRelationConflictPercentageMeasure))
+	{
+		mensaje = "ClusterRelationConflictPercentageMeasure";
+		tipoPor.println();
+		if(tipoPor == "1")
+		{
+			self.tipo = target!TipoMetrica#ClusterRelationConflictPercentageMeasureTarget;
+		}
+		else
+		{
+			self.tipo = target!TipoMetrica#ClusterRelationConflictPercentageMeasureSource;
+		}
+	}
+}
+
+//Adiciona una clase a un paquete, si el paquete ya existe adiciona la clase
+//en caso contrario crea el nuevo paquete y adiciona la clase
+operation AddClassToPackage(class:target!Clase, codEl: kdmMicro!CodeItem){
+	 var packageName = codEl.GetNamePackage();
+	 var paquetes = target!Paquete.allInstances();
+	 var paquete = paquetes.select(x| x.name.equals(packageName)).first();
+	 
+	 if(paquete.isDefined())
+	 {
+	 	paquete.hijos.add(class);
+	 }
+	 else
+	 {
+	 	var package = new target!Paquete();
+    	package.name = codEl.GetNamePackage();
+    	package.hijos.add(class);
+    	app.hijos.add(package);
+	 }
+}
+
+/*obtiene el nombre completo del paquete de una clase*/
+operation kdmMicro!AbstractCodeElement GetNamePackage(): String
+{
+	var namePackage = "";
+	var container = self.eContainer();
+	
+	while (container.isTypeOf(kdmMicro!Package)){
+	   namePackage = container.name + "." + namePackage;
+	   container = container.eContainer();
+	}
+	
+	return namePackage;
+}
+
+//Crea dependencias de los clusters
+operation CreateDependeciesCluster(){
+	var classLR = kdmMicro!ClusterRelation.allInstances();
+	var nodosCluster = target!Cluster.allInstances();
+	
+	for(nodo in nodosCluster)
+	{
+		nodo.GetRelationsCluster(classLR, nodosCluster);
+	}	
+}
+
+//Obtiene las relaciones de cada cluster 
+operation target!Cluster GetRelationsCluster(classLR: Sequence, nodosCluster: Sequence){
+	var relations = classLR.select(x | x.`from`.name == self.name);
+	
+	for(rel in relations){
+	    var dep = new target!Arco();
+	    
+	    var ClusterTarg = nodosCluster.select(x | x.name == rel.`to`.name).first();
+	    dep.target =  ClusterTarg;
+	    dep.source = self;
+	    
+	    dep.tipos.add(asociacion);
+	    dep.CreateMeasuresRelationsCluster(rel, ClusterTarg, self);   
+	    dep.CreateInterseptions(ClusterTarg, self);
+		self.relaciones.add(dep);
+	}
+}
+
+//adiciona las clases comunes entre clusters, se hace por cada relacion entre cluster existentes
+operation target!Arco CreateInterseptions (clusterTarget: target!Cluster, clusterSource: target!Cluster) {
+	var	clasesClusterTarget = clusterTarget.elementos.select(x| x.isTypeOf(target!Clase))->asSet();
+	var	clasesClusterSource = clusterSource.elementos.select(x| x.isTypeOf(target!Clase))->asSet();
+	
+ 	var intersect = new Set;	
+ 	intersect.addAll(clasesClusterTarget->select(c|clasesClusterSource->includes(c)));
+ 	var Interception = new target!Intercepcion();
+ 	Interception.name = clusterTarget.name + " - " + clusterSource.name;	
+ 	Interception.arco = self;
+ 	
+ 	for(inter in intersect){
+ 		Interception.elementos.add(inter);
+ 	}
+ 	
+ 	app.hijos.add(Interception);
+}
+
+//asocia metricas de relaciones - arcos
+operation target!Arco CreateMeasuresRelationsCluster(relation: kdmMicro!ClusterRelation, clusterTarget: target!Cluster, clusterSource: target!Cluster){
+	
+	if(kdmMicro!MofElement.allInstances().exists(x | x.element.isTypeOf(kdmMicro!ClusterRelation) and x.element.equals(relation)))
+	{
+		var mofElement = kdmMicro!MofElement.allInstances().select(x | x.element.isTypeOf(kdmMicro!ClusterRelation) and x.element.equals(relation)).first();
+		var measurant = mofElement.measurant;
+		
+		for(m in measurant)
+		{  
+			var tipoPor = "";
+			var met1 = new target!Metrica();
+			met1.valor = m.value.asDouble();
+			
+			if(m.isTypeOf(kdmMicro!DimensionalToObjectMeasurement))
+			{
+				m.object.name.println();
+				clusterTarget.name.println();
+				clusterSource.name.println();
+				if(m.object.name.equals(clusterTarget.name))
+				{
+					tipoPor = "1";
+				}
+				else if(m.object.name.equals(clusterSource.name))
+				{
+					tipoPor = "2";
+				}
+			}
+			
+			met1.SetTipoMetrics(m.measure, tipoPor);
+			
+			
+			self.metricas.add(met1);
+		}
+	}
+}
+
+//Crea las dependencias para cada clase en el modelo
+//relaciones - arcos
+operation CreateDependecies(){
+
+	var classLR = kdmMicro!ClassLevelRelation.allInstances();
+	var nodosClases = target!Clase.allInstances();
+	
+	for(nodo in nodosClases)
+	{	
+		nodo.GetRelationsClass(classLR, nodosClases);
+	}	
+}
+
+//Obtiene las relaciones de cada clase 
+operation target!Nodo GetRelationsClass(classLR: Sequence, nodosClases: Sequence){
+	var relations = classLR.select(x | x.`from`.name == self.name);
+	for(rel in relations){
+	    var ClaseTarg = nodosClases.select(x | x.name == rel.`to`.name).first();
+	    
+	    if(ClaseTarg.isDefined())
+	    {
+	    	var dep = new target!Arco();
+		    dep.target =  ClaseTarg;
+		    dep.source = self;
+		    dep.CreateMeasuresRelations(rel);
+		    
+		    for(t in rel.typeRelations){
+		    	dep.AddTypeRelation(t);
+		    }
+		    
+			self.relaciones.add(dep);
+	    }
+	}
+}
+
+//asocia metricas de relaciones - arcos
+operation target!Arco CreateMeasuresRelations(relation: kdmMicro!ClassLevelRelation){
+	
+	if(kdmMicro!MofElement.allInstances().exists(x | x.element.isTypeOf(kdmMicro!ClassLevelRelation) and x.element.equals(relation)))
+	{
+		var mofElement = kdmMicro!MofElement.allInstances().select(x | x.element.isTypeOf(kdmMicro!ClassLevelRelation) and x.element.equals(relation)).first();
+		var measurant = mofElement.measurant;
+		
+		for(m in measurant)
+		{
+			var met1 = new target!Metrica();
+			met1.valor = m.value.asDouble();
+			met1.SetTipoMetrics(m.measure, "");
+			self.metricas.add(met1);
+		}
+	}
+}
+
+/*Adiciona a un arco el tipo de relacion segun modelo visualizacion*/
+operation target!Arco AddTypeRelation(relation: kdmMicro!TypeRelation){
+	
+	if(relation.name == "Containment")
+	{
+		self.tipos.add(composicion);
+	}
+	else if(relation.name == "Uses")
+	{
+		self.tipos.add(dependencia);
+	}
+	else if(relation.name == "Implements")
+	{
+		self.tipos.add(generalizacion);
+	}
+	else if(relation.name == "Extends")
+	{
+		self.tipos.add(generalizacion);
+	}
+}

@@ -1,0 +1,136 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Universidad de los Andes
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * Version:
+ *		$Id: HilesMerge.eml 136 2011-09-09 18:42:00Z hhoyos $
+ * Contributors:
+ *		Horacio Hoyos - initial API and implementation 
+ ******************************************************************************/
+ 
+/****h* m2m/SysML2HiLeS
+ * SUMMARY
+ *   Create the HiLeS model from a SysML model ($Rev: 136 $).
+ *  USAGE
+ 	<project default="HilesMerge">
+	
+	<property name="ModelName" value="SystemX"/>
+
+ 	<target name="loadSysMLModel">
+ 		<!-- Load the SysML mode using the TopCased SysML metamodel. 
+ 			 Do not save any changes done to it (store="false") --> 		
+		<epsilon.emf.loadModel
+			name="SysML"
+			modelfile="${ModelName}.sysml"
+			metamodeluri="http://www.eclipse.org/papyrus/0.7.0/SysML"
+			read="true"
+			store="false"
+		/>
+ 	</target>
+	
+	<target name="createHiLeSStrcutureModel">
+ 		<!-- Load the HiLeS Structure model using the HiLeS metamodel.
+ 			 Do no read the model as we intend to create a new one 
+ 			 (read="false") and save any changes made to it (store="true") -->  		
+		<epsilon.emf.loadModel
+			name="HiLeSS"
+			aliases="HiLeS"
+			modelfile="${ModelName}_Structure.hiles"
+			metamodeluri="http://hiles.uniandes.edu.co/1.1/HiLeS"
+			read="false" 	
+			store="true"
+		/>
+ 	</target>
+	
+	<target name="createHiLeSBehaviorModel">
+ 		<!-- Load the HiLeS Behavior model using the HiLeS metamodel.
+ 			 Do not read the model as we intend to create a new one 
+ 			 (read="false") and save any changes made to it (store="true") -->  		
+		<epsilon.emf.loadModel
+			name="HiLeSB"
+			aliases="HiLeS"
+			modelfile="${ModelName}_Behavior.hiles"
+			metamodeluri="http://hiles.uniandes.edu.co/1.1/HiLeS"
+			read="false" 	
+			store="true"
+		/>
+ 	</target>
+	
+	<target name="SysML2HilesStructure" depends="loadSysMLModel,createHiLeSStrcutureModel">
+		<epsilon.etl src="../epsilon/m2m/structure/SysML2HilesStructure.etl">
+			<model ref="sysmlModel"/>
+			<model ref="hilesS"/>
+		</epsilon.etl>
+	</target>
+	
+	<target name="SysML2HilesBehavior" depends="SysML2HilesStructure,createHiLeSBehaviorModel">
+		<epsilon.etl src="../epsilon/m2m/behavior/SysML2HilesBehavior.etl">
+			<model ref="sysmlModel"/>
+			<model ref="hilesB"/>
+		</epsilon.etl>
+	</target>
+	
+	<target name="disposeHiLeSModels">
+		<epsilon.disposeModel model="hilesS"/>
+		<epsilon.disposeModel model="hilesB"/>
+	</target>
+		
+	<target name="loadHiLeSModels" depends="disposeHiLeSModels">
+		<epsilon.emf.loadModel
+			name="hilesS"
+			aliases="hilesSB"
+			modelfile="${ModelName}_Structure.hiles"
+			metamodeluri="http://hiles.uniandes.edu.co/1.1/HiLeS"
+			read="true" 	
+			store="false"
+		/>
+		<epsilon.emf.loadModel
+			name="hilesB"
+			aliases="hilesSB"
+			modelfile="${ModelName}_Behavior.hiles"
+			metamodeluri="http://hiles.uniandes.edu.co/1.1/HiLeS"
+			read="true" 	
+			store="false"
+		/>
+	</target>
+	
+	<target name="HilesComparision" depends="loadHiLeSModels">
+		<epsilon.ecl src="../epsilon/m2m/merge/HilesCompare.ecl" exportMatchTrace="true">
+			<model ref="hilesB"/>
+			<model ref="hilesS"/>
+		</epsilon.ecl>
+	</target>
+	
+	<target name="createHiLeSModel" depends="HilesComparision">
+ 		<epsilon.emf.loadModel
+			name="hiles"
+			modelfile="${ModelName}.hiles"
+			metamodeluri="http://hiles.uniandes.edu.co/1.1/HiLeS"
+			read="false" 	
+			store="true"
+		/>
+ 	</target>
+	
+	<target name="HilesMerge" depends="SysML2HilesBehavior,createHiLeSModel">
+		<epsilon.eml src="../epsilon/m2m/merge/HilesMerge.eml" useMatchTrace="true">
+			<model ref="hilesB"/>
+			<model ref="hilesS"/>
+			<model ref="hiles"/>
+		</epsilon.eml>
+	</target>
+
+</project>
+ *  DESCRIPTION
+ *    The complete SysML to HiLeS transformation results form executing the Behavior, 
+ *   Structure and Merge transformations.
+ *  RESULT
+ *    A HiLeS model equivalent to the SysML model
+ *  SEE ALSO
+ *    Structure
+ *    Behavior
+ *    Merge
+ *    
+ ******
+ */
